@@ -12,7 +12,7 @@ image:
 ingress:
   enabled: true
   enable_whitelist: false
-  host: hmpps-manage-supervisions-dev.hmpps.service.justice.gov.uk
+  host: hmpps-manage-supervisions-dev.apps.live-1.cloud-platform.service.justice.gov.uk
   cert_secret: hmpps-manage-supervisions-cert
   path: /
 
@@ -20,3 +20,4 @@ env:
   HMPPS_AUTH_URL: https://sign-in-dev.hmpps.service.justice.gov.uk/auth
   TOKEN_VERIFICATION_API_URL: https://token-verification-api-dev.prison.service.justice.gov.uk
   TOKEN_VERIFICATION_ENABLED: true
+  COMMUNITY_API_URL: https://community-api-secure.test.delius.probation.hmpps.dsd.io
