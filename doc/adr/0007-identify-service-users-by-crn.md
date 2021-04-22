@@ -16,7 +16,7 @@ Data is moving out of nDelius over time into alternative services. For now we ca
 
 ## Decision
 
-We will identify service users by a [Uniform Resource Name (URN)](https://en.wikipedia.org/wiki/Uniform_Resource_Name) in the format `urn:justice:{service}:{identifier_type}:{identifier_value}`. When we store a service user identifier, whether in our own database or in client storage, we will use this complete format.
+We will identify service users by a [Uniform Resource Name (URN)](https://en.wikipedia.org/wiki/Uniform_Resource_Name) in the format `urn:justice:{service}:{entity}:{identifier_type}:{identifier_value}`. When we store a service user identifier, whether in our own database or in client storage, we will use this complete format.
 
 At this time, we will only support URNs that describe the CRN of a service user in nDelius. These will all be in the form `urn:justice:ndelius:crn:{crn}`, where `{crn}` is the actual value of the service user's CRN.
 
@@ -28,7 +28,7 @@ We will use a shortened form of the full identifier in the page URLs for our ser
 
 ## Consequences
 
-Some service users known to HMPPS may not have a CRN. However, we understand that any service user on probation will have a CRN. If that is incorrect, we will need to either state that we do not support SUs without a CRN, or extend our URN scheme to include alternative identifiers. For instance, it may be necessary to use NOMS numbers instead, producing URNs like `urn:justice:ndelius:noms:{nomsNumber}`. Or, to refer to data owned by a hypothetical future "Single Offender View" service, we may use a URN like `urn:justice:sov:crn:{crn}`.
+Some service users known to HMPPS may not have a CRN. However, we understand that any service user on probation will have a CRN. If that is incorrect, we will need to either state that we do not support SUs without a CRN, or extend our URN scheme to include alternative identifiers. For instance, it may be necessary to use NOMS numbers instead, producing URNs like `urn:justice:communityapi:offender:noms:{nomsNumber}`. Or, to refer to data owned by a hypothetical future "Single Offender View" service, we may use a URN like `urn:justice:sov:offender:crn:{crn}`.
 
 This decision should be revisited when a HMPPS-wide unique identifier approach for service users is adopted. If the approach is incompatible with this decision, we should refactor and change our approach to match.
 
