@@ -1,6 +1,7 @@
 import nunjucks from 'nunjucks'
 import express from 'express'
 import * as pathModule from 'path'
+import { DateTime } from 'luxon'
 
 export default function nunjucksSetup(app: express.Application, path: pathModule.PlatformPath): void {
   const njkEnv = nunjucks.configure(
@@ -24,5 +25,9 @@ export default function nunjucksSetup(app: express.Application, path: pathModule
     }
     const array = fullName.split(' ')
     return `${array[0][0]}. ${array.reverse()[0]}`
+  })
+
+  njkEnv.addFilter('dateWithDayAndWithoutYear', (datetimeString: string) => {
+    return DateTime.fromISO(datetimeString).toFormat('cccc d MMMM')
   })
 }
