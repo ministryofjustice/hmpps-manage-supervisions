@@ -16,7 +16,7 @@ Data is moving out of nDelius over time into alternative services. For now we ca
 
 ## Decision
 
-We will identify service users by a [Uniform Resource Name (URN)](https://en.wikipedia.org/wiki/Uniform_Resource_Name) in the format `urn:justice:{service}:{entity}:{identifier_type}:{identifier_value}`. When we store a service user identifier, whether in our own database or in client storage, we will use this complete format.
+We will identify service users by a [Uniform Resource Name (URN)](https://en.wikipedia.org/wiki/Uniform_Resource_Name) in the format `urn:justice:{service}:{entity}:{optional_identifier_type}:{identifier_value}`. When we store a service user identifier, whether in our own database or in client storage, we will use this complete format.
 
 At this time, we will only support URNs that describe the CRN of a service user in nDelius. These will all be in the form `urn:justice:ndelius:crn:{crn}`, where `{crn}` is the actual value of the service user's CRN.
 
