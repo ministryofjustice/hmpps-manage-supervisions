@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import createApp from './app'
 import HmppsAuthClient from './data/hmppsAuthClient'
 import TokenStore from './data/tokenStore'
