@@ -18,7 +18,7 @@ Data is moving out of nDelius over time into alternative services. For now we ca
 
 We will identify service users by a [Uniform Resource Name (URN)](https://en.wikipedia.org/wiki/Uniform_Resource_Name) in the format `urn:justice:{service}:{entity}:{optional_identifier_type}:{identifier_value}`. When we store a service user identifier, whether in our own database or in client storage, we will use this complete format.
 
-At this time, we will only support URNs that describe the CRN of a service user in nDelius. These will all be in the form `urn:justice:ndelius:crn:{crn}`, where `{crn}` is the actual value of the service user's CRN.
+At this time, we will only support URNs that describe the CRN of [an "offender" in the Community API](https://community-api-secure.test.delius.probation.hmpps.dsd.io/swagger-ui/index.html#/Core%20offender). These will all be in the form `urn:justice:communityapi:offender:crn:{crn}`, where `{crn}` is the actual value of the service user's CRN.
 
 We choose to use URNs in order to future-proof our system against inevitable changes of identifier in future. It is important to state that we do not *need* to do this at this point; we are only dealing with one service and one identifier, and we will most likely delay any non-trivial implementation of the full URN structure until we need to support more data sources. However, in this ADR we are setting our direction, and aim to promote the idea of URNs as a flexible solution to identifying data objects across HMPPS.
 
