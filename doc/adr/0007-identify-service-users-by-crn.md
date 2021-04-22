@@ -16,9 +16,9 @@ Data is moving out of nDelius over time into alternative services. For now we ca
 
 ## Decision
 
-We will identify service users by a [Uniform Resource Name (URN)](https://en.wikipedia.org/wiki/Uniform_Resource_Name) in the format `urn:justice:{service}:{entity}:{optional_identifier_type}:{identifier_value}`. When we store a service user identifier, whether in our own database or in client storage, we will use this complete format.
+We will identify service users by a [Uniform Resource Name (URN)](https://en.wikipedia.org/wiki/Uniform_Resource_Name) in the format `urn:uk:gov:justice:{service}:{entity}:{optional_identifier_type}:{identifier_value}`. When we store a service user identifier, whether in our own database or in client storage, we will use this complete format.
 
-At this time, we will only support URNs that describe the CRN of [an "offender" in the Community API](https://community-api-secure.test.delius.probation.hmpps.dsd.io/swagger-ui/index.html#/Core%20offender). These will all be in the form `urn:justice:communityapi:offender:crn:{crn}`, where `{crn}` is the actual value of the service user's CRN.
+At this time, we will only support URNs that describe the CRN of [an "offender" in the Community API](https://community-api-secure.test.delius.probation.hmpps.dsd.io/swagger-ui/index.html#/Core%20offender). These will all be in the form `urn:uk:gov:justice:communityapi:offender:crn:{crn}`, where `{crn}` is the actual value of the service user's CRN.
 
 We choose to use URNs in order to future-proof our system against inevitable changes of identifier in future. It is important to state that we do not *need* to do this at this point; we are only dealing with one service and one identifier, and we will most likely delay any non-trivial implementation of the full URN structure until we need to support more data sources. However, in this ADR we are setting our direction, and aim to promote the idea of URNs as a flexible solution to identifying data objects across HMPPS.
 
@@ -28,10 +28,10 @@ We will use a shortened form of the full identifier in the page URLs for our ser
 
 ## Consequences
 
-Some service users known to HMPPS may not have a CRN. However, we understand that any service user on probation will have a CRN. If that is incorrect, we will need to either state that we do not support SUs without a CRN, or extend our URN scheme to include alternative identifiers. For instance, it may be necessary to use NOMS numbers instead, producing URNs like `urn:justice:communityapi:offender:noms:{nomsNumber}`. Or, to refer to data owned by a hypothetical future "Single Offender View" service, we may use a URN like `urn:justice:sov:offender:crn:{crn}`.
+Some service users known to HMPPS may not have a CRN. However, we understand that any service user on probation will have a CRN. If that is incorrect, we will need to either state that we do not support SUs without a CRN, or extend our URN scheme to include alternative identifiers. For instance, it may be necessary to use NOMS numbers instead, producing URNs like `urn:uk:gov:justice:communityapi:offender:noms:{nomsNumber}`. Or, to refer to data owned by a hypothetical future "Single Offender View" service, we may use a URN like `urn:uk:gov:justice:sov:offender:crn:{crn}`.
 
 This decision should be revisited when a HMPPS-wide unique identifier approach for service users is adopted. If the approach is incompatible with this decision, we should refactor and change our approach to match.
 
-We may also wish to follow this approach when referring to any data object outside our service. For instance, an appointment owned by the Interventions service would be referred to as `urn:justice:interventions:appointment:{id}`.
+We may also wish to follow this approach when referring to any data object outside our service. For instance, an appointment owned by the Interventions service would be referred to as `urn:uk:gov:justice:interventions:appointment:{id}`.
 
 This flexibility comes at the expense of complicating the code slightly, though the logic for converting URNs to the bare identifiers is simple and easily shared across our code, or even across services via an `npm` package.
