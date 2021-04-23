@@ -28,7 +28,7 @@ const production = process.env.NODE_ENV === 'production'
 const testMode = process.env.NODE_ENV === 'test'
 const RedisStore = connectRedis(session)
 
-export default function createApp(userService: UserService): express.Application {
+export default async function createApp(userService: UserService): Promise<express.Application> {
   const app = express()
 
   auth.init()
@@ -189,7 +189,8 @@ export default function createApp(userService: UserService): express.Application
   })
 
   app.use(authorisationMiddleware())
-  app.use('/', indexRoutes(standardRouter(userService)))
+  const router = await indexRoutes(standardRouter(userService))
+  app.use('/', router)
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(process.env.NODE_ENV === 'production'))
 

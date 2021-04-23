@@ -1,0 +1,33 @@
+{% extends "../../partials/layout.njk" %}
+
+{% set pageTitle = applicationName + " - Home" %}
+
+{% block content %}
+    <h1>{{ id }}</h1>
+
+    <form method='POST'>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+        <label for='message'>string value</label>
+        <input id='message' name='message' type='text'>
+
+        <label for='n'>int value</label>
+        <input id='n' name='n' type='number'>
+
+        <button type='submit'>submit</button>
+    </form>
+
+    {% if dto %}
+        <dl>
+            <dd>{{ dto.message }}</dd>
+            <dd>{{ dto.n }}</dd>
+        </dl>
+    {% endif %}
+
+    {% if errors %}
+        {{ errors }}
+    {% endif %}
+
+{% endblock %}
+
+
