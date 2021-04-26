@@ -1,55 +1,86 @@
 # HMPPS Manage Supervisions
 
-## Running the app
-The easiest way to run the app is to use docker compose to create the service and all dependencies. 
+## Running
+The easiest way to run `HMPPS Manage Supervisions` is to use docker compose to create the service and all dependencies. 
 
-`docker-compose pull`
+```bash
+docker-compose pull
+docker-compose up
+```
 
-`docker-compose up`
+This will run with a fake Community API & allow non-Delius user authentication.
+If you'd like to run with Delius user based authentication & against the real Community API then run.
+
+```bash
+docker-compose -f docker-compose.yml -f docker-compose.community-api.yml up
+```
+
+> Warning: this requires access to the private [Oracle DB image](https://github.com/ministryofjustice/hmpps-delius-api/blob/main/doc/development.md#oracle-database)
 
 ### Dependencies
-The app requires: 
-* hmpps-auth - for authentication
+
+`HMPPS Manage Supervisions` requires: 
 * redis - session store and token caching
+* [hmpps-auth](https://github.com/ministryofjustice/hmpps-auth) - for authentication
+* [community-api](https://github.com/ministryofjustice/community-api) - for data access
 
-### Runing the app for development
+### Development
 
-To start the main services excluding the example typescript template app: 
+To start the main services excluding `HMPPS Manage Supervisions`: 
 
-`docker-compose up`
+```bash
+docker-compose up redis hmpps-auth fake-api
+```
+
+Pr with real Community API:
+
+```bash
+docker-compose -f docker-compose.yml -f docker-compose.community-api.yml up redis hmpps-auth community-api
+```
 
 Install dependencies using `npm install`, ensuring you are using >= `Node v14.x`
 
-And then, to build the assets and start the app with nodemon:
-
-`npm run start:dev`
+```bash
+npm run start:dev
+```
 
 ### Run linter
 
-`npm run lint`
+```bash
+npm run lint
+```
 
 ### Run tests
 
-`npm run test`
+```bash
+npm run test
+```
 
 ### Running integration tests
 
-For local running, start a test db, redis, and wiremock instance by:
+For local running, start redis and a wiremock instance by:
 
-`docker-compose -f docker-compose-test.yml up`
+```bash
+docker-compose -f docker-compose-test.yml up
+```
 
 Then run the server in test mode by:
 
-`npm run start-feature` (or `npm run start-feature:dev` to run with nodemon)
+```bash
+npm run start-feature
 
-And then either, run tests in headless mode with:
+# or to run with nodemon:
+npm run start-feature:dev
+```
 
-`npm run int-test`
- 
-Or run tests with the cypress UI:
+Then run tests in headless mode with:
 
-`npm run int-test-ui`
+```bash
+npm run int-test
 
+# or to run with Cyprus UI:
+npm run int-test-ui
+```
 
 ### Dependency Checks
 
