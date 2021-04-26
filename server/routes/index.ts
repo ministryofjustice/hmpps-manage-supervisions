@@ -1,13 +1,10 @@
-import type { RequestHandler, Router } from 'express'
+import * as path from 'path'
+import { Router } from 'express'
+import { useMvc } from '../mvc'
 
-import asyncMiddleware from '../middleware/asyncMiddleware'
+export default async function routes(router: Router): Promise<Router> {
+  const rootPath = path.resolve(__dirname, '..')
 
-export default function routes(router: Router): Router {
-  const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
-
-  get('/', (req, res, next) => {
-    res.render('pages/index')
-  })
-
+  await useMvc(router, { controllers: `${rootPath}/**/*.controller.js` })
   return router
 }

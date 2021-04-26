@@ -33,6 +33,11 @@
         "plugin:prettier/recommended"
       ],
       "rules": {
+        "@typescript-eslint/no-explicit-any": 0,
+        "@typescript-eslint/explicit-module-boundary-types": 0,
+        "import/prefer-default-export": 0,
+        "no-restricted-syntax": 0,
+        "@typescript-eslint/ban-types": 0,
         "@typescript-eslint/no-use-before-define": 0,
         "class-methods-use-this": 0,
         "no-useless-constructor": 0,

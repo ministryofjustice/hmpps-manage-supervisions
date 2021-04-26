@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import express, { Router, Express } from 'express'
 import cookieSession from 'cookie-session'
 import createError from 'http-errors'
@@ -54,7 +55,8 @@ function appSetup(route: Router, production: boolean): Express {
   return app
 }
 
-export default function appWithAllRoutes({ production = false }: { production?: boolean }): Express {
+export default async function appWithAllRoutes({ production = false }: { production?: boolean }): Promise<Express> {
   auth.default.authenticationMiddleware = () => (req, res, next) => next()
-  return appSetup(allRoutes(standardRouter(new MockUserService())), production)
+  const router = await allRoutes(standardRouter(new MockUserService()))
+  return appSetup(router, production)
 }
