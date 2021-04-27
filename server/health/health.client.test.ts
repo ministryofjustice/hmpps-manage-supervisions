@@ -1,12 +1,23 @@
 import nock from 'nock'
-import { serviceCheckFactory } from './healthCheck'
-import { AgentConfig } from '../config'
+import { HealthClient } from './health.client'
+import { ApiConfig } from '../config'
 
-describe('Service healthcheck', () => {
-  const healthcheck = serviceCheckFactory('externalService', 'http://test-service.com/ping', new AgentConfig(), {
-    response: 100,
-    deadline: 150,
-  })
+describe('HealthClient', () => {
+  const client = new HealthClient()
+  const config: ApiConfig = {
+    enabled: true,
+    agent: {
+      maxSockets: 100,
+      maxFreeSockets: 10,
+      freeSocketTimeout: 30000,
+    },
+    timeout: {
+      response: 100,
+      deadline: 150,
+    },
+    url: 'http://test-service.com',
+  }
+  const check = client.serviceCheckFactory('hmppsAuth', config, '/ping')
 
   let fakeServiceApi: nock.Scope
 
@@ -22,8 +33,8 @@ describe('Service healthcheck', () => {
     it('Should return data from api', async () => {
       fakeServiceApi.get('/ping').reply(200, 'pong')
 
-      const output = await healthcheck()
-      expect(output).toEqual('OK')
+      const output = await check()
+      expect(output).toEqual({ healthy: true, name: 'hmppsAuth', result: 'OK' })
     })
   })
 
@@ -31,7 +42,10 @@ describe('Service healthcheck', () => {
     it('Should throw error from api', async () => {
       fakeServiceApi.get('/ping').thrice().reply(500)
 
-      await expect(healthcheck()).rejects.toThrow('Internal Server Error')
+      const output = await check()
+      expect(output.healthy).toEqual(false)
+      expect(output.name).toEqual('hmppsAuth')
+      expect((output.result as Error)?.message).toBe('Internal Server Error')
     })
   })
 
@@ -45,8 +59,8 @@ describe('Service healthcheck', () => {
         .get('/ping')
         .reply(200, 'pong')
 
-      const response = await healthcheck()
-      expect(response).toEqual('OK')
+      const response = await check()
+      expect(response).toEqual({ healthy: true, name: 'hmppsAuth', result: 'OK' })
     })
 
     it('Should retry twice if request times out', async () => {
@@ -60,8 +74,8 @@ describe('Service healthcheck', () => {
         .get('/ping')
         .reply(200, 'pong')
 
-      const response = await healthcheck()
-      expect(response).toEqual('OK')
+      const response = await check()
+      expect(response).toEqual({ healthy: true, name: 'hmppsAuth', result: 'OK' })
     })
 
     it('Should fail if request times out three times', async () => {
@@ -76,7 +90,10 @@ describe('Service healthcheck', () => {
         .delay(10000)
         .reply(200, { failure: 'three' })
 
-      await expect(healthcheck()).rejects.toThrow('Response timeout of 100ms exceeded')
+      const output = await check()
+      expect(output.healthy).toEqual(false)
+      expect(output.name).toEqual('hmppsAuth')
+      expect((output.result as Error)?.message).toBe('Response timeout of 100ms exceeded')
     })
   })
 })

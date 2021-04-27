@@ -1,4 +1,4 @@
-import { trimStart, trimEnd, replace } from 'lodash'
+import { trim, replace } from 'lodash'
 import glob from 'glob'
 import { Request, Response, Router } from 'express'
 import { plainToClass } from 'class-transformer'
@@ -6,7 +6,7 @@ import { Container } from 'typedi'
 import logger from '../../logger'
 import { ControllerMeta, EndpointMeta, ParamMeta, ParamSource } from './types'
 import { ControllerContext } from './controller.context'
-import { RedirectException } from './errors'
+import { HealthException, RedirectException } from './errors'
 
 interface MvcOptions {
   controllers: string
@@ -98,7 +98,10 @@ export async function useMvc(router: Router, options: MvcOptions): Promise<void>
 
   for (const controller of ControllerContext.value) {
     for (const endpoint of controller.endpoints) {
-      const path = `${trimEnd(controller.path || '/', '/')}/${trimStart(endpoint.path || '/', '/')}`
+      const path = `/${[controller.path, endpoint.path]
+        .map(x => trim(x, '/'))
+        .filter(x => x)
+        .join('/')}`
       if (!(endpoint.method in router)) {
         throw Error(`unknown http method ${endpoint.method}`)
       }
@@ -123,6 +126,10 @@ export async function useMvc(router: Router, options: MvcOptions): Promise<void>
         } catch (e) {
           if (e instanceof RedirectException) {
             res.status(e.status).redirect(e.url)
+            return
+          }
+          if (e instanceof HealthException) {
+            res.status(503).json(e.health)
             return
           }
           next(e)

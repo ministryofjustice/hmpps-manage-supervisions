@@ -1,7 +1,11 @@
 import nock from 'nock'
 import { Request } from 'express'
+import { ConfigService } from '../config'
+import { fakeConfig } from '../config/config.fake'
 import verifyToken from './tokenVerification'
-import config from '../config'
+
+// eslint-disable-next-line no-multi-assign
+const config = (ConfigService.INSTANCE = fakeConfig())
 
 describe('token verification api tests', () => {
   let fakeApi: nock.Scope

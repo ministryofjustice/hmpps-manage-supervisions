@@ -2,7 +2,7 @@ import passport from 'passport'
 import { Strategy } from 'passport-oauth2'
 import type { RequestHandler } from 'express'
 
-import config from '../config'
+import { ConfigService } from '../config'
 import generateOauthClientToken from './clientCredentials'
 import type { TokenVerifier } from '../data/tokenVerification'
 
@@ -23,19 +23,24 @@ const authenticationMiddleware: AuthenticationMiddleware = verifyToken => {
     if (req.isAuthenticated() && (await verifyToken(req))) {
       return next()
     }
+    if (res.locals?.publicEndpoint === true) {
+      // public override from the authorisation middleware
+      return next()
+    }
     req.session.returnTo = req.originalUrl
     return res.redirect('/login')
   }
 }
 
 function init(): void {
+  const config = ConfigService.INSTANCE
   const strategy = new Strategy(
     {
       authorizationURL: `${config.apis.hmppsAuth.externalUrl}/oauth/authorize`,
       tokenURL: `${config.apis.hmppsAuth.url}/oauth/token`,
-      clientID: config.apis.hmppsAuth.apiClientId,
-      clientSecret: config.apis.hmppsAuth.apiClientSecret,
-      callbackURL: `${config.domain}/login/callback`,
+      clientID: config.apis.hmppsAuth.apiClientCredentials.id,
+      clientSecret: config.apis.hmppsAuth.apiClientCredentials.secret,
+      callbackURL: `${config.server.domain}/login/callback`,
       state: true,
       customHeaders: { Authorization: generateOauthClientToken() },
     },
