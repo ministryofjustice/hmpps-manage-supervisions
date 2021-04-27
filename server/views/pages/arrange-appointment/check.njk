@@ -1,0 +1,9 @@
+{% extends "../wizard-form.njk" %}
+{% set buttonText = 'Arrange appointment' %}
+{% set title = 'Check your answers' %}
+
+{% block form %}
+  <h1 class="govuk-heading-xl">{{ title }}</h1>
+
+  {% include '../../partials/arrange-appointment/session-details.njk' %}
+{% endblock %}
