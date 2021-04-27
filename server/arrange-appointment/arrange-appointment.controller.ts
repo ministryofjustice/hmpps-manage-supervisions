@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 import { Controller, Get, Post, RedirectException, Render, Req, Param } from '../mvc'
-import { ArrangeASessionService } from './arrange-a-session.service'
+import { ArrangeAppointmentService } from './arrange-appointment.service'
 import { CapiAppointmentCreateRequest } from './capiAppointmentCreateRequest.dto'
 
 export interface CheckSessionViewModel {
@@ -38,12 +38,12 @@ export interface AppointmentCreationDetails {
   sentenceId: number
 }
 
-@Controller('/arrange-a-session/:crn(\\w+)')
-export class ArrangeASessionController {
-  constructor(private readonly service: ArrangeASessionService) {}
+@Controller('/arrange-appointment/:crn(\\w+)')
+export class ArrangeAppointmentontroller {
+  constructor(private readonly service: ArrangeAppointmentService) {}
 
   @Get('/check')
-  @Render('pages/arrange-a-session/check')
+  @Render('pages/arrange-appointment/check')
   get(@Param('crn') crn: string, @Req() request: any): CheckSessionViewModel {
     const appointmentCreateRequest: AppointmentCreationDetails = {
       appointmentStart: DateTime.now().plus({ hours: 1 }),

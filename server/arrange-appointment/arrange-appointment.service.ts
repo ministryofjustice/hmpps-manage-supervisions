@@ -8,7 +8,7 @@ import { CapiAppointmentCreateRequest } from './capiAppointmentCreateRequest.dto
 import { CapiAppointmentCreateResponse } from './capiAppointmentCreateResponse.dto'
 
 @Service()
-export class ArrangeASessionService {
+export class ArrangeAppointmentService {
   private restClient(token: string): RestClient {
     return new RestClient('Community API Client', config.apis.community, token)
   }
