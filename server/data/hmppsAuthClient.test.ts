@@ -1,8 +1,11 @@
 import nock from 'nock'
 
-import config from '../config'
+import { ConfigService } from '../config'
 import HmppsAuthClient from './hmppsAuthClient'
 import TokenStore from './tokenStore'
+
+// TODO mock this
+const config = ConfigService.INSTANCE
 
 jest.mock('./tokenStore')
 
@@ -68,7 +71,10 @@ describe('hmppsAuthClient', () => {
 
       fakeHmppsAuthApi
         .post(`/oauth/token`, 'grant_type=client_credentials&username=Bob')
-        .basicAuth({ user: config.apis.hmppsAuth.systemClientId, pass: config.apis.hmppsAuth.systemClientSecret })
+        .basicAuth({
+          user: config.apis.hmppsAuth.systemClientCredentials.id,
+          pass: config.apis.hmppsAuth.systemClientCredentials.secret,
+        })
         .matchHeader('Content-Type', 'application/x-www-form-urlencoded')
         .reply(200, token)
 
@@ -83,7 +89,10 @@ describe('hmppsAuthClient', () => {
 
       fakeHmppsAuthApi
         .post(`/oauth/token`, 'grant_type=client_credentials')
-        .basicAuth({ user: config.apis.hmppsAuth.systemClientId, pass: config.apis.hmppsAuth.systemClientSecret })
+        .basicAuth({
+          user: config.apis.hmppsAuth.systemClientCredentials.id,
+          pass: config.apis.hmppsAuth.systemClientCredentials.secret,
+        })
         .matchHeader('Content-Type', 'application/x-www-form-urlencoded')
         .reply(200, token)
 

@@ -2,14 +2,13 @@ import redis from 'redis'
 import { promisify } from 'util'
 
 import logger from '../../logger'
-import config from '../config'
+import { ConfigService } from '../config'
+
+const config = ConfigService.INSTANCE
 
 const createRedisClient = () => {
   return redis.createClient({
-    port: config.redis.port,
-    password: config.redis.password,
-    host: config.redis.host,
-    tls: config.redis.tls_enabled === 'true' ? {} : false,
+    ...config.redis,
     prefix: 'systemToken:',
   })
 }

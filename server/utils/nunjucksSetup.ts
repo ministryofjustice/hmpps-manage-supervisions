@@ -1,12 +1,12 @@
 import nunjucks from 'nunjucks'
 import express from 'express'
-import * as pathModule from 'path'
+import * as path from 'path'
 import { DateTime } from 'luxon'
 
-export default function nunjucksSetup(app: express.Application, path: pathModule.PlatformPath): void {
+export default function nunjucksSetup(app: express.Application): void {
   const njkEnv = nunjucks.configure(
     [
-      path.join(__dirname, '../../server/views'),
+      path.resolve(path.join(__dirname, '..', 'views')),
       'node_modules/govuk-frontend/',
       'node_modules/govuk-frontend/components/',
       'node_modules/@ministryofjustice/frontend/',
@@ -19,12 +19,11 @@ export default function nunjucksSetup(app: express.Application, path: pathModule
   )
 
   njkEnv.addFilter('initialiseName', (fullName: string) => {
-    // this check is for the authError page
     if (!fullName) {
       return null
     }
-    const array = fullName.split(' ')
-    return `${array[0][0]}. ${array.reverse()[0]}`
+    const [[initial], ...rest] = fullName.split(' ')
+    return `${initial}. ${rest.slice(-1)}`
   })
 
   njkEnv.addFilter('dateWithDayAndWithoutYear', (datetimeString: string) => {

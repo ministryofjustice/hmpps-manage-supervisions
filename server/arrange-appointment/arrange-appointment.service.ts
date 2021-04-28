@@ -1,16 +1,18 @@
 import { Service } from 'typedi'
 import { classToPlain } from 'class-transformer'
 import RestClient from '../data/restClient'
-import config from '../config'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore'
 import { CapiAppointmentCreateRequest } from './capiAppointmentCreateRequest.dto'
 import { CapiAppointmentCreateResponse } from './capiAppointmentCreateResponse.dto'
+import { ConfigService } from '../config'
 
 @Service()
 export class ArrangeAppointmentService {
+  constructor(private readonly config: ConfigService) {}
+
   private restClient(token: string): RestClient {
-    return new RestClient('Community API Client', config.apis.community, token)
+    return new RestClient('Community API Client', this.config.apis.community, token)
   }
 
   async createAppointment(

@@ -3,17 +3,19 @@ import querystring from 'querystring'
 import type TokenStore from './tokenStore'
 
 import logger from '../../logger'
-import config from '../config'
+import { ConfigService } from '../config'
 import generateOauthClientToken from '../authentication/clientCredentials'
 import RestClient from './restClient'
+
+const config = ConfigService.INSTANCE
 
 const timeoutSpec = config.apis.hmppsAuth.timeout
 const hmppsAuthUrl = config.apis.hmppsAuth.url
 
 function getSystemClientTokenFromHmppsAuth(username?: string): Promise<superagent.Response> {
   const clientToken = generateOauthClientToken(
-    config.apis.hmppsAuth.systemClientId,
-    config.apis.hmppsAuth.systemClientSecret
+    config.apis.hmppsAuth.systemClientCredentials.id,
+    config.apis.hmppsAuth.systemClientCredentials.secret
   )
 
   const authRequest = username
@@ -21,7 +23,7 @@ function getSystemClientTokenFromHmppsAuth(username?: string): Promise<superagen
     : querystring.stringify({ grant_type: 'client_credentials' })
 
   logger.info(
-    `HMPPS Auth request '${authRequest}' for client id '${config.apis.hmppsAuth.systemClientId}' and user '${username}'`
+    `HMPPS Auth request '${authRequest}' for client id '${config.apis.hmppsAuth.apiClientCredentials.id}' and user '${username}'`
   )
 
   return superagent

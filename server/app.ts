@@ -15,13 +15,12 @@ import connectRedis from 'connect-redis'
 
 import auth from './authentication/auth'
 import indexRoutes from './routes'
-import healthcheck from './services/healthCheck'
 import nunjucksSetup from './utils/nunjucksSetup'
-import config from './config'
 import errorHandler from './errorHandler'
 import standardRouter from './routes/standardRouter'
 import authorisationMiddleware from './middleware/authorisationMiddleware'
 import type UserService from './services/userService'
+import { ConfigService } from './config'
 
 const version = Date.now().toString()
 const production = process.env.NODE_ENV === 'production'
@@ -42,7 +41,7 @@ export default async function createApp(userService: UserService): Promise<expre
   // View Engine Configuration
   app.set('view engine', 'njk')
 
-  nunjucksSetup(app, path)
+  nunjucksSetup(app)
 
   // Server Configuration
   app.set('port', process.env.PORT || 3000)
@@ -66,17 +65,13 @@ export default async function createApp(userService: UserService): Promise<expre
 
   app.use(addRequestId())
 
-  const client = redis.createClient({
-    port: config.redis.port,
-    password: config.redis.password,
-    host: config.redis.host,
-    tls: config.redis.tls_enabled === 'true' ? {} : false,
-  })
+  const config = ConfigService.INSTANCE
+  const client = redis.createClient({ ...config.redis })
 
   app.use(
     session({
       store: new RedisStore({ client }),
-      cookie: { secure: config.https, sameSite: 'lax', maxAge: config.session.expiryMinutes * 60 * 1000 },
+      cookie: { secure: config.server.https, sameSite: 'lax', maxAge: config.session.expiryMinutes * 60 * 1000 },
       secret: config.session.secret,
       resave: false, // redis implements touch so shouldn't need this
       saveUninitialized: false,
@@ -109,7 +104,7 @@ export default async function createApp(userService: UserService): Promise<expre
   }
 
   //  Static Resources Configuration
-  const cacheControl = { maxAge: config.staticResourceCacheDuration * 1000 }
+  const cacheControl = { maxAge: config.server.staticResourceCacheDuration * 1000 }
   ;[
     '/assets',
     '/assets/stylesheets',
@@ -127,16 +122,6 @@ export default async function createApp(userService: UserService): Promise<expre
   })
   ;['/node_modules/jquery/dist/jquery.min.js'].forEach(dir => {
     app.use('/assets/js/jquery.min.js', express.static(path.join(process.cwd(), dir), cacheControl))
-  })
-
-  // Express Routing Configuration
-  app.get('/health', (req, res, next) => {
-    healthcheck(result => {
-      if (!result.healthy) {
-        res.status(503)
-      }
-      res.json(result)
-    })
   })
 
   // GovUK Template Configuration
@@ -177,7 +162,7 @@ export default async function createApp(userService: UserService): Promise<expre
     })(req, res, next)
   )
 
-  const authLogoutUrl = `${config.apis.hmppsAuth.externalUrl}/logout?client_id=${config.apis.hmppsAuth.apiClientId}&redirect_uri=${config.domain}`
+  const authLogoutUrl = `${config.apis.hmppsAuth.externalUrl}/logout?client_id=${config.apis.hmppsAuth.apiClientCredentials.id}&redirect_uri=${config.server.domain}`
 
   app.use('/logout', (req, res) => {
     if (req.user) {
