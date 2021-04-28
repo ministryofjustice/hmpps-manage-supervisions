@@ -1,7 +1,7 @@
 import { Expose } from 'class-transformer'
 import { IsInt, IsNotEmpty, IsPositive, IsString } from 'class-validator'
 
-export class CapiAppointmentCreateRequest {
+export class AppointmentCreateRequest {
   @Expose()
   @IsInt()
   @IsPositive()

@@ -1,4 +1,4 @@
-import { trim, replace } from 'lodash'
+import { replace, trim } from 'lodash'
 import glob from 'glob'
 import { Request, Response, Router } from 'express'
 import { plainToClass } from 'class-transformer'
@@ -41,21 +41,30 @@ interface ResolvedEndpointMeta {
   params: KeyedParamMeta[]
 }
 
+function mapClass(id: string, { type, index, src }: KeyedParamMeta, value: any): any {
+  if (!type || [String, Boolean, Number, Array, Object].includes(type as any)) {
+    throw new Error(`[${id}] parameter ${index} is not a class, it cannot be mapped through the ${src}`)
+  }
+  // use class-transformer where appropriate
+  return plainToClass(type as any, value, { excludeExtraneousValues: true, enableImplicitConversion: true })
+}
+
 async function mapParameter(id: string, p: KeyedParamMeta, req: Request, res: Response) {
   switch (p.src) {
-    case ParamSource.Body: {
-      if (!p.type || [String, Boolean, Number, Array, Object].includes(p.type as any)) {
-        return req.body
-      }
-      // use class-transformer where appropriate
-      return plainToClass(p.type as any, req.body, { excludeExtraneousValues: true })
-    }
+    case ParamSource.Body:
+      return mapClass(id, p, req.body)
+
+    case ParamSource.Session:
+      return req.session
 
     case ParamSource.Request:
       return req
 
     case ParamSource.Response:
       return res
+
+    case ParamSource.User:
+      return req.user
 
     default: {
       const src = req[p.src]

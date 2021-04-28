@@ -9,13 +9,14 @@ declare module 'express-session' {
 }
 
 export declare global {
+  interface UserPrincipal {
+    username: string
+    token: string
+  }
   namespace Express {
     interface Request {
       verified?: boolean
-      user: {
-        username: string
-        token: string
-      }
+      user: UserPrincipal
     }
   }
 }

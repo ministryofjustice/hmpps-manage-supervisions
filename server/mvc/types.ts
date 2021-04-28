@@ -6,6 +6,8 @@ export enum ParamSource {
   Body = 'body',
   Request = 'req',
   Response = 'res',
+  Session = 'session',
+  User = 'user',
 }
 
 export interface ParamMeta {
@@ -33,7 +35,6 @@ export interface ControllerMeta {
   endpoints: EndpointMeta[]
 }
 
-export interface ViewModel<T> {
-  dto: T
+export type ViewModel<T, Name extends string = 'dto'> = {
   errors?: ValidationError[] | null
-}
+} & { [P in Name]: T }

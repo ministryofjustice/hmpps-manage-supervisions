@@ -1,34 +1,34 @@
-{{ govukSummaryList({
-  classes: 'govuk-!-margin-bottom-9',
-  rows: [
-    {
-      key: { text: "Type of appointment" },
-      value: { text: typeOfSession }
-    },
-    {
-      key: { text: "Date" },
-      value: { text: date | dateWithDayAndWithoutYear }
-    },
-    {
-      key: { text: "Time" },
-      value: { text: startTime + ' to ' + endTime }
-    },
-    {
-      key: { text: "RAR activity" },
-      value: { text: rarCategory }
-    } if rarCategory,
-    {
-      key: { text: "RAR activity subcategory" },
-      value: { text: rarSubCategory }
-    } if rarCategory,
-    {
-      key: { text: "RAR activity" },
-      value: { text: 'Yes' if countsTowardsRAR else 'No' }
-    },
-    {
-      key: { text: "Appointment notes" },
-      value: { text: sessionNotes or 'None' }
-    }
-  ]
-  }) 
-}}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% macro sessionDetails(appointment, rarDetails) %}
+  {{ govukSummaryList({
+    classes: 'govuk-!-margin-bottom-9',
+    rows: [
+      {
+        key: { text: "Type of appointment" },
+        value: { text: appointment.contactType.description }
+      },
+      {
+        key: { text: "Date" },
+        value: { text: appointment.appointmentStart | dateFormat('cccc d MMMM') }
+      },
+      {
+        key: { text: "Time" },
+        value: { text: (appointment.appointmentStart | dateFormat('h:mm a')) + ' to ' + (appointment.appointmentEnd | dateFormat('h:mm a')) }
+      },
+      {
+        key: { text: "RAR activity" },
+        value: { text: rarDetails.category if rarDetails and rarDetails.category else 'No' }
+      },
+      {
+        key: { text: "RAR activity subcategory" },
+        value: { text: rarDetails.subCategory }
+      } if rarDetails and rarDetails.subCategory,
+      {
+        key: { text: "Appointment notes" },
+        value: { text: appointment.notes or 'None' }
+      }
+    ]
+  })
+  }}
+{% endmacro %}
