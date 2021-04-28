@@ -26,6 +26,13 @@ app.get('/health', (req, res, next) => {
 })
 
 app.use(middlewares)
+
+app.use(
+  jsonServer.rewriter({
+    '/offenders/crn/*/sentence/*/appointments': '/appointments',
+  }),
+)
+
 app.use(router)
 
 app.listen(8082, () => {

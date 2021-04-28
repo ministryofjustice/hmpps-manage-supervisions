@@ -1,11 +1,30 @@
 import { Service } from 'typedi'
-import { classToPlain } from 'class-transformer'
+import { classToPlain, plainToClass } from 'class-transformer'
 import RestClient from '../data/restClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore'
-import { CapiAppointmentCreateRequest } from './capiAppointmentCreateRequest.dto'
-import { CapiAppointmentCreateResponse } from './capiAppointmentCreateResponse.dto'
+import { AppointmentCreateRequest } from './dto/AppointmentCreateRequest'
 import { ConfigService } from '../config'
+import { AppointmentBuilderDto } from './dto/AppointmentBuilderDto'
+import { validate } from 'class-validator'
+import logger from '../../logger'
+
+export interface AppointmentCreateResponse {
+  id?: number
+  appointmentId: number
+}
+
+export interface ErrorResponse {
+  status: number
+
+  errorCode?: string
+
+  userMessage: string
+
+  developerMessage: string
+
+  moreInfo: string
+}
 
 @Service()
 export class ArrangeAppointmentService {
@@ -16,20 +35,34 @@ export class ArrangeAppointmentService {
   }
 
   async createAppointment(
-    request: CapiAppointmentCreateRequest,
+    { sentenceId, ...appointment }: AppointmentBuilderDto,
     crn: string,
-    sentenceId: number,
     username: string,
   ): Promise<number> {
+    const request = plainToClass(
+      AppointmentCreateRequest,
+      {
+        ...appointment,
+        appointmentStart: appointment.appointmentStart.toISO(),
+        appointmentEnd: appointment.appointmentEnd.toISO(),
+        contactType: appointment.contactType.code,
+      } as AppointmentCreateRequest,
+      { excludeExtraneousValues: true, enableImplicitConversion: false },
+    )
+
+    // TODO do something with these errors
+    const errors = await validate(request)
+    logger.error(errors)
+
     const authClient = new HmppsAuthClient(new TokenStore())
     const token = await authClient.getSystemClientToken(username)
 
-    return this.restClient(token)
-      .post({
-        path: `/offenders/crn/${crn}/sentence/${sentenceId}/appointments`,
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        data: classToPlain(request),
-      })
-      .then(response => (<CapiAppointmentCreateResponse>response).appointmentId) as Promise<number>
+    const response = await this.restClient(token).post<AppointmentCreateResponse>({
+      path: `/offenders/crn/${crn}/sentence/${sentenceId}/appointments`,
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      data: classToPlain(request),
+    })
+
+    return response.appointmentId || response.id
   }
 }

@@ -1,9 +1,10 @@
 {% extends "../wizard-form.njk" %}
 {% set buttonText = 'Arrange appointment' %}
 {% set title = 'Check your answers' %}
+{% from "../../partials/arrange-appointment/session-details.njk" import sessionDetails %}
 
 {% block form %}
   <h1 class="govuk-heading-xl">{{ title }}</h1>
 
-  {% include '../../partials/arrange-appointment/session-details.njk' %}
+  {{ sessionDetails(appointment, rarDetails) }}
 {% endblock %}

@@ -112,3 +112,15 @@ export function Res() {
     addParam(ParamSource.Response, 'res', target, propertyKey, index)
   }
 }
+
+export function Session() {
+  return (target: any, propertyKey: string | symbol, index: number) => {
+    addParam(ParamSource.Session, 'session', target, propertyKey, index)
+  }
+}
+
+export function User() {
+  return (target: any, propertyKey: string | symbol, index: number) => {
+    addParam(ParamSource.User, 'user', target, propertyKey, index)
+  }
+}
