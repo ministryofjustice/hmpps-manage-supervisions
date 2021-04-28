@@ -68,6 +68,9 @@ env:
   - name: TOKEN_VERIFICATION_ENABLED
     value: {{ .Values.env.TOKEN_VERIFICATION_ENABLED | quote }}
 
+  - name: COMMUNITY_API_URL
+    value: {{ .Values.env.COMMUNITY_API_URL | quote }}
+
   - name: NODE_ENV
     value: production
 
