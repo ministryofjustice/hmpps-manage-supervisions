@@ -6,7 +6,10 @@ context('Healthcheck', () => {
     cy.task('stubCommunityApiPing')
   })
 
-  it('Health check page is visible', () => {
+  it('Health check api reports as healthy', () => {
     cy.request('/health').its('body.healthy').should('equal', true)
+  })
+  it('Health check ping api reports as UP', () => {
+    cy.request('/health/ping').its('body.status').should('equal', 'UP')
   })
 })

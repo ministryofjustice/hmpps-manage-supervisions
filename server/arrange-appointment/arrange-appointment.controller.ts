@@ -76,7 +76,7 @@ export class ArrangeAppointmentontroller {
   }
 
   @Post('/check')
-  async post(@Param('crn') crn: string, @Req() request: any): Promise<{}> {
+  async post(@Param('crn') crn: string, @Req() request: any): Promise<never> {
     const creationDetails = request.session.appointmentCreateRequest
 
     const capiRequest: CapiAppointmentCreateRequest = {
@@ -94,7 +94,7 @@ export class ArrangeAppointmentontroller {
       capiRequest,
       crn,
       creationDetails.sentenceId,
-      request.user.username
+      request.user.username,
     )
     throw new RedirectException(`/arrange-a-session/${appointmentId}/confirmation`)
   }

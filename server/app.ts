@@ -60,7 +60,7 @@ export default async function createApp(userService: UserService): Promise<expre
           fontSrc: ["'self'"],
         },
       },
-    })
+    }),
   )
 
   app.use(addRequestId())
@@ -76,7 +76,7 @@ export default async function createApp(userService: UserService): Promise<expre
       resave: false, // redis implements touch so shouldn't need this
       saveUninitialized: false,
       rolling: true,
-    })
+    }),
   )
 
   app.use(passport.initialize())
@@ -159,7 +159,7 @@ export default async function createApp(userService: UserService): Promise<expre
     passport.authenticate('oauth2', {
       successReturnToOrRedirect: req.session.returnTo || '/',
       failureRedirect: '/autherror',
-    })(req, res, next)
+    })(req, res, next),
   )
 
   const authLogoutUrl = `${config.apis.hmppsAuth.externalUrl}/logout?client_id=${config.apis.hmppsAuth.apiClientCredentials.id}&redirect_uri=${config.server.domain}`

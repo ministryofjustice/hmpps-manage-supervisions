@@ -4,7 +4,6 @@ import { ConfigService } from '../config'
 import { fakeConfig } from '../config/config.fake'
 import verifyToken from './tokenVerification'
 
-// eslint-disable-next-line no-multi-assign
 const config = (ConfigService.INSTANCE = fakeConfig())
 
 describe('token verification api tests', () => {
