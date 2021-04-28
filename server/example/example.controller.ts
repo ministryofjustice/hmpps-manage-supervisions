@@ -20,7 +20,7 @@ export class ExampleController {
   async get(
     @Param('id') id: number,
     @Query('name') name: string | undefined,
-    @Res() response: any // as an example, you can also get @Req
+    @Res() response: any, // as an example, you can also get @Req
   ): Promise<ExampleViewModel> {
     const dto = await this.service.get()
     return { id, name, dto }

@@ -18,7 +18,7 @@ export function fakeApiConfig(partial: DeepPartial<ApiConfig> = {}): ApiConfig {
         freeSocketTimeout: faker.datatype.number({ min: 5000, max: 60000 }),
       },
     },
-    partial
+    partial,
   )
 }
 
@@ -58,6 +58,6 @@ export function fakeConfig(partial: DeepPartial<ConfigService> = {}): ConfigServ
         community: fakeApiConfig(),
       },
     },
-    partial
+    partial,
   )
 }

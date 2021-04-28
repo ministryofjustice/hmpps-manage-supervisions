@@ -17,7 +17,7 @@ export class HealthClient {
   serviceCheckFactory(
     name: keyof DependentApisConfig,
     { url, agent, timeout }: ApiConfig,
-    path = '/health/ping'
+    path = '/health/ping',
   ): ServiceCheck {
     const keepaliveAgent = url.startsWith('https') ? new HttpsAgent(agent) : new Agent(agent)
     const failure = (error: Error) => ({ name, healthy: false, result: error })

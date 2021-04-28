@@ -77,7 +77,7 @@ function addParam(src: ParamSource, key: string, target: any, propertyKey: strin
   const type = Reflect.getMetadata('design:paramtypes', target, propertyKey)[index]
   if ((src === ParamSource.Url || src === ParamSource.Query) && ![String, Number].includes(type)) {
     throw new Error(
-      `unsupported ${src} param type ${target.constructor.name}.${meta.action.name}(${key}: ${type.name})`
+      `unsupported ${src} param type ${target.constructor.name}.${meta.action.name}(${key}: ${type.name})`,
     )
   }
   meta.params[key] = { src, type, index }

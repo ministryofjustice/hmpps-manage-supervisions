@@ -19,7 +19,7 @@ export class ArrangeAppointmentService {
     request: CapiAppointmentCreateRequest,
     crn: string,
     sentenceId: number,
-    username: string
+    username: string,
   ): Promise<number> {
     const authClient = new HmppsAuthClient(new TokenStore())
     const token = await authClient.getSystemClientToken(username)

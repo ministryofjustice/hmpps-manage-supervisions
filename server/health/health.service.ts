@@ -34,7 +34,6 @@ export class HealthService {
 
   private static async getBuildInfo() {
     try {
-      // eslint-disable-next-line import/no-unresolved,global-require
       return await require('../../build-info.json')
     } catch (ex) {
       return null

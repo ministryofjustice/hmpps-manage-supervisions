@@ -18,6 +18,6 @@ export function fakeHealthResult(partial: DeepPartial<HealthResult> = {}): Healt
         gitRef: faker.git.commitSha(),
       },
     },
-    partial
+    partial,
   )
 }

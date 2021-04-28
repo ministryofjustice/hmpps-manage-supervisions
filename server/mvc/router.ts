@@ -26,7 +26,7 @@ async function loadModules(pattern: string) {
       } else {
         resolve(files.map(f => import(f)))
       }
-    })
+    }),
   )
 
   await Promise.all(promises)
@@ -76,7 +76,7 @@ async function mapParameter(id: string, p: KeyedParamMeta, req: Request, res: Re
 async function mvcRequestHandler(
   { id, controller, endpoint, params }: ResolvedEndpointMeta,
   req: Request,
-  res: Response
+  res: Response,
 ) {
   const argPromises = params.map(async p => mapParameter(id, p, req, res))
   const args = await Promise.all(argPromises)

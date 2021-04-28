@@ -1,7 +1,5 @@
 import { ValidationError } from 'class-validator'
 
-// TODO why does this eslint setup hate typescript enums?!
-// eslint-disable-next-line no-shadow
 export enum ParamSource {
   Url = 'params',
   Query = 'query',
@@ -16,7 +14,6 @@ export interface ParamMeta {
   index: number
 }
 
-// eslint-disable-next-line no-shadow
 export enum HttpMethod {
   Get = 'get',
   Post = 'post',
