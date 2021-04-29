@@ -37,3 +37,5 @@ This decision should be revisited when a HMPPS-wide unique identifier approach f
 We may also wish to follow this approach when referring to any data object outside our service. For instance, an appointment owned by the Interventions service would be referred to as `urn:justice:interventions:appointment:{id}`.
 
 This flexibility comes at the expense of complicating the code slightly, though the logic for converting URNs to the bare identifiers is simple and easily shared across our code, or even across services via an `npm` package.
+
+There are other efforts across MoJ, GDS, the Data Strategy Authority, and the Open Standards Board to define cross-organisational identifiers for data, and we hope that this scheme gives us what we need in the short term, while supporting changes to more standardised systems in the future.
