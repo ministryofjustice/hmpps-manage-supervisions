@@ -1,5 +1,5 @@
 import request from 'supertest'
-import appWithAllRoutes from './routes/testutils/appSetup'
+import appFixture from './routes/testutils/app.fixture'
 
 afterEach(() => {
   jest.resetAllMocks()
@@ -7,7 +7,7 @@ afterEach(() => {
 
 describe('GET 404', () => {
   it('should render content with stack in dev mode', async () => {
-    const app = await appWithAllRoutes({})
+    const app = await appFixture({})
     return request(app)
       .get('/unknown')
       .expect(404)
@@ -19,7 +19,7 @@ describe('GET 404', () => {
   })
 
   it('should render content without stack in production mode', async () => {
-    const app = await appWithAllRoutes({ production: true })
+    const app = await appFixture({ server: { isProduction: true } })
     return request(app)
       .get('/unknown')
       .expect(404)

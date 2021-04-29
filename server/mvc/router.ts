@@ -1,4 +1,4 @@
-import { replace, trim } from 'lodash'
+import { replace } from 'lodash'
 import glob from 'glob'
 import { Request, Response, Router } from 'express'
 import { plainToClass } from 'class-transformer'
@@ -7,6 +7,7 @@ import logger from '../../logger'
 import { ControllerMeta, EndpointMeta, ParamMeta, ParamSource } from './types'
 import { ControllerContext } from './controller.context'
 import { HealthException, RedirectException } from './errors'
+import { urlJoin } from '../utils/utils'
 
 interface MvcOptions {
   controllers: string
@@ -107,10 +108,7 @@ export async function useMvc(router: Router, options: MvcOptions): Promise<void>
 
   for (const controller of ControllerContext.value) {
     for (const endpoint of controller.endpoints) {
-      const path = `/${[controller.path, endpoint.path]
-        .map(x => trim(x, '/'))
-        .filter(x => x)
-        .join('/')}`
+      const path = urlJoin(controller.path, endpoint.path)
       if (!(endpoint.method in router)) {
         throw Error(`unknown http method ${endpoint.method}`)
       }

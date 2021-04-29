@@ -55,13 +55,9 @@ function bool(name: string, fallbackFn?: EnvironmentFallback<boolean>): boolean 
 
 @Service()
 export class ConfigService {
-  /**
-   * For use outside DI only
-   */
-  public static INSTANCE: ConfigService = new ConfigService()
-
   get server(): ServerConfig {
     return {
+      isProduction: isProduction(),
       https: bool('PROTOCOL_HTTPS', fallback(isProduction())),
       domain: string('INGRESS_URL', developmentOnly('http://localhost:3000')),
       staticResourceCacheDuration: int('STATIC_RESOURCE_CACHE_DURATION', fallback(20)),
@@ -104,6 +100,7 @@ export class ConfigService {
           id: string('SYSTEM_CLIENT_ID', developmentOnly('interventions')),
           secret: string('SYSTEM_CLIENT_SECRET', developmentOnly('clientsecret')),
         },
+        issuerPath: string('HMPPS_AUTH_ISSUER_PATH', fallback('/issuer')),
       },
       tokenVerification: {
         enabled: bool('TOKEN_VERIFICATION_ENABLED', fallback(false)),

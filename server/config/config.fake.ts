@@ -33,6 +33,7 @@ export function fakeConfig(partial: DeepPartial<ConfigService> = {}): ConfigServ
   return merge(
     {
       server: {
+        isProduction: false,
         https: faker.datatype.boolean(),
         domain: faker.internet.domainName(),
         staticResourceCacheDuration: faker.datatype.number({ min: 60, max: 6000 }),
@@ -53,6 +54,7 @@ export function fakeConfig(partial: DeepPartial<ConfigService> = {}): ConfigServ
           externalUrl: faker.internet.url(),
           apiClientCredentials: fakeClientCredentials(),
           systemClientCredentials: fakeClientCredentials(),
+          issuerPath: '/issuer',
         },
         tokenVerification: fakeApiConfig(),
         community: fakeApiConfig(),
