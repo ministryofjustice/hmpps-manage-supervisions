@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer'
-import { IsInt, IsNotEmpty, IsPositive, IsString } from 'class-validator'
+import { IsDateString, IsInt, IsNotEmpty, IsPositive, IsString } from 'class-validator'
 
 export class AppointmentCreateRequest {
   @Expose()
@@ -13,12 +13,12 @@ export class AppointmentCreateRequest {
   contactType: string
 
   @Expose()
-  @IsString()
+  @IsDateString()
   @IsNotEmpty()
   appointmentStart: string
 
   @Expose()
-  @IsString()
+  @IsDateString()
   @IsNotEmpty()
   appointmentEnd: string
 

@@ -59,7 +59,7 @@ export class ArrangeAppointmentController {
   ): Promise<never> {
     const appointment = plainToClass(AppointmentBuilderDto, session.appointment)
 
-    const appointmentId = await this.service.createAppointment(appointment, crn, user.username)
+    const appointmentId = await this.service.createAppointment(appointment, crn, user)
 
     // TODO render something if the appointment creation fails
 

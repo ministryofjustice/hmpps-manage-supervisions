@@ -1,4 +1,5 @@
 export interface ServerConfig {
+  isProduction: boolean
   https: boolean
   domain: string
   staticResourceCacheDuration: number
@@ -43,6 +44,7 @@ export interface AuthApiConfig extends ApiConfig {
   externalUrl: string
   apiClientCredentials: ClientCredentials
   systemClientCredentials: ClientCredentials
+  issuerPath: string
 }
 
 export interface DependentApisConfig {

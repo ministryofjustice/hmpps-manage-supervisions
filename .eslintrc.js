@@ -38,7 +38,7 @@ module.exports = {
         'import/no-extraneous-dependencies': [
           'error',
           {
-            devDependencies: ['**/*.test.*', '**/*.spec.*', '**/*.fake.*'],
+            devDependencies: ['**/*.test.*', '**/*.spec.*', '**/*.fake.*', '**/*.fixture.*', '**/*.mock.*'],
           },
         ],
       },
@@ -48,4 +48,4 @@ module.exports = {
       extends: ['plugin:cypress/recommended', 'plugin:prettier/recommended'],
     },
   ],
-};
+}

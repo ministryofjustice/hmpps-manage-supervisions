@@ -13,24 +13,24 @@ import redis from 'redis'
 import session from 'express-session'
 import connectRedis from 'connect-redis'
 
-import auth from './authentication/auth'
-import indexRoutes from './routes'
+import { useHmppsAuthPassportStrategy } from './authentication/hmpps.strategy'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
-import standardRouter from './routes/standardRouter'
-import authorisationMiddleware from './middleware/authorisationMiddleware'
-import type UserService from './services/userService'
 import { ConfigService } from './config'
+import { mvcRouter } from './routes'
+import { Container } from 'typedi'
 
 const version = Date.now().toString()
 const production = process.env.NODE_ENV === 'production'
 const testMode = process.env.NODE_ENV === 'test'
 const RedisStore = connectRedis(session)
 
-export default async function createApp(userService: UserService): Promise<express.Application> {
+export default async function createApp(): Promise<express.Application> {
+  const config = Container.get(ConfigService)
+
   const app = express()
 
-  auth.init()
+  useHmppsAuthPassportStrategy(config)
 
   app.set('json spaces', 2)
 
@@ -65,7 +65,6 @@ export default async function createApp(userService: UserService): Promise<expre
 
   app.use(addRequestId())
 
-  const config = ConfigService.INSTANCE
   const client = redis.createClient({ ...config.redis })
 
   app.use(
@@ -173,8 +172,7 @@ export default async function createApp(userService: UserService): Promise<expre
     res.redirect(authLogoutUrl)
   })
 
-  app.use(authorisationMiddleware())
-  const router = await indexRoutes(standardRouter(userService))
+  const router = await mvcRouter()
   app.use('/', router)
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(process.env.NODE_ENV === 'production'))

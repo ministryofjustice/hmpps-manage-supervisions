@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon'
 
+type DateTypes = Date | DateTime
+
 export declare global {
   /**
    * Same as Partial<T> but goes deeper and makes Partial<T> all its properties and sub-properties.
@@ -9,8 +11,8 @@ export declare global {
       ? Array<DeepPartial<U>>
       : T[P] extends ReadonlyArray<infer U>
       ? ReadonlyArray<DeepPartial<U>>
-      : T[P] extends Date
-      ? Date
+      : T[P] extends DateTypes
+      ? T[P]
       : DeepPartial<T[P]>
   }
 
@@ -19,13 +21,11 @@ export declare global {
    */
   declare type FlatDeepPartial<T> = {
     [P in keyof T]?: T[P] extends Array<infer U>
-      ? Array<DeepPartial<U>>
+      ? Array<FlatDeepPartial<U>>
       : T[P] extends ReadonlyArray<infer U>
-      ? ReadonlyArray<DeepPartial<U>>
-      : T[P] extends Date
+      ? ReadonlyArray<FlatDeepPartial<U>>
+      : T[P] extends DateTypes
       ? string
-      : T[P] extends DateTime
-      ? string
-      : DeepPartial<T[P]>
+      : FlatDeepPartial<T[P]>
   }
 }
