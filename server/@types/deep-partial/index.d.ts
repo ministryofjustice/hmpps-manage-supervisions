@@ -21,11 +21,11 @@ export declare global {
    */
   declare type FlatDeepPartial<T> = {
     [P in keyof T]?: T[P] extends Array<infer U>
-      ? Array<DeepPartial<U>>
+      ? Array<FlatDeepPartial<U>>
       : T[P] extends ReadonlyArray<infer U>
-      ? ReadonlyArray<DeepPartial<U>>
+      ? ReadonlyArray<FlatDeepPartial<U>>
       : T[P] extends DateTypes
       ? string
-      : DeepPartial<T[P]>
+      : FlatDeepPartial<T[P]>
   }
 }
