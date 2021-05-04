@@ -15,6 +15,9 @@
         {% block form %}{% endblock %}
 
         {{ govukButton({
+          attributes: {
+            'data-qa': 'arrange-appointment/continue-button'
+          },
           html: buttonText if buttonText else 'Continue'
         }) }}
       </form>

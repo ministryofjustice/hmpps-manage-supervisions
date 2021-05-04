@@ -3,6 +3,7 @@ import { HealthClient, ServiceCheck } from './health.client'
 import { ConfigService, DependentApisConfig } from '../config'
 import { HealthResult } from './types'
 import { HealthException } from '../mvc'
+import ApplicationVersion from '../applicationVersion'
 
 @Service({ global: true })
 export class HealthService {
@@ -16,13 +17,12 @@ export class HealthService {
 
   async getHealth(): Promise<HealthResult> {
     const checks = await Promise.all(this.serviceChecks.map(x => x()))
-    const build = await HealthService.getBuildInfo()
     const result = {
       healthy: checks.length === 0 || checks.every(x => x.healthy),
       checks: checks.reduce((agg, x) => ({ ...agg, [x.name]: x.result }), {}),
       uptime: process.uptime(),
-      build,
-      version: build?.buildNumber,
+      build: ApplicationVersion.buildInfo,
+      version: ApplicationVersion.buildNumber,
     }
 
     if (!result.healthy) {
@@ -30,13 +30,5 @@ export class HealthService {
     }
 
     return result
-  }
-
-  private static async getBuildInfo() {
-    try {
-      return await require('../../build-info.json')
-    } catch (ex) {
-      return null
-    }
   }
 }

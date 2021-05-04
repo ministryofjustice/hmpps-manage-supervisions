@@ -3,6 +3,9 @@
 {% macro sessionDetails(appointment, rarDetails) %}
   {{ govukSummaryList({
     classes: 'govuk-!-margin-bottom-9',
+    attributes: {
+      'data-qa': 'arrange-appointment/details'
+    },
     rows: [
       {
         key: { text: "Type of appointment" },

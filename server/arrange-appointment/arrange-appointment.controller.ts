@@ -23,9 +23,10 @@ export class ArrangeAppointmentController {
   @Render('pages/arrange-appointment/check')
   get(@Param('crn') crn: string, @Session() session: AppointmentSession): ArrangeAppointmentViewModel {
     // HACK fill out dummy data
+    const date = DateTime.now().plus({ hours: 1 }).set({ minute: 0, second: 0, millisecond: 0 })
     session.appointment = {
-      appointmentStart: DateTime.now().plus({ hours: 1 }).toISO(),
-      appointmentEnd: DateTime.now().plus({ hours: 2 }).toISO(),
+      appointmentStart: date.toISO(),
+      appointmentEnd: date.plus({ hours: 1 }).toISO(),
       contactType: {
         code: 'COTH',
         description: 'Office Visit',
