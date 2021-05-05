@@ -1,6 +1,5 @@
 import { ArrangeAppointmentPage } from '../../pages'
 import { DateTime } from 'luxon'
-import { chunk } from 'lodash'
 
 const crn = 'ABC123'
 const sentenceId = 2500443138
@@ -39,12 +38,7 @@ context('CreateAppointment', () => {
     cy.arrangeAppointmentStep(crn, 'check')
     page.pageTitle.contains('Check your answers')
 
-    page.appointmentSummaryTable.then($el => {
-      const text = $el.map((i, x) => x.innerText).toArray()
-      const observed = chunk(text, 2).reduce((agg, [k, v]) => ({ ...agg, [k]: v }), {})
-
-      expect(observed).to.deep.eq(expectedSummary)
-    })
+    page.appointmentSummaryTable.should('deep.eq', expectedSummary)
   })
 
   it('Dummy appointment booked', () => {
