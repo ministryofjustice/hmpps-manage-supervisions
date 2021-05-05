@@ -1,5 +1,6 @@
 import { ArrangeAppointmentPage } from '../../pages'
 import { DateTime } from 'luxon'
+import { chunk } from 'lodash'
 
 const crn = 'ABC123'
 const sentenceId = 2500443138
@@ -38,19 +39,11 @@ context('CreateAppointment', () => {
     cy.arrangeAppointmentStep(crn, 'check')
     page.pageTitle.contains('Check your answers')
 
-    // TODO these assertions are not nice, open to suggestions please!!!
-    page.appointmentSummaryTableLabels.then(labels => {
-      const expectedKeys = Object.keys(expectedSummary)
-      for (let i = 0; i < expectedKeys.length; i++) {
-        expect(labels[i]).to.contain.text(expectedKeys[i])
-      }
-    })
+    page.appointmentSummaryTable.then($el => {
+      const text = $el.map((i, x) => x.innerText).toArray()
+      const observed = chunk(text, 2).reduce((agg, [k, v]) => ({ ...agg, [k]: v }), {})
 
-    page.appointmentSummaryTableData.then(values => {
-      const expectedValues = Object.values(expectedSummary)
-      for (let i = 0; i < expectedValues.length; i++) {
-        expect(values[i]).to.contain.text(expectedValues[i])
-      }
+      expect(observed).to.deep.eq(expectedSummary)
     })
   })
 
