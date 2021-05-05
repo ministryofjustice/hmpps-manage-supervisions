@@ -2,8 +2,11 @@ import nunjucks from 'nunjucks'
 import express from 'express'
 import * as path from 'path'
 import { DateTime } from 'luxon'
+import { Container } from 'typedi'
+import { ConfigService } from '../config'
 
 export default function nunjucksSetup(app: express.Application): void {
+  const config = Container.get(ConfigService)
   nunjucks
     .configure(
       [
@@ -16,6 +19,8 @@ export default function nunjucksSetup(app: express.Application): void {
       {
         autoescape: true,
         express: app,
+        watch: !config.server.isProduction,
+        noCache: !config.server.isProduction,
       },
     )
     .addFilter('initialiseName', (fullName: string) => {
