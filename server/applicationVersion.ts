@@ -1,8 +1,9 @@
 import * as fs from 'fs'
 
 const packageData = JSON.parse(fs.readFileSync('./package.json').toString())
-const buildNumber = fs.existsSync('./build-info.json')
-  ? JSON.parse(fs.readFileSync('./build-info.json').toString()).buildNumber
-  : packageData.version
+const buildInfo = fs.existsSync('./build-info.json')
+  ? JSON.parse(fs.readFileSync('./build-info.json', { encoding: 'utf8' }).toString())
+  : {}
+const buildNumber = buildInfo?.buildNumber || packageData.version
 
-export default { buildNumber, packageData }
+export default { buildNumber, packageData, buildInfo }

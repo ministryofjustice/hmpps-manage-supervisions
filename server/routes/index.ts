@@ -8,7 +8,7 @@ export async function mvcRouter(): Promise<Router> {
 
   router.use(tokenVerificationMiddleware())
 
-  // populate some some response local data
+  // populate some response local data
   router.use((req, res, next) => {
     res.locals.user = req.user
     if (typeof req.csrfToken === 'function') {
