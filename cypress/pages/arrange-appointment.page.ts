@@ -1,15 +1,16 @@
 import { PageBase } from './page'
+import { chunk } from 'lodash'
+import Chainable = Cypress.Chainable
 
 /**
  * TODO this needs splitting up into steps somehow, preferably via a fluent api
  */
 export class ArrangeAppointmentPage extends PageBase {
-  get appointmentSummaryTableLabels() {
-    return cy.get('dl[data-qa="arrange-appointment/details"] div > dt')
-  }
-
-  get appointmentSummaryTableData() {
-    return cy.get('dl[data-qa="arrange-appointment/details"] div > dd')
+  get appointmentSummaryTable(): Chainable<any> {
+    return cy.get('dl[data-qa="arrange-appointment/details"] div >').then($el => {
+      const text = $el.map((i, x) => x.innerText).toArray()
+      return chunk(text, 2).reduce((agg, [k, v]) => ({ ...agg, [k]: v }), {})
+    })
   }
 
   get continueButton() {

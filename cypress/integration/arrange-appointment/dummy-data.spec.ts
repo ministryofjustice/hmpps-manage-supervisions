@@ -38,20 +38,7 @@ context('CreateAppointment', () => {
     cy.arrangeAppointmentStep(crn, 'check')
     page.pageTitle.contains('Check your answers')
 
-    // TODO these assertions are not nice, open to suggestions please!!!
-    page.appointmentSummaryTableLabels.then(labels => {
-      const expectedKeys = Object.keys(expectedSummary)
-      for (let i = 0; i < expectedKeys.length; i++) {
-        expect(labels[i]).to.contain.text(expectedKeys[i])
-      }
-    })
-
-    page.appointmentSummaryTableData.then(values => {
-      const expectedValues = Object.values(expectedSummary)
-      for (let i = 0; i < expectedValues.length; i++) {
-        expect(values[i]).to.contain.text(expectedValues[i])
-      }
-    })
+    page.appointmentSummaryTable.should('deep.eq', expectedSummary)
   })
 
   it('Dummy appointment booked', () => {
