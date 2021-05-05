@@ -7,7 +7,6 @@ import csurf from 'csurf'
 import path from 'path'
 import compression from 'compression'
 import createError from 'http-errors'
-import flash from 'connect-flash'
 import passport from 'passport'
 import redis from 'redis'
 import session from 'express-session'
@@ -84,8 +83,6 @@ export default async function createApp(): Promise<express.Application> {
   // Request Processing Configuration
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
-
-  app.use(flash())
 
   // Resource Delivery Configuration
   app.use(compression())
