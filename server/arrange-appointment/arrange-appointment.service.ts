@@ -29,7 +29,7 @@ export class ArrangeAppointmentService {
 
     // TODO do something with these errors
     const errors = await validate(request)
-    if (errors) {
+    if (errors.length > 0) {
       logger.error(errors)
     }
 
