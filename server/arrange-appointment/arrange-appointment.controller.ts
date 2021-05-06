@@ -28,8 +28,8 @@ export class ArrangeAppointmentController {
       appointmentStart: date.toISO(),
       appointmentEnd: date.plus({ hours: 1 }).toISO(),
       contactType: {
-        code: 'COTH',
-        description: 'Office Visit',
+        code: 'COPT',
+        description: 'Planned Telephone Contact (NS)',
       },
       notes: 'some notes',
       providerCode: 'CRS',
