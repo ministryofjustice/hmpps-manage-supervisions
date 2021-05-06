@@ -132,4 +132,25 @@ export class HmppsAuthMockApi {
       },
     })
   }
+
+  async stubOpenIdConfiguration() {
+    return this.client.stub({
+      request: {
+        method: 'GET',
+        urlPattern: '/auth/issuer/.well-known/openid-configuration',
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          issuer: 'http://localhost:9091/auth/issuer',
+          authorization_endpoint: 'http://localhost:9091/auth/oauth/authorize',
+          token_endpoint: 'http://localhost:9091/auth/oauth/token',
+          jwks_uri: 'http://localhost:9091/auth/.well-known/jwks.json',
+        },
+      },
+    })
+  }
 }

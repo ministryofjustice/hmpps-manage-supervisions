@@ -40,7 +40,7 @@ export class CacheService implements ICacheService {
 
   async getOrSet(key: string, factory: ValueFactory): Promise<string> {
     const cached = await this.get(key)
-    if (cached !== undefined) {
+    if (cached) {
       return cached
     }
 
