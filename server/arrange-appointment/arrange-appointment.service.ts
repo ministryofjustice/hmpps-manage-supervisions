@@ -29,7 +29,9 @@ export class ArrangeAppointmentService {
 
     // TODO do something with these errors
     const errors = await validate(request)
-    logger.error(errors)
+    if (errors) {
+      logger.error(errors)
+    }
 
     // TODO pass the user token through where appropriate
     const client = await this.factory.build('community', user, AuthenticationMethod.ReissueForDeliusUser)
@@ -40,7 +42,6 @@ export class ArrangeAppointmentService {
         data: classToPlain(request),
       },
     )
-
     return response.appointmentId || response.id
   }
 }

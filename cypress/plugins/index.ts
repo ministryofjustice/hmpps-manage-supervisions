@@ -18,7 +18,8 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
     getLoginUrl: () => auth.getLoginUrl(),
     getLoginAttempts: () => auth.getLoginAttempts(),
     getLogoutAttempts: () => auth.getLogoutAttempts(),
-    stubLogin: () => Promise.all([auth.stubToken(), auth.stubRedirect(), auth.stubLogout()]),
+    stubLogin: () =>
+      Promise.all([auth.stubToken(), auth.stubRedirect(), auth.stubLogout(), auth.stubOpenIdConfiguration()]),
     stubAuthUser: () => Promise.all([auth.stubUser(), auth.stubUserRoles()]),
 
     stubCreateAppointment(args: CreateAppointmentArgs) {

@@ -20,6 +20,9 @@ export class CommunityMockApi {
       },
       response: {
         status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
         jsonBody: { appointmentId: 100 },
       },
     })
