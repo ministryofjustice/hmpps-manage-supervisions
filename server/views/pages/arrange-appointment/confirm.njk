@@ -1,0 +1,26 @@
+{% extends "../wizard-page.njk" %}
+{% set buttonText = 'Finish' %}
+{% set buttonQa = 'confirm-appointment/finish-button' %}
+{% set title = 'Appointment arranged' %}
+{% block page %}
+  {% set panelHtml %}
+    <strong><span data-qa="confirm-appointment/description">{{ appointment.description }}</span></strong><br />
+    <span data-qa="confirm-appointment/times">{{ appointment.start | dateFormat('cccc d MMMM') }} from {{ appointment.start | dateFormat('h:mm a') }}</span>
+  {% endset %}
+
+  {{ govukPanel({
+    titleText: title,
+    html: panelHtml
+  }) }}
+
+  <h2 class="govuk-heading-m govuk-!-margin-top-6">Next steps</h2>
+  <p class="govuk-body">
+    Add this appointment to your calendar.
+  </p>
+  <p class="govuk-body">
+    Give details of the appointment to {{ offender.firstName }}.<br>
+    {% if offender.phoneNumber %}
+      <span data-qa="confirm-appointment/phone">{{ offender.firstName }}’s phone number is <strong>{{ offender.phoneNumber }}</strong>.</span>
+    {% endif %}
+  </p>
+{% endblock %}

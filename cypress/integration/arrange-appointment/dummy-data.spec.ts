@@ -1,4 +1,4 @@
-import { ArrangeAppointmentPage } from '../../pages'
+import { ArrangeAppointmentPage, ConfirmAppointmentPage } from '../../pages'
 import { DateTime } from 'luxon'
 
 const crn = 'ABC123'
@@ -43,12 +43,20 @@ context('CreateAppointment', () => {
 
   it('Dummy appointment booked', () => {
     cy.task('stubCreateAppointment', { crn, sentenceId })
+    cy.task('stubOffenderDetails', crn)
     cy.login()
 
     // TODO run through form builder here, using the page object as an abstraction.
 
     cy.arrangeAppointmentStep(crn, 'check')
     page.continueButton.click()
+
+    const confirmationPage = new ConfirmAppointmentPage()
+    confirmationPage.pageTitle.contains('Appointment arranged')
+    confirmationPage.descriptionMessage.contains('Office Visit')
+    confirmationPage.timeMessage.contains('Thursday 6 May from 10:00 AM')
+    confirmationPage.phoneMessage.contains('Beth')
+    confirmationPage.phoneMessage.contains('07734 111992')
 
     cy.task('getCreatedAppointments', { crn, sentenceId }).should('deep.eq', [
       {

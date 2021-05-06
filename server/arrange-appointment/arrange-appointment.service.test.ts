@@ -4,9 +4,14 @@ import { RestClient } from '../data/RestClient'
 import { RestClientFactory } from '../data/RestClientFactory'
 import { fakeUserPrincipal } from '../authentication/user.fake'
 import { ArrangeAppointmentService } from './arrange-appointment.service'
-import { fakeAppointmentBuilderDto, fakeAppointmentCreateResponse } from './dto/arrange-appointment.fake'
+import {
+  fakeAppointmentBuilderDto,
+  fakeAppointmentCreateResponse,
+  fakeOffenderDetailsResponse,
+} from './dto/arrange-appointment.fake'
 import * as faker from 'faker'
 import { AppointmentCreateResponse } from './dto/AppointmentCreateResponse'
+import { OffenderDetailsResponse } from './dto/OffenderDetailsResponse'
 
 describe('ArrangeAppointmentService', () => {
   let client: SinonStubbedInstance<RestClient>
@@ -31,9 +36,9 @@ describe('ArrangeAppointmentService', () => {
       .withArgs(AppointmentCreateResponse, `/offenders/crn/${crn}/sentence/${dto.sentenceId}/appointments`, match.any)
       .resolves(response)
 
-    const id = await subject.createAppointment(dto, crn, user)
+    const returned = await subject.createAppointment(dto, crn, user)
 
-    expect(id).toBe(response.appointmentId)
+    expect(returned).toBe(response)
     expect(stub.getCall(0).args[2]).toEqual({
       data: {
         appointmentStart: dto.appointmentStart.toISO(),
@@ -47,5 +52,16 @@ describe('ArrangeAppointmentService', () => {
         teamCode: dto.teamCode,
       },
     })
+  })
+
+  it('gets offender details', async () => {
+    const response = fakeOffenderDetailsResponse()
+    const crn = faker.datatype.uuid()
+
+    client.get.withArgs(OffenderDetailsResponse, `/offenders/crn/${crn}`).resolves(response)
+
+    const returned = await subject.getOffenderDetails(crn, user)
+
+    expect(returned).toBe(response)
   })
 })
