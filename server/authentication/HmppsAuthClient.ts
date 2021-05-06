@@ -1,5 +1,6 @@
 import { Service } from 'typedi'
 import { RestClientFactory } from '../data/RestClientFactory'
+import { ClientCredentials } from '../config'
 import { Expose } from 'class-transformer'
 
 export class UserProfile {
@@ -41,4 +42,9 @@ export class HmppsAuthClient {
     const roles = await client.get<UserRole[]>(UserRole, '/api/user/me/roles')
     return roles.map(x => x.roleCode)
   }
+}
+
+export function generateOauthClientToken(credentials: ClientCredentials): string {
+  const token = Buffer.from(`${credentials.id}:${credentials.secret}`).toString('base64')
+  return `Basic ${token}`
 }

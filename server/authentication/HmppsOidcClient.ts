@@ -1,6 +1,7 @@
 import { Service } from 'typedi'
-import { Client, Issuer } from 'openid-client'
+import { Client, Issuer, custom } from 'openid-client'
 import { AuthApiConfig, ConfigService } from '../config'
+import { generateOauthClientToken } from './HmppsAuthClient'
 import { CacheService } from '../data/CacheService'
 import { urlJoin } from '../utils/utils'
 
@@ -22,6 +23,11 @@ export class HmppsOidcClient {
         client_id: credentials.id,
         client_secret: credentials.secret,
       })
+
+      client[custom.http_options] = options => {
+        options.headers = Object.assign(options.headers, { Authorization: generateOauthClientToken(credentials) })
+        return options
+      }
 
       const tokenSet = await client.grant({ grant_type: 'client_credentials', username })
       return { value: tokenSet.access_token, options: { durationSeconds: tokenSet.expires_in - 60 } }

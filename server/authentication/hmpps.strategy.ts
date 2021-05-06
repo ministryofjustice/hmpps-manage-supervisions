@@ -1,19 +1,14 @@
 import passport from 'passport'
 import { Strategy } from 'passport-oauth2'
 
-import { ClientCredentials, ConfigService } from '../config'
-import { HmppsAuthClient } from './HmppsAuthClient'
+import { ConfigService } from '../config'
+import { HmppsAuthClient, generateOauthClientToken } from './HmppsAuthClient'
 import { Container } from 'typedi'
 import { convertToTitleCase } from '../utils/utils'
 
 // Our user principal is quite flat so no need for complex serialization
 passport.serializeUser((user, done) => done(null, user))
 passport.deserializeUser((user, done) => done(null, user))
-
-function generateOauthClientToken(credentials: ClientCredentials): string {
-  const token = Buffer.from(`${credentials.id}:${credentials.secret}`).toString('base64')
-  return `Basic ${token}`
-}
 
 export function useHmppsAuthPassportStrategy(config: ConfigService): void {
   const client = Container.get(HmppsAuthClient)
