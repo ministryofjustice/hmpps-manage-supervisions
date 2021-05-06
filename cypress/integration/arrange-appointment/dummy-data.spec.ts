@@ -12,7 +12,7 @@ context('CreateAppointment', () => {
   const expectedEnd = expectedStart.plus({ hour: 1 })
 
   const expectedSummary = {
-    'Type of appointment': 'Office Visit',
+    'Type of appointment': 'Planned Telephone Contact (NS)',
     Date: expectedStart.toFormat('cccc d MMMM'),
     Time: `${expectedStart.toFormat('h:mm a')} to ${expectedEnd.toFormat('h:mm a')}`,
     'RAR activity': 'No',
@@ -53,7 +53,7 @@ context('CreateAppointment', () => {
     cy.task('getCreatedAppointments', { crn, sentenceId }).should('deep.eq', [
       {
         requirementId: 2500199144,
-        contactType: 'COTH',
+        contactType: 'COPT',
         appointmentStart: expectedStart.toISO(),
         appointmentEnd: expectedEnd.toISO(),
         notes: 'some notes',
