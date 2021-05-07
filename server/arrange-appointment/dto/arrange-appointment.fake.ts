@@ -84,12 +84,14 @@ export function fakeOffenderDetailsResponse(
       {
         firstName: faker.name.firstName(),
         surname: faker.name.lastName(),
-        phoneNumbers: [
-          {
-            type: 'MOBILE',
-            number: faker.phone.phoneNumber(),
-          },
-        ],
+        contactDetails: {
+          phoneNumbers: [
+            {
+              type: 'MOBILE',
+              number: faker.phone.phoneNumber(),
+            },
+          ],
+        },
       } as OffenderDetailsResponse,
       partial,
     ),
