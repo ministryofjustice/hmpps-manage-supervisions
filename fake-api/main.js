@@ -29,7 +29,7 @@ app.use(middlewares)
 
 app.use(
   jsonServer.rewriter({
-    '/offenders/crn/*/sentence/*/appointments': '/appointments',
+    '/secure/offenders/crn/*/sentence/*/appointments': '/appointments',
   }),
 )
 

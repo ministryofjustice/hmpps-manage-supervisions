@@ -38,7 +38,7 @@ export class ArrangeAppointmentService {
     const client = await this.factory.build('community', user, AuthenticationMethod.ReissueForDeliusUser)
     const response = await client.post(
       AppointmentCreateResponse,
-      `/offenders/crn/${crn}/sentence/${sentenceId}/appointments`,
+      `/secure/offenders/crn/${crn}/sentence/${sentenceId}/appointments`,
       {
         data: classToPlain(request),
       },
@@ -50,6 +50,6 @@ export class ArrangeAppointmentService {
   async getOffenderDetails(crn: string, user: UserPrincipal): Promise<OffenderDetailsResponse> {
     const client = await this.factory.build('community', user, AuthenticationMethod.ReissueForDeliusUser)
 
-    return await client.get(OffenderDetailsResponse, `/offenders/crn/${crn}`)
+    return await client.get(OffenderDetailsResponse, `/secure/offenders/crn/${crn}`)
   }
 }
