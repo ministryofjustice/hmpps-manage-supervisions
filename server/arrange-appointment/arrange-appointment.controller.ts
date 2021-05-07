@@ -1,7 +1,6 @@
 import { DateTime } from 'luxon'
-import { Controller, Get, Param, Post, RedirectException, Render, Session, User, ViewModel } from '../mvc'
+import { Controller, Get, Param, Post, Render, Session, User, ViewModel } from '../mvc'
 import { ArrangeAppointmentService } from './arrange-appointment.service'
-import { AppointmentCreateResponse } from './dto/AppointmentCreateResponse'
 import { plainToClass } from 'class-transformer'
 import { first } from 'lodash'
 import { AppointmentBuilderDto } from './dto/AppointmentBuilderDto'
@@ -13,9 +12,20 @@ export interface ArrangeAppointmentViewModel extends ViewModel<AppointmentBuilde
   }
 }
 
+export interface ConfirmAppointmentViewModel {
+  appointment: {
+    start: string
+    end: string
+    description: string
+  }
+  offender: {
+    firstName: string
+    phoneNumber: string
+  }
+}
+
 interface AppointmentSession {
   appointment?: FlatDeepPartial<AppointmentBuilderDto>
-  appointmentCreateReponse?: FlatDeepPartial<AppointmentCreateResponse>
 }
 
 @Controller('/arrange-appointment/:crn(\\w+)')
@@ -56,31 +66,15 @@ export class ArrangeAppointmentController {
   }
 
   @Post('/check')
+  @Render('pages/arrange-appointment/confirm')
   async post(
     @Param('crn') crn: string,
     @Session() session: AppointmentSession,
     @User() user: UserPrincipal,
-  ): Promise<never> {
+  ): Promise<ConfirmAppointmentViewModel> {
     const appointment = plainToClass(AppointmentBuilderDto, session.appointment)
 
-    await this.service
-      .createAppointment(appointment, crn, user)
-      .then(appointmentResponse => (session.appointmentCreateReponse = appointmentResponse))
-
-    // TODO render something if the appointment creation fails
-    throw new RedirectException(`/arrange-appointment/${crn}/confirmation`)
-  }
-
-  @Get('/confirmation')
-  @Render('pages/arrange-appointment/confirm')
-  async confirm(
-    @Param('crn') crn: string,
-    @Session() session: AppointmentSession,
-    @User() user: UserPrincipal,
-  ): Promise<any> {
-    if (session.appointmentCreateReponse == null) {
-      throw new RedirectException(`/arrange-appointment/${crn}/check`)
-    }
+    const appointmentCreateReponse = await this.service.createAppointment(appointment, crn, user)
 
     const offenderDetails = await this.service.getOffenderDetails(crn, user)
 
@@ -91,9 +85,9 @@ export class ArrangeAppointmentController {
 
     return {
       appointment: {
-        start: session.appointmentCreateReponse.appointmentStart,
-        end: session.appointmentCreateReponse.appointmentEnd,
-        description: session.appointmentCreateReponse.typeDescription,
+        start: appointmentCreateReponse.appointmentStart,
+        end: appointmentCreateReponse.appointmentEnd,
+        description: appointmentCreateReponse.typeDescription,
       },
       offender: {
         firstName: offenderDetails.firstName,
