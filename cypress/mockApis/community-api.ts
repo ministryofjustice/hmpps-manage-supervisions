@@ -16,7 +16,7 @@ export class CommunityMockApi {
     return this.client.stub({
       request: {
         method: 'POST',
-        urlPath: `/community/offenders/crn/${crn}/sentence/${sentenceId}/appointments`,
+        urlPath: `/community/secure/offenders/crn/${crn}/sentence/${sentenceId}/appointments`,
       },
       response: {
         status: 200,
@@ -37,7 +37,7 @@ export class CommunityMockApi {
     return this.client.stub({
       request: {
         method: 'GET',
-        urlPath: `/community/offenders/crn/${crn}`,
+        urlPath: `/community/secure/offenders/crn/${crn}`,
       },
       response: {
         status: 200,
@@ -77,7 +77,7 @@ export class CommunityMockApi {
 
   async getCreatedAppointments({ crn, sentenceId }: CreateAppointmentArgs) {
     const requests = await this.client.getRequests(
-      `/community/offenders/crn/${crn}/sentence/${sentenceId}/appointments`,
+      `/community/secure/offenders/crn/${crn}/sentence/${sentenceId}/appointments`,
     )
     return requests.map(x => JSON.parse(x.request.body))
   }

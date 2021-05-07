@@ -33,7 +33,11 @@ describe('ArrangeAppointmentService', () => {
     const crn = faker.datatype.uuid()
 
     const stub = client.post
-      .withArgs(AppointmentCreateResponse, `/offenders/crn/${crn}/sentence/${dto.sentenceId}/appointments`, match.any)
+      .withArgs(
+        AppointmentCreateResponse,
+        `/secure/offenders/crn/${crn}/sentence/${dto.sentenceId}/appointments`,
+        match.any,
+      )
       .resolves(response)
 
     const returned = await subject.createAppointment(dto, crn, user)
@@ -58,7 +62,7 @@ describe('ArrangeAppointmentService', () => {
     const response = fakeOffenderDetailsResponse()
     const crn = faker.datatype.uuid()
 
-    client.get.withArgs(OffenderDetailsResponse, `/offenders/crn/${crn}`).resolves(response)
+    client.get.withArgs(OffenderDetailsResponse, `/secure/offenders/crn/${crn}`).resolves(response)
 
     const returned = await subject.getOffenderDetails(crn, user)
 
