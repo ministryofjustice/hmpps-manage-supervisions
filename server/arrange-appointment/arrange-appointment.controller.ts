@@ -74,20 +74,24 @@ export class ArrangeAppointmentController {
   ): Promise<ConfirmAppointmentViewModel> {
     const appointment = plainToClass(AppointmentBuilderDto, session.appointment)
 
-    const appointmentCreateReponse = await this.service.createAppointment(appointment, crn, user)
+    const appointmentCreateResponse = await this.service.createAppointment(appointment, crn, user)
 
     const offenderDetails = await this.service.getOffenderDetails(crn, user)
 
+    console.log(offenderDetails.contactDetails.phoneNumbers)
+
     const phoneNumber =
-      offenderDetails.phoneNumbers && offenderDetails.phoneNumbers.length > 0
-        ? first(offenderDetails.phoneNumbers).number
+      offenderDetails.contactDetails &&
+      offenderDetails.contactDetails.phoneNumbers &&
+      offenderDetails.contactDetails.phoneNumbers.length > 0
+        ? first(offenderDetails.contactDetails.phoneNumbers).number
         : null
 
     return {
       appointment: {
-        start: appointmentCreateReponse.appointmentStart,
-        end: appointmentCreateReponse.appointmentEnd,
-        description: appointmentCreateReponse.typeDescription,
+        start: appointmentCreateResponse.appointmentStart,
+        end: appointmentCreateResponse.appointmentEnd,
+        description: appointmentCreateResponse.typeDescription,
       },
       offender: {
         firstName: offenderDetails.firstName,

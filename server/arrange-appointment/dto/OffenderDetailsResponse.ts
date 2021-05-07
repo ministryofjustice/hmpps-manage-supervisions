@@ -1,5 +1,5 @@
 import { Expose, Type } from 'class-transformer'
-import { PhoneNumber } from './PhoneNumber'
+import { ContactDetails } from './ContactDetails'
 
 export class OffenderDetailsResponse {
   @Expose()
@@ -9,6 +9,6 @@ export class OffenderDetailsResponse {
   surname: string
 
   @Expose()
-  @Type(() => PhoneNumber)
-  phoneNumbers?: PhoneNumber[]
+  @Type(() => ContactDetails)
+  contactDetails: ContactDetails
 }

@@ -52,18 +52,19 @@ export class CommunityMockApi {
           dateOfBirth: '1970-01-01',
           gender: 'Female',
           otherIds: { crn: 'X009923' },
-          contactDetails: {},
+          contactDetails: {
+            phoneNumbers: [
+              {
+                type: 'MOBILE',
+                number: '07734 111992',
+              },
+            ],
+          },
           offenderProfile: {
             offenderLanguages: {},
             remandStatus: 'Bail - Unconditional',
             previousConviction: {},
           },
-          phoneNumbers: [
-            {
-              type: 'MOBILE',
-              number: '07734 111992',
-            },
-          ],
           softDeleted: false,
           currentDisposal: '1',
           partitionArea: 'National Data',
