@@ -4,6 +4,7 @@ import { AppointmentCreateRequest } from './AppointmentCreateRequest'
 import { AppointmentBuilderDto, AppointmentMetaType } from './AppointmentBuilderDto'
 import { plainToClass } from 'class-transformer'
 import { AppointmentCreateResponse } from './AppointmentCreateResponse'
+import { OffenderDetailsResponse } from './OffenderDetailsResponse'
 
 function fakeAppointmentMetaType(): DeepPartial<AppointmentMetaType> {
   return {
@@ -65,7 +66,31 @@ export function fakeAppointmentCreateResponse(
     merge(
       {
         appointmentId: faker.datatype.number(),
+        appointmentStart: faker.date.future().toISOString(),
+        appointmentEnd: faker.date.future().toISOString(),
+        typeDescription: faker.lorem.slug(3),
       } as AppointmentCreateResponse,
+      partial,
+    ),
+  )
+}
+
+export function fakeOffenderDetailsResponse(
+  partial: DeepPartial<OffenderDetailsResponse> = {},
+): OffenderDetailsResponse {
+  return plainToClass(
+    OffenderDetailsResponse,
+    merge(
+      {
+        firstName: faker.name.firstName(),
+        surname: faker.name.lastName(),
+        phoneNumbers: [
+          {
+            type: 'MOBILE',
+            number: faker.phone.phoneNumber(),
+          },
+        ],
+      } as OffenderDetailsResponse,
       partial,
     ),
   )

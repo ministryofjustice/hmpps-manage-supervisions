@@ -1,13 +1,26 @@
 import { DateTime } from 'luxon'
-import { Controller, Get, Param, Post, RedirectException, Render, Session, User, ViewModel } from '../mvc'
+import { Controller, Get, Param, Post, Render, Session, User, ViewModel } from '../mvc'
 import { ArrangeAppointmentService } from './arrange-appointment.service'
 import { plainToClass } from 'class-transformer'
+import { first } from 'lodash'
 import { AppointmentBuilderDto } from './dto/AppointmentBuilderDto'
 
 export interface ArrangeAppointmentViewModel extends ViewModel<AppointmentBuilderDto, 'appointment'> {
   rarDetails: {
     category: string
     subCategory: string
+  }
+}
+
+export interface ConfirmAppointmentViewModel {
+  appointment: {
+    start: string
+    end: string
+    description: string
+  }
+  offender: {
+    firstName: string
+    phoneNumber: string
   }
 }
 
@@ -53,17 +66,33 @@ export class ArrangeAppointmentController {
   }
 
   @Post('/check')
+  @Render('pages/arrange-appointment/confirm')
   async post(
     @Param('crn') crn: string,
     @Session() session: AppointmentSession,
     @User() user: UserPrincipal,
-  ): Promise<never> {
+  ): Promise<ConfirmAppointmentViewModel> {
     const appointment = plainToClass(AppointmentBuilderDto, session.appointment)
 
-    const appointmentId = await this.service.createAppointment(appointment, crn, user)
+    const appointmentCreateReponse = await this.service.createAppointment(appointment, crn, user)
 
-    // TODO render something if the appointment creation fails
+    const offenderDetails = await this.service.getOffenderDetails(crn, user)
 
-    throw new RedirectException(`/arrange-a-session/${appointmentId}/confirmation`)
+    const phoneNumber =
+      offenderDetails.phoneNumbers && offenderDetails.phoneNumbers.length > 0
+        ? first(offenderDetails.phoneNumbers).number
+        : null
+
+    return {
+      appointment: {
+        start: appointmentCreateReponse.appointmentStart,
+        end: appointmentCreateReponse.appointmentEnd,
+        description: appointmentCreateReponse.typeDescription,
+      },
+      offender: {
+        firstName: offenderDetails.firstName,
+        phoneNumber: phoneNumber,
+      },
+    }
   }
 }

@@ -6,6 +6,7 @@ import { validate } from 'class-validator'
 import logger from '../../logger'
 import { AuthenticationMethod, RestClientFactory } from '../data/RestClientFactory'
 import { AppointmentCreateResponse } from './dto/AppointmentCreateResponse'
+import { OffenderDetailsResponse } from './dto/OffenderDetailsResponse'
 
 @Service()
 export class ArrangeAppointmentService {
@@ -15,7 +16,7 @@ export class ArrangeAppointmentService {
     { sentenceId, ...appointment }: AppointmentBuilderDto,
     crn: string,
     user: UserPrincipal,
-  ): Promise<number> {
+  ): Promise<AppointmentCreateResponse> {
     const request = plainToClass(
       AppointmentCreateRequest,
       {
@@ -42,6 +43,13 @@ export class ArrangeAppointmentService {
         data: classToPlain(request),
       },
     )
-    return response.appointmentId || response.id
+
+    return response
+  }
+
+  async getOffenderDetails(crn: string, user: UserPrincipal): Promise<OffenderDetailsResponse> {
+    const client = await this.factory.build('community', user, AuthenticationMethod.ReissueForDeliusUser)
+
+    return await client.get(OffenderDetailsResponse, `/offenders/crn/${crn}`)
   }
 }

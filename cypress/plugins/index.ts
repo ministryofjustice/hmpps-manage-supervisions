@@ -25,6 +25,9 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
     stubCreateAppointment(args: CreateAppointmentArgs) {
       return communityApi.stubCreateAppointment(args)
     },
+    stubOffenderDetails(crn: string) {
+      return communityApi.stubOffenderDetails(crn)
+    },
     getCreatedAppointments(args: CreateAppointmentArgs) {
       return communityApi.getCreatedAppointments(args)
     },
