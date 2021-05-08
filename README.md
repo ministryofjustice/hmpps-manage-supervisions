@@ -32,7 +32,7 @@ To start the main services excluding `HMPPS Manage Supervisions`:
 docker-compose up redis hmpps-auth fake-api
 ```
 
-Pr with real Community API:
+Or with real Community API:
 
 ```bash
 docker-compose -f docker-compose.yml -f docker-compose.community-api.yml up redis hmpps-auth community-api

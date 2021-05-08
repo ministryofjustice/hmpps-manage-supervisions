@@ -22,6 +22,9 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
       Promise.all([auth.stubToken(), auth.stubRedirect(), auth.stubLogout(), auth.stubOpenIdConfiguration()]),
     stubAuthUser: () => Promise.all([auth.stubUser(), auth.stubUserRoles()]),
 
+    stubGetAppointmentTypes() {
+      return communityApi.stubGetAppointmentTypes()
+    },
     stubCreateAppointment(args: CreateAppointmentArgs) {
       return communityApi.stubCreateAppointment(args)
     },

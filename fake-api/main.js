@@ -30,6 +30,8 @@ app.use(middlewares)
 app.use(
   jsonServer.rewriter({
     '/secure/offenders/crn/*/sentence/*/appointments': '/appointments',
+    '/secure/appointment-types': '/appointment-types',
+    '/secure/offenders/crn/:crn': '/offenders-by-crn/:crn',
   }),
 )
 

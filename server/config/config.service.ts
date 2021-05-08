@@ -106,8 +106,8 @@ export class ConfigService {
         enabled: bool('TOKEN_VERIFICATION_ENABLED', fallback(false)),
         url: string('TOKEN_VERIFICATION_API_URL', developmentOnly('http://localhost:8100')),
         timeout: {
-          response: int('TOKEN_VERIFICATION_API_TIMEOUT_RESPONSE', fallback(5000)),
-          deadline: int('TOKEN_VERIFICATION_API_TIMEOUT_DEADLINE', fallback(5000)),
+          response: int('TOKEN_VERIFICATION_API_TIMEOUT_RESPONSE', fallback(10000)),
+          deadline: int('TOKEN_VERIFICATION_API_TIMEOUT_DEADLINE', fallback(10000)),
         },
         agent: defaultAgentConfig(),
       },
@@ -115,8 +115,8 @@ export class ConfigService {
         enabled: true,
         url: string('COMMUNITY_API_URL', developmentOnly('http://localhost:8082')),
         timeout: {
-          response: int('COMMUNITY_API_TIMEOUT_RESPONSE', fallback(5000)),
-          deadline: int('COMMUNITY_API_TIMEOUT_DEADLINE', fallback(5000)),
+          response: int('COMMUNITY_API_TIMEOUT_RESPONSE', fallback(30000)),
+          deadline: int('COMMUNITY_API_TIMEOUT_DEADLINE', fallback(30000)),
         },
         agent: defaultAgentConfig(),
       },

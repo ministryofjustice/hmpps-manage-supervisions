@@ -2,6 +2,7 @@ import nunjucks from 'nunjucks'
 import express from 'express'
 import * as path from 'path'
 import { DateTime } from 'luxon'
+import { get } from 'lodash'
 import { Container } from 'typedi'
 import { ConfigService } from '../config'
 
@@ -34,5 +35,12 @@ export default function nunjucksSetup(app: express.Application): void {
     .addFilter('dateFormat', (value: string | DateTime, format: string) => {
       const date = value instanceof DateTime ? value : DateTime.fromISO(value)
       return date.toFormat(format)
+    })
+    .addFilter('toOptionList', (arr: any[], value: any, valuePath: string, textPath: string) => {
+      return arr.map(x => ({
+        text: get(x, textPath),
+        value: get(x, valuePath),
+        checked: value && get(x, valuePath) === value,
+      }))
     })
 }
