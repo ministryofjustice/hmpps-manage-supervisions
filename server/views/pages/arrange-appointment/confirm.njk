@@ -4,8 +4,12 @@
 {% set title = 'Appointment arranged' %}
 {% block page %}
   {% set panelHtml %}
-    <strong><span data-qa="confirm-appointment/description">{{ appointment.description }}</span></strong><br />
-    <span data-qa="confirm-appointment/times">{{ appointment.start | dateFormat('cccc d MMMM') }} from {{ appointment.start | dateFormat('h:mm a') }}</span>
+    <strong><span data-qa="confirm-appointment/description">{{ appointment.contactType.description }}</span></strong><br />
+    <span data-qa="confirm-appointment/times">
+      {{ appointment.appointmentStart | dateFormat('cccc d MMMM') }}
+      from
+      {{ appointment.appointmentStart | dateFormat('h:mm a') }}
+    </span>
   {% endset %}
 
   {{ govukPanel({

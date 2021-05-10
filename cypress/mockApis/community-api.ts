@@ -12,6 +12,41 @@ export class CommunityMockApi {
     await this.client.stubPing('community')
   }
 
+  async stubGetAppointmentTypes() {
+    return this.client.stub({
+      request: {
+        method: 'GET',
+        urlPath: '/community/secure/appointment-types',
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: [
+          {
+            contactType: 'APAT',
+            description: 'Programme Session (NS)',
+            requiresLocation: 'REQUIRED',
+            orderTypes: ['CJA', 'LEGACY'],
+          },
+          {
+            contactType: 'CHVS',
+            description: 'Home Visit to Case (NS)',
+            requiresLocation: 'NOT_REQUIRED',
+            orderTypes: ['CJA', 'LEGACY'],
+          },
+          {
+            contactType: 'APRE',
+            description: 'Programme Pre-work (NS)',
+            requiresLocation: 'REQUIRED',
+            orderTypes: ['CJA', 'LEGACY'],
+          },
+        ],
+      },
+    })
+  }
+
   async stubCreateAppointment({ crn, sentenceId }: CreateAppointmentArgs) {
     return this.client.stub({
       request: {

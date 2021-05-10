@@ -1,4 +1,4 @@
-import { ArrangeAppointmentPage, ConfirmAppointmentPage } from '../../pages'
+import { ArrangeAppointmentPage } from '../../pages'
 import { DateTime } from 'luxon'
 
 const crn = 'ABC123'
@@ -12,7 +12,7 @@ context('CreateAppointment', () => {
   const expectedEnd = expectedStart.plus({ hour: 1 })
 
   const expectedSummary = {
-    'Type of appointment': 'Planned Telephone Contact (NS)',
+    'Type of appointment': 'Office visit',
     Date: expectedStart.toFormat('cccc d MMMM'),
     Time: `${expectedStart.toFormat('h:mm a')} to ${expectedEnd.toFormat('h:mm a')}`,
     'RAR activity': 'No',
@@ -26,42 +26,41 @@ context('CreateAppointment', () => {
   })
 
   it('Unauthenticated user directed to login', () => {
-    cy.arrangeAppointmentStep(crn, 'check')
+    cy.arrangeAppointment(crn)
     cy.task('getLoginAttempts').should('have.length', 1)
   })
 
-  it('Check page rendered', () => {
-    cy.login()
-
-    // TODO run through form builder here, using the page object as an abstraction.
-
-    cy.arrangeAppointmentStep(crn, 'check')
-    page.pageTitle.contains('Check your answers')
-
-    page.appointmentSummaryTable.should('deep.eq', expectedSummary)
-  })
-
   it('Dummy appointment booked', () => {
+    cy.task('stubGetAppointmentTypes')
     cy.task('stubCreateAppointment', { crn, sentenceId })
     cy.task('stubOffenderDetails', crn)
     cy.login()
 
-    // TODO run through form builder here, using the page object as an abstraction.
+    cy.arrangeAppointment(crn)
 
-    cy.arrangeAppointmentStep(crn, 'check')
+    // appointment type step
+    page.pageTitle.contains('What type of appointment are you arranging?')
+    page.type.officeVisitRadio.click()
     page.continueButton.click()
 
-    const confirmationPage = new ConfirmAppointmentPage()
-    confirmationPage.pageTitle.contains('Appointment arranged')
-    confirmationPage.descriptionMessage.contains('Office Visit')
-    confirmationPage.timeMessage.contains('Thursday 6 May from 10:00 AM')
-    confirmationPage.phoneMessage.contains('Beth')
-    confirmationPage.phoneMessage.contains('07734 111992')
+    // check step
+    page.pageTitle.contains('Check your answers')
+    page.check.appointmentSummaryTable.should('deep.eq', expectedSummary)
+    page.continueButton.click()
+
+    // confirm step
+    page.pageTitle.contains('Appointment arranged')
+    page.confirm.descriptionMessage.contains('Office visit')
+    page.confirm.timeMessage.contains(
+      `${expectedStart.toFormat('cccc d MMMM')} from ${expectedStart.toFormat('h:mm a')}`,
+    )
+    page.confirm.phoneMessage.contains('Beth')
+    page.confirm.phoneMessage.contains('07734 111992')
 
     cy.task('getCreatedAppointments', { crn, sentenceId }).should('deep.eq', [
       {
         requirementId: 2500199144,
-        contactType: 'COPT',
+        contactType: 'APAT',
         appointmentStart: expectedStart.toISO(),
         appointmentEnd: expectedEnd.toISO(),
         notes: 'some notes',

@@ -1,0 +1,17 @@
+{% extends "../wizard-form.njk" %}
+{% set title = 'What type of appointment are you arranging?' %}
+
+{% block form %}
+    {{ govukRadios({
+        name: "type",
+        fieldset: {
+            legend: {
+                text: title,
+                isPageHeading: true,
+                classes: "govuk-label--xl govuk-!-margin-bottom-6"
+            }
+        },
+        items: types.featured | toOptionList(appointment.contactType.code, "contactType", "name")
+    })}}
+
+{% endblock %}

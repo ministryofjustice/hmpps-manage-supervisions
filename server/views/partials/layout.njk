@@ -50,6 +50,10 @@
   {% include "./header.njk" %}
 {% endblock %}
 
+{% block beforeContent %}
+  {% block pageNavigation %}{% endblock %}
+{% endblock %}
+
 {% block bodyStart %}
 {% endblock %}
 
