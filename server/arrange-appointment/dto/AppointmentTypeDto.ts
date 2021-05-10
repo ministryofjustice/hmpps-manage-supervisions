@@ -19,10 +19,10 @@ export enum RequiredOptional {
 
 export enum OrderType {
   /**
-   * A CJA 2003 order.
+   * A CJA 2003 or later order.
    * https://www.legislation.gov.uk/ukpga/2003/44/contents
    */
-  Cja2003 = 'CJA_2003',
+  Cja = 'CJA',
 
   /**
    * An order that predates CJA 2003.

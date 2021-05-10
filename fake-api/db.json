@@ -34,7 +34,7 @@
       "description": "Citizenship Induction Session (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -43,7 +43,7 @@
       "description": "Citizenship Alcohol Session (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003"
+        "CJA"
       ]
     },
     {
@@ -51,7 +51,7 @@
       "description": "Citizenship Drugs Session (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -60,7 +60,7 @@
       "description": "Citizenship Emotions Session (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -69,7 +69,7 @@
       "description": "Citizenship Lifestyle Session (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -78,7 +78,7 @@
       "description": "Citizenship Relationships Session (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -87,7 +87,7 @@
       "description": "Citizenship Variation from Citizenship (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -96,7 +96,7 @@
       "description": "Citizenship Next Steps Session/Handover (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -105,7 +105,7 @@
       "description": "Citizenship Induct. Sex Offender (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -114,7 +114,7 @@
       "description": "Programme Session (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -123,7 +123,7 @@
       "description": "Programme Pre-work (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -132,7 +132,7 @@
       "description": "Programme Post Work (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -141,7 +141,7 @@
       "description": "Home Visit to Case (NS)",
       "requiresLocation": "NOT_REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -150,7 +150,7 @@
       "description": "Planned Office Visit (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -159,7 +159,7 @@
       "description": "IOM External Provider Appointment",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -168,7 +168,7 @@
       "description": "IOM Office Visit planned",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -177,7 +177,7 @@
       "description": "AP - Keyworker Session (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -186,7 +186,7 @@
       "description": "Test",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -195,7 +195,7 @@
       "description": "ETE Appointment (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -204,7 +204,7 @@
       "description": "Other Appointment (Non NS)",
       "requiresLocation": "OPTIONAL",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -213,7 +213,7 @@
       "description": "Programme Session (Non NS)",
       "requiresLocation": "OPTIONAL",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -222,7 +222,7 @@
       "description": "Programme Pre-Work (Non NS)",
       "requiresLocation": "OPTIONAL",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -231,7 +231,7 @@
       "description": "Programme Post-Work (Non NS)",
       "requiresLocation": "OPTIONAL",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -240,7 +240,7 @@
       "description": "Alcohol Key Worker Session (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -249,7 +249,7 @@
       "description": "Drug Key Worker Session (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -258,7 +258,7 @@
       "description": "Appointment with External Agency",
       "requiresLocation": "OPTIONAL",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -267,7 +267,7 @@
       "description": "Clinic Appointment (NS)",
       "requiresLocation": "OPTIONAL",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -276,7 +276,7 @@
       "description": "ETE Appointment (Non NS)",
       "requiresLocation": "OPTIONAL",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -285,7 +285,7 @@
       "description": "Restorative Justice Attendance",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -294,7 +294,7 @@
       "description": "Drug Test (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -303,7 +303,7 @@
       "description": "Court Review (NS)",
       "requiresLocation": "OPTIONAL",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -312,7 +312,7 @@
       "description": "Drug Group Work Session (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -321,7 +321,7 @@
       "description": "Alcohol Group Work Session (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -330,7 +330,7 @@
       "description": "Post Citizenship Contact (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -360,7 +360,7 @@
       "description": "IAG Appointment (NS)",
       "requiresLocation": "OPTIONAL",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -369,7 +369,7 @@
       "description": "Appointment with External Agency (NS)",
       "requiresLocation": "OPTIONAL",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -378,7 +378,7 @@
       "description": "Biometric Reporting Appointment",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -401,7 +401,7 @@
       "description": "START Programme Attendance (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -410,7 +410,7 @@
       "description": "Other Appointment (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -419,7 +419,7 @@
       "description": "AP PA - Accommodation",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -428,7 +428,7 @@
       "description": "Attendance Centre Appointment (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -675,7 +675,7 @@
       "description": "Planned Telephone Contact (NS)",
       "requiresLocation": "OPTIONAL",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -698,7 +698,7 @@
       "description": "Biometric Reporting Appointment (NS)",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003",
+        "CJA",
         "LEGACY"
       ]
     },
@@ -1078,7 +1078,7 @@
       "description": "Restorative Justice Individual Tailored Work",
       "requiresLocation": "REQUIRED",
       "orderTypes": [
-        "CJA_2003"
+        "CJA"
       ]
     }
   ]
