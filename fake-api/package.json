@@ -4,12 +4,16 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "nodemon main.js"
+    "start": "node main.js",
+    "start:dev": "nodemon main.js"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "json-server": "^0.14.2",
     "nodemon": "^2.0.7"
+  },
+  "nodemonConfig": {
+    "ignore": ["db.json"]
   }
 }
