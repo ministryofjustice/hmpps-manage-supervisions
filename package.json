@@ -9,13 +9,13 @@
     "copy-views": "cp -R server/views dist/server/",
     "compile-sass": "sass --no-source-map --load-path=node_modules/govuk-frontend --load-path=node_modules/@ministryofjustice/frontend ./assets/sass/application.sass:./assets/stylesheets/application.css ./assets/sass/application-ie8.sass:./assets/stylesheets/application-ie8.css --style compressed",
     "watch-views": "nodemon --watch server/views -e html,njk -x npm run copy-views",
-    "watch-node": "DEBUG=gov-starter-server* nodemon --watch \"**\" --ext 'ts,json' --ignore \"**/*.test.ts\" --exec \"ts-node server.ts\" | bunyan -o short",
+    "watch-node": "DEBUG=gov-starter-server* nodemon -x \"ts-node server.ts\" | bunyan -o short",
     "watch-sass": "npm run compile-sass -- --watch",
     "build": "npm run compile-sass && tsc && npm run copy-views",
     "start": "node $NODE_OPTIONS dist/server.js | bunyan -o short",
     "start:dev": "concurrently -k -p \"[{name}]\" -n \"Node,Sass\" -c \"green.bold,blue.bold\" \"npm run watch-node\" \"npm run watch-sass\"",
     "start-feature": "export $(cat feature.env) && node dist/server.js | bunyan -o short",
-    "watch-node-feature": "export $(cat feature.env) && nodemon --watch \"**\" --ext 'ts,json' --ignore \"**/*.test.ts\" --exec \"ts-node server.ts\" | bunyan -o short",
+    "watch-node-feature": "export $(cat feature.env) && npm run watch-node",
     "start-feature:dev": "concurrently -k -p \"[{name}]\" -n \"Node,Sass\" -c \"green.bold,blue.bold\" \"npm run watch-node-feature\" \"npm run watch-sass\"",
     "record-build-info": "node ./bin/record-build-info",
     "lint": "eslint . --cache --max-warnings 0",
@@ -65,13 +65,22 @@
   "nodemonConfig": {
     "ignore": [
       ".circleci/*",
-      "migrations/*",
-      "node_modules/*",
-      "test/*",
-      "integration_tests/*"
+      "doc/*",
+      "helm_deploy/*",
+      "cypress/*",
+      "fake-api/*",
+      "*.yml",
+      "Dockerfile",
+      "README.md",
+      ".eslint*",
+      "*.test.ts",
+      "*.spec.ts",
+      "*.fake.ts",
+      "*.fixture.ts",
+      "*.mock.ts"
     ],
     "delay": 2500,
-    "ext": "js,json,html,njk"
+    "ext": "ts,json"
   },
   "lint-staged": {
     "*.{ts,js,css}": [
