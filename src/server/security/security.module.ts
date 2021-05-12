@@ -1,13 +1,16 @@
-import { Module } from '@nestjs/common'
+import { MiddlewareConsumer, Module } from '@nestjs/common'
+import { PassportModule } from '@nestjs/passport'
+import { APP_GUARD } from '@nestjs/core'
+import * as passport from 'passport'
+import * as csurf from 'csurf'
 import { UserService } from './user/user.service'
 import { CommonModule } from '../common/common.module'
 import { HmppsStrategy, SessionSerializer } from './hmpps.strategy'
-import { PassportModule } from '@nestjs/passport'
 import { LoginController } from './login/login.controller'
 import { LogoutController } from './logout/logout.controller'
-import { APP_GUARD } from '@nestjs/core'
 import { AuthenticatedGuard } from './guards/authenticated.guard'
 import { TokenVerificationService } from './token-verification/token-verification.service'
+import { setLocals, csp } from './middleware'
 
 /**
  * Applies HMPPS authentication to all routes via passport-oauth.
@@ -29,4 +32,8 @@ import { TokenVerificationService } from './token-verification/token-verificatio
   ],
   controllers: [LoginController, LogoutController],
 })
-export class SecurityModule {}
+export class SecurityModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(passport.initialize(), passport.session(), csp(), csurf(), setLocals).forRoutes('*')
+  }
+}

@@ -25,7 +25,7 @@ enum TransformModifier {
 @Injectable()
 export class CacheService implements ICacheService {
   private readonly client: WrappedNodeRedisClient
-  private readonly logger = new Logger()
+  private readonly logger = new Logger(CacheService.name)
 
   constructor(config: ConfigService<Config>) {
     this.client = createNodeRedisClient({ ...config.get<RedisConfig>('redis') })

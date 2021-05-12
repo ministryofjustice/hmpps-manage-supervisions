@@ -9,11 +9,11 @@
     "prepare": "husky install",
     "prebuild": "rimraf dist",
     "build": "nest build",
-    "start": "node dist/main",
-    "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug --watch",
-    "start:e2e": "DOTENV_CONFIG_PATH=e2e.env node -r dotenv/config dist/main",
-    "start:e2e:dev": "DOTENV_CONFIG_PATH=e2e.env nest start --watch -e \"node -r dotenv/config\"",
+    "start": "node -r dotenv/config dist/main",
+    "start:dev": "nest start --watch -e \"node -r dotenv/config\"",
+    "start:debug": "nest start --watch --debug -e \"node -r dotenv/config\"",
+    "start:e2e": "DOTENV_CONFIG_PATH=e2e.env npm start",
+    "start:e2e:dev": "DOTENV_CONFIG_PATH=e2e.env npm run start:dev",
     "record-build-info": "node scripts/record-build-info.js",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint . --cache --max-warnings 0",
@@ -54,7 +54,8 @@
     "redis": "^3.1.2",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^6.6.6"
+    "rxjs": "^6.6.6",
+    "source-map-support": "^0.5.19"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.6.0",

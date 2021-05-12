@@ -1,23 +1,27 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common'
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common'
 import type { Response } from 'express'
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(HttpExceptionFilter.name)
+
   catch(exception: Error, host: ArgumentsHost) {
     const response: Response = host.switchToHttp().getResponse()
 
     if (exception instanceof HttpException) {
-      return HttpExceptionFilter.handleHttpException(exception, response)
+      return this.handleHttpException(exception, response)
     }
 
-    return response.status(500).render('pages/error', {
-      message: exception.message,
-      status: 500,
-      stack: exception.stack,
-    })
+    return this.renderErrorPage(exception, response)
   }
 
-  private static handleHttpException(exception: HttpException, response: Response) {
+  private renderErrorPage(exception: Error, response: Response, status = 500) {
+    const viewModel = { message: exception.message, status, stack: exception.stack }
+    this.logger.error(JSON.stringify(viewModel))
+    return response.status(status).render('pages/error', viewModel)
+  }
+
+  private handleHttpException(exception: HttpException, response: Response) {
     const status = exception.getStatus()
     const meta: any = exception.getResponse()
 
@@ -40,11 +44,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         })
 
       default:
-        return response.status(status).render('pages/error', {
-          message: exception.message,
-          status,
-          stack: exception.stack,
-        })
+        return this.renderErrorPage(exception, response, status)
     }
   }
 }

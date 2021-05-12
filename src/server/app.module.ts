@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { MiddlewareConsumer, Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { configFactory } from './config'
 import { HealthModule } from './health/health.module'
@@ -7,6 +7,7 @@ import { SecurityModule } from './security/security.module'
 import { APP_FILTER } from '@nestjs/core'
 import { HttpExceptionFilter } from './http-exception.filter'
 import { ArrangeAppointmentModule } from './arrange-appointment/arrange-appointment.module'
+import { LoggerMiddleware } from './logger.middleware'
 
 @Module({
   imports: [
@@ -18,4 +19,8 @@ import { ArrangeAppointmentModule } from './arrange-appointment/arrange-appointm
   ],
   providers: [{ provide: APP_FILTER, useClass: HttpExceptionFilter }],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).exclude('/health').forRoutes('*')
+  }
+}

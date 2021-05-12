@@ -27,7 +27,7 @@ const featuredAppointmentTypes = {
 
 @Injectable()
 export class ArrangeAppointmentService {
-  private readonly logger = new Logger()
+  private readonly logger = new Logger(ArrangeAppointmentService.name)
 
   constructor(private readonly factory: RestService, private readonly cache: CacheService) {}
 

@@ -59,7 +59,7 @@ export class RestClientError extends Error {
 }
 
 export class RestClient {
-  private readonly logger = new Logger()
+  private readonly logger = new Logger(RestClient.name)
   private readonly baseRequest: AxiosRequestConfig
 
   constructor(private readonly http: HttpService, private readonly name: string, config: ApiConfig, token: string) {

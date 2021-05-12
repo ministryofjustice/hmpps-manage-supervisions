@@ -1,4 +1,11 @@
 import { NestExpressApplication } from '@nestjs/platform-express'
+import * as express from 'express'
+
+export function useBodyParser(app: NestExpressApplication) {
+  // nest still uses body-parser but this doesnt play nice with some other libraries, so let's disable it and replace.
+  app.use(express.json())
+  app.use(express.urlencoded({ extended: true }))
+}
 
 export function useTrustProxy(app: NestExpressApplication) {
   // Configure Express for running behind proxies
