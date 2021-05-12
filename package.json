@@ -1,13 +1,13 @@
 {
   "name": "hmpps-manage-supervisions",
   "version": "0.0.1",
+  "repository": "git@github.com:ministryofjustice/hmpps-manage-supervisions.git",
   "description": "Manage Supervisions",
-  "author": "",
-  "private": true,
   "license": "MIT",
   "scripts": {
     "prepare": "husky install",
     "prebuild": "rimraf dist",
+    "clean": "rimraf dist",
     "build": "nest build",
     "start": "node -r dotenv/config dist/main",
     "start:dev": "nest start --watch -e \"node -r dotenv/config\"",
@@ -23,7 +23,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "cypress run --config video=false",
-    "test:e2e-ui": "cypress open"
+    "test:e2e-ui": "cypress open",
+    "security_audit": "npx audit-ci --config audit-ci.json"
   },
   "dependencies": {
     "@ministryofjustice/frontend": "^0.2.2",
@@ -110,6 +111,10 @@
     "typescript": "^4.2.3",
     "webpack-node-externals": "^3.0.0"
   },
+  "engines": {
+    "node": "^14",
+    "npm": "^6.4.1"
+  },
   "jest": {
     "moduleFileExtensions": [
       "js",
@@ -128,6 +133,7 @@
     "testEnvironment": "node"
   },
   "lint-staged": {
-    "*.js": "eslint --cache --fix"
+    "*.ts": "eslint --fix",
+    "*.{json}": "prettier --write"
   }
 }
