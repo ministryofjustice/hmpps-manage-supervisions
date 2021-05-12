@@ -3,6 +3,7 @@ import * as $ from 'jquery'
 import 'jquery-ui'
 import * as govuk from 'govuk-frontend'
 import '@ministryofjustice/frontend'
+import 'timepicker'
 import * as accessibleAutocomplete from 'accessible-autocomplete'
 
 govuk.initAll()
@@ -20,4 +21,6 @@ $(() => {
       displayMenu: 'overlay',
     })
   })
+
+  $('.time-input').timepicker({ minTime: '9:00AM', maxTime: '4:45PM', step: 15 })
 })

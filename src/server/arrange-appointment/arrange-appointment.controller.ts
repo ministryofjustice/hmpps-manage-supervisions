@@ -1,15 +1,16 @@
-import { DateTime } from 'luxon'
 import { ArrangeAppointmentService, DomainAppointmentType } from './arrange-appointment.service'
 import { plainToClass } from 'class-transformer'
 import { AppointmentBuilderDto } from './dto/AppointmentBuilderDto'
 import { validate, ValidationError } from 'class-validator'
 import {
+  AppointmentSchedulingViewModel,
   AppointmentTypeViewModel,
   AppointmentWizardStep,
   AppointmentWizardViewModel,
 } from './dto/AppointmentWizardViewModel'
 import { AppointmentWizardSession } from './dto/AppointmentWizardSession'
 import { AppointmentWizardUpdateTypeDto } from './dto/AppointmentWizardUpdate.dto'
+import { AppointmentWizardUpdateWhenDto } from './dto/AppointmentWizardUpdateWhen.dto'
 import { AppointmentWizardService } from './appointment-wizard.service'
 import { Controller, Get, Param, Post, Redirect, Render, Session } from '@nestjs/common'
 import { AuthenticatedUser, DynamicRedirect, RedirectResponse } from '../common'
@@ -97,6 +98,41 @@ export class ArrangeAppointmentController {
 
     // TODO revalidate the builder model, may be a step common thing so could be part of a potential AOP solution
     return this.wizard.nextStep(session, AppointmentWizardStep.AppointmentType, crn)
+  }
+
+  @Get('when')
+  @Render('pages/arrange-appointment/when')
+  async getWhen(@Param('crn') crn: string, @Session() session: AppointmentWizardSession): Promise<RenderOrRedirect> {
+    const redirect = this.wizard.assertStep(session, AppointmentWizardStep.When, crn)
+    if (redirect) {
+      return redirect
+    }
+    const appointment = plainToClass(AppointmentBuilderDto, session.appointment)
+    const form = new AppointmentWizardUpdateWhenDto()
+    form.setFromDates(appointment.appointmentStart, appointment.appointmentEnd)
+    const errors = appointment.appointmentStart || appointment.appointmentEnd ? await validate(form) : []
+    return await this.getAppointmentSchedulingViewModel(crn, appointment, form, errors)
+  }
+
+  @Post('when')
+  @Render('pages/arrange-appointment/when')
+  @DynamicRedirect()
+  async postWhen(
+    @Param('crn') crn: string,
+    @Session() session: AppointmentWizardSession,
+    @BodyClass() body: AppointmentWizardUpdateWhenDto,
+  ): Promise<RenderOrRedirect> {
+    this.wizard.assertStep(session, AppointmentWizardStep.When, crn)
+    const appointment = plainToClass(AppointmentBuilderDto, session.appointment)
+    const errors = await validate(body)
+    if (errors.length > 0) {
+      return await this.getAppointmentSchedulingViewModel(crn, appointment, body, errors)
+    }
+
+    session.appointment.appointmentStart = body.getStartDateTime().toISO()
+    session.appointment.appointmentEnd = body.getEndDateTime().toISO()
+
+    return this.wizard.nextStep(session, AppointmentWizardStep.When, crn)
   }
 
   @Get('check')
@@ -202,16 +238,30 @@ export class ArrangeAppointmentController {
     }
   }
 
+  private async getAppointmentSchedulingViewModel(
+    crn: string,
+    appointment: AppointmentBuilderDto,
+    form: AppointmentWizardUpdateWhenDto,
+    errors: ValidationError[],
+  ): Promise<AppointmentSchedulingViewModel> {
+    return {
+      step: AppointmentWizardStep.When,
+      errors,
+      appointment,
+      paths: {
+        back: this.wizard.getBackPath(AppointmentWizardStep.When, crn),
+      },
+      form,
+    }
+  }
+
   private static requireDummyAppointment(session: AppointmentWizardSession) {
     if (session.appointment) {
       return
     }
 
     // HACK fill out dummy data
-    const date = DateTime.now().plus({ hours: 1 }).set({ minute: 0, second: 0, millisecond: 0 })
     session.appointment = {
-      appointmentStart: date.toISO(),
-      appointmentEnd: date.plus({ hours: 1 }).toISO(),
       notes: 'some notes',
       providerCode: 'CRS',
       requirementId: 2500199144,

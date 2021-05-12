@@ -1,9 +1,11 @@
 import { DomainAppointmentType } from '../arrange-appointment.service'
 import { ViewModel } from '../../common'
 import { AppointmentBuilderDto } from './AppointmentBuilderDto'
+import { AppointmentWizardUpdateWhenDto } from './AppointmentWizardUpdateWhen.dto'
 
 export enum AppointmentWizardStep {
   AppointmentType = 'type',
+  When = 'when',
   Check = 'check',
   Confirm = 'confirm',
 }
@@ -20,6 +22,11 @@ export interface AppointmentTypeViewModel extends AppointmentWizardViewModelBase
   }
   type: string | null
   other: string | null
+}
+
+export interface AppointmentSchedulingViewModel extends AppointmentWizardViewModelBase {
+  step: AppointmentWizardStep.When
+  form: AppointmentWizardUpdateWhenDto
 }
 
 export interface CheckAppointmentViewModel extends AppointmentWizardViewModelBase {
@@ -40,5 +47,6 @@ export interface ConfirmAppointmentViewModel extends AppointmentWizardViewModelB
 
 export type AppointmentWizardViewModel =
   | AppointmentTypeViewModel
+  | AppointmentSchedulingViewModel
   | CheckAppointmentViewModel
   | ConfirmAppointmentViewModel

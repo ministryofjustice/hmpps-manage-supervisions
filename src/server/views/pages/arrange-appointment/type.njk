@@ -14,8 +14,9 @@
                 label: {
                     text: "Type of appointment"
                 },
-                items: types.other | toSelectList(other, "contactType", "name")
-            } | setErrorMessage("other", errors)) }}
+                items: types.other | toSelectList(other, "contactType", "name"),
+                errorMessage: errors | findErrorMessages("other")
+            }) }}
         {% endset %}
     {% endif %}
 
@@ -32,7 +33,8 @@
                 classes: "govuk-label--xl govuk-!-margin-bottom-6"
             }
         },
-        items: types.featured | toRadioList(type, "contactType", "name", { otherHtml: otherHtml })
-    } | setErrorMessage("type", errors)) }}
+        items: types.featured | toRadioList(type, "contactType", "name", { otherHtml: otherHtml }),
+        errorMessage: errors | findErrorMessages("type")
+    }) }}
 
 {% endblock %}

@@ -29,7 +29,8 @@ module.exports = function (options) {
           'jquery-ui',
           'govuk-frontend',
           '@ministryofjustice/frontend',
-          'accessible-autocomplete'
+          'accessible-autocomplete',
+          'timepicker',
         ],
       }),
     ],
