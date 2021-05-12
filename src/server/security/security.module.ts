@@ -7,6 +7,7 @@ import { LoginController } from './login/login.controller'
 import { LogoutController } from './logout/logout.controller'
 import { APP_GUARD } from '@nestjs/core'
 import { AuthenticatedGuard } from './guards/authenticated.guard'
+import { TokenVerificationService } from './token-verification/token-verification.service'
 
 /**
  * Applies HMPPS authentication to all routes via passport-oauth.
@@ -24,6 +25,7 @@ import { AuthenticatedGuard } from './guards/authenticated.guard'
       provide: APP_GUARD,
       useExisting: AuthenticatedGuard,
     },
+    TokenVerificationService,
   ],
   controllers: [LoginController, LogoutController],
 })
