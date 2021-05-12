@@ -1,4 +1,4 @@
-import * as superagent from 'superagent'
+import axios from 'axios'
 import { trim } from 'lodash'
 
 export class WireMockClient {
@@ -16,14 +16,30 @@ export class WireMockClient {
     return this.urlJoin(this.WIRE_MOCK_URL, '__admin', ...pathTokens)
   }
 
+  private static async deleteAll(entity: string) {
+    const url = WireMockClient.admin(entity)
+    WireMockClient.log('DELETE', url)
+    await axios.delete(WireMockClient.admin(entity))
+  }
+
+  private static log(method: string, url: string, body?: any) {
+    if (process.env.DEBUG?.includes('WIREMOCK_CLIENT')) {
+      console.log(`${method} ${url} ${body ? JSON.stringify(body) : ''}`)
+    }
+  }
+
   async stub(mapping: WireMock.CreateStubMappingRequest): Promise<WireMock.StubMapping> {
-    const response = await superagent.post(WireMockClient.admin('mappings')).send(mapping)
-    return response.body as WireMock.StubMapping
+    const url = WireMockClient.admin('mappings')
+    WireMockClient.log('POST', url, mapping)
+    const response = await axios.post<WireMock.StubMapping>(url, mapping)
+    return response.data
   }
 
   async getRequests(basePath: string): Promise<WireMock.JournaledRequest[]> {
-    const response = await superagent.get(WireMockClient.admin('requests'))
-    const { requests } = response.body as WireMock.GetAllRequestsResponse
+    const url = WireMockClient.admin('requests')
+    const {
+      data: { requests },
+    } = await axios.get<WireMock.GetAllRequestsResponse>(url)
     return requests.filter(x => x.request.url.startsWith(basePath))
   }
 
@@ -54,9 +70,6 @@ export class WireMockClient {
   }
 
   async reset() {
-    await Promise.all([
-      superagent.delete(WireMockClient.admin('mappings')),
-      superagent.delete(WireMockClient.admin('requests')),
-    ])
+    await Promise.all([WireMockClient.deleteAll('mappings'), WireMockClient.deleteAll('requests')])
   }
 }
