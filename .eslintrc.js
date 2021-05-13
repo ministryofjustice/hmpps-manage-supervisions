@@ -4,6 +4,7 @@ module.exports = {
     node: true,
     jest: true,
   },
+  ignorePatterns: ['*.js'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     sourceType: 'module',
@@ -27,7 +28,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['./*.ts', 'server/**/*.ts'],
+      files: ['src/server/**/*.ts'],
       extends: ['plugin:import/errors', 'plugin:import/warnings', 'plugin:import/typescript'],
       rules: {
         'import/no-extraneous-dependencies': [

@@ -1,23 +1,16 @@
 {
-  "compileOnSave": true,
   "compilerOptions": {
-    "target": "es2018",
     "module": "commonjs",
-    "moduleResolution": "node",
-    "outDir": "./dist",
-    "sourceMap": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "skipLibCheck": true,
-    "noEmit": false,
-    "allowJs": false,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "noImplicitAny": true,
-    "experimentalDecorators": true,
+    "declaration": true,
+    "removeComments": true,
     "emitDecoratorMetadata": true,
-    "typeRoots": ["./server/@types", "./node_modules/@types"]
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "es2018",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true
   },
-  "exclude": ["node_modules", "assets/**/*.js", "cypress", "dist", "fake-api"],
-  "include": ["**/*.js", "**/*.ts"]
+  "include": ["src/**/*"],
 }

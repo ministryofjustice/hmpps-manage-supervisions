@@ -6,6 +6,6 @@
     "configFile": "reporter-config.json"
   },
   "videoUploadOnPasses": false,
-  "taskTimeout": 60000,
+  "taskTimeout": 5000,
   "env": {}
 }

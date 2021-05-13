@@ -1,3 +1,4 @@
+### https://github.com/github/gitignore/blob/master/Node.gitignore
 # Logs
 logs
 *.log
@@ -115,14 +116,18 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+### JetBrains
+*.iws
+*.iml
+.idea/
 
-
-assets/stylesheets/*.css
-.idea
+### VSCode
 .vscode
-build-info.json
-dist/
-test_results/
+
+### Cypress
 cypress/videos/
 cypress/screenshots/
-*/*.iml
+
+### Local
+build-info.json
+test_results/

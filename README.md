@@ -17,14 +17,14 @@ docker-compose -f docker-compose.yml -f docker-compose.community-api.yml up
 
 > Warning: this requires access to the private [Oracle DB image](https://github.com/ministryofjustice/hmpps-delius-api/blob/main/doc/development.md#oracle-database)
 
-### Dependencies
+## Dependencies
 
 `HMPPS Manage Supervisions` requires: 
 * redis - session store and token caching
 * [hmpps-auth](https://github.com/ministryofjustice/hmpps-auth) - for authentication
 * [community-api](https://github.com/ministryofjustice/community-api) - for data access
 
-### Development
+## Development
 
 To start the main services excluding `HMPPS Manage Supervisions`: 
 
@@ -58,28 +58,29 @@ npm run test
 
 ### Running integration tests
 
-For local running, start redis and a wiremock instance by:
+For local running, start redis and a wiremock instance:
 
 ```bash
 docker-compose -f docker-compose-test.yml up
 ```
 
-Then run the server in test mode by:
+Then run the server in test mode:
 
 ```bash
-npm run start-feature
+npm run build
+npm run start:e2e
 
-# or to run with nodemon:
-npm run start-feature:dev
+# or to run from source:
+npm run start:e2e:dev
 ```
 
-Then run tests in headless mode with:
+Then run tests in headless mode:
 
 ```bash
-npm run int-test
+npm run test:e2e
 
 # or to run with Cyprus UI:
-npm run int-test-ui
+npm run test:e2e-ui
 ```
 
 ### Dependency Checks
