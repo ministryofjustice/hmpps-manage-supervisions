@@ -11,8 +11,9 @@ import {
 import { AppointmentWizardSession } from './dto/AppointmentWizardSession'
 import { AppointmentWizardUpdateTypeDto } from './dto/AppointmentWizardUpdate.dto'
 import { AppointmentWizardService } from './appointment-wizard.service'
-import { Controller, Get, Param, Post, Redirect, Render, Session, Body } from '@nestjs/common'
+import { Controller, Get, Param, Post, Redirect, Render, Session } from '@nestjs/common'
 import { AuthenticatedUser, DynamicRedirect, RedirectResponse } from '../common'
+import { BodyClass } from '../common/meta/body-class.decorator'
 
 type RenderOrRedirect = AppointmentWizardViewModel | RedirectResponse
 
@@ -57,7 +58,7 @@ export class ArrangeAppointmentController {
     @Param('crn') crn: string,
     @Session() session: AppointmentWizardSession,
     @AuthenticatedUser() user: User,
-    @Body() body: AppointmentWizardUpdateTypeDto,
+    @BodyClass() body: AppointmentWizardUpdateTypeDto,
   ): Promise<RenderOrRedirect> {
     const redirect = this.wizard.assertStep(session, AppointmentWizardStep.AppointmentType, crn)
     if (redirect) {
