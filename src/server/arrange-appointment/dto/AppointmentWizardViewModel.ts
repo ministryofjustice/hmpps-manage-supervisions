@@ -18,6 +18,8 @@ export interface AppointmentTypeViewModel extends AppointmentWizardViewModelBase
     featured: DomainAppointmentType[]
     other: DomainAppointmentType[]
   }
+  type: string | null
+  other: string | null
 }
 
 export interface CheckAppointmentViewModel extends AppointmentWizardViewModelBase {

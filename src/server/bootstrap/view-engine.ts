@@ -1,53 +1,41 @@
 import { NestExpressApplication } from '@nestjs/platform-express'
+import { Logger } from '@nestjs/common'
 import * as nunjucks from 'nunjucks'
 import * as path from 'path'
 import { ConfigService } from '@nestjs/config'
 import { ServerConfig } from '../config'
-import { DateTime } from 'luxon'
-import { get } from 'lodash'
+import { camelCase } from 'lodash'
+import * as filters from './nunjucks/filters'
 
 export function useGovUkUi(app: NestExpressApplication) {
   const serverConfig = app.get(ConfigService).get<ServerConfig>('server')
+  const logger = new Logger('view-engine')
 
   app.setLocal('asset_path', '/assets/')
   app.setLocal('applicationName', serverConfig.description)
 
-  nunjucks
-    .configure(
-      [
-        path.resolve(path.join(__dirname, 'views')),
-        'node_modules/govuk-frontend/',
-        'node_modules/govuk-frontend/components/',
-        'node_modules/@ministryofjustice/frontend/',
-        'node_modules/@ministryofjustice/frontend/moj/components/',
-      ],
-      {
-        express: app.getHttpAdapter().getInstance(),
-        autoescape: true,
-        noCache: !serverConfig.isProduction,
-        watch: !serverConfig.isProduction,
-      },
-    )
-    // TODO modularise these filters
-    .addFilter('initialiseName', (fullName: string) => {
-      if (!fullName) {
-        return null
-      }
-      const [[initial], ...rest] = fullName.split(' ')
-      return `${initial}. ${rest.slice(-1)}`
-    })
-    .addFilter('toIsoDate', (date: DateTime) => date.toISODate())
-    .addFilter('dateFormat', (value: string | DateTime, format: string) => {
-      const date = value instanceof DateTime ? value : DateTime.fromISO(value)
-      return date.toFormat(format)
-    })
-    .addFilter('toOptionList', (arr: any[], value: any, valuePath: string, textPath: string) => {
-      return arr.map(x => ({
-        text: get(x, textPath),
-        value: get(x, valuePath),
-        checked: value && get(x, valuePath) === value,
-      }))
-    })
+  const environment = nunjucks.configure(
+    [
+      path.resolve(path.join(__dirname, 'views')),
+      'node_modules/govuk-frontend/',
+      'node_modules/govuk-frontend/components/',
+      'node_modules/@ministryofjustice/frontend/',
+      'node_modules/@ministryofjustice/frontend/moj/components/',
+    ],
+    {
+      express: app.getHttpAdapter().getInstance(),
+      autoescape: true,
+      noCache: !serverConfig.isProduction,
+      watch: !serverConfig.isProduction,
+    },
+  )
+
+  for (const Filter of Object.values(filters)) {
+    const name = camelCase(Filter.name)
+    logger.log(`adding filter ${name}`)
+    const filter: filters.NunjucksFilter = new Filter()
+    environment.addFilter(name, filter.filter, filter.async)
+  }
 
   app.useStaticAssets(path.join(__dirname, 'assets'), {
     prefix: '/assets',

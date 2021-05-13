@@ -9,8 +9,16 @@ export class ArrangeAppointmentPage extends PageBase {
 
   get type() {
     return {
-      get officeVisitRadio() {
-        return cy.get('#type')
+      radio(contactType: string) {
+        return cy.get(`[data-qa="arrange-appointment/featured-type"] input[type=radio][value="${contactType}"]`)
+      },
+
+      get otherAutoComplete() {
+        return cy.get('#arrange-appointment-other-select')
+      },
+
+      autoCompleteResult(name: string) {
+        return cy.get('#arrange-appointment-other-select__listbox > li').contains(name)
       },
     }
   }

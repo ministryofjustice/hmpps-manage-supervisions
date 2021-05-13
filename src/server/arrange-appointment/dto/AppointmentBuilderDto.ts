@@ -15,7 +15,7 @@ export class AppointmentBuilderDto {
   requirementId: number
 
   @Type(() => AppointmentMetaType)
-  contactType: AppointmentMetaType
+  contactType?: AppointmentMetaType
 
   @Type(() => AppointmentMetaType)
   nsiType?: AppointmentMetaType
