@@ -1,12 +1,29 @@
 import { ArrangeAppointmentPage } from '../../pages'
 import { DateTime } from 'luxon'
 
+interface AppointmentBookingTestCase {
+  start: DateTime
+  end: DateTime
+  crn: string
+  sentenceId: number
+  type: {
+    code: string
+    name: string
+  }
+}
+
+function testCase(partial: Omit<AppointmentBookingTestCase, 'start' | 'end'>) {
+  const start = DateTime.now().plus({ hours: 1 }).set({ minute: 0, second: 0, millisecond: 0 })
+  const end = start.plus({ hour: 1 })
+  return {
+    ...partial,
+    start,
+    end,
+  }
+}
+
 context('CreateAppointment', () => {
   const page = new ArrangeAppointmentPage()
-
-  // TODO this will be built up in the form builder, no dynamic date, so we can probably use a json fixture?
-  const expectedStart = DateTime.now().plus({ hours: 1 }).set({ minute: 0, second: 0, millisecond: 0 })
-  const expectedEnd = expectedStart.plus({ hour: 1 })
 
   beforeEach(() => {
     cy.task('reset')
@@ -20,67 +37,100 @@ context('CreateAppointment', () => {
   })
 
   it('can book an office visit appointment', () => {
-    const crn = 'ABC123'
-    const sentenceId = 2500443138
+    const test = testCase({
+      crn: 'ABC123',
+      sentenceId: 2500443138,
+      type: { code: 'APAT', name: 'Office visit' },
+    })
 
-    havingOffender(crn, sentenceId)
-    havingLoggedInAndBeginBookingAppointmentFlow(crn)
+    havingOffender(test)
+    havingLoggedInAndBeginBookingAppointmentFlow(test)
 
-    whenSelectingFeaturedAppointmentType('APAT')
-    shouldDisplayCorrectAppointmentSummary('Office visit')
+    whenSelectingTypeRadio(test.type.name)
+    whenSubmittingCurrentStep()
+    shouldDisplayCorrectAppointmentSummary(test)
 
-    whenBookingAppointment()
-    shouldDisplayAppointmentBookingConfirmation('Office visit')
+    whenSubmittingCurrentStep()
+    shouldDisplayAppointmentBookingConfirmation(test)
 
-    shouldHaveBookedAppointment(crn, sentenceId, 'APAT')
+    shouldHaveBookedAppointment(test)
   })
 
   it('can book an "other" appointment by searching', () => {
-    const crn = 'ABC123'
-    const sentenceId = 2500443138
+    const test = testCase({
+      crn: 'ABC123',
+      sentenceId: 2500443138,
+      type: { code: 'C243', name: 'Alcohol Group Work Session (NS)' },
+    })
 
-    havingOffender(crn, sentenceId)
-    havingLoggedInAndBeginBookingAppointmentFlow(crn)
+    havingOffender(test)
+    havingLoggedInAndBeginBookingAppointmentFlow(test)
 
-    whenSelectingOtherAppointmentType('Alcohol', 'Alcohol Group Work Session (NS)')
-    shouldDisplayCorrectAppointmentSummary('Alcohol Group Work Session (NS)')
+    whenSelectingTypeRadio('Other')
+    whenSelectingOtherAppointmentType('Alcohol', test)
+    whenSubmittingCurrentStep()
+    shouldDisplayCorrectAppointmentSummary(test)
 
-    whenBookingAppointment()
-    shouldDisplayAppointmentBookingConfirmation('Alcohol Group Work Session (NS)')
+    whenSubmittingCurrentStep()
+    shouldDisplayAppointmentBookingConfirmation(test)
 
-    shouldHaveBookedAppointment(crn, sentenceId, 'C243')
+    shouldHaveBookedAppointment(test)
   })
 
-  function havingOffender(crn: string, sentenceId: number) {
+  it('renders validation errors', () => {
+    const test = testCase({
+      crn: 'ABC123',
+      sentenceId: 2500443138,
+      type: { code: 'APAT', name: 'Office visit' },
+    })
+
+    havingOffender(test)
+    havingLoggedInAndBeginBookingAppointmentFlow(test)
+
+    // nothing selected
+    whenSubmittingCurrentStep()
+    shouldRenderTypeValidationMessages({
+      type: 'Select an appointment type',
+    })
+
+    // select 'other' but do not select an 'other' type
+    whenSelectingTypeRadio('Other')
+    whenSubmittingCurrentStep()
+    shouldRenderTypeValidationMessages({
+      other: 'Select an appointment type',
+    })
+  })
+
+  function havingOffender({ crn, sentenceId }: AppointmentBookingTestCase) {
     cy.task('stubGetAppointmentTypes')
     cy.task('stubCreateAppointment', { crn, sentenceId })
     cy.task('stubOffenderDetails', crn)
   }
 
-  function havingLoggedInAndBeginBookingAppointmentFlow(crn: string) {
+  function havingLoggedInAndBeginBookingAppointmentFlow({ crn }: AppointmentBookingTestCase) {
     cy.login()
     cy.arrangeAppointment(crn)
   }
 
-  function whenSelectingOtherAppointmentType(search: string, name: string) {
+  function whenSubmittingCurrentStep() {
+    page.continueButton.click()
+  }
+
+  function whenSelectingTypeRadio(name: string) {
     page.pageTitle.contains('What type of appointment are you arranging?')
-    page.type.radio('other').click()
+    page.type.radio(name).click()
+  }
+
+  function whenSelectingOtherAppointmentType(search: string, { type }: AppointmentBookingTestCase) {
     page.type.otherAutoComplete.type(search)
-    page.type.autoCompleteResult(name).click()
-    page.continueButton.click()
+    page.type.autoCompleteResult(type.name).click()
   }
 
-  function whenSelectingFeaturedAppointmentType(type: string) {
-    page.pageTitle.contains('What type of appointment are you arranging?')
-    page.type.radio(type).click()
-    page.continueButton.click()
-  }
-
-  function shouldDisplayCorrectAppointmentSummary(type: string) {
+  function shouldDisplayCorrectAppointmentSummary({ start, end, type }: AppointmentBookingTestCase) {
     const expectedSummary = {
-      'Type of appointment': type,
-      Date: expectedStart.toFormat('cccc d MMMM'),
-      Time: `${expectedStart.toFormat('h:mm a')} to ${expectedEnd.toFormat('h:mm a')}`,
+      'Type of appointment': type.name,
+      Date: start.toFormat('cccc d MMMM'),
+      Time: `${start.toFormat('h:mm a')} to ${end.toFormat('h:mm a')}`,
       'RAR activity': 'No',
       'Appointment notes': 'some notes',
     }
@@ -88,32 +138,36 @@ context('CreateAppointment', () => {
     page.check.appointmentSummaryTable.should('deep.eq', expectedSummary)
   }
 
-  function whenBookingAppointment() {
-    page.continueButton.click()
-  }
-
-  function shouldDisplayAppointmentBookingConfirmation(type: string) {
+  function shouldDisplayAppointmentBookingConfirmation({ start, type }: AppointmentBookingTestCase) {
     page.pageTitle.contains('Appointment arranged')
-    page.confirm.descriptionMessage.contains(type)
-    page.confirm.timeMessage.contains(
-      `${expectedStart.toFormat('cccc d MMMM')} from ${expectedStart.toFormat('h:mm a')}`,
-    )
+    page.confirm.descriptionMessage.contains(type.name)
+    page.confirm.timeMessage.contains(`${start.toFormat('cccc d MMMM')} from ${start.toFormat('h:mm a')}`)
     page.confirm.phoneMessage.contains('Beth')
     page.confirm.phoneMessage.contains('07734 111992')
   }
 
-  function shouldHaveBookedAppointment(crn: string, sentenceId: number, contactType: string) {
+  function shouldHaveBookedAppointment({ crn, sentenceId, start, end, type }: AppointmentBookingTestCase) {
     cy.task('getCreatedAppointments', { crn, sentenceId }).should('deep.eq', [
       {
         requirementId: 2500199144,
-        contactType,
-        appointmentStart: expectedStart.toISO(),
-        appointmentEnd: expectedEnd.toISO(),
+        contactType: type.code,
+        appointmentStart: start.toISO(),
+        appointmentEnd: end.toISO(),
         notes: 'some notes',
         providerCode: 'CRS',
         teamCode: 'CRSUAT',
         staffCode: 'CRSUATU',
       },
     ])
+  }
+
+  function shouldRenderTypeValidationMessages(expected: { type?: string; other?: string }) {
+    for (const name of Object.keys(page.type.errorMessages)) {
+      if (expected[name]) {
+        page.type.errorMessages[name].contains(expected[name])
+      } else {
+        page.type.errorMessages[name].should('not.exist')
+      }
+    }
   }
 })
