@@ -48,6 +48,7 @@ context('CreateAppointment', () => {
 
     whenSelectingTypeRadio(test.type.name)
     whenSubmittingCurrentStep()
+    whenEnteringAppointmentDateAndTimes(test)
     shouldDisplayCorrectAppointmentSummary(test)
 
     whenSubmittingCurrentStep()
@@ -69,6 +70,7 @@ context('CreateAppointment', () => {
     whenSelectingTypeRadio('Other')
     whenSelectingOtherAppointmentType('Alcohol', test)
     whenSubmittingCurrentStep()
+    whenEnteringAppointmentDateAndTimes(test)
     shouldDisplayCorrectAppointmentSummary(test)
 
     whenSubmittingCurrentStep()
@@ -101,6 +103,41 @@ context('CreateAppointment', () => {
     })
   })
 
+  it('validates time and dates', () => {
+    const test = testCase({
+      crn: 'ABC123',
+      sentenceId: 2500443138,
+      type: { code: 'APAT', name: 'Office visit' },
+    })
+
+    havingOffender(test)
+    havingLoggedInAndBeginBookingAppointmentFlow(test)
+
+    whenSelectingTypeRadio(test.type.name)
+    whenSubmittingCurrentStep()
+
+    whenEnteringDateStrings('80', '20', '6')
+    whenSubmittingCurrentStep()
+    aDateErrorIsShown('Enter a valid date')
+    aTimeErrorIsShown('Enter a valid start time')
+
+    whenEnteringDateStrings('15', '01', '2021')
+    whenSubmittingCurrentStep()
+    aDateErrorIsShown('Enter a date in the future')
+    aTimeErrorIsShown('Enter a valid start time')
+
+    const now = DateTime.now()
+
+    whenEnteringDate(now)
+    whenEnteringStartTime(now)
+    whenSubmittingCurrentStep()
+    aTimeErrorIsShown('Enter a start time in the future')
+
+    whenEnteringEndTime(now.minus({ minutes: 1 }))
+    whenSubmittingCurrentStep()
+    aTimeErrorIsShown('Enter a start time in the future, Enter a start time before the end time')
+  })
+
   function havingOffender({ crn, sentenceId }: AppointmentBookingTestCase) {
     cy.task('stubGetAppointmentTypes')
     cy.task('stubCreateAppointment', { crn, sentenceId })
@@ -126,6 +163,13 @@ context('CreateAppointment', () => {
     page.type.autoCompleteResult(type.name).click()
   }
 
+  function whenEnteringAppointmentDateAndTimes({ start, end }: AppointmentBookingTestCase) {
+    whenEnteringDate(start)
+    whenEnteringStartTime(start)
+    whenEnteringEndTime(end)
+    page.continueButton.click()
+  }
+
   function shouldDisplayCorrectAppointmentSummary({ start, end, type }: AppointmentBookingTestCase) {
     const expectedSummary = {
       'Type of appointment': type.name,
@@ -134,6 +178,7 @@ context('CreateAppointment', () => {
       'RAR activity': 'No',
       'Appointment notes': 'some notes',
     }
+
     page.pageTitle.contains('Check your answers')
     page.check.appointmentSummaryTable.should('deep.eq', expectedSummary)
   }
@@ -169,5 +214,31 @@ context('CreateAppointment', () => {
         page.type.errorMessages[name].should('not.exist')
       }
     }
+  }
+
+  function whenEnteringDate(date: DateTime) {
+    whenEnteringDateStrings(date.day.toString(), date.month.toString(), date.year.toString())
+  }
+
+  function whenEnteringDateStrings(day: string, month: string, year: string) {
+    page.when.dayField.clear().type(day)
+    page.when.monthField.clear().type(month)
+    page.when.yearField.clear().type(year)
+  }
+
+  function whenEnteringStartTime(time: DateTime) {
+    page.when.startTimeField.clear().type(time.toFormat('h:mma').toString()).type('{esc}')
+  }
+
+  function whenEnteringEndTime(time: DateTime) {
+    page.when.endTimeField.clear().type(time.toFormat('h:mma').toString()).type('{esc}')
+  }
+
+  function aTimeErrorIsShown(message: string) {
+    page.when.timeErrorMessage.contains(message)
+  }
+
+  function aDateErrorIsShown(message: string) {
+    page.when.dateErrorMessage.contains(message)
   }
 })

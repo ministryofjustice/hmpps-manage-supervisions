@@ -9,7 +9,7 @@ describe('AppointmentWizardService', () => {
   const subject = new AppointmentWizardService()
   const crn = faker.datatype.uuid()
   const FIRST_STEP = AppointmentWizardStep.AppointmentType
-  const SECOND_STEP = AppointmentWizardStep.Check
+  const SECOND_STEP = AppointmentWizardStep.When
   const LAST_STEP = AppointmentWizardStep.Confirm
 
   it('asserting first step', () => {

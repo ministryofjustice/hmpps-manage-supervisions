@@ -1,0 +1,79 @@
+{% extends "../wizard-form.njk" %}
+{% set title = "When will the appointment be?" %}
+
+{% block form %}
+  <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">
+    {{ title }}
+  </h1>
+
+  {{ govukDateInput({
+    id: "session-date",
+    fieldset: {
+      legend: {
+        text: "Date",
+        classes: "govuk-label--s"
+      }
+    },
+    items: [
+      {
+        name: "startDate[day]",
+        value: form.startDate.day,
+        classes: "govuk-input--width-2",
+        label: "Day"
+      },
+      {
+        name: "startDate[month]",
+        value: form.startDate.month,
+        classes: "govuk-input--width-2",
+        label: "Month"
+      },
+      {
+        name: "startDate[year]",
+        value: form.startDate.year,
+        classes: "govuk-input--width-4",
+        label: "Year"
+      }
+    ],
+    hint: {
+      text: "For example, 20 5 2021"
+    },
+    errorMessage: errors | findErrorMessages("startDate")
+  }) }}
+
+{% set errorMessage = errors | findErrorMessages("startTime", "endTime") %}
+<div class="govuk-form-group {%- if errorMessage %} govuk-form-group--error{% endif %}">
+  {% call govukFieldset({
+    role: "group",
+    legend: {
+        text: "Time",
+        classes: "govuk-label--s"
+      }
+  }) %}
+  {% if errorMessage %}
+    {{ govukErrorMessage({
+      id: "times-error",
+      text: errorMessage.text
+    })}}
+  {% endif %}
+  <div class="govuk-form-group">
+      <div class="time-field">
+        {{ govukInput({
+        id: "startTime",
+        name: "startTime",
+        classes: "govuk-input govuk-input--width-5 time-input",
+        value: form.startTime
+      }) }}
+      </div>
+      <span class="govuk-body time-to">to</span>
+      <div class="time-field">
+        {{ govukInput({
+        id: "endTime",
+        name: "endTime",
+        classes: "govuk-input govuk-input--width-5 time-input",
+        value: form.endTime
+      }) }}
+    </div>
+  </div>
+  {% endcall %}
+</div>
+{% endblock %}

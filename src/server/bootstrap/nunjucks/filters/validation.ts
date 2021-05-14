@@ -5,13 +5,13 @@ export interface GdsErrorMessage {
   text: string
 }
 
-export class SetErrorMessage implements NunjucksFilter {
-  filter<T>(template: T, name: string, errors?: ValidationError[]): T & { errorMessage?: GdsErrorMessage } {
-    const filtered = errors?.filter(x => x.property === name) || []
+export class FindErrorMessages implements NunjucksFilter {
+  filter(errors: ValidationError[], ...names: string[]): GdsErrorMessage {
+    const filtered = errors?.filter(x => names.indexOf(x.property) >= 0) || []
     if (filtered.length === 0) {
-      return template
+      return null
     }
     const errorSet = new Set(filtered.map(x => Object.values(x.constraints)).reduce((x, y) => [...x, ...y]))
-    return { ...template, errorMessage: { text: [...errorSet].join(', ') } }
+    return { text: [...errorSet].join(', ') }
   }
 }

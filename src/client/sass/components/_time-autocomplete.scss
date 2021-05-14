@@ -1,0 +1,20 @@
+.time-field {
+  position: relative;
+  display: inline-block;
+}
+
+.time-to {
+  margin:0 0.75rem 0 0.75rem;
+}
+
+.ui-timepicker-list li {
+  @include govuk-font($size: 19);
+  padding: 8px;
+  border-bottom: 1px solid govuk-colour("mid-grey");
+}
+
+.ui-timepicker-wrapper {
+  border: 2px solid govuk-colour("black");
+  border-top: none;
+  max-width: 13.4ex;
+}

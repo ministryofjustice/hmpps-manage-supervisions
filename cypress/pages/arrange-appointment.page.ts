@@ -38,6 +38,38 @@ export class ArrangeAppointmentPage extends PageBase {
     }
   }
 
+  get when() {
+    return {
+      get dayField() {
+        return cy.get('input[name="startDate[day]"]')
+      },
+
+      get monthField() {
+        return cy.get('input[name="startDate[month]"]')
+      },
+
+      get yearField() {
+        return cy.get('input[name="startDate[year]"]')
+      },
+
+      get startTimeField() {
+        return cy.get('input[name="startTime"]')
+      },
+
+      get endTimeField() {
+        return cy.get('input[name="endTime"]')
+      },
+
+      get timeErrorMessage() {
+        return cy.get('#times-error')
+      },
+
+      get dateErrorMessage() {
+        return cy.get('#session-date-error')
+      },
+    }
+  }
+
   get check() {
     return {
       get appointmentSummaryTable(): Chainable<any> {
