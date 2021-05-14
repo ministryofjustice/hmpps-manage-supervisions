@@ -1,32 +1,32 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common'
-import type { Response } from 'express'
+import type { Request, Response } from 'express'
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(HttpExceptionFilter.name)
 
   catch(exception: Error, host: ArgumentsHost) {
-    const response: Response = host.switchToHttp().getResponse()
-
     if (exception instanceof HttpException) {
-      return this.handleHttpException(exception, response)
+      return this.handleHttpException(exception, host)
     }
 
-    return this.renderErrorPage(exception, response)
+    return this.renderErrorPage(exception, host)
   }
 
-  private renderErrorPage(exception: Error, response: Response, status = 500) {
+  private renderErrorPage(exception: Error, host: ArgumentsHost, status = 500) {
     const viewModel = { message: exception.message, status, stack: exception.stack }
     this.logger.error(JSON.stringify(viewModel))
-    return response.status(status).render('pages/error', viewModel)
+    return host.switchToHttp().getResponse<Response>().status(status).render('pages/error', viewModel)
   }
 
-  private handleHttpException(exception: HttpException, response: Response) {
+  private handleHttpException(exception: HttpException, host: ArgumentsHost) {
+    const response = host.switchToHttp().getResponse<Response>()
     const status = exception.getStatus()
     const meta: any = exception.getResponse()
 
     switch (status) {
       case HttpStatus.FORBIDDEN:
+        host.switchToHttp().getRequest<Request>().logout()
         return response.redirect('/login')
 
       case HttpStatus.MOVED_PERMANENTLY:
@@ -44,7 +44,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         })
 
       default:
-        return this.renderErrorPage(exception, response, status)
+        return this.renderErrorPage(exception, host, status)
     }
   }
 }
