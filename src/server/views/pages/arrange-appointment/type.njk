@@ -2,8 +2,29 @@
 {% set title = 'What type of appointment are you arranging?' %}
 
 {% block form %}
+    {% if types.other.length > 0 %}
+        {% set otherHtml %}
+            {{ govukSelect({
+                id: "arrange-appointment-other-select",
+                name: "other",
+                attributes: {
+                    "data-qa": "arrange-appointment/other-type",
+                    "data-enhance": "accessible-autocomplete"
+                },
+                label: {
+                    text: "Type of appointment"
+                },
+                items: types.other | toSelectList(other, "contactType", "name")
+            } | setErrorMessage("other", errors)) }}
+        {% endset %}
+    {% endif %}
+
     {{ govukRadios({
+        id: "arrange-appointment-featured-radios",
         name: "type",
+        attributes: {
+            "data-qa": "arrange-appointment/featured-type"
+        },
         fieldset: {
             legend: {
                 text: title,
@@ -11,7 +32,7 @@
                 classes: "govuk-label--xl govuk-!-margin-bottom-6"
             }
         },
-        items: types.featured | toOptionList(appointment.contactType.code, "contactType", "name")
-    })}}
+        items: types.featured | toRadioList(type, "contactType", "name", { otherHtml: otherHtml })
+    } | setErrorMessage("type", errors)) }}
 
 {% endblock %}

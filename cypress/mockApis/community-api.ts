@@ -42,6 +42,24 @@ export class CommunityMockApi {
             requiresLocation: 'REQUIRED',
             orderTypes: ['CJA', 'LEGACY'],
           },
+          {
+            contactType: 'C243',
+            description: 'Alcohol Group Work Session (NS)',
+            requiresLocation: 'REQUIRED',
+            orderTypes: ['CJA', 'LEGACY'],
+          },
+          {
+            contactType: 'C089',
+            description: 'Alcohol Key Worker Session (NS)',
+            requiresLocation: 'REQUIRED',
+            orderTypes: ['CJA', 'LEGACY'],
+          },
+          {
+            contactType: 'CITA',
+            description: 'Citizenship Alcohol Session (NS)',
+            requiresLocation: 'REQUIRED',
+            orderTypes: ['CJA', 'LEGACY'],
+          },
         ],
       },
     })

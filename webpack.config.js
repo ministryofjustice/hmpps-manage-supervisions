@@ -29,6 +29,7 @@ module.exports = function (options) {
           'jquery-ui',
           'govuk-frontend',
           '@ministryofjustice/frontend',
+          'accessible-autocomplete'
         ],
       }),
     ],
@@ -41,12 +42,26 @@ module.exports = function (options) {
       rules: [
         {
           test: /\.ts$/i,
+          include: [path.join(__dirname, 'src', 'server')],
           use: [
             {
               loader: 'ts-loader',
               options: {
                 transpileOnly: true,
                 configFile: 'tsconfig.build.json',
+              },
+            },
+          ],
+        },
+        {
+          test: /\.ts$/i,
+          include: [path.join(__dirname, 'src', 'client')],
+          use: [
+            {
+              loader: 'ts-loader',
+              options: {
+                transpileOnly: true,
+                configFile: 'tsconfig.client.json',
               },
             },
           ],

@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { ArrangeAppointmentService } from './arrange-appointment.service'
+import { ArrangeAppointmentService, DomainAppointmentType } from './arrange-appointment.service'
 import { plainToClass } from 'class-transformer'
 import { AppointmentBuilderDto } from './dto/AppointmentBuilderDto'
 import { validate, ValidationError } from 'class-validator'
@@ -65,17 +65,32 @@ export class ArrangeAppointmentController {
       return redirect
     }
 
+    // clear out the saved type if any
+    session.appointment.contactType = {}
+
     const appointment = plainToClass(AppointmentBuilderDto, session.appointment)
     const errors = await validate(body)
     if (errors.length > 0) {
-      return await this.getAppointmentTypeViewModel(crn, user, appointment, errors)
+      return await this.getAppointmentTypeViewModel(crn, user, appointment, body, errors)
     }
 
     const types = await this.service.getAppointmentTypes(user)
-    const type = types.find(x => x.contactType === body.type)
+    let type: DomainAppointmentType
+    if (body.type === 'other') {
+      type = types.find(x => x.contactType === body.other)
+    } else {
+      type = types.find(x => x.contactType === body.type)
+    }
+
     if (!type) {
-      // if this happens then someone is messing with us, so no need for a descriptive error
-      return await this.getAppointmentTypeViewModel(crn, user, appointment)
+      return await this.getAppointmentTypeViewModel(crn, user, appointment, body, [
+        {
+          property: 'type',
+          constraints: {
+            isAppointmentType: AppointmentWizardUpdateTypeDto.MESSAGES.type.required,
+          },
+        },
+      ])
     }
 
     session.appointment.contactType = { code: type.contactType, description: type.name }
@@ -159,9 +174,18 @@ export class ArrangeAppointmentController {
     crn: string,
     user: User,
     appointment: AppointmentBuilderDto,
+    body?: AppointmentWizardUpdateTypeDto,
     errors: ValidationError[] = [],
   ): Promise<AppointmentTypeViewModel> {
     const types = await this.service.getAppointmentTypes(user)
+    const currentType = appointment.contactType?.code
+      ? types.find(x => x.contactType === appointment.contactType.code) || null
+      : null
+    const [type, other] = currentType
+      ? currentType.isFeatured
+        ? [currentType.contactType, null]
+        : ['other', currentType.contactType]
+      : [null, null]
     return {
       step: AppointmentWizardStep.AppointmentType,
       errors,
@@ -173,6 +197,8 @@ export class ArrangeAppointmentController {
         featured: [],
         other: [],
       }),
+      type: body?.type || type,
+      other: body?.other || other,
     }
   }
 

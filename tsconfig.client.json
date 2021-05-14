@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "es5",
+  },
+  "include": ["src/client/**/*"],
+  "exclude": ["node_modules", "dist", "**/*spec.ts"]
+}
