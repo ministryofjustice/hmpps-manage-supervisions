@@ -8,13 +8,14 @@
 }
 
 .ui-timepicker-list li {
-  @include govuk-font($size: 19);
   padding: 8px;
   border-bottom: 1px solid govuk-colour("mid-grey");
 }
 
 .ui-timepicker-wrapper {
+  @include govuk-font($size: 19);
   border: 2px solid govuk-colour("black");
   border-top: none;
-  max-width: 13.4ex;
+  max-width: 10.8ex;
+  box-sizing: border-box;
 }
