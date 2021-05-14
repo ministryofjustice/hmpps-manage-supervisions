@@ -9,8 +9,11 @@ export class ArrangeAppointmentPage extends PageBase {
 
   get type() {
     return {
-      radio(contactType: string) {
-        return cy.get(`[data-qa="arrange-appointment/featured-type"] input[type=radio][value="${contactType}"]`)
+      radio(name: string) {
+        return cy
+          .get(`[data-qa="arrange-appointment/featured-type"] input[type=radio]`)
+          .siblings('label')
+          .contains(name)
       },
 
       get otherAutoComplete() {
@@ -19,6 +22,18 @@ export class ArrangeAppointmentPage extends PageBase {
 
       autoCompleteResult(name: string) {
         return cy.get('#arrange-appointment-other-select__listbox > li').contains(name)
+      },
+
+      get errorMessages() {
+        return {
+          get type() {
+            return cy.get('#type-error')
+          },
+
+          get other() {
+            return cy.get('#arrange-appointment-other-select-error')
+          },
+        }
       },
     }
   }
