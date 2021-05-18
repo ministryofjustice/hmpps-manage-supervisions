@@ -60,8 +60,12 @@ export class ArrangeAppointmentPage extends PageBase {
         return cy.get('input[name="endTime"]')
       },
 
-      get timeErrorMessage() {
-        return cy.get('#times-error')
+      get startTimeErrorMessage() {
+        return cy.get('#startTime-error')
+      },
+
+      get endTimeErrorMessage() {
+        return cy.get('#endTime-error')
       },
 
       get dateErrorMessage() {
