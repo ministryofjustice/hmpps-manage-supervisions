@@ -11,7 +11,7 @@ import {
 import { AppointmentWizardSession } from './dto/AppointmentWizardSession'
 import { AppointmentWizardUpdateTypeDto } from './dto/AppointmentWizardUpdate.dto'
 import { AppointmentWizardUpdateWhenDto } from './dto/AppointmentWizardUpdateWhen.dto'
-import { AppointmentWizardService } from './appointment-wizard.service'
+import { AppointmentWizardService, getStepUrl } from './appointment-wizard.service'
 import { Controller, Get, Param, Post, Redirect, Render, Session } from '@nestjs/common'
 import { AuthenticatedUser, DynamicRedirect, RedirectResponse } from '../common'
 import { BodyClass } from '../common/meta/body-class.decorator'
@@ -149,6 +149,8 @@ export class ArrangeAppointmentController {
       appointment,
       paths: {
         back: this.wizard.getBackPath(AppointmentWizardStep.Check, crn),
+        type: getStepUrl(AppointmentWizardStep.AppointmentType, crn),
+        when: getStepUrl(AppointmentWizardStep.When, crn),
       },
       rarDetails: {
         category: appointment.nsiType?.description || '',

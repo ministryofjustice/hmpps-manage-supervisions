@@ -8,7 +8,7 @@ const steps = Object.freeze(Object.values(AppointmentWizardStep))
 const firstStep = steps[0]
 const lastStep = steps[steps.length - 1]
 
-function getStepUrl(step: AppointmentWizardStep, crn: string) {
+export function getStepUrl(step: AppointmentWizardStep, crn: string) {
   return `/arrange-appointment/${crn}/${step}`
 }
 

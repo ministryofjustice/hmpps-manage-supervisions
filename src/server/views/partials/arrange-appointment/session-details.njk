@@ -1,6 +1,6 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-{% macro sessionDetails(appointment, rarDetails) %}
+{% macro sessionDetails(appointment, rarDetails, paths) %}
   {{ govukSummaryList({
     classes: 'govuk-!-margin-bottom-9',
     attributes: {
@@ -9,15 +9,42 @@
     rows: [
       {
         key: { text: "Type of appointment" },
-        value: { text: appointment.contactType.description }
+        value: { text: appointment.contactType.description },
+        actions: {
+          items: [
+            {
+              href: paths.type,
+              text: "Change",
+              visuallyHiddenText: "type of appointment"
+            }
+          ]
+        }
       },
       {
         key: { text: "Date" },
-        value: { text: appointment.appointmentStart | dateFormat('cccc d MMMM') }
+        value: { text: appointment.appointmentStart | dateFormat('cccc d MMMM') },
+        actions: {
+          items: [
+            {
+              href: paths.when,
+              text: "Change",
+              visuallyHiddenText: "date"
+            }
+          ]
+        }
       },
       {
         key: { text: "Time" },
-        value: { text: (appointment.appointmentStart | dateFormat('h:mm a')) + ' to ' + (appointment.appointmentEnd | dateFormat('h:mm a')) }
+        value: { text: (appointment.appointmentStart | dateFormat('h:mm a')) + ' to ' + (appointment.appointmentEnd | dateFormat('h:mm a')) },
+        actions: {
+          items: [
+            {
+              href: paths.when,
+              text: "Change",
+              visuallyHiddenText: "date"
+            }
+          ]
+        }
       },
       {
         key: { text: "RAR activity" },
