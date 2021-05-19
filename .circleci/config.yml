@@ -78,6 +78,7 @@ jobs:
       tag: 14.15-browsers
     environment:
       TZ: "Europe/London"
+      NODE_OPTIONS: "--max_old_space_size=4096"
     steps:
       - checkout
       - restore_cache:

@@ -1,12 +1,11 @@
 import { Type } from 'class-transformer'
 import { DateTime } from 'luxon'
-import { IsInt, IsNotEmpty, IsPositive, IsString, Validate, ValidateIf, ValidateNested } from 'class-validator'
+import { IsBoolean, IsInt, IsNotEmpty, IsPositive, IsString, ValidateIf, ValidateNested } from 'class-validator'
 import { AppointmentWizardStep } from './AppointmentWizardViewModel'
 import { RequiredOptional } from './AppointmentTypeDto'
-import IsTimeValidator, { IsTime } from '../../validators/IsTime'
-import { DateInput, IsAfter, IsDateInput, IsFutureTime, ValidationGroup, IsFutureDate } from '../../validators'
+import { DateInput, IsAfter, IsDateInput, IsFutureTime, ValidationGroup, IsFutureDate, IsTime } from '../../validators'
 import { getDateTime } from '../../util'
-import { ExposeDefault } from '../../util/mapping'
+import { ExposeDefault, ToBoolean } from '../../util/mapping'
 
 export const MESSAGES = {
   type: {
@@ -17,6 +16,9 @@ export const MESSAGES = {
   },
   date: {
     required: 'Enter a {}',
+  },
+  sensitive: {
+    required: 'Select yes if the appointment contains sensitive information',
   },
 }
 
@@ -120,9 +122,14 @@ export class AppointmentBuilderDto {
   startTime?: string
 
   @ExposeDefault({ groups: [AppointmentWizardStep.When] })
-  @Validate(IsTimeValidator, { message: 'Enter a valid time', groups: [AppointmentWizardStep.When] })
+  @IsTime({ message: 'Enter a valid time', groups: [AppointmentWizardStep.When] })
   @IsAfter('startTime', { message: 'Enter an end time after the start time', groups: [AppointmentWizardStep.When] })
   endTime?: string
+
+  @ExposeDefault({ groups: [AppointmentWizardStep.Sensitive] })
+  @ToBoolean()
+  @IsBoolean({ groups: [AppointmentWizardStep.Sensitive], message: MESSAGES.sensitive.required })
+  sensitive?: boolean
 
   get contactType() {
     return this.type === 'other' ? this.otherType : this.type

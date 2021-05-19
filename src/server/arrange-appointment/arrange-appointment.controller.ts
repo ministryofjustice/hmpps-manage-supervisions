@@ -5,6 +5,7 @@ import { validate, ValidationError } from 'class-validator'
 import {
   AppointmentLocationViewModel,
   AppointmentSchedulingViewModel,
+  AppointmentSensitiveViewModel,
   AppointmentTypeViewModel,
   AppointmentWizardStep,
   AppointmentWizardViewModel,
@@ -97,6 +98,7 @@ export class ArrangeAppointmentController {
 
   @Get('where')
   @Render('pages/arrange-appointment/where')
+  @DynamicRedirect()
   async getWhere(
     @Param('crn') crn: string,
     @Session() session: AppointmentWizardSession,
@@ -125,7 +127,7 @@ export class ArrangeAppointmentController {
     }
 
     const errors = await this.validateWithSession(body, session, AppointmentWizardStep.Where)
-    const viewModel = await this.getAppointmentLocationViewModel(session, user, errors)
+    const viewModel = await this.getAppointmentLocationViewModel(session, user, body, errors)
 
     if (errors.length > 0) {
       return viewModel
@@ -148,6 +150,7 @@ export class ArrangeAppointmentController {
 
   @Get('when')
   @Render('pages/arrange-appointment/when')
+  @DynamicRedirect()
   async getWhen(@Param('crn') crn: string, @Session() session: AppointmentWizardSession): Promise<RenderOrRedirect> {
     const redirect = this.wizard.assertStep(session, AppointmentWizardStep.When, crn)
     if (redirect) {
@@ -177,6 +180,44 @@ export class ArrangeAppointmentController {
     return this.wizard.nextStep(session, AppointmentWizardStep.When)
   }
 
+  @Get('sensitive')
+  @Render('pages/arrange-appointment/sensitive')
+  @DynamicRedirect()
+  async getSensitive(
+    @Param('crn') crn: string,
+    @Session() session: AppointmentWizardSession,
+  ): Promise<RenderOrRedirect> {
+    const redirect = this.wizard.assertStep(session, AppointmentWizardStep.Sensitive, crn)
+    if (redirect) {
+      return redirect
+    }
+
+    return this.getSensitiveViewModel(session)
+  }
+
+  @Post('sensitive')
+  @Render('pages/arrange-appointment/sensitive')
+  @DynamicRedirect()
+  async postSensitive(
+    @Param('crn') crn: string,
+    @Session() session: AppointmentWizardSession,
+    @BodyClass(AppointmentWizardStep.Sensitive) body: AppointmentBuilderDto,
+  ): Promise<RenderOrRedirect> {
+    const redirect = this.wizard.assertStep(session, AppointmentWizardStep.Sensitive, crn)
+    if (redirect) {
+      return redirect
+    }
+
+    const errors = await this.validateWithSession(body, session, AppointmentWizardStep.Sensitive)
+    if (errors.length > 0) {
+      return this.getSensitiveViewModel(session, body, errors)
+    }
+
+    Object.assign(session.appointment, body)
+
+    return this.wizard.nextStep(session, AppointmentWizardStep.Sensitive)
+  }
+
   @Get('check')
   @Render('pages/arrange-appointment/check')
   @DynamicRedirect()
@@ -197,6 +238,7 @@ export class ArrangeAppointmentController {
         type: getStepUrl(session, AppointmentWizardStep.Type),
         where: getStepUrl(session, AppointmentWizardStep.Where),
         when: getStepUrl(session, AppointmentWizardStep.When),
+        sensitive: getStepUrl(session, AppointmentWizardStep.Sensitive),
       },
       rarDetails: {
         category: '', // TODO from nsiType.description
@@ -333,6 +375,7 @@ export class ArrangeAppointmentController {
   private async getAppointmentLocationViewModel(
     session: AppointmentWizardSession,
     user: User,
+    body?: DeepPartial<AppointmentBuilderDto>,
     errors: ValidationError[] = [],
   ): Promise<AppointmentLocationViewModel> {
     const offender = await this.service.getOffenderDetails(session.crn, user)
@@ -346,11 +389,31 @@ export class ArrangeAppointmentController {
       step: AppointmentWizardStep.Where,
       appointment,
       locations,
-      location: appointment.location,
+      location: body?.location || appointment.location,
       paths: {
         back: this.wizard.getBackUrl(session, AppointmentWizardStep.Where),
       },
       errors,
+    }
+  }
+
+  private getSensitiveViewModel(
+    session: AppointmentWizardSession,
+    body?: DeepPartial<AppointmentBuilderDto>,
+    errors: ValidationError[] = [],
+  ): AppointmentSensitiveViewModel {
+    const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
+      groups: [DEFAULT_GROUP],
+      excludeExtraneousValues: true,
+    })
+    return {
+      step: AppointmentWizardStep.Sensitive,
+      appointment,
+      paths: {
+        back: this.wizard.getBackUrl(session, AppointmentWizardStep.Sensitive),
+      },
+      errors,
+      sensitive: body?.sensitive || appointment.sensitive,
     }
   }
 }

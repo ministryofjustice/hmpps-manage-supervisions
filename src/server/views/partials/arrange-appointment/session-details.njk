@@ -63,6 +63,21 @@
       {
         key: { text: "Appointment notes" },
         value: { text: appointment.notes or 'None' }
+      },
+      {
+        key: { text: "Sensitive" },
+        value: { text: appointment.sensitive | yesNo },
+        classes: ["qa-sensitive"],
+        actions: {
+          items: [
+            {
+              href: paths.sensitive,
+              text: "Change",
+              visuallyHiddenText: "sensitive",
+              classes: ["qa-change"]
+            }
+          ]
+        }
       }
     ]
   })

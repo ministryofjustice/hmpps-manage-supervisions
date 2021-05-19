@@ -16,6 +16,7 @@ export interface AppointmentCreateRequest {
   providerCode: string
   teamCode: string
   staffCode: string
+  sensitive?: boolean
 }
 
 export interface DomainAppointmentType
@@ -58,6 +59,7 @@ export class ArrangeAppointmentService {
       appointmentEnd: builder.appointmentEnd.toISO(),
       contactType: builder.contactType,
       officeLocationCode: builder.location,
+      sensitive: builder.sensitive,
     }
 
     // TODO pass the user token through where appropriate
