@@ -173,17 +173,16 @@ context('CreateAppointment', () => {
     page.continueButton.click()
   }
 
-  function shouldDisplayCorrectAppointmentSummary({ start, end, type }: AppointmentBookingTestCase) {
-    const expectedSummary = {
-      'Type of appointment': type.name,
-      Date: start.toFormat('cccc d MMMM'),
-      Time: `${start.toFormat('h:mm a')} to ${end.toFormat('h:mm a')}`,
-      'RAR activity': 'No',
-      'Appointment notes': 'some notes',
-    }
-
+  function shouldDisplayCorrectAppointmentSummary({ start, end, type, crn }: AppointmentBookingTestCase) {
     page.pageTitle.contains('Check your answers')
-    page.check.appointmentSummaryTable.should('deep.eq', expectedSummary)
+    page.check.appointmentType.contains(type.name)
+    page.check.appointmentTypeChangeLink.should('have.attr', 'href').and('include', `${crn}/type`)
+
+    page.check.appointmentDate.contains(start.toFormat('cccc d MMMM'))
+    page.check.appointmentDateChangeLink.should('have.attr', 'href').and('include', `${crn}/when`)
+
+    page.check.appointmentTime.contains(`${start.toFormat('h:mm a')} to ${end.toFormat('h:mm a')}`)
+    page.check.appointmentTimeChangeLink.should('have.attr', 'href').and('include', `${crn}/when`)
   }
 
   function shouldDisplayAppointmentBookingConfirmation({ start, type }: AppointmentBookingTestCase) {
