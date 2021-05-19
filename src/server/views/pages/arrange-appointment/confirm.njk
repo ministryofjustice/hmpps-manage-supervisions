@@ -8,7 +8,7 @@
     <span data-qa="confirm-appointment/times">
       {{ appointment.appointmentStart | dateWithDayAndWithoutYear() }}
       from
-      {{ appointment.appointmentStart | timeWithMinutes() }}
+      {{ appointment.appointmentStart | time() }}
     </span>
   {% endset %}
 

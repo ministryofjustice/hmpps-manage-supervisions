@@ -39,7 +39,7 @@
       },
       {
         key: { text: "Time" },
-        value: { text: (appointment.appointmentStart | timeWithMinutes()) + ' to ' + (appointment.appointmentEnd | timeWithMinutes()) },
+        value: { text: (appointment.appointmentStart | time()) + ' to ' + (appointment.appointmentEnd | time()) },
         classes: ["qa-time"],
         actions: {
           items: [

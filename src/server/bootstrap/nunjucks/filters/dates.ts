@@ -14,9 +14,11 @@ export class DateFormat implements NunjucksFilter {
   }
 }
 
-export class TimeWithMinutes extends DateFormat {
+export class Time implements NunjucksFilter {
   filter(value: string | DateTime): string {
-    return super.filter(value, 'h:mma').toLowerCase()
+    const datetime = value instanceof DateTime ? value : DateTime.fromISO(value)
+    const hourMinuteFormat = datetime.minute === 0 ? 'ha' : 'h:mma'
+    return datetime.toFormat(hourMinuteFormat).toLowerCase()
   }
 }
 
