@@ -1,6 +1,6 @@
 import { ArrangeAppointmentPage } from '../../pages'
 import { DateTime } from 'luxon'
-
+import { Time, DateWithDayAndWithoutYear } from '../../../src/server/bootstrap/nunjucks/filters'
 interface AppointmentBookingTestCase {
   start: DateTime
   end: DateTime
@@ -178,17 +178,19 @@ context('CreateAppointment', () => {
     page.check.appointmentType.contains(type.name)
     page.check.appointmentTypeChangeLink.should('have.attr', 'href').and('include', `${crn}/type`)
 
-    page.check.appointmentDate.contains(start.toFormat('cccc d MMMM'))
+    page.check.appointmentDate.contains(new DateWithDayAndWithoutYear().filter(start))
     page.check.appointmentDateChangeLink.should('have.attr', 'href').and('include', `${crn}/when`)
 
-    page.check.appointmentTime.contains(`${start.toFormat('h:mm a')} to ${end.toFormat('h:mm a')}`)
+    page.check.appointmentTime.contains(`${new Time().filter(start)} to ${new Time().filter(end)}`)
     page.check.appointmentTimeChangeLink.should('have.attr', 'href').and('include', `${crn}/when`)
   }
 
   function shouldDisplayAppointmentBookingConfirmation({ start, type }: AppointmentBookingTestCase) {
     page.pageTitle.contains('Appointment arranged')
     page.confirm.descriptionMessage.contains(type.name)
-    page.confirm.timeMessage.contains(`${start.toFormat('cccc d MMMM')} from ${start.toFormat('h:mm a')}`)
+    page.confirm.timeMessage.contains(
+      `${new DateWithDayAndWithoutYear().filter(start)} from ${new Time().filter(start)}`,
+    )
     page.confirm.phoneMessage.contains('Beth')
     page.confirm.phoneMessage.contains('07734 111992')
   }
