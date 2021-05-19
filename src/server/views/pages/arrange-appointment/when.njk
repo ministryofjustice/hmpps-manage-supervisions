@@ -16,20 +16,20 @@
     },
     items: [
       {
-        name: "startDate[day]",
-        value: form.startDate.day,
+        name: "date[day]",
+        value: date.day,
         classes: "govuk-input--width-2",
         label: "Day"
       },
       {
-        name: "startDate[month]",
-        value: form.startDate.month,
+        name: "date[month]",
+        value: date.month,
         classes: "govuk-input--width-2",
         label: "Month"
       },
       {
-        name: "startDate[year]",
-        value: form.startDate.year,
+        name: "date[year]",
+        value: date.year,
         classes: "govuk-input--width-4",
         label: "Year"
       }
@@ -37,7 +37,7 @@
     hint: {
       text: "For example, 20 5 2021"
     },
-    errorMessage: errors | findErrorMessages("startDate")
+    errorMessage: errors | findErrorMessages("date")
   }) }}
 
   {{ govukInput({
@@ -48,7 +48,7 @@
       text: "Start time",
       classes: "govuk-label--s"
     },
-    value: form.startTime,
+    value: startTime,
     errorMessage: errors | findErrorMessages("startTime")
   }) }}
   {{ govukInput({
@@ -59,7 +59,7 @@
       text: "End time",
       classes: "govuk-label--s"
     },
-    value: form.endTime,
+    value: endTime,
     errorMessage: errors | findErrorMessages("endTime")
   }) }}
 {% endblock %}

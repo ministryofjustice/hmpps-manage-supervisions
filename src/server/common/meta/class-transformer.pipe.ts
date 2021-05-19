@@ -1,12 +1,14 @@
 import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common'
-import { plainToClass } from 'class-transformer'
+import { plainToClass, TransformOptions } from 'class-transformer'
 
 @Injectable()
-export class ClassTransformerPipe implements PipeTransform<any> {
+export class ClassTransformerPipe implements PipeTransform {
+  constructor(private readonly options: TransformOptions) {}
+
   transform(value: any, { metatype }: ArgumentMetadata) {
     if (!metatype) {
       return value
     }
-    return plainToClass(metatype, value, { excludeExtraneousValues: true })
+    return plainToClass(metatype, value, { ...this.options, excludeExtraneousValues: true })
   }
 }

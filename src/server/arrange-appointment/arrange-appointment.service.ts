@@ -1,17 +1,36 @@
-import { classToPlain, plainToClass } from 'class-transformer'
-import { AppointmentCreateRequest } from './dto/AppointmentCreateRequest'
 import { AppointmentBuilderDto } from './dto/AppointmentBuilderDto'
-import { validate } from 'class-validator'
 import { AppointmentCreateResponse } from './dto/AppointmentCreateResponse'
 import { OffenderDetailsResponse } from './dto/OffenderDetailsResponse'
 import { AppointmentTypeDto } from './dto/AppointmentTypeDto'
 import { Injectable, Logger } from '@nestjs/common'
 import { AuthenticationMethod, CacheService, RestService } from '../common'
+import { OfficeLocation } from './dto/OfficeLocation'
+
+export interface AppointmentCreateRequest {
+  requirementId: number
+  contactType: string
+  appointmentStart: string
+  appointmentEnd: string
+  officeLocationCode?: string
+  notes: string
+  providerCode: string
+  teamCode: string
+  staffCode: string
+}
 
 export interface DomainAppointmentType
   extends Pick<AppointmentTypeDto, 'contactType' | 'requiresLocation' | 'orderTypes'> {
   isFeatured: boolean
   name: string
+}
+
+export const DUMMY_DATA = {
+  sentenceId: 2500443138,
+  notes: 'some notes',
+  providerCode: 'CRS',
+  requirementId: 2500199144,
+  staffCode: 'CRSUATU',
+  teamCode: 'CRSUAT',
 }
 
 /**
@@ -31,26 +50,14 @@ export class ArrangeAppointmentService {
 
   constructor(private readonly factory: RestService, private readonly cache: CacheService) {}
 
-  async createAppointment(
-    { sentenceId, ...appointment }: AppointmentBuilderDto,
-    crn: string,
-    user: User,
-  ): Promise<AppointmentCreateResponse> {
-    const request = plainToClass(
-      AppointmentCreateRequest,
-      {
-        ...appointment,
-        appointmentStart: appointment.appointmentStart.toISO(),
-        appointmentEnd: appointment.appointmentEnd.toISO(),
-        contactType: appointment.contactType.code,
-      } as AppointmentCreateRequest,
-      { excludeExtraneousValues: true },
-    )
-
-    // TODO this is a bit pointless, we should remove it
-    const errors = await validate(request)
-    if (errors.length > 0) {
-      this.logger.error(errors)
+  async createAppointment(builder: AppointmentBuilderDto, crn: string, user: User): Promise<AppointmentCreateResponse> {
+    const { sentenceId, ...dummy } = DUMMY_DATA
+    const request: AppointmentCreateRequest = {
+      ...dummy,
+      appointmentStart: builder.appointmentStart.toISO(),
+      appointmentEnd: builder.appointmentEnd.toISO(),
+      contactType: builder.contactType,
+      officeLocationCode: builder.location,
     }
 
     // TODO pass the user token through where appropriate
@@ -59,7 +66,7 @@ export class ArrangeAppointmentService {
       AppointmentCreateResponse,
       `/secure/offenders/crn/${crn}/sentence/${sentenceId}/appointments`,
       {
-        data: classToPlain(request),
+        data: request,
       },
     )
   }
@@ -67,7 +74,7 @@ export class ArrangeAppointmentService {
   async getOffenderDetails(crn: string, user: User): Promise<OffenderDetailsResponse> {
     const client = await this.factory.build('community', user, AuthenticationMethod.ReissueForDeliusUser)
 
-    return await client.get(OffenderDetailsResponse, `/secure/offenders/crn/${crn}`)
+    return await client.get(OffenderDetailsResponse, `/secure/offenders/crn/${crn}/all`)
   }
 
   async getAppointmentTypes(user: User): Promise<DomainAppointmentType[]> {
@@ -90,6 +97,14 @@ export class ArrangeAppointmentService {
         orderTypes: type.orderTypes,
         requiresLocation: type.requiresLocation,
       }
+    })
+  }
+
+  async getTeamOfficeLocations(user: User, teamCode: string): Promise<OfficeLocation[]> {
+    return this.cache.getOrSetTransformedArray(OfficeLocation, `community:office-locations:${teamCode}`, async () => {
+      const client = await this.factory.build('community', user, AuthenticationMethod.ReissueForDeliusUser)
+      const value = await client.get<OfficeLocation[]>(OfficeLocation, `/secure/teams/${teamCode}/office-locations`)
+      return { value, options: { durationSeconds: 600 } }
     })
   }
 }

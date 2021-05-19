@@ -90,7 +90,7 @@ export class CommunityMockApi {
     return this.client.stub({
       request: {
         method: 'GET',
-        urlPath: `/community/secure/offenders/crn/${crn}`,
+        urlPath: `/community/secure/offenders/crn/${crn}/all`,
       },
       response: {
         status: 200,
@@ -118,6 +118,49 @@ export class CommunityMockApi {
             remandStatus: 'Bail - Unconditional',
             previousConviction: {},
           },
+          offenderManagers: [
+            {
+              trustOfficer: {
+                forenames: 'Unallocated Staff(N07)',
+                surname: 'Staff',
+              },
+              staff: {
+                code: 'N07UATU',
+                forenames: 'Unallocated Staff(N07)',
+                surname: 'Staff',
+                unallocated: true,
+              },
+              partitionArea: 'National Data',
+              softDeleted: false,
+              team: {
+                code: 'N07UAT',
+                description: 'Unallocated Team(N07)',
+                localDeliveryUnit: {
+                  code: 'N07NPSA',
+                  description: 'N07 Division',
+                },
+                district: {
+                  code: 'N07NPSA',
+                  description: 'N07 Division',
+                },
+                borough: {
+                  code: 'N07100',
+                  description: 'N07 Cluster 1',
+                },
+              },
+              probationArea: {
+                code: 'N07',
+                description: 'NPS London',
+                nps: true,
+              },
+              fromDate: '1900-01-01',
+              active: true,
+              allocationReason: {
+                code: 'IN1',
+                description: 'Initial Allocation',
+              },
+            },
+          ],
           softDeleted: false,
           currentDisposal: '1',
           partitionArea: 'National Data',
@@ -125,6 +168,52 @@ export class CommunityMockApi {
           currentExclusion: false,
           activeProbationManagedSentence: true,
         },
+      },
+    })
+  }
+
+  async stubGetLocations() {
+    return this.client.stub({
+      request: {
+        method: 'GET',
+        urlPath: `/community/secure/teams/N07UAT/office-locations`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: [
+          {
+            code: 'LDN_MTH',
+            description: '117 STOCKWELL ROAD',
+            buildingName: 'Moat House',
+            buildingNumber: '117',
+            streetName: 'Stockwell Road',
+            townCity: 'London',
+            county: 'Lambeth',
+            postcode: 'SW9 9TN',
+          },
+          {
+            code: 'LDN_BCR',
+            description: '29/33 VICTORIA ROAD',
+            buildingNumber: '29/31',
+            streetName: 'Victoria Road',
+            townCity: 'Romford',
+            county: 'BarkingDag/Havering',
+            postcode: 'RM1 2JT',
+          },
+          {
+            code: 'DTVBIS1',
+            description: 'Bishop Auckland',
+            buildingName: 'Beechburn House',
+            buildingNumber: '8',
+            streetName: 'Kensington',
+            townCity: 'Bishop Auckland',
+            county: 'County Durham',
+            postcode: 'DL14 6HX',
+          },
+        ],
       },
     })
   }

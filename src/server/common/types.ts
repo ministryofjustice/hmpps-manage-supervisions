@@ -5,6 +5,7 @@ export type ViewModel<T, Name extends string = 'dto'> = {
   paths?: {
     back?: string
     type?: string
+    where?: string
     when?: string
   }
 } & { [P in Name]: T }

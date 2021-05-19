@@ -1,61 +1,35 @@
 import * as faker from 'faker'
 import { merge } from 'lodash'
-import { AppointmentCreateRequest } from './AppointmentCreateRequest'
-import { AppointmentBuilderDto, AppointmentMetaType } from './AppointmentBuilderDto'
+import { AppointmentBuilderDto } from './AppointmentBuilderDto'
 import { plainToClass } from 'class-transformer'
 import { AppointmentCreateResponse } from './AppointmentCreateResponse'
 import { OffenderDetailsResponse } from './OffenderDetailsResponse'
 import { AppointmentTypeDto, OrderType, RequiredOptional } from './AppointmentTypeDto'
+import { OfficeLocation } from './OfficeLocation'
+import { DateTime } from 'luxon'
+import { TIME_FORMAT } from '../../validators'
+import { DEFAULT_GROUP } from '../../util/mapping'
 
-function fakeAppointmentMetaType(): DeepPartial<AppointmentMetaType> {
-  return {
-    code: faker.datatype.uuid(),
-    description: faker.company.bs(),
-  }
-}
-
-export function fakeAppointmentBuilderDto(partial: DeepPartial<AppointmentBuilderDto> = {}): AppointmentBuilderDto {
+export function fakeAppointmentBuilderDto(
+  partial: DeepPartial<AppointmentBuilderDto> = {},
+  groups: string[] = [DEFAULT_GROUP],
+): AppointmentBuilderDto {
+  const date = DateTime.fromJSDate(faker.date.future(), { locale: 'en-gb' }).set({ hour: 12 })
   return plainToClass(
     AppointmentBuilderDto,
     merge(
       {
-        requirementId: faker.datatype.number(),
-        contactType: fakeAppointmentMetaType(),
-        nsiType: fakeAppointmentMetaType(),
-        nsiSubType: fakeAppointmentMetaType(),
-        appointmentStart: faker.date.soon().toISOString(),
-        appointmentEnd: faker.date.future().toISOString(),
-        officeLocationCode: faker.datatype.uuid(),
-        notes: faker.lorem.sentence(),
-        providerCode: faker.datatype.uuid(),
-        teamCode: faker.datatype.uuid(),
-        staffCode: faker.datatype.uuid(),
-        sentenceId: faker.datatype.number(),
+        type: faker.datatype.uuid(),
+        requiresLocation: RequiredOptional.Required,
+        typeDescription: faker.company.bs(),
+        location: faker.datatype.uuid(),
+        date: { day: date.day, month: date.month, year: date.year },
+        startTime: date.toFormat(TIME_FORMAT, { locale: 'en-gb' }),
+        endTime: date.plus({ hour: 1 }).toFormat(TIME_FORMAT, { locale: 'en-gb' }),
       } as FlatDeepPartial<AppointmentBuilderDto>,
       partial,
     ),
-  )
-}
-
-export function fakeAppointmentCreateRequest(
-  partial: DeepPartial<AppointmentCreateRequest> = {},
-): AppointmentCreateRequest {
-  return plainToClass(
-    AppointmentCreateRequest,
-    merge(
-      {
-        requirementId: faker.datatype.number(),
-        contactType: faker.datatype.uuid(),
-        appointmentStart: faker.date.soon().toISOString(),
-        appointmentEnd: faker.date.future().toISOString(),
-        officeLocationCode: faker.datatype.uuid(),
-        notes: faker.lorem.sentence(),
-        providerCode: faker.datatype.uuid(),
-        teamCode: faker.datatype.uuid(),
-        staffCode: faker.datatype.uuid(),
-      } as AppointmentCreateRequest,
-      partial,
-    ),
+    { groups },
   )
 }
 
@@ -93,6 +67,7 @@ export function fakeOffenderDetailsResponse(
             },
           ],
         },
+        offenderManagers: [{ team: { code: faker.datatype.uuid() } }],
       } as OffenderDetailsResponse,
       partial,
     ),
@@ -109,6 +84,25 @@ export function fakeAppointmentTypeDto(partial: DeepPartial<AppointmentTypeDto> 
         contactType: faker.datatype.uuid(),
         description: faker.company.bs(),
       } as AppointmentTypeDto,
+      partial,
+    ),
+  )
+}
+
+export function fakeOfficeLocation(partial: DeepPartial<OfficeLocation> = {}): OfficeLocation {
+  return plainToClass(
+    OfficeLocation,
+    merge(
+      {
+        code: faker.datatype.uuid(),
+        buildingName: faker.name.firstName(),
+        buildingNumber: faker.datatype.number({ min: 1, max: 999 }).toString(),
+        streetName: faker.address.streetName(),
+        townCity: faker.address.city(),
+        county: faker.address.county(),
+        postcode: faker.address.zipCode(),
+        description: faker.address.streetAddress(),
+      } as OfficeLocation,
       partial,
     ),
   )

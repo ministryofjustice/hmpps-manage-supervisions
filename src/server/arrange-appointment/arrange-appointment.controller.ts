@@ -1,20 +1,21 @@
-import { ArrangeAppointmentService, DomainAppointmentType } from './arrange-appointment.service'
+import { ArrangeAppointmentService } from './arrange-appointment.service'
 import { plainToClass } from 'class-transformer'
-import { AppointmentBuilderDto } from './dto/AppointmentBuilderDto'
+import { AppointmentBuilderDto, MESSAGES } from './dto/AppointmentBuilderDto'
 import { validate, ValidationError } from 'class-validator'
 import {
+  AppointmentLocationViewModel,
   AppointmentSchedulingViewModel,
   AppointmentTypeViewModel,
   AppointmentWizardStep,
   AppointmentWizardViewModel,
 } from './dto/AppointmentWizardViewModel'
 import { AppointmentWizardSession } from './dto/AppointmentWizardSession'
-import { AppointmentWizardUpdateTypeDto } from './dto/AppointmentWizardUpdate.dto'
-import { AppointmentWizardUpdateWhenDto } from './dto/AppointmentWizardUpdateWhen.dto'
 import { AppointmentWizardService, getStepUrl } from './appointment-wizard.service'
 import { Controller, Get, Param, Post, Redirect, Render, Session } from '@nestjs/common'
 import { AuthenticatedUser, DynamicRedirect, RedirectResponse } from '../common'
 import { BodyClass } from '../common/meta/body-class.decorator'
+import { DEFAULT_GROUP } from '../util/mapping'
+import { RequiredOptional } from './dto/AppointmentTypeDto'
 
 type RenderOrRedirect = AppointmentWizardViewModel | RedirectResponse
 
@@ -30,8 +31,8 @@ export class ArrangeAppointmentController {
 
   @Get()
   @Redirect()
-  get(@Param('crn') crn: string): RedirectResponse {
-    return this.wizard.firstStep(crn)
+  get(@Param('crn') crn: string, @Session() session: AppointmentWizardSession): RedirectResponse {
+    return this.wizard.reset(session, crn)
   }
 
   @Get('type')
@@ -42,14 +43,12 @@ export class ArrangeAppointmentController {
     @Session() session: AppointmentWizardSession,
     @AuthenticatedUser() user: User,
   ): Promise<RenderOrRedirect> {
-    const redirect = this.wizard.assertStep(session, AppointmentWizardStep.AppointmentType, crn)
+    const redirect = this.wizard.assertStep(session, AppointmentWizardStep.Type, crn)
     if (redirect) {
       return redirect
     }
 
-    ArrangeAppointmentController.requireDummyAppointment(session)
-    const appointment = plainToClass(AppointmentBuilderDto, session.appointment)
-    return await this.getAppointmentTypeViewModel(crn, user, appointment)
+    return await this.getAppointmentTypeViewModel(session, user)
   }
 
   @Post('type')
@@ -59,45 +58,92 @@ export class ArrangeAppointmentController {
     @Param('crn') crn: string,
     @Session() session: AppointmentWizardSession,
     @AuthenticatedUser() user: User,
-    @BodyClass() body: AppointmentWizardUpdateTypeDto,
+    @BodyClass(AppointmentWizardStep.Type) body: AppointmentBuilderDto,
   ): Promise<RenderOrRedirect> {
-    const redirect = this.wizard.assertStep(session, AppointmentWizardStep.AppointmentType, crn)
+    const redirect = this.wizard.assertStep(session, AppointmentWizardStep.Type, crn)
     if (redirect) {
       return redirect
     }
 
-    // clear out the saved type if any
-    session.appointment.contactType = {}
-
-    const appointment = plainToClass(AppointmentBuilderDto, session.appointment)
-    const errors = await validate(body)
+    const errors = await this.validateWithSession(body, session, AppointmentWizardStep.Type)
     if (errors.length > 0) {
-      return await this.getAppointmentTypeViewModel(crn, user, appointment, body, errors)
+      return await this.getAppointmentTypeViewModel(session, user, body, errors)
     }
 
     const types = await this.service.getAppointmentTypes(user)
-    let type: DomainAppointmentType
-    if (body.type === 'other') {
-      type = types.find(x => x.contactType === body.other)
-    } else {
-      type = types.find(x => x.contactType === body.type)
-    }
+    const type = types.find(x => x.contactType === body.contactType)
 
     if (!type) {
-      return await this.getAppointmentTypeViewModel(crn, user, appointment, body, [
+      return await this.getAppointmentTypeViewModel(session, user, body, [
         {
           property: 'type',
           constraints: {
-            isAppointmentType: AppointmentWizardUpdateTypeDto.MESSAGES.type.required,
+            isAppointmentType: MESSAGES.type.required,
           },
         },
       ])
     }
 
-    session.appointment.contactType = { code: type.contactType, description: type.name }
+    Object.assign(session.appointment, body)
+    session.appointment.typeDescription = type.name
+    session.appointment.requiresLocation = type.requiresLocation
+    if (type.requiresLocation === RequiredOptional.NotRequired && session.appointment.location) {
+      session.appointment.location = null
+      session.appointment.locationDescription = null
+    }
 
-    // TODO revalidate the builder model, may be a step common thing so could be part of a potential AOP solution
-    return this.wizard.nextStep(session, AppointmentWizardStep.AppointmentType, crn)
+    return this.wizard.nextStep(session, AppointmentWizardStep.Type)
+  }
+
+  @Get('where')
+  @Render('pages/arrange-appointment/where')
+  async getWhere(
+    @Param('crn') crn: string,
+    @Session() session: AppointmentWizardSession,
+    @AuthenticatedUser() user: User,
+  ): Promise<RenderOrRedirect> {
+    const redirect = this.wizard.assertStep(session, AppointmentWizardStep.Where, crn)
+    if (redirect) {
+      return redirect
+    }
+
+    return this.getAppointmentLocationViewModel(session, user)
+  }
+
+  @Post('where')
+  @Render('pages/arrange-appointment/where')
+  @DynamicRedirect()
+  async postWhere(
+    @Param('crn') crn: string,
+    @Session() session: AppointmentWizardSession,
+    @AuthenticatedUser() user: User,
+    @BodyClass(AppointmentWizardStep.Where) body: AppointmentBuilderDto,
+  ): Promise<RenderOrRedirect> {
+    const redirect = this.wizard.assertStep(session, AppointmentWizardStep.Where, crn)
+    if (redirect) {
+      return redirect
+    }
+
+    const errors = await this.validateWithSession(body, session, AppointmentWizardStep.Where)
+    const viewModel = await this.getAppointmentLocationViewModel(session, user, errors)
+
+    if (errors.length > 0) {
+      return viewModel
+    }
+
+    const location = viewModel.locations.find(x => x.code === body.location)
+    if (!location) {
+      viewModel.errors.push({
+        property: 'location',
+        constraints: { isLocation: MESSAGES.location.required },
+      })
+      return viewModel
+    }
+
+    Object.assign(session.appointment, body)
+    session.appointment.locationDescription = location.description
+
+    return this.wizard.nextStep(session, AppointmentWizardStep.Where)
   }
 
   @Get('when')
@@ -107,11 +153,8 @@ export class ArrangeAppointmentController {
     if (redirect) {
       return redirect
     }
-    const appointment = plainToClass(AppointmentBuilderDto, session.appointment)
-    const form = new AppointmentWizardUpdateWhenDto()
-    form.setFromDates(appointment.appointmentStart, appointment.appointmentEnd)
-    const errors = appointment.appointmentStart || appointment.appointmentEnd ? await validate(form) : []
-    return await this.getAppointmentSchedulingViewModel(crn, appointment, form, errors)
+
+    return await this.getAppointmentSchedulingViewModel(session)
   }
 
   @Post('when')
@@ -120,19 +163,18 @@ export class ArrangeAppointmentController {
   async postWhen(
     @Param('crn') crn: string,
     @Session() session: AppointmentWizardSession,
-    @BodyClass() body: AppointmentWizardUpdateWhenDto,
+    @BodyClass(AppointmentWizardStep.When) body: AppointmentBuilderDto,
   ): Promise<RenderOrRedirect> {
     this.wizard.assertStep(session, AppointmentWizardStep.When, crn)
-    const appointment = plainToClass(AppointmentBuilderDto, session.appointment)
-    const errors = await validate(body)
+
+    const errors = await this.validateWithSession(body, session, AppointmentWizardStep.When)
     if (errors.length > 0) {
-      return await this.getAppointmentSchedulingViewModel(crn, appointment, body, errors)
+      return await this.getAppointmentSchedulingViewModel(session, body, errors)
     }
 
-    session.appointment.appointmentStart = body.getStartDateTime().toISO()
-    session.appointment.appointmentEnd = body.getEndDateTime().toISO()
+    Object.assign(session.appointment, body)
 
-    return this.wizard.nextStep(session, AppointmentWizardStep.When, crn)
+    return this.wizard.nextStep(session, AppointmentWizardStep.When)
   }
 
   @Get('check')
@@ -143,18 +185,22 @@ export class ArrangeAppointmentController {
     if (redirect) {
       return redirect
     }
-    const appointment = plainToClass(AppointmentBuilderDto, session.appointment)
+    const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
+      groups: [DEFAULT_GROUP],
+      excludeExtraneousValues: true,
+    })
     return {
       step: AppointmentWizardStep.Check,
       appointment,
       paths: {
-        back: this.wizard.getBackPath(AppointmentWizardStep.Check, crn),
-        type: getStepUrl(AppointmentWizardStep.AppointmentType, crn),
-        when: getStepUrl(AppointmentWizardStep.When, crn),
+        back: this.wizard.getBackUrl(session, AppointmentWizardStep.Check),
+        type: getStepUrl(session, AppointmentWizardStep.Type),
+        where: getStepUrl(session, AppointmentWizardStep.Where),
+        when: getStepUrl(session, AppointmentWizardStep.When),
       },
       rarDetails: {
-        category: appointment.nsiType?.description || '',
-        subCategory: appointment.nsiSubType?.description || '',
+        category: '', // TODO from nsiType.description
+        subCategory: '', // TODO from nsiSubType.description
       },
     }
   }
@@ -170,10 +216,13 @@ export class ArrangeAppointmentController {
     if (redirect) {
       return redirect
     }
-    const appointment = plainToClass(AppointmentBuilderDto, session.appointment)
+    const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
+      groups: [DEFAULT_GROUP],
+      excludeExtraneousValues: true,
+    })
     await this.service.createAppointment(appointment, crn, user)
 
-    return this.wizard.nextStep(session, AppointmentWizardStep.Check, crn)
+    return this.wizard.nextStep(session, AppointmentWizardStep.Check)
   }
 
   @Get('confirm')
@@ -188,7 +237,10 @@ export class ArrangeAppointmentController {
     if (redirect) {
       return redirect
     }
-    const appointment = plainToClass(AppointmentBuilderDto, session.appointment)
+    const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
+      groups: [DEFAULT_GROUP],
+      excludeExtraneousValues: true,
+    })
     const offenderDetails = await this.service.getOffenderDetails(crn, user)
     const phoneNumber =
       offenderDetails.contactDetails?.phoneNumbers?.length > 0
@@ -208,16 +260,32 @@ export class ArrangeAppointmentController {
     }
   }
 
+  private async validateWithSession(
+    body: AppointmentBuilderDto,
+    session: AppointmentWizardSession,
+    step: AppointmentWizardStep,
+  ) {
+    const merged = plainToClass(
+      AppointmentBuilderDto,
+      { ...session.appointment, ...body },
+      { groups: [DEFAULT_GROUP], excludeExtraneousValues: true },
+    )
+    return await validate(merged, { groups: [step] })
+  }
+
   private async getAppointmentTypeViewModel(
-    crn: string,
+    session: AppointmentWizardSession,
     user: User,
-    appointment: AppointmentBuilderDto,
-    body?: AppointmentWizardUpdateTypeDto,
+    body?: DeepPartial<AppointmentBuilderDto>,
     errors: ValidationError[] = [],
   ): Promise<AppointmentTypeViewModel> {
+    const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
+      groups: [DEFAULT_GROUP],
+      excludeExtraneousValues: true,
+    })
     const types = await this.service.getAppointmentTypes(user)
-    const currentType = appointment.contactType?.code
-      ? types.find(x => x.contactType === appointment.contactType.code) || null
+    const currentType = appointment?.contactType
+      ? types.find(x => x.contactType === appointment?.contactType) || null
       : null
     const [type, other] = currentType
       ? currentType.isFeatured
@@ -225,51 +293,64 @@ export class ArrangeAppointmentController {
         : ['other', currentType.contactType]
       : [null, null]
     return {
-      step: AppointmentWizardStep.AppointmentType,
+      step: AppointmentWizardStep.Type,
       errors,
       appointment,
       paths: {
-        back: this.wizard.getBackPath(AppointmentWizardStep.AppointmentType, crn),
+        back: this.wizard.getBackUrl(session, AppointmentWizardStep.Type),
       },
       types: types.reduce((agg, type) => (type.isFeatured ? agg.featured : agg.other).push(type) && agg, {
         featured: [],
         other: [],
       }),
       type: body?.type || type,
-      other: body?.other || other,
+      other: body?.otherType || other,
     }
   }
 
   private async getAppointmentSchedulingViewModel(
-    crn: string,
-    appointment: AppointmentBuilderDto,
-    form: AppointmentWizardUpdateWhenDto,
-    errors: ValidationError[],
+    session: AppointmentWizardSession,
+    body?: DeepPartial<AppointmentBuilderDto>,
+    errors: ValidationError[] = [],
   ): Promise<AppointmentSchedulingViewModel> {
+    const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
+      groups: [DEFAULT_GROUP],
+      excludeExtraneousValues: true,
+    })
     return {
       step: AppointmentWizardStep.When,
       errors,
       appointment,
       paths: {
-        back: this.wizard.getBackPath(AppointmentWizardStep.When, crn),
+        back: this.wizard.getBackUrl(session, AppointmentWizardStep.When),
       },
-      form,
+      date: (body?.date as any) || appointment.date,
+      startTime: body?.startTime || appointment.startTime,
+      endTime: body?.endTime || appointment.endTime,
     }
   }
 
-  private static requireDummyAppointment(session: AppointmentWizardSession) {
-    if (session.appointment) {
-      return
-    }
-
-    // HACK fill out dummy data
-    session.appointment = {
-      notes: 'some notes',
-      providerCode: 'CRS',
-      requirementId: 2500199144,
-      staffCode: 'CRSUATU',
-      teamCode: 'CRSUAT',
-      sentenceId: 2500443138,
+  private async getAppointmentLocationViewModel(
+    session: AppointmentWizardSession,
+    user: User,
+    errors: ValidationError[] = [],
+  ): Promise<AppointmentLocationViewModel> {
+    const offender = await this.service.getOffenderDetails(session.crn, user)
+    const offenderManager = offender.offenderManagers[0] // TODO what happens when we have >1? or 0?
+    const locations = await this.service.getTeamOfficeLocations(user, offenderManager.team.code)
+    const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
+      groups: [DEFAULT_GROUP],
+      excludeExtraneousValues: true,
+    })
+    return {
+      step: AppointmentWizardStep.Where,
+      appointment,
+      locations,
+      location: appointment.location,
+      paths: {
+        back: this.wizard.getBackUrl(session, AppointmentWizardStep.Where),
+      },
+      errors,
     }
   }
 }

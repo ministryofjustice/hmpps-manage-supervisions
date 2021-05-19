@@ -31,7 +31,8 @@ app.use(
   jsonServer.rewriter({
     '/secure/offenders/crn/*/sentence/*/appointments': '/appointments',
     '/secure/appointment-types': '/appointment-types',
-    '/secure/offenders/crn/:crn': '/offenders-by-crn/:crn',
+    '/secure/offenders/crn/:crn/all': '/offenders-by-crn/:crn',
+    '/secure/teams/:teamCode/office-locations': '/team-office-locations?teamCode=:teamCode',
   }),
 )
 
