@@ -5,7 +5,7 @@ import { DateTime } from 'luxon'
 import FutureDateValidator from '../../validators/FutureDateValidator'
 import FutureTimeValidator from '../../validators/FutureTimeValidator'
 import DateInputValidator from '../../validators/DateInputValidator'
-import { IsBeforeValidator } from '../../validators/IsBeforeValidator'
+import { IsAfterValidator } from '../../validators/IsAfterValidator'
 import TimeInputValidator, { TIME_FORMAT } from '../../validators/TimeInputValidator'
 import DateInputForm from './DateInputForm'
 
@@ -18,13 +18,13 @@ export class AppointmentWizardUpdateWhenDto {
   startDate: DateInputForm
 
   @Expose()
-  @Validate(TimeInputValidator, { message: 'Enter a valid start time' })
-  @Validate(IsBeforeValidator, ['endTime'], { message: 'Enter a start time before the end time' })
-  @Validate(FutureTimeValidator, ['startDate'], { message: 'Enter a start time in the future' })
+  @Validate(TimeInputValidator, { message: 'Enter a valid time' })
+  @Validate(FutureTimeValidator, ['startDate'], { message: 'Enter a time in the future' })
   startTime: string
 
   @Expose()
-  @Validate(TimeInputValidator, { message: 'Enter a valid end time' })
+  @Validate(TimeInputValidator, { message: 'Enter a valid time' })
+  @Validate(IsAfterValidator, ['startTime'], { message: 'Enter an end time after the start time' })
   endTime: string
 
   setFromDates(start: DateTime, end: DateTime) {

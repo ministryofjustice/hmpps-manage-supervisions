@@ -119,23 +119,26 @@ context('CreateAppointment', () => {
     whenEnteringDateStrings('80', '20', '6')
     whenSubmittingCurrentStep()
     aDateErrorIsShown('Enter a valid date')
-    aTimeErrorIsShown('Enter a valid start time')
+    aStartTimeErrorIsShown('Enter a valid time')
+    aEndTimeErrorIsShown('Enter a valid time')
 
     whenEnteringDateStrings('15', '01', '2021')
     whenSubmittingCurrentStep()
     aDateErrorIsShown('Enter a date in the future')
-    aTimeErrorIsShown('Enter a valid start time')
+    aStartTimeErrorIsShown('Enter a valid time')
+    aEndTimeErrorIsShown('Enter a valid time')
 
     const now = DateTime.now()
 
     whenEnteringDate(now)
     whenEnteringStartTime(now)
     whenSubmittingCurrentStep()
-    aTimeErrorIsShown('Enter a start time in the future')
+    aStartTimeErrorIsShown('Enter a time in the future')
 
     whenEnteringEndTime(now.minus({ minutes: 1 }))
     whenSubmittingCurrentStep()
-    aTimeErrorIsShown('Enter a start time in the future, Enter a start time before the end time')
+    aStartTimeErrorIsShown('Enter a time in the future')
+    aEndTimeErrorIsShown('Enter an end time after the start time')
   })
 
   function havingOffender({ crn, sentenceId }: AppointmentBookingTestCase) {
@@ -234,8 +237,12 @@ context('CreateAppointment', () => {
     page.when.endTimeField.clear().type(time.toFormat('h:mma').toString()).type('{esc}')
   }
 
-  function aTimeErrorIsShown(message: string) {
-    page.when.timeErrorMessage.contains(message)
+  function aStartTimeErrorIsShown(message: string) {
+    page.when.startTimeErrorMessage.contains(message)
+  }
+
+  function aEndTimeErrorIsShown(message: string) {
+    page.when.endTimeErrorMessage.contains(message)
   }
 
   function aDateErrorIsShown(message: string) {
