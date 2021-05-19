@@ -13,3 +13,15 @@ export class DateFormat implements NunjucksFilter {
     return date.toFormat(format)
   }
 }
+
+export class TimeWithMinutes extends DateFormat {
+  filter(value: string | DateTime): string {
+    return super.filter(value, 'h:mma').toLowerCase()
+  }
+}
+
+export class DateWithDayAndWithoutYear extends DateFormat {
+  filter(value: string | DateTime): string {
+    return super.filter(value, 'cccc d MMMM')
+  }
+}

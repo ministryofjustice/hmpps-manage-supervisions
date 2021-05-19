@@ -24,7 +24,7 @@
       },
       {
         key: { text: "Date" },
-        value: { text: appointment.appointmentStart | dateFormat('cccc d MMMM') },
+        value: { text: appointment.appointmentStart | dateWithDayAndWithoutYear() },
         classes: ["qa-date"],
         actions: {
           items: [
@@ -39,7 +39,7 @@
       },
       {
         key: { text: "Time" },
-        value: { text: (appointment.appointmentStart | dateFormat('h:mm a')) + ' to ' + (appointment.appointmentEnd | dateFormat('h:mm a')) },
+        value: { text: (appointment.appointmentStart | timeWithMinutes()) + ' to ' + (appointment.appointmentEnd | timeWithMinutes()) },
         classes: ["qa-time"],
         actions: {
           items: [
