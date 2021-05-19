@@ -10,12 +10,14 @@
       {
         key: { text: "Type of appointment" },
         value: { text: appointment.contactType.description },
+        classes: ["qa-type"],
         actions: {
           items: [
             {
               href: paths.type,
               text: "Change",
-              visuallyHiddenText: "type of appointment"
+              visuallyHiddenText: "type of appointment",
+              classes: ["qa-change"]
             }
           ]
         }
@@ -23,12 +25,14 @@
       {
         key: { text: "Date" },
         value: { text: appointment.appointmentStart | dateFormat('cccc d MMMM') },
+        classes: ["qa-date"],
         actions: {
           items: [
             {
               href: paths.when,
               text: "Change",
-              visuallyHiddenText: "date"
+              visuallyHiddenText: "date",
+              classes: ["qa-change"]
             }
           ]
         }
@@ -36,12 +40,14 @@
       {
         key: { text: "Time" },
         value: { text: (appointment.appointmentStart | dateFormat('h:mm a')) + ' to ' + (appointment.appointmentEnd | dateFormat('h:mm a')) },
+        classes: ["qa-time"],
         actions: {
           items: [
             {
               href: paths.when,
               text: "Change",
-              visuallyHiddenText: "date"
+              visuallyHiddenText: "date",
+              classes: ["qa-change"]
             }
           ]
         }

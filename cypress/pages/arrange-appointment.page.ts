@@ -1,6 +1,4 @@
 import { PageBase } from './page'
-import { chunk } from 'lodash'
-import Chainable = Cypress.Chainable
 
 export class ArrangeAppointmentPage extends PageBase {
   get continueButton() {
@@ -72,11 +70,28 @@ export class ArrangeAppointmentPage extends PageBase {
 
   get check() {
     return {
-      get appointmentSummaryTable(): Chainable<any> {
-        return cy.get('dl[data-qa="arrange-appointment/details"] div >').then($el => {
-          const text = $el.map((i, x) => x.innerText).toArray()
-          return chunk(text, 2).reduce((agg, [k, v]) => ({ ...agg, [k]: v }), {})
-        })
+      get appointmentType() {
+        return cy.get('.qa-type .govuk-summary-list__value')
+      },
+
+      get appointmentTypeChangeLink() {
+        return cy.get('.qa-type .qa-change')
+      },
+
+      get appointmentDate() {
+        return cy.get('.qa-date .govuk-summary-list__value')
+      },
+
+      get appointmentDateChangeLink() {
+        return cy.get('.qa-date .qa-change')
+      },
+
+      get appointmentTime() {
+        return cy.get('.qa-time .govuk-summary-list__value')
+      },
+
+      get appointmentTimeChangeLink() {
+        return cy.get('.qa-time .qa-change')
       },
     }
   }
