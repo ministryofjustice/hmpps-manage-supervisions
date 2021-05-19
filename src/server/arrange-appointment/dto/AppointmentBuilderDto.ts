@@ -1,44 +1,138 @@
-import { Transform, Type } from 'class-transformer'
+import { Type } from 'class-transformer'
 import { DateTime } from 'luxon'
+import { IsInt, IsNotEmpty, IsPositive, IsString, Validate, ValidateIf, ValidateNested } from 'class-validator'
+import { AppointmentWizardStep } from './AppointmentWizardViewModel'
+import { RequiredOptional } from './AppointmentTypeDto'
+import IsTimeValidator, { IsTime } from '../../validators/IsTime'
+import { DateInput, IsAfter, IsDateInput, IsFutureTime, ValidationGroup, IsFutureDate } from '../../validators'
+import { getDateTime } from '../../util'
+import { ExposeDefault } from '../../util/mapping'
 
-export class AppointmentMetaType {
-  description: string
-  code: string
+export const MESSAGES = {
+  type: {
+    required: 'Select an appointment type',
+  },
+  location: {
+    required: 'Select a location',
+  },
+  date: {
+    required: 'Enter a {}',
+  },
 }
 
-/**
- * TODO for validation, this probably needs to be split up into steps
- * OR, keep it as a single dto & use class-validator groups to validate each step
- */
+function IsAppointmentType() {
+  return ValidationGroup(
+    { message: MESSAGES.type.required, groups: [AppointmentWizardStep.Type] },
+    IsString,
+    IsNotEmpty,
+  )
+}
+
+function IsLocationCode() {
+  return ValidationGroup(
+    { message: MESSAGES.location.required, groups: [AppointmentWizardStep.Where] },
+    IsString,
+    IsNotEmpty,
+  )
+}
+
+function IsDateComponent(component: 'day' | 'month' | 'year') {
+  return ValidationGroup(
+    { message: MESSAGES.date.required.replace('{}', component), groups: [AppointmentWizardStep.When] },
+    IsInt,
+    IsPositive,
+  )
+}
+
+export class AppointmentDateDto implements DateInput {
+  @ExposeDefault({ groups: [AppointmentWizardStep.When] })
+  @IsDateComponent('day')
+  @Type(() => Number)
+  day: number
+
+  @ExposeDefault({ groups: [AppointmentWizardStep.When] })
+  @IsDateComponent('month')
+  @Type(() => Number)
+  month: number
+
+  @ExposeDefault({ groups: [AppointmentWizardStep.When] })
+  @IsDateComponent('year')
+  @Type(() => Number)
+  year: number
+
+  get value(): DateTime | null {
+    if (!this.day || !this.month || !this.year) {
+      return null
+    }
+
+    return DateTime.fromObject({ day: this.day, month: this.month, year: this.year, locale: 'en-gb' })
+  }
+
+  set value(value: DateTime | null) {
+    if (value) {
+      this.day = value.day
+      this.month = value.month
+      this.year = value.year
+    } else {
+      delete this.day
+      delete this.month
+      delete this.year
+    }
+  }
+}
+
 export class AppointmentBuilderDto {
-  @Type(() => Number)
-  requirementId: number
+  @ExposeDefault({ groups: [AppointmentWizardStep.Type] })
+  @IsAppointmentType()
+  type?: string | 'other'
 
-  @Type(() => AppointmentMetaType)
-  contactType?: AppointmentMetaType
+  @ExposeDefault({ groups: [AppointmentWizardStep.Type] })
+  @ValidateIf(object => object?.type === 'other', { groups: [AppointmentWizardStep.Type] })
+  @IsAppointmentType()
+  otherType?: string
 
-  @Type(() => AppointmentMetaType)
-  nsiType?: AppointmentMetaType
+  @ExposeDefault()
+  typeDescription?: string
 
-  @Type(() => AppointmentMetaType)
-  nsiSubType?: AppointmentMetaType
+  @ExposeDefault()
+  requiresLocation?: RequiredOptional
 
-  @Transform(({ value }) => (value ? DateTime.fromISO(value) : null))
-  appointmentStart: DateTime
+  @ExposeDefault({ groups: [AppointmentWizardStep.Where] })
+  @ValidateIf(object => object?.requiresLocation === RequiredOptional.Required, {
+    groups: [AppointmentWizardStep.Where],
+  })
+  @IsLocationCode()
+  location?: string
 
-  @Transform(({ value }) => (value ? DateTime.fromISO(value) : null))
-  appointmentEnd: DateTime
+  @ExposeDefault()
+  locationDescription?: string
 
-  officeLocationCode?: string
+  @ExposeDefault({ groups: [AppointmentWizardStep.When] })
+  @Type(() => AppointmentDateDto)
+  @IsDateInput({ groups: [AppointmentWizardStep.When], message: 'Enter a valid date' })
+  @IsFutureDate({ groups: [AppointmentWizardStep.When], message: 'Enter a date in the future' })
+  @ValidateNested({ groups: [AppointmentWizardStep.When] })
+  date: AppointmentDateDto
 
-  notes: string
+  @ExposeDefault({ groups: [AppointmentWizardStep.When] })
+  @IsTime({ message: 'Enter a valid time', groups: [AppointmentWizardStep.When] })
+  @IsFutureTime('date', { message: 'Enter a time in the future', groups: [AppointmentWizardStep.When] })
+  startTime?: string
 
-  providerCode: string
+  @ExposeDefault({ groups: [AppointmentWizardStep.When] })
+  @Validate(IsTimeValidator, { message: 'Enter a valid time', groups: [AppointmentWizardStep.When] })
+  @IsAfter('startTime', { message: 'Enter an end time after the start time', groups: [AppointmentWizardStep.When] })
+  endTime?: string
 
-  teamCode: string
+  get contactType() {
+    return this.type === 'other' ? this.otherType : this.type
+  }
 
-  staffCode: string
+  get appointmentStart(): DateTime | null {
+    return getDateTime(this.date.value, this.startTime)
+  }
 
-  @Type(() => Number)
-  sentenceId: number
+  get appointmentEnd(): DateTime {
+    return getDateTime(this.date.value, this.endTime)
+  }
 }

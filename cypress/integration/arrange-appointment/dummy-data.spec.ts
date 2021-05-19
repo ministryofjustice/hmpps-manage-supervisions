@@ -10,6 +10,10 @@ interface AppointmentBookingTestCase {
     code: string
     name: string
   }
+  location?: {
+    code: string
+    name: string
+  }
 }
 
 function testCase(partial: Omit<AppointmentBookingTestCase, 'start' | 'end'>) {
@@ -41,6 +45,7 @@ context('CreateAppointment', () => {
       crn: 'ABC123',
       sentenceId: 2500443138,
       type: { code: 'APAT', name: 'Office visit' },
+      location: { code: 'LDN_BCR', name: '29/33 VICTORIA ROAD' },
     })
 
     havingOffender(test)
@@ -48,6 +53,10 @@ context('CreateAppointment', () => {
 
     whenSelectingTypeRadio(test.type.name)
     whenSubmittingCurrentStep()
+
+    whenSelectingLocationRadio(test.location.name)
+    whenSubmittingCurrentStep()
+
     whenEnteringAppointmentDateAndTimes(test)
     shouldDisplayCorrectAppointmentSummary(test)
 
@@ -62,6 +71,7 @@ context('CreateAppointment', () => {
       crn: 'ABC123',
       sentenceId: 2500443138,
       type: { code: 'C243', name: 'Alcohol Group Work Session (NS)' },
+      location: { code: 'LDN_BCR', name: '29/33 VICTORIA ROAD' },
     })
 
     havingOffender(test)
@@ -70,6 +80,10 @@ context('CreateAppointment', () => {
     whenSelectingTypeRadio('Other')
     whenSelectingOtherAppointmentType('Alcohol', test)
     whenSubmittingCurrentStep()
+
+    whenSelectingLocationRadio(test.location.name)
+    whenSubmittingCurrentStep()
+
     whenEnteringAppointmentDateAndTimes(test)
     shouldDisplayCorrectAppointmentSummary(test)
 
@@ -79,7 +93,7 @@ context('CreateAppointment', () => {
     shouldHaveBookedAppointment(test)
   })
 
-  it('renders validation errors', () => {
+  it('validates appointment type', () => {
     const test = testCase({
       crn: 'ABC123',
       sentenceId: 2500443138,
@@ -103,11 +117,29 @@ context('CreateAppointment', () => {
     })
   })
 
-  it('validates time and dates', () => {
+  it('validates location', () => {
     const test = testCase({
       crn: 'ABC123',
       sentenceId: 2500443138,
       type: { code: 'APAT', name: 'Office visit' },
+    })
+
+    havingOffender(test)
+    havingLoggedInAndBeginBookingAppointmentFlow(test)
+
+    whenSelectingTypeRadio(test.type.name)
+    whenSubmittingCurrentStep()
+
+    // nothing selected
+    whenSubmittingCurrentStep()
+    shouldRenderLocationValidationMessages('Select a location')
+  })
+
+  it('validates time and dates', () => {
+    const test = testCase({
+      crn: 'ABC123',
+      sentenceId: 2500443138,
+      type: { code: 'CHVS', name: 'Home visit' },
     })
 
     havingOffender(test)
@@ -143,6 +175,7 @@ context('CreateAppointment', () => {
 
   function havingOffender({ crn, sentenceId }: AppointmentBookingTestCase) {
     cy.task('stubGetAppointmentTypes')
+    cy.task('stubGetLocations')
     cy.task('stubCreateAppointment', { crn, sentenceId })
     cy.task('stubOffenderDetails', crn)
   }
@@ -164,6 +197,11 @@ context('CreateAppointment', () => {
   function whenSelectingOtherAppointmentType(search: string, { type }: AppointmentBookingTestCase) {
     page.type.otherAutoComplete.type(search)
     page.type.autoCompleteResult(type.name).click()
+  }
+
+  function whenSelectingLocationRadio(name: string) {
+    page.pageTitle.contains('Where will the appointment be?')
+    page.where.radio(name).click()
   }
 
   function whenEnteringAppointmentDateAndTimes({ start, end }: AppointmentBookingTestCase) {
@@ -195,7 +233,7 @@ context('CreateAppointment', () => {
     page.confirm.phoneMessage.contains('07734 111992')
   }
 
-  function shouldHaveBookedAppointment({ crn, sentenceId, start, end, type }: AppointmentBookingTestCase) {
+  function shouldHaveBookedAppointment({ crn, sentenceId, start, end, type, location }: AppointmentBookingTestCase) {
     cy.task('getCreatedAppointments', { crn, sentenceId }).should('deep.eq', [
       {
         requirementId: 2500199144,
@@ -206,6 +244,7 @@ context('CreateAppointment', () => {
         providerCode: 'CRS',
         teamCode: 'CRSUAT',
         staffCode: 'CRSUATU',
+        officeLocationCode: location?.code,
       },
     ])
   }
@@ -218,6 +257,10 @@ context('CreateAppointment', () => {
         page.type.errorMessages[name].should('not.exist')
       }
     }
+  }
+
+  function shouldRenderLocationValidationMessages(expected: string) {
+    page.where.errorMessages.location.contains(expected)
   }
 
   function whenEnteringDate(date: DateTime) {

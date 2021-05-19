@@ -1,0 +1,20 @@
+{% extends "../wizard-form.njk" %}
+{% set title = 'Where will the appointment be?' %}
+
+{% block form %}
+    {{ govukRadios({
+        name: "location",
+        attributes: {
+            "data-qa": "arrange-appointment/location"
+        },
+        fieldset: {
+            legend: {
+                text: title,
+                isPageHeading: true,
+                classes: "govuk-label--xl govuk-!-margin-bottom-6"
+            }
+        },
+        items: locations | toRadioList(location, "code", "description"),
+        errorMessage: errors | findErrorMessages("location")
+    }) }}
+{% endblock %}

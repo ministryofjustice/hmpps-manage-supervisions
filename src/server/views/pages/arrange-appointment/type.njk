@@ -6,7 +6,7 @@
         {% set otherHtml %}
             {{ govukSelect({
                 id: "arrange-appointment-other-select",
-                name: "other",
+                name: "otherType",
                 attributes: {
                     "data-qa": "arrange-appointment/other-type",
                     "data-enhance": "accessible-autocomplete"
@@ -14,8 +14,8 @@
                 label: {
                     text: "Type of appointment"
                 },
-                items: types.other | toSelectList(other, "contactType", "name"),
-                errorMessage: errors | findErrorMessages("other")
+                items: types.other | toSelectList(otherType, "contactType", "name"),
+                errorMessage: errors | findErrorMessages("otherType")
             }) }}
         {% endset %}
     {% endif %}

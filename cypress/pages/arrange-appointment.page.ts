@@ -36,18 +36,34 @@ export class ArrangeAppointmentPage extends PageBase {
     }
   }
 
+  get where() {
+    return {
+      radio(name: string) {
+        return cy.get(`[data-qa="arrange-appointment/location"] input[type=radio]`).siblings('label').contains(name)
+      },
+
+      get errorMessages() {
+        return {
+          get location() {
+            return cy.get('#location-error')
+          },
+        }
+      },
+    }
+  }
+
   get when() {
     return {
       get dayField() {
-        return cy.get('input[name="startDate[day]"]')
+        return cy.get('input[name="date[day]"]')
       },
 
       get monthField() {
-        return cy.get('input[name="startDate[month]"]')
+        return cy.get('input[name="date[month]"]')
       },
 
       get yearField() {
-        return cy.get('input[name="startDate[year]"]')
+        return cy.get('input[name="date[year]"]')
       },
 
       get startTimeField() {

@@ -38,8 +38,8 @@ export class HealthService {
     return this.http.get(urlJoin(config.url, 'health', 'ping'), { timeout: config.timeout }).pipe(
       map(() => ({ name, healthy: true, result: 'OK' })),
       catchError(err => {
-        const message = err.response?.data || err.message
-        this.logger.error(`${name} is unhealthy ${message}`)
+        const message = err.response?.data || err.message || '[no data]'
+        this.logger.error(`${name} is unhealthy ${JSON.stringify(message)}`)
         return of({ name, healthy: false, result: message })
       }),
     )

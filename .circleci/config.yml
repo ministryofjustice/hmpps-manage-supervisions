@@ -17,6 +17,8 @@ jobs:
     executor:
       name: hmpps/node
       tag: 14.15-browsers
+    environment:
+      TZ: "Europe/London"
     steps:
       - checkout
       - run:
@@ -54,6 +56,8 @@ jobs:
     executor:
       name: hmpps/node
       tag: 14.15-browsers
+    environment:
+      TZ: "Europe/London"
     steps:
       - checkout
       - restore_cache:
@@ -72,6 +76,8 @@ jobs:
     executor:
       name: hmpps/node
       tag: 14.15-browsers
+    environment:
+      TZ: "Europe/London"
     steps:
       - checkout
       - restore_cache:

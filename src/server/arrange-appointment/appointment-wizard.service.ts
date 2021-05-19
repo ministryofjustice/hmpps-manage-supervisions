@@ -3,44 +3,99 @@ import { AppointmentWizardStep } from './dto/AppointmentWizardViewModel'
 import { difference } from 'lodash'
 import { Injectable } from '@nestjs/common'
 import { RedirectResponse } from '../common'
+import { AppointmentBuilderDto } from './dto/AppointmentBuilderDto'
+import { RequiredOptional } from './dto/AppointmentTypeDto'
+import { plainToClass } from 'class-transformer'
+import { DEFAULT_GROUP } from '../util/mapping'
 
-const steps = Object.freeze(Object.values(AppointmentWizardStep))
-const firstStep = steps[0]
-const lastStep = steps[steps.length - 1]
-
-export function getStepUrl(step: AppointmentWizardStep, crn: string) {
+export function getStepUrl({ crn }: AppointmentWizardSession, step: AppointmentWizardStep) {
   return `/arrange-appointment/${crn}/${step}`
 }
 
-function toStep(step: AppointmentWizardStep, crn: string): RedirectResponse {
-  return RedirectResponse.found(getStepUrl(step, crn))
+function toStep(session: AppointmentWizardSession, step: AppointmentWizardStep): RedirectResponse {
+  const url = getStepUrl(session, step)
+  return RedirectResponse.found(url)
+}
+
+type StepTransitionFunction = (model?: AppointmentBuilderDto) => AppointmentWizardStep
+
+const meta: {
+  [Step in AppointmentWizardStep]: {
+    next: AppointmentWizardStep | StepTransitionFunction | null
+  }
+} = {
+  [AppointmentWizardStep.Type]: {
+    next(model?: AppointmentBuilderDto) {
+      switch (model?.requiresLocation) {
+        case RequiredOptional.Optional:
+        case RequiredOptional.Required:
+          return AppointmentWizardStep.Where
+        default:
+          return AppointmentWizardStep.When
+      }
+    },
+  },
+  [AppointmentWizardStep.Where]: {
+    next: AppointmentWizardStep.When,
+  },
+  [AppointmentWizardStep.When]: {
+    next: AppointmentWizardStep.Check,
+  },
+  [AppointmentWizardStep.Check]: {
+    next: AppointmentWizardStep.Confirm,
+  },
+  [AppointmentWizardStep.Confirm]: {
+    next: null,
+  },
+}
+
+function getSteps(session: AppointmentWizardSession): AppointmentWizardStep[] {
+  const dto = plainToClass(AppointmentBuilderDto, session.appointment, {
+    groups: [DEFAULT_GROUP],
+    excludeExtraneousValues: true,
+  })
+  const rawSteps = Object.values(AppointmentWizardStep)
+  const result: AppointmentWizardStep[] = rawSteps.slice(0, 1)
+
+  let next: AppointmentWizardStep | null
+  do {
+    const current = result[result.length - 1]
+    const stepMeta = meta[current]
+    next = typeof stepMeta.next === 'function' ? stepMeta.next(dto) : stepMeta.next
+    result.push(next)
+  } while (next)
+
+  return result
 }
 
 @Injectable()
 export class AppointmentWizardService {
-  firstStep(crn: string): RedirectResponse {
-    return toStep(firstStep, crn)
+  reset(session: AppointmentWizardSession, crn: string): RedirectResponse {
+    const [firstStep] = getSteps(session)
+    session.crn = crn
+    session.appointment = {}
+    session.completedSteps = []
+    return toStep(session, firstStep)
   }
 
   assertStep(session: AppointmentWizardSession, step: AppointmentWizardStep, crn: string): RedirectResponse | null {
+    const steps = getSteps(session)
+    const [firstStep, lastStep] = [steps[0], ...steps.slice(-1)]
     const completedSteps = session?.completedSteps || []
 
-    // if the last step was completed & we're not also asserting the last step then assume a fresh wizard is required
-    if (completedSteps.includes(lastStep) && step !== lastStep) {
-      session.appointment = null
-      session.completedSteps = []
-      if (step !== firstStep) {
-        return this.firstStep(crn)
-      } else {
-        return null
-      }
+    // if the session is for a different offender
+    // OR
+    // the last step was completed & we're not also asserting the last step then assume a fresh wizard is required
+    if (!session.appointment || crn !== session.crn || (completedSteps.includes(lastStep) && step !== lastStep)) {
+      const toFirstStep = this.reset(session, crn)
+      return step !== firstStep ? toFirstStep : null
     }
 
     // assert all previous steps completed
     const requiredSteps = steps.slice(0, steps.indexOf(step))
     const missingSteps = difference(requiredSteps, completedSteps)
     if (missingSteps.length > 0) {
-      return toStep(missingSteps[0], crn)
+      return toStep(session, missingSteps[0])
     }
 
     return null
@@ -56,19 +111,21 @@ export class AppointmentWizardService {
     }
   }
 
-  nextStep(session: AppointmentWizardSession, step: AppointmentWizardStep, crn: string): RedirectResponse {
+  nextStep(session: AppointmentWizardSession, step: AppointmentWizardStep): RedirectResponse {
     this.recordStep(session, step)
+    const steps = getSteps(session)
     const nextIndex = (steps.indexOf(step) + 1) % steps.length
-    return toStep(steps[nextIndex], crn)
+    return toStep(session, steps[nextIndex])
   }
 
-  getBackPath(currentStep: AppointmentWizardStep, crn: string): string {
-    const currentIndex = steps.indexOf(currentStep)
+  getBackUrl(session: AppointmentWizardSession, step: AppointmentWizardStep): string {
+    const steps = getSteps(session)
+    const currentIndex = steps.indexOf(step)
     if (currentIndex === 0) {
       return null
     }
 
     const previousIndex = (currentIndex - 1) % steps.length
-    return getStepUrl(steps[previousIndex], crn)
+    return getStepUrl(session, steps[previousIndex])
   }
 }

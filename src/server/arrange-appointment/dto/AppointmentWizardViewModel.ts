@@ -1,10 +1,11 @@
 import { DomainAppointmentType } from '../arrange-appointment.service'
 import { ViewModel } from '../../common'
 import { AppointmentBuilderDto } from './AppointmentBuilderDto'
-import { AppointmentWizardUpdateWhenDto } from './AppointmentWizardUpdateWhen.dto'
+import { OfficeLocation } from './OfficeLocation'
 
 export enum AppointmentWizardStep {
-  AppointmentType = 'type',
+  Type = 'type',
+  Where = 'where',
   When = 'when',
   Check = 'check',
   Confirm = 'confirm',
@@ -15,7 +16,7 @@ interface AppointmentWizardViewModelBase extends ViewModel<AppointmentBuilderDto
 }
 
 export interface AppointmentTypeViewModel extends AppointmentWizardViewModelBase {
-  step: AppointmentWizardStep.AppointmentType
+  step: AppointmentWizardStep.Type
   types: {
     featured: DomainAppointmentType[]
     other: DomainAppointmentType[]
@@ -24,9 +25,17 @@ export interface AppointmentTypeViewModel extends AppointmentWizardViewModelBase
   other: string | null
 }
 
+export interface AppointmentLocationViewModel extends AppointmentWizardViewModelBase {
+  step: AppointmentWizardStep.Where
+  location: string
+  locations: OfficeLocation[]
+}
+
 export interface AppointmentSchedulingViewModel extends AppointmentWizardViewModelBase {
   step: AppointmentWizardStep.When
-  form: AppointmentWizardUpdateWhenDto
+  date: { day: number; month: number; year: number }
+  startTime: string
+  endTime: string
 }
 
 export interface CheckAppointmentViewModel extends AppointmentWizardViewModelBase {
@@ -47,6 +56,7 @@ export interface ConfirmAppointmentViewModel extends AppointmentWizardViewModelB
 
 export type AppointmentWizardViewModel =
   | AppointmentTypeViewModel
+  | AppointmentLocationViewModel
   | AppointmentSchedulingViewModel
   | CheckAppointmentViewModel
   | ConfirmAppointmentViewModel

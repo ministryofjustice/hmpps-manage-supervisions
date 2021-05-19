@@ -1,13 +1,16 @@
 import { NunjucksFilter } from './types'
 import { ValidationError } from 'class-validator'
+import { flattenValidationErrors } from '../../../util/flattenValidationErrors'
 
 export interface GdsErrorMessage {
   text: string
 }
 
 export class FindErrorMessages implements NunjucksFilter {
-  filter(errors: ValidationError[], ...names: string[]): GdsErrorMessage {
-    const filtered = errors?.filter(x => names.indexOf(x.property) >= 0) || []
+  filter(errors: ValidationError[], ...paths: string[]): GdsErrorMessage {
+    const flattened = flattenValidationErrors(errors || [])
+
+    const filtered = flattened?.filter(x => paths.some(p => x.path.startsWith(p))) || []
     if (filtered.length === 0) {
       return null
     }
