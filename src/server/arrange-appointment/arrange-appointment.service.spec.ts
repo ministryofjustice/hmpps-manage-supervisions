@@ -62,6 +62,7 @@ describe('ArrangeAppointmentService', () => {
         officeLocationCode: dto.location,
         appointmentStart: dto.appointmentStart.toISO(),
         appointmentEnd: dto.appointmentEnd.toISO(),
+        sensitive: dto.sensitive,
         notes: DUMMY_DATA.notes,
         providerCode: DUMMY_DATA.providerCode,
         requirementId: DUMMY_DATA.requirementId,

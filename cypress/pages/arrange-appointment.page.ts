@@ -88,6 +88,31 @@ export class ArrangeAppointmentPage extends PageBase {
     }
   }
 
+  get sensitive() {
+    return {
+      radio(value: boolean) {
+        const label = value ? 'Yes, it includes sensitive information' : 'No, it is not sensitive'
+        return cy.get(`[data-qa="arrange-appointment/sensitive"] input[type=radio]`).siblings('label').contains(label)
+      },
+
+      get help() {
+        return cy.get('details[data-qa="arrange-appointment/sensitive-help"]')
+      },
+
+      get helpText() {
+        return this.help.get('.govuk-details__text')
+      },
+
+      get errorMessages() {
+        return {
+          get sensitive() {
+            return cy.get('#sensitive-error')
+          },
+        }
+      },
+    }
+  }
+
   get check() {
     return {
       get appointmentType() {
@@ -112,6 +137,14 @@ export class ArrangeAppointmentPage extends PageBase {
 
       get appointmentTimeChangeLink() {
         return cy.get('.qa-time .qa-change')
+      },
+
+      get sensitive() {
+        return cy.get('.qa-sensitive .govuk-summary-list__value')
+      },
+
+      get sensitiveChangeLink() {
+        return cy.get('.qa-sensitive .qa-change')
       },
     }
   }

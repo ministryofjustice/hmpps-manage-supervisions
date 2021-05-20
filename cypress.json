@@ -7,5 +7,6 @@
   },
   "videoUploadOnPasses": false,
   "taskTimeout": 5000,
+  "video": false,
   "env": {}
 }

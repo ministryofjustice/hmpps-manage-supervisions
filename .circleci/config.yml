@@ -2,66 +2,89 @@ version: 2.1
 
 orbs:
   hmpps: ministryofjustice/hmpps@3.2
+  cypress: cypress-io/cypress@1
 
 executors:
-  integration-tests:
+  integration-test:
     docker:
-      - image: cimg/node:14.15-browsers
+      - image: cypress/base:14.16.0
         environment:
-         TZ: "Europe/London"
+          TZ: "Europe/London"
       - image: circleci/redis:buster
-    working_directory: ~/app
+      - image: rodolpheche/wiremock
+        command: ['/docker-entrypoint.sh', '--port', '9091']
 
 jobs:
   build:
     executor:
       name: hmpps/node
-      tag: 14.15-browsers
+      tag: 14.17-browsers
     environment:
       TZ: "Europe/London"
     steps:
       - checkout
       - run:
           name: Update npm
-          command: 'sudo npm install -g npm@latest'
+          command: sudo npm install -g npm
       - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
+          key: dependencies-{{ checksum "package-lock.json" }}
       - run:
-          name: Install Dependencies
-          command: npm ci --no-audit
+          name: Install dependencies
+          command: CYPRESS_INSTALL_BINARY=0  npm ci --no-audit
       - save_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
+          key: dependencies-{{ checksum "package-lock.json" }}
           paths:
             - node_modules
-            - ~/.cache
       - run:
+          name: Record build info
           command: |
             npm run build
             DATE=$(date '+%Y-%m-%d')
             export BUILD_NUMBER=${DATE}.${CIRCLE_BUILD_NUM}
             export GIT_REF="$CIRCLE_SHA1"
             npm run record-build-info
-      - run: # Run linter after build because the integration test code depend on compiled typescript...
-          name: Linter check
+      - run:
+          name: Lint
           command: npm run lint
       - persist_to_workspace:
           root: .
           paths:
             - node_modules
-            - build-info.json
             - dist
-            - .cache/Cypress
+
+  unit_test:
+    executor:
+      name: hmpps/node
+      tag: 14.17-browsers
+    environment:
+      TZ: "Europe/London"
+      NODE_OPTIONS: "--max_old_space_size=4096"
+    steps:
+      - checkout
+      - run:
+          name: Update npm
+          command: sudo npm install -g npm
+      - attach_workspace:
+          at: ~/app
+      - run:
+          name: unit tests
+          command: npm run test -- --maxWorkers=2 --ci
+      - store_test_results:
+          path: test_results
 
   check_outdated:
     executor:
       name: hmpps/node
-      tag: 14.15-browsers
+      tag: 14.17-browsers
     environment:
       TZ: "Europe/London"
     steps:
       - checkout
+      - run:
+          name: Update npm
+          command: sudo npm install -g npm
       - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
+          key: dependencies-{{ checksum "package-lock.json" }}
       - run:
           name: install-npm
           command: 'npm ci --no-audit'
@@ -71,59 +94,6 @@ jobs:
       - run:
           name: Run check
           command: 'npm outdated typescript govuk-frontend'
-
-  unit_test:
-    executor:
-      name: hmpps/node
-      tag: 14.15-browsers
-    environment:
-      TZ: "Europe/London"
-    steps:
-      - checkout
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
-      - run:
-          name: unit tests
-          command: npm run test
-      - store_test_results:
-          path: test_results
-      - store_artifacts:
-          path: test-results/unit-test-reports.html
-
-  integration_test:
-    executor: integration-tests
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/app
-      - run:
-          name: Install missing OS dependency
-          command: sudo apt-get install libxss1
-      - run:
-          name: Get wiremock
-          command: curl -o wiremock.jar https://repo1.maven.org/maven2/com/github/tomakehurst/wiremock-standalone/2.27.1/wiremock-standalone-2.27.1.jar
-      - run:
-          name: Run wiremock
-          command: java -jar wiremock.jar --port 9091
-          background: true
-      - run:
-          name: Run the node app.
-          command: npm run start:e2e
-          background: true
-      - run:
-          name: Wait for node app to start
-          command: sleep 5
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
-      - run:
-          name: integration tests
-          command: npm run test:e2e
-      - store_test_results:
-          path: test_results
-      - store_artifacts:
-          path: cypress/videos
-      - store_artifacts:
-          path: cypress/screenshots
 
 workflows:
   version: 2
@@ -136,9 +106,17 @@ workflows:
       - unit_test:
           requires:
             - build
-      - integration_test:
-          requires:
-            - build
+      - cypress/run:
+          name: integration_test
+          executor: integration-test
+          build: npm run build
+          start: npm run start:e2e
+          wait-on: 'http://localhost:3007/health/ping'
+          no-workspace: true
+          store_artifacts: true
+          post-steps:
+            - store_test_results:
+                path: test_results
       - hmpps/helm_lint:
           name: helm_lint
       - hmpps/build_docker:

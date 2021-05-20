@@ -14,6 +14,7 @@ interface AppointmentBookingTestCase {
     code: string
     name: string
   }
+  sensitive: boolean
 }
 
 function testCase(partial: Omit<AppointmentBookingTestCase, 'start' | 'end'>) {
@@ -46,6 +47,7 @@ context('CreateAppointment', () => {
       sentenceId: 2500443138,
       type: { code: 'APAT', name: 'Office visit' },
       location: { code: 'LDN_BCR', name: '29/33 VICTORIA ROAD' },
+      sensitive: true,
     })
 
     havingOffender(test)
@@ -58,6 +60,9 @@ context('CreateAppointment', () => {
     whenSubmittingCurrentStep()
 
     whenEnteringAppointmentDateAndTimes(test)
+
+    whenSelectingSensitive(test)
+
     shouldDisplayCorrectAppointmentSummary(test)
 
     whenSubmittingCurrentStep()
@@ -72,6 +77,7 @@ context('CreateAppointment', () => {
       sentenceId: 2500443138,
       type: { code: 'C243', name: 'Alcohol Group Work Session (NS)' },
       location: { code: 'LDN_BCR', name: '29/33 VICTORIA ROAD' },
+      sensitive: false,
     })
 
     havingOffender(test)
@@ -85,6 +91,9 @@ context('CreateAppointment', () => {
     whenSubmittingCurrentStep()
 
     whenEnteringAppointmentDateAndTimes(test)
+
+    whenSelectingSensitive(test)
+
     shouldDisplayCorrectAppointmentSummary(test)
 
     whenSubmittingCurrentStep()
@@ -98,6 +107,7 @@ context('CreateAppointment', () => {
       crn: 'ABC123',
       sentenceId: 2500443138,
       type: { code: 'APAT', name: 'Office visit' },
+      sensitive: true,
     })
 
     havingOffender(test)
@@ -122,6 +132,7 @@ context('CreateAppointment', () => {
       crn: 'ABC123',
       sentenceId: 2500443138,
       type: { code: 'APAT', name: 'Office visit' },
+      sensitive: true,
     })
 
     havingOffender(test)
@@ -140,6 +151,7 @@ context('CreateAppointment', () => {
       crn: 'ABC123',
       sentenceId: 2500443138,
       type: { code: 'CHVS', name: 'Home visit' },
+      sensitive: true,
     })
 
     havingOffender(test)
@@ -171,6 +183,36 @@ context('CreateAppointment', () => {
     whenSubmittingCurrentStep()
     aStartTimeErrorIsShown('Enter a time in the future')
     aEndTimeErrorIsShown('Enter an end time after the start time')
+  })
+
+  it('validates sensitive & sensitive help text', () => {
+    const test = testCase({
+      crn: 'ABC123',
+      sentenceId: 2500443138,
+      type: { code: 'APAT', name: 'Office visit' },
+      location: { code: 'LDN_BCR', name: '29/33 VICTORIA ROAD' },
+      sensitive: true,
+    })
+
+    havingOffender(test)
+    havingLoggedInAndBeginBookingAppointmentFlow(test)
+
+    whenSelectingTypeRadio(test.type.name)
+    whenSubmittingCurrentStep()
+
+    whenSelectingLocationRadio(test.location.name)
+    whenSubmittingCurrentStep()
+
+    whenEnteringAppointmentDateAndTimes(test)
+
+    page.sensitive.help.should('not.have.attr', 'open')
+    page.sensitive.help.contains('Help with sensitive content').click()
+    page.sensitive.help.should('have.attr', 'open')
+    page.sensitive.helpText.contains('Marking information as sensitive means that')
+
+    // nothing selected
+    whenSubmittingCurrentStep()
+    page.sensitive.errorMessages.sensitive.contains('Select yes if the appointment contains sensitive information')
   })
 
   function havingOffender({ crn, sentenceId }: AppointmentBookingTestCase) {
@@ -211,7 +253,13 @@ context('CreateAppointment', () => {
     page.continueButton.click()
   }
 
-  function shouldDisplayCorrectAppointmentSummary({ start, end, type, crn }: AppointmentBookingTestCase) {
+  function whenSelectingSensitive({ sensitive }: AppointmentBookingTestCase) {
+    page.pageTitle.contains('Does this appointment include sensitive information?')
+    page.sensitive.radio(sensitive).click()
+    page.continueButton.click()
+  }
+
+  function shouldDisplayCorrectAppointmentSummary({ start, end, type, crn, sensitive }: AppointmentBookingTestCase) {
     page.pageTitle.contains('Check your answers')
     page.check.appointmentType.contains(type.name)
     page.check.appointmentTypeChangeLink.should('have.attr', 'href').and('include', `${crn}/type`)
@@ -221,6 +269,9 @@ context('CreateAppointment', () => {
 
     page.check.appointmentTime.contains(`${new Time().filter(start)} to ${new Time().filter(end)}`)
     page.check.appointmentTimeChangeLink.should('have.attr', 'href').and('include', `${crn}/when`)
+
+    page.check.sensitive.contains(sensitive ? 'Yes' : 'No')
+    page.check.sensitiveChangeLink.should('have.attr', 'href').and('include', `${crn}/sensitive`)
   }
 
   function shouldDisplayAppointmentBookingConfirmation({ start, type }: AppointmentBookingTestCase) {
@@ -233,7 +284,15 @@ context('CreateAppointment', () => {
     page.confirm.phoneMessage.contains('07734 111992')
   }
 
-  function shouldHaveBookedAppointment({ crn, sentenceId, start, end, type, location }: AppointmentBookingTestCase) {
+  function shouldHaveBookedAppointment({
+    crn,
+    sentenceId,
+    start,
+    end,
+    type,
+    location,
+    sensitive,
+  }: AppointmentBookingTestCase) {
     cy.task('getCreatedAppointments', { crn, sentenceId }).should('deep.eq', [
       {
         requirementId: 2500199144,
@@ -245,6 +304,7 @@ context('CreateAppointment', () => {
         teamCode: 'CRSUAT',
         staffCode: 'CRSUATU',
         officeLocationCode: location?.code,
+        sensitive,
       },
     ])
   }

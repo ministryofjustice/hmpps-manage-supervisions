@@ -7,5 +7,6 @@ export type ViewModel<T, Name extends string = 'dto'> = {
     type?: string
     where?: string
     when?: string
+    sensitive?: string
   }
 } & { [P in Name]: T }

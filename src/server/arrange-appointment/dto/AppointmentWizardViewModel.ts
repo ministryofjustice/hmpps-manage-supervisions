@@ -7,6 +7,7 @@ export enum AppointmentWizardStep {
   Type = 'type',
   Where = 'where',
   When = 'when',
+  Sensitive = 'sensitive',
   Check = 'check',
   Confirm = 'confirm',
 }
@@ -38,6 +39,11 @@ export interface AppointmentSchedulingViewModel extends AppointmentWizardViewMod
   endTime: string
 }
 
+export interface AppointmentSensitiveViewModel extends AppointmentWizardViewModelBase {
+  step: AppointmentWizardStep.Sensitive
+  sensitive?: boolean
+}
+
 export interface CheckAppointmentViewModel extends AppointmentWizardViewModelBase {
   step: AppointmentWizardStep.Check
   rarDetails: {
@@ -58,5 +64,6 @@ export type AppointmentWizardViewModel =
   | AppointmentTypeViewModel
   | AppointmentLocationViewModel
   | AppointmentSchedulingViewModel
+  | AppointmentSensitiveViewModel
   | CheckAppointmentViewModel
   | ConfirmAppointmentViewModel

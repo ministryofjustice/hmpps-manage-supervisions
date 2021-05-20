@@ -1,0 +1,51 @@
+{% extends "../wizard-form.njk" %}
+{% set title = 'Does this appointment include sensitive information?' %}
+
+{% set helpText %}
+    <p>
+        Marking information as sensitive means that the information could cause harm or undermine the investigation of a crime if it were disclosed to the person on probation.
+        For example, a victim`s personal details.
+    </p>
+    <p>
+        Individuals can make a request for access to all information and records held on them called Subject Access Requests (SARs).
+        Sensitive information will not be included in any SARs.
+    </p>
+{% endset %}
+
+{% block form %}
+    {{ govukRadios({
+        id: "arrange-appointment-sensitive-radios",
+        name: "sensitive",
+        attributes: {
+            "data-qa": "arrange-appointment/sensitive"
+        },
+        fieldset: {
+            legend: {
+                text: title,
+                isPageHeading: true,
+                classes: "govuk-label--xl govuk-!-margin-bottom-6"
+            }
+        },
+        items: [
+            {
+                html: 'Yes, it includes sensitive information.<br />Some details must not be shared with ' + case.serviceUserPersonalDetails.firstName + '.',
+                value: 'true',
+                checked: sensitive === true
+            },
+            {
+                text: 'No, it is not sensitive',
+                value: 'false',
+                checked: sensitive === false
+            }
+        ],
+        errorMessage: errors | findErrorMessages("sensitive")
+    }) }}
+
+    {{ govukDetails({
+        summaryText: "Help with sensitive content",
+        html: helpText,
+        attributes: {
+            "data-qa": "arrange-appointment/sensitive-help"
+        }
+    }) }}
+{% endblock %}

@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { AppointmentWizardStep } from './AppointmentWizardViewModel'
 import { fakeAppointmentBuilderDto } from './arrange-appointment.fake'
-import { IS_INT, IS_NOT_EMPTY, IS_POSITIVE, IS_STRING, validate } from 'class-validator'
+import { IS_BOOLEAN, IS_INT, IS_NOT_EMPTY, IS_POSITIVE, IS_STRING, validate } from 'class-validator'
 import { AppointmentBuilderDto } from './AppointmentBuilderDto'
 import { flattenValidationErrors } from '../../util/flattenValidationErrors'
 import { RequiredOptional } from './AppointmentTypeDto'
@@ -12,14 +12,23 @@ import { DEFAULT_GROUP } from '../../util/mapping'
 import { pick } from 'lodash'
 import { IS_AFTER, IS_DATE_INPUT, IS_FUTURE_DATE, IS_FUTURE_TIME, IS_TIME } from '../../validators'
 
+type Assertion = (subject: AppointmentBuilderDto) => void
+
 class Given {
   static dto(partial: DeepPartial<AppointmentBuilderDto>) {
     const subject = fakeAppointmentBuilderDto(partial)
     return new Given(subject)
   }
 
+  static exactly(partial: DeepPartial<AppointmentBuilderDto>) {
+    const subject = new AppointmentBuilderDto()
+    Object.assign(subject, partial)
+    return new Given(subject)
+  }
+
   private group?: AppointmentWizardStep
-  private expectedConstraints: Record<string, string[]> = {}
+  private readonly expectedConstraints: Record<string, string[]> = {}
+  private readonly assertions: Assertion[] = []
 
   constructor(private readonly subject: AppointmentBuilderDto) {}
 
@@ -34,11 +43,19 @@ class Given {
   }
 
   shouldBeValid() {
-    this.expectedConstraints = {}
+    return this
+  }
+
+  shouldMap(assertion: Assertion) {
+    this.assertions.push(assertion)
     return this
   }
 
   async run() {
+    for (const assertion of this.assertions) {
+      assertion(this.subject)
+    }
+
     const errors = await validate(this.subject, { groups: this.group ? [this.group] : [] })
     if (Object.keys(this.expectedConstraints).length === 0) {
       expect(errors).toHaveLength(0)
@@ -86,6 +103,11 @@ describe('AppointmentBuilderDto validation & mapping', () => {
     it('mapping with "when" group', () => {
       const observed = plainToClass(AppointmentBuilderDto, plain, { groups: [AppointmentWizardStep.When] })
       expect(observed).toEqual(pick(plain, ['date', 'startTime', 'endTime']))
+    })
+
+    it('mapping with "sensitive" group', () => {
+      const observed = plainToClass(AppointmentBuilderDto, plain, { groups: [AppointmentWizardStep.Sensitive] })
+      expect(observed).toEqual(pick(plain, ['sensitive']))
     })
   })
 
@@ -236,6 +258,30 @@ describe('AppointmentBuilderDto validation & mapping', () => {
       })
         .whenValidating(AppointmentWizardStep.When)
         .shouldTriggerConstraints('endTime', IS_AFTER)
+        .run())
+  })
+
+  describe('sensitive group', () => {
+    it('is valid', async () =>
+      Given.dto({ sensitive: true }).whenValidating(AppointmentWizardStep.Sensitive).shouldBeValid().run())
+
+    it('is valid string', async () =>
+      Given.dto({ sensitive: 'false' as any })
+        .whenValidating(AppointmentWizardStep.Sensitive)
+        .shouldMap(x => expect(x.sensitive).toBe(false))
+        .shouldBeValid()
+        .run())
+
+    it('is invalid string', async () =>
+      Given.dto({ sensitive: 'not-a-boolean' as any })
+        .whenValidating(AppointmentWizardStep.Sensitive)
+        .shouldTriggerConstraints('sensitive', IS_BOOLEAN)
+        .run())
+
+    it('is missing', async () =>
+      Given.exactly({})
+        .whenValidating(AppointmentWizardStep.Sensitive)
+        .shouldTriggerConstraints('sensitive', IS_BOOLEAN)
         .run())
   })
 })

@@ -22,12 +22,12 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "cypress run --config video=false",
+    "test:e2e": "cypress run",
     "test:e2e-ui": "cypress open",
     "security_audit": "npx audit-ci --config audit-ci.json"
   },
   "dependencies": {
-    "@ministryofjustice/frontend": "^0.2.2",
+    "@ministryofjustice/frontend": "^0.2.4",
     "@nestjs/common": "^7.6.15",
     "@nestjs/config": "^0.6.3",
     "@nestjs/core": "^7.6.15",
@@ -72,7 +72,7 @@
     "@types/jsonwebtoken": "^8.5.1",
     "@types/lodash": "^4.14.168",
     "@types/luxon": "^1.26.5",
-    "@types/node": "^14.14.36",
+    "@types/node": "^14.17.0",
     "@types/nunjucks": "^3.1.4",
     "@types/passport-oauth2": "^1.4.10",
     "@types/redis": "^2.8.28",
@@ -96,6 +96,7 @@
     "file-loader": "^6.2.0",
     "husky": "^6.0.0",
     "jest": "^26.6.3",
+    "jest-junit": "^12.0.0",
     "jquery": "^3.6.0",
     "jquery-ui": "^1.12.1",
     "lint-staged": "^11.0.0",
@@ -117,7 +118,7 @@
   },
   "engines": {
     "node": "^14",
-    "npm": "^6.4.1"
+    "npm": "^7"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -126,7 +127,7 @@
       "ts"
     ],
     "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
+    "testRegex": ".*\\.(spec|test)\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
@@ -134,7 +135,16 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "reporters": [
+      "default",
+      [
+        "jest-junit",
+        {
+          "outputDirectory": "test_results"
+        }
+      ]
+    ]
   },
   "lint-staged": {
     "*.ts": "eslint --fix",
