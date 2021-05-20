@@ -16,7 +16,7 @@ jobs:
   build:
     executor:
       name: hmpps/node
-      tag: "14.17"
+      tag: 14.17-browsers
     environment:
       TZ: "Europe/London"
     steps:
@@ -25,15 +25,18 @@ jobs:
           name: Update npm
           command: sudo npm install -g npm
       - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
+          key: dependencies-{{ checksum "package-lock.json" }}
       - run:
           name: Install Dependencies
           command: npm ci --no-audit
+      - run:
+          name: Prune Cypress Cache
+          command: npx cypress cache prune
       - save_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
+          key: dependencies-{{ checksum "package-lock.json" }}
           paths:
             - node_modules
-            - ~/.cache
+            - .cache/Cypress
       - run:
           command: |
             npm run build
@@ -48,14 +51,13 @@ jobs:
           root: .
           paths:
             - node_modules
-            - build-info.json
             - dist
             - .cache/Cypress
 
   check_outdated:
     executor:
       name: hmpps/node
-      tag: "14.17"
+      tag: 14.17-browsers
     environment:
       TZ: "Europe/London"
     steps:
@@ -64,7 +66,7 @@ jobs:
           name: Update npm
           command: sudo npm install -g npm
       - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
+          key: dependencies-{{ checksum "package-lock.json" }}
       - run:
           name: install-npm
           command: 'npm ci --no-audit'
@@ -78,7 +80,7 @@ jobs:
   unit_test:
     executor:
       name: hmpps/node
-      tag: "14.17"
+      tag: 14.17-browsers
     environment:
       TZ: "Europe/London"
       NODE_OPTIONS: "--max_old_space_size=4096"
@@ -87,8 +89,8 @@ jobs:
       - run:
           name: Update npm
           command: sudo npm install -g npm
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - attach_workspace:
+          at: ~/app
       - run:
           name: unit tests
           command: npm run test -- --maxWorkers=2 --ci
@@ -110,6 +112,9 @@ jobs:
           name: Install missing OS dependency
           command: sudo apt-get install libxss1
       - run:
+          name: Check cypress can run
+          command: npx cypress verify
+      - run:
           name: Get wiremock
           command: curl -o wiremock.jar https://repo1.maven.org/maven2/com/github/tomakehurst/wiremock-standalone/2.27.1/wiremock-standalone-2.27.1.jar
       - run:
@@ -117,17 +122,15 @@ jobs:
           command: java -jar wiremock.jar --port 9091
           background: true
       - run:
-          name: Run the node app.
+          name: Run the app
           command: npm run start:e2e
           background: true
       - run:
           name: Wait for node app to start
           command: sleep 5
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
           name: integration tests
-          command: npm run test:e2e
+          command: npm run test:e2e -- --config videos=true
       - store_test_results:
           path: test_results
       - store_artifacts:

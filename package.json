@@ -22,12 +22,12 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "cypress run --config video=false",
+    "test:e2e": "cypress run",
     "test:e2e-ui": "cypress open",
     "security_audit": "npx audit-ci --config audit-ci.json"
   },
   "dependencies": {
-    "@ministryofjustice/frontend": "^0.2.2",
+    "@ministryofjustice/frontend": "^0.2.4",
     "@nestjs/common": "^7.6.15",
     "@nestjs/config": "^0.6.3",
     "@nestjs/core": "^7.6.15",
@@ -72,7 +72,7 @@
     "@types/jsonwebtoken": "^8.5.1",
     "@types/lodash": "^4.14.168",
     "@types/luxon": "^1.26.5",
-    "@types/node": "^14.14.36",
+    "@types/node": "^14.17.0",
     "@types/nunjucks": "^3.1.4",
     "@types/passport-oauth2": "^1.4.10",
     "@types/redis": "^2.8.28",
@@ -136,7 +136,15 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
-    "reporters": ["default", ["jest-junit", { "outputDirectory": "test_results" }]]
+    "reporters": [
+      "default",
+      [
+        "jest-junit",
+        {
+          "outputDirectory": "test_results"
+        }
+      ]
+    ]
   },
   "lint-staged": {
     "*.ts": "eslint --fix",
