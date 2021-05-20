@@ -6,7 +6,7 @@ orbs:
 executors:
   integration-tests:
     docker:
-      - image: cimg/node:14.15-browsers
+      - image: cimg/node:14.17-browsers
         environment:
          TZ: "Europe/London"
       - image: circleci/redis:buster
@@ -16,14 +16,14 @@ jobs:
   build:
     executor:
       name: hmpps/node
-      tag: 14.15-browsers
+      tag: "14.17"
     environment:
       TZ: "Europe/London"
     steps:
       - checkout
       - run:
           name: Update npm
-          command: 'sudo npm install -g npm@latest'
+          command: sudo npm install -g npm
       - restore_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
@@ -55,11 +55,14 @@ jobs:
   check_outdated:
     executor:
       name: hmpps/node
-      tag: 14.15-browsers
+      tag: "14.17"
     environment:
       TZ: "Europe/London"
     steps:
       - checkout
+      - run:
+          name: Update npm
+          command: sudo npm install -g npm
       - restore_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
@@ -75,12 +78,15 @@ jobs:
   unit_test:
     executor:
       name: hmpps/node
-      tag: 14.15-browsers
+      tag: "14.17"
     environment:
       TZ: "Europe/London"
       NODE_OPTIONS: "--max_old_space_size=4096"
     steps:
       - checkout
+      - run:
+          name: Update npm
+          command: sudo npm install -g npm
       - restore_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
@@ -95,6 +101,9 @@ jobs:
     executor: integration-tests
     steps:
       - checkout
+      - run:
+          name: Update npm
+          command: sudo npm install -g npm
       - attach_workspace:
           at: ~/app
       - run:
