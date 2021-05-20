@@ -96,6 +96,7 @@
     "file-loader": "^6.2.0",
     "husky": "^6.0.0",
     "jest": "^26.6.3",
+    "jest-junit": "^12.0.0",
     "jquery": "^3.6.0",
     "jquery-ui": "^1.12.1",
     "lint-staged": "^11.0.0",
@@ -126,7 +127,7 @@
       "ts"
     ],
     "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
+    "testRegex": ".*\\.(spec|test)\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
@@ -134,7 +135,8 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "reporters": ["default", ["jest-junit", { "outputDirectory": "test_results" }]]
   },
   "lint-staged": {
     "*.ts": "eslint --fix",
