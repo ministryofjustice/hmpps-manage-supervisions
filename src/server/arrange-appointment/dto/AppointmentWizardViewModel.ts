@@ -8,6 +8,7 @@ export enum AppointmentWizardStep {
   Where = 'where',
   When = 'when',
   Sensitive = 'sensitive',
+  Notes = 'notes',
   Check = 'check',
   Confirm = 'confirm',
 }
@@ -43,6 +44,10 @@ export interface AppointmentSensitiveViewModel extends AppointmentWizardViewMode
   step: AppointmentWizardStep.Sensitive
   sensitive?: boolean
 }
+export interface AppointmentNotesViewModel extends AppointmentWizardViewModelBase {
+  step: AppointmentWizardStep.Notes
+  notes: string
+}
 
 export interface CheckAppointmentViewModel extends AppointmentWizardViewModelBase {
   step: AppointmentWizardStep.Check
@@ -64,6 +69,7 @@ export type AppointmentWizardViewModel =
   | AppointmentTypeViewModel
   | AppointmentLocationViewModel
   | AppointmentSchedulingViewModel
+  | AppointmentNotesViewModel
   | AppointmentSensitiveViewModel
   | CheckAppointmentViewModel
   | ConfirmAppointmentViewModel

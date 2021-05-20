@@ -8,5 +8,6 @@ export type ViewModel<T, Name extends string = 'dto'> = {
     where?: string
     when?: string
     sensitive?: string
+    notes?: string
   }
 } & { [P in Name]: T }

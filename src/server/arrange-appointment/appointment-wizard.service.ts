@@ -39,6 +39,9 @@ const meta: {
     next: AppointmentWizardStep.When,
   },
   [AppointmentWizardStep.When]: {
+    next: AppointmentWizardStep.Notes,
+  },
+  [AppointmentWizardStep.Notes]: {
     next: AppointmentWizardStep.Sensitive,
   },
   [AppointmentWizardStep.Sensitive]: {

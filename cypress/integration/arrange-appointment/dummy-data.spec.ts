@@ -14,6 +14,7 @@ interface AppointmentBookingTestCase {
     code: string
     name: string
   }
+  notes?: string
   sensitive: boolean
 }
 
@@ -47,6 +48,7 @@ context('CreateAppointment', () => {
       sentenceId: 2500443138,
       type: { code: 'APAT', name: 'Office visit' },
       location: { code: 'LDN_BCR', name: '29/33 VICTORIA ROAD' },
+      notes: 'These are some notes',
       sensitive: true,
     })
 
@@ -60,6 +62,8 @@ context('CreateAppointment', () => {
     whenSubmittingCurrentStep()
 
     whenEnteringAppointmentDateAndTimes(test)
+
+    whenEnteringNotes(test)
 
     whenSelectingSensitive(test)
 
@@ -78,6 +82,7 @@ context('CreateAppointment', () => {
       type: { code: 'C243', name: 'Alcohol Group Work Session (NS)' },
       location: { code: 'LDN_BCR', name: '29/33 VICTORIA ROAD' },
       sensitive: false,
+      notes: 'These are some notes',
     })
 
     havingOffender(test)
@@ -91,6 +96,8 @@ context('CreateAppointment', () => {
     whenSubmittingCurrentStep()
 
     whenEnteringAppointmentDateAndTimes(test)
+
+    whenEnteringNotes(test)
 
     whenSelectingSensitive(test)
 
@@ -253,13 +260,19 @@ context('CreateAppointment', () => {
     page.continueButton.click()
   }
 
+  function whenEnteringNotes({ notes }: AppointmentBookingTestCase) {
+    page.pageTitle.contains('Add appointment notes')
+    page.notes.notesField.type(notes)
+    page.continueButton.click()
+  }
+
   function whenSelectingSensitive({ sensitive }: AppointmentBookingTestCase) {
     page.pageTitle.contains('Does this appointment include sensitive information?')
     page.sensitive.radio(sensitive).click()
     page.continueButton.click()
   }
 
-  function shouldDisplayCorrectAppointmentSummary({ start, end, type, crn, sensitive }: AppointmentBookingTestCase) {
+  function shouldDisplayCorrectAppointmentSummary({ start, end, type, crn, notes, sensitive }: AppointmentBookingTestCase) {
     page.pageTitle.contains('Check your answers')
     page.check.appointmentType.contains(type.name)
     page.check.appointmentTypeChangeLink.should('have.attr', 'href').and('include', `${crn}/type`)
@@ -269,6 +282,9 @@ context('CreateAppointment', () => {
 
     page.check.appointmentTime.contains(`${new Time().filter(start)} to ${new Time().filter(end)}`)
     page.check.appointmentTimeChangeLink.should('have.attr', 'href').and('include', `${crn}/when`)
+
+    page.check.notes.contains(notes)
+    page.check.notesChangeLink.should('have.attr', 'href').and('include', `${crn}/notes`)
 
     page.check.sensitive.contains(sensitive ? 'Yes' : 'No')
     page.check.sensitiveChangeLink.should('have.attr', 'href').and('include', `${crn}/sensitive`)

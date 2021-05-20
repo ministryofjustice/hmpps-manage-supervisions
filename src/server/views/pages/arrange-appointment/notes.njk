@@ -1,0 +1,24 @@
+{% extends "../wizard-form.njk" %}
+{% set title = "Add appointment notes" %}
+
+{% block form %}
+  <div class="govuk-form-group">
+    
+    {{ govukTextarea({
+      name: "notes",
+      id: "notes",
+      label: {
+        text: "Add appointment notes",
+        classes: "govuk-label--xl",
+        isPageHeading: true
+      },
+      rows: 10,
+      value: notes
+    }) }}
+
+  </div>
+
+  <p class="govuk-hint">
+    This will be added to the NDelius contact log.
+  </p>
+{% endblock %}

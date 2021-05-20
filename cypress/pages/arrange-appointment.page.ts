@@ -88,6 +88,14 @@ export class ArrangeAppointmentPage extends PageBase {
     }
   }
 
+  get notes() {
+    return {
+      get notesField() {
+        return cy.get('#notes')
+      },
+    }
+  }
+
   get sensitive() {
     return {
       radio(value: boolean) {
@@ -109,7 +117,7 @@ export class ArrangeAppointmentPage extends PageBase {
             return cy.get('#sensitive-error')
           },
         }
-      },
+      }
     }
   }
 
@@ -138,14 +146,21 @@ export class ArrangeAppointmentPage extends PageBase {
       get appointmentTimeChangeLink() {
         return cy.get('.qa-time .qa-change')
       },
+      get notes() {
+        return cy.get('.qa-notes .govuk-summary-list__value')
+      },
 
+      get notesChangeLink() {
+        return cy.get('.qa-notes .qa-change')
+      },
+      
       get sensitive() {
         return cy.get('.qa-sensitive .govuk-summary-list__value')
       },
 
       get sensitiveChangeLink() {
         return cy.get('.qa-sensitive .qa-change')
-      },
+      }
     }
   }
 

@@ -130,6 +130,9 @@ export class AppointmentBuilderDto {
   @ToBoolean()
   @IsBoolean({ groups: [AppointmentWizardStep.Sensitive], message: MESSAGES.sensitive.required })
   sensitive?: boolean
+  
+  @ExposeDefault({ groups: [AppointmentWizardStep.Notes] })
+  notes?: string
 
   get contactType() {
     return this.type === 'other' ? this.otherType : this.type

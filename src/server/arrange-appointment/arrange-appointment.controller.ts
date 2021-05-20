@@ -180,6 +180,40 @@ export class ArrangeAppointmentController {
     return this.wizard.nextStep(session, AppointmentWizardStep.When)
   }
 
+  @Get('notes')
+  @Render('pages/arrange-appointment/notes')
+  async getNotes(@Param('crn') crn: string, @Session() session: AppointmentWizardSession): Promise<RenderOrRedirect> {
+    const redirect = this.wizard.assertStep(session, AppointmentWizardStep.Notes, crn)
+    if (redirect) {
+      return redirect
+    }
+    const appointment = plainToClass(AppointmentBuilderDto, session.appointment)
+
+    return {
+      step: AppointmentWizardStep.Notes,
+      appointment,
+      paths: {
+        back: this.wizard.getBackUrl(session, AppointmentWizardStep.Notes),
+      },
+      notes: session.appointment.notes,
+    }
+  }
+
+  @Post('notes')
+  @Render('pages/arrange-appointment/notes')
+  @DynamicRedirect()
+  async postNotes(
+    @Param('crn') crn: string,
+    @Session() session: AppointmentWizardSession,
+    @BodyClass(AppointmentWizardStep.Notes) body: AppointmentBuilderDto,
+  ): Promise<RenderOrRedirect> {
+    this.wizard.assertStep(session, AppointmentWizardStep.Notes, crn)
+
+    session.appointment.notes = body.notes
+
+    return this.wizard.nextStep(session, AppointmentWizardStep.Notes)
+  }
+
   @Get('sensitive')
   @Render('pages/arrange-appointment/sensitive')
   @DynamicRedirect()
@@ -238,6 +272,7 @@ export class ArrangeAppointmentController {
         type: getStepUrl(session, AppointmentWizardStep.Type),
         where: getStepUrl(session, AppointmentWizardStep.Where),
         when: getStepUrl(session, AppointmentWizardStep.When),
+        notes: getStepUrl(session, AppointmentWizardStep.Notes),
         sensitive: getStepUrl(session, AppointmentWizardStep.Sensitive),
       },
       rarDetails: {
