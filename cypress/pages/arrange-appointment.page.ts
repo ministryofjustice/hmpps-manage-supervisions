@@ -5,6 +5,10 @@ export class ArrangeAppointmentPage extends PageBase {
     return cy.get('button[data-qa="arrange-appointment/continue-button"]')
   }
 
+  get backLink() {
+    return cy.get('.govuk-back-link')
+  }
+
   get type() {
     return {
       radio(name: string) {
@@ -88,6 +92,24 @@ export class ArrangeAppointmentPage extends PageBase {
     }
   }
 
+  get addNotes() {
+    return {
+      get yesField() {
+        return cy.get('#addNotes-yes')
+      },
+      get noField() {
+        return cy.get('#addNotes-no')
+      },
+      get errorMessages() {
+        return {
+          get addNotes() {
+            return cy.get('#addNotes-error')
+          },
+        }
+      },
+    }
+  }
+
   get notes() {
     return {
       get notesField() {
@@ -117,7 +139,7 @@ export class ArrangeAppointmentPage extends PageBase {
             return cy.get('#sensitive-error')
           },
         }
-      }
+      },
     }
   }
 
@@ -153,14 +175,14 @@ export class ArrangeAppointmentPage extends PageBase {
       get notesChangeLink() {
         return cy.get('.qa-notes .qa-change')
       },
-      
+
       get sensitive() {
         return cy.get('.qa-sensitive .govuk-summary-list__value')
       },
 
       get sensitiveChangeLink() {
         return cy.get('.qa-sensitive .qa-change')
-      }
+      },
     }
   }
 

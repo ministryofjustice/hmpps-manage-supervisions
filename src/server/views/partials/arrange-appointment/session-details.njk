@@ -62,7 +62,7 @@
       } if rarDetails and rarDetails.subCategory,
       {
         key: { text: "Appointment notes" },
-        value: { text: appointment.notes or 'None' }
+        value: { text: appointment.notes or 'None' },
         classes: ["qa-notes"],
         actions: {
           items: [
@@ -85,6 +85,7 @@
               href: paths.sensitive,
               text: "Change",
               visuallyHiddenText: "sensitive",
+              classes: ["qa-change"]
             }
           ]
         }

@@ -14,6 +14,7 @@ interface AppointmentBookingTestCase {
     code: string
     name: string
   }
+  addNotes?: boolean
   notes?: string
   sensitive: boolean
 }
@@ -48,6 +49,7 @@ context('CreateAppointment', () => {
       sentenceId: 2500443138,
       type: { code: 'APAT', name: 'Office visit' },
       location: { code: 'LDN_BCR', name: '29/33 VICTORIA ROAD' },
+      addNotes: true,
       notes: 'These are some notes',
       sensitive: true,
     })
@@ -63,6 +65,7 @@ context('CreateAppointment', () => {
 
     whenEnteringAppointmentDateAndTimes(test)
 
+    whenAskingToEnterNotes(test)
     whenEnteringNotes(test)
 
     whenSelectingSensitive(test)
@@ -82,6 +85,7 @@ context('CreateAppointment', () => {
       type: { code: 'C243', name: 'Alcohol Group Work Session (NS)' },
       location: { code: 'LDN_BCR', name: '29/33 VICTORIA ROAD' },
       sensitive: false,
+      addNotes: true,
       notes: 'These are some notes',
     })
 
@@ -97,6 +101,7 @@ context('CreateAppointment', () => {
 
     whenEnteringAppointmentDateAndTimes(test)
 
+    whenAskingToEnterNotes(test)
     whenEnteringNotes(test)
 
     whenSelectingSensitive(test)
@@ -192,12 +197,13 @@ context('CreateAppointment', () => {
     aEndTimeErrorIsShown('Enter an end time after the start time')
   })
 
-  it('validates sensitive & sensitive help text', () => {
+  it('validates selecting to add notes', () => {
     const test = testCase({
       crn: 'ABC123',
       sentenceId: 2500443138,
       type: { code: 'APAT', name: 'Office visit' },
       location: { code: 'LDN_BCR', name: '29/33 VICTORIA ROAD' },
+      notes: 'Some note text',
       sensitive: true,
     })
 
@@ -211,6 +217,47 @@ context('CreateAppointment', () => {
     whenSubmittingCurrentStep()
 
     whenEnteringAppointmentDateAndTimes(test)
+
+    page.pageTitle.contains('Would you like to add notes about this appointment?')
+
+    // nothing selected
+    whenSubmittingCurrentStep()
+    page.addNotes.errorMessages.addNotes.contains('Select yes if you would like to add notes')
+
+    // no skips to sensitive page
+    whenAskingToEnterNotes({ ...test, addNotes: false })
+    page.pageTitle.contains('Does this appointment include sensitive information?')
+    page.backLink.click()
+
+    // yes goes to notes entry page
+    whenAskingToEnterNotes({ ...test, addNotes: true })
+    whenEnteringNotes(test)
+  })
+
+  it('validates sensitive & sensitive help text', () => {
+    const test = testCase({
+      crn: 'ABC123',
+      sentenceId: 2500443138,
+      type: { code: 'APAT', name: 'Office visit' },
+      location: { code: 'LDN_BCR', name: '29/33 VICTORIA ROAD' },
+      addNotes: true,
+      notes: 'Some note text',
+      sensitive: true,
+    })
+
+    havingOffender(test)
+    havingLoggedInAndBeginBookingAppointmentFlow(test)
+
+    whenSelectingTypeRadio(test.type.name)
+    whenSubmittingCurrentStep()
+
+    whenSelectingLocationRadio(test.location.name)
+    whenSubmittingCurrentStep()
+
+    whenEnteringAppointmentDateAndTimes(test)
+
+    whenAskingToEnterNotes(test)
+    whenEnteringNotes(test)
 
     page.sensitive.help.should('not.have.attr', 'open')
     page.sensitive.help.contains('Help with sensitive content').click()
@@ -260,6 +307,12 @@ context('CreateAppointment', () => {
     page.continueButton.click()
   }
 
+  function whenAskingToEnterNotes({ addNotes }: AppointmentBookingTestCase) {
+    page.pageTitle.contains('Would you like to add notes about this appointment?')
+    addNotes ? page.addNotes.yesField.click() : page.addNotes.noField.click()
+    page.continueButton.click()
+  }
+
   function whenEnteringNotes({ notes }: AppointmentBookingTestCase) {
     page.pageTitle.contains('Add appointment notes')
     page.notes.notesField.type(notes)
@@ -272,7 +325,14 @@ context('CreateAppointment', () => {
     page.continueButton.click()
   }
 
-  function shouldDisplayCorrectAppointmentSummary({ start, end, type, crn, notes, sensitive }: AppointmentBookingTestCase) {
+  function shouldDisplayCorrectAppointmentSummary({
+    start,
+    end,
+    type,
+    crn,
+    notes,
+    sensitive,
+  }: AppointmentBookingTestCase) {
     page.pageTitle.contains('Check your answers')
     page.check.appointmentType.contains(type.name)
     page.check.appointmentTypeChangeLink.should('have.attr', 'href').and('include', `${crn}/type`)
@@ -307,6 +367,7 @@ context('CreateAppointment', () => {
     end,
     type,
     location,
+    notes,
     sensitive,
   }: AppointmentBookingTestCase) {
     cy.task('getCreatedAppointments', { crn, sentenceId }).should('deep.eq', [
@@ -315,7 +376,7 @@ context('CreateAppointment', () => {
         contactType: type.code,
         appointmentStart: start.toISO(),
         appointmentEnd: end.toISO(),
-        notes: 'some notes',
+        notes,
         providerCode: 'CRS',
         teamCode: 'CRSUAT',
         staffCode: 'CRSUATU',

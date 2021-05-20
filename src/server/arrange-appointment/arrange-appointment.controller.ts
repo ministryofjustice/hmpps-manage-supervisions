@@ -3,7 +3,9 @@ import { plainToClass } from 'class-transformer'
 import { AppointmentBuilderDto, MESSAGES } from './dto/AppointmentBuilderDto'
 import { validate, ValidationError } from 'class-validator'
 import {
+  AppointmentAddNotesViewModel,
   AppointmentLocationViewModel,
+  AppointmentNotesViewModel,
   AppointmentSchedulingViewModel,
   AppointmentSensitiveViewModel,
   AppointmentTypeViewModel,
@@ -180,6 +182,44 @@ export class ArrangeAppointmentController {
     return this.wizard.nextStep(session, AppointmentWizardStep.When)
   }
 
+  @Get('add-notes')
+  @Render('pages/arrange-appointment/add-notes')
+  async getAddNotes(
+    @Param('crn') crn: string,
+    @Session() session: AppointmentWizardSession,
+  ): Promise<RenderOrRedirect> {
+    const redirect = this.wizard.assertStep(session, AppointmentWizardStep.AddNotes, crn)
+    if (redirect) {
+      return redirect
+    }
+
+    return this.getAddNotesViewModel(session)
+  }
+
+  @Post('add-notes')
+  @Render('pages/arrange-appointment/add-notes')
+  @DynamicRedirect()
+  async postAddNotes(
+    @Param('crn') crn: string,
+    @Session() session: AppointmentWizardSession,
+    @BodyClass(AppointmentWizardStep.AddNotes) body: AppointmentBuilderDto,
+  ): Promise<RenderOrRedirect> {
+    this.wizard.assertStep(session, AppointmentWizardStep.AddNotes, crn)
+
+    const errors = await this.validateWithSession(body, session, AppointmentWizardStep.AddNotes)
+    if (errors.length > 0) {
+      return this.getAddNotesViewModel(session, body, errors)
+    }
+
+    session.appointment.addNotes = body.addNotes
+
+    if (!body.addNotes) {
+      session.appointment.notes = null
+    }
+
+    return this.wizard.nextStep(session, AppointmentWizardStep.AddNotes)
+  }
+
   @Get('notes')
   @Render('pages/arrange-appointment/notes')
   async getNotes(@Param('crn') crn: string, @Session() session: AppointmentWizardSession): Promise<RenderOrRedirect> {
@@ -187,16 +227,8 @@ export class ArrangeAppointmentController {
     if (redirect) {
       return redirect
     }
-    const appointment = plainToClass(AppointmentBuilderDto, session.appointment)
 
-    return {
-      step: AppointmentWizardStep.Notes,
-      appointment,
-      paths: {
-        back: this.wizard.getBackUrl(session, AppointmentWizardStep.Notes),
-      },
-      notes: session.appointment.notes,
-    }
+    return this.getNotesViewModel(session)
   }
 
   @Post('notes')
@@ -207,7 +239,15 @@ export class ArrangeAppointmentController {
     @Session() session: AppointmentWizardSession,
     @BodyClass(AppointmentWizardStep.Notes) body: AppointmentBuilderDto,
   ): Promise<RenderOrRedirect> {
-    this.wizard.assertStep(session, AppointmentWizardStep.Notes, crn)
+    const redirect = this.wizard.assertStep(session, AppointmentWizardStep.Notes, crn)
+    if (redirect) {
+      return redirect
+    }
+
+    const errors = await this.validateWithSession(body, session, AppointmentWizardStep.Notes)
+    if (errors.length > 0) {
+      return this.getNotesViewModel(session, body, errors)
+    }
 
     session.appointment.notes = body.notes
 
@@ -429,6 +469,46 @@ export class ArrangeAppointmentController {
         back: this.wizard.getBackUrl(session, AppointmentWizardStep.Where),
       },
       errors,
+    }
+  }
+
+  private getAddNotesViewModel(
+    session: AppointmentWizardSession,
+    body?: DeepPartial<AppointmentBuilderDto>,
+    errors: ValidationError[] = [],
+  ): AppointmentAddNotesViewModel {
+    const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
+      groups: [DEFAULT_GROUP],
+      excludeExtraneousValues: true,
+    })
+    return {
+      step: AppointmentWizardStep.AddNotes,
+      appointment,
+      paths: {
+        back: this.wizard.getBackUrl(session, AppointmentWizardStep.AddNotes),
+      },
+      errors,
+      addNotes: body?.addNotes || appointment.addNotes,
+    }
+  }
+
+  private getNotesViewModel(
+    session: AppointmentWizardSession,
+    body?: DeepPartial<AppointmentBuilderDto>,
+    errors: ValidationError[] = [],
+  ): AppointmentNotesViewModel {
+    const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
+      groups: [DEFAULT_GROUP],
+      excludeExtraneousValues: true,
+    })
+    return {
+      step: AppointmentWizardStep.Notes,
+      appointment,
+      paths: {
+        back: this.wizard.getBackUrl(session, AppointmentWizardStep.Notes),
+      },
+      errors,
+      notes: body?.notes || appointment.notes,
     }
   }
 

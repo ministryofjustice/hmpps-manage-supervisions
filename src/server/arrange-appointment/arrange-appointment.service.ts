@@ -59,6 +59,7 @@ export class ArrangeAppointmentService {
       appointmentEnd: builder.appointmentEnd.toISO(),
       contactType: builder.contactType,
       officeLocationCode: builder.location,
+      notes: builder.notes,
       sensitive: builder.sensitive,
     }
 

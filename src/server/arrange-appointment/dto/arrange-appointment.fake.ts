@@ -26,6 +26,8 @@ export function fakeAppointmentBuilderDto(
         date: { day: date.day, month: date.month, year: date.year },
         startTime: date.toFormat(TIME_FORMAT, { locale: 'en-gb' }),
         endTime: date.plus({ hour: 1 }).toFormat(TIME_FORMAT, { locale: 'en-gb' }),
+        addNotes: true,
+        notes: faker.lorem.sentences(3),
         sensitive: faker.datatype.boolean(),
       } as FlatDeepPartial<AppointmentBuilderDto>,
       partial,
