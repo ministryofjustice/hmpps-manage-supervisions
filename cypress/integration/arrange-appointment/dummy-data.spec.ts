@@ -185,7 +185,7 @@ context('CreateAppointment', () => {
     aEndTimeErrorIsShown('Enter an end time after the start time')
   })
 
-  it('validates sensitive', () => {
+  it('validates sensitive & sensitive help text', () => {
     const test = testCase({
       crn: 'ABC123',
       sentenceId: 2500443138,
@@ -204,6 +204,11 @@ context('CreateAppointment', () => {
     whenSubmittingCurrentStep()
 
     whenEnteringAppointmentDateAndTimes(test)
+
+    page.sensitive.help.should('not.have.attr', 'open')
+    page.sensitive.help.contains('Help with sensitive content').click()
+    page.sensitive.help.should('have.attr', 'open')
+    page.sensitive.helpText.contains('Marking information as sensitive means that')
 
     // nothing selected
     whenSubmittingCurrentStep()

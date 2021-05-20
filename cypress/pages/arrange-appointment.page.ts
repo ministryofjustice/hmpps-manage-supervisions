@@ -95,6 +95,14 @@ export class ArrangeAppointmentPage extends PageBase {
         return cy.get(`[data-qa="arrange-appointment/sensitive"] input[type=radio]`).siblings('label').contains(label)
       },
 
+      get help() {
+        return cy.get('details[data-qa="arrange-appointment/sensitive-help"]')
+      },
+
+      get helpText() {
+        return this.help.get('.govuk-details__text')
+      },
+
       get errorMessages() {
         return {
           get sensitive() {
