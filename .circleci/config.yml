@@ -23,15 +23,12 @@ jobs:
       - checkout
       - run:
           name: Update npm
-          command: sudo npm install -g npm
+          command: sudo npm install -g npm@6
       - restore_cache:
           key: dependencies-{{ checksum "package-lock.json" }}
       - run:
           name: Install Dependencies
           command: npm ci --no-audit
-      - run:
-          name: Prune Cypress Cache
-          command: cypress cache prune
       - save_cache:
           key: dependencies-{{ checksum "package-lock.json" }}
           paths:
@@ -52,7 +49,7 @@ jobs:
           paths:
             - node_modules
             - dist
-            - ~/.cache/Cypress
+            - .cache/Cypress
 
   check_outdated:
     executor:
@@ -64,7 +61,7 @@ jobs:
       - checkout
       - run:
           name: Update npm
-          command: sudo npm install -g npm
+          command: sudo npm install -g npm@6
       - restore_cache:
           key: dependencies-{{ checksum "package-lock.json" }}
       - run:
@@ -88,7 +85,7 @@ jobs:
       - checkout
       - run:
           name: Update npm
-          command: sudo npm install -g npm
+          command: sudo npm install -g npm@6
       - attach_workspace:
           at: ~/app
       - run:
@@ -105,15 +102,12 @@ jobs:
       - checkout
       - run:
           name: Update npm
-          command: sudo npm install -g npm
+          command: sudo npm install -g npm@6
       - attach_workspace:
           at: ~/app
       - run:
           name: Install missing OS dependency
           command: sudo apt-get install libxss1
-      - run:
-          name: Check cypress can run
-          command: cypress verify
       - run:
           name: Get wiremock
           command: curl -o wiremock.jar https://repo1.maven.org/maven2/com/github/tomakehurst/wiremock-standalone/2.27.1/wiremock-standalone-2.27.1.jar
@@ -128,6 +122,8 @@ jobs:
       - run:
           name: Wait for node app to start
           command: sleep 5
+      - restore_cache:
+          key: dependencies-{{ checksum "package-lock.json" }}
       - run:
           name: integration tests
           command: npm run test:e2e -- --config videos=true
