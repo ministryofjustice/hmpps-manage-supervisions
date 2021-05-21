@@ -17,6 +17,9 @@ export const MESSAGES = {
   date: {
     required: 'Enter a {}',
   },
+  addNotes: {
+    required: 'Select yes if you would like to add notes',
+  },
   sensitive: {
     required: 'Select yes if the appointment contains sensitive information',
   },
@@ -130,6 +133,14 @@ export class AppointmentBuilderDto {
   @ToBoolean()
   @IsBoolean({ groups: [AppointmentWizardStep.Sensitive], message: MESSAGES.sensitive.required })
   sensitive?: boolean
+
+  @ExposeDefault({ groups: [AppointmentWizardStep.AddNotes] })
+  @ToBoolean()
+  @IsBoolean({ groups: [AppointmentWizardStep.AddNotes], message: MESSAGES.addNotes.required })
+  addNotes?: boolean
+
+  @ExposeDefault({ groups: [AppointmentWizardStep.Notes] })
+  notes?: string
 
   get contactType() {
     return this.type === 'other' ? this.otherType : this.type

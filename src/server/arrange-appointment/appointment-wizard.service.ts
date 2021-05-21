@@ -39,6 +39,14 @@ const meta: {
     next: AppointmentWizardStep.When,
   },
   [AppointmentWizardStep.When]: {
+    next: AppointmentWizardStep.AddNotes,
+  },
+  [AppointmentWizardStep.AddNotes]: {
+    next(model?: AppointmentBuilderDto) {
+      return model?.addNotes ? AppointmentWizardStep.Notes : AppointmentWizardStep.Sensitive
+    },
+  },
+  [AppointmentWizardStep.Notes]: {
     next: AppointmentWizardStep.Sensitive,
   },
   [AppointmentWizardStep.Sensitive]: {
