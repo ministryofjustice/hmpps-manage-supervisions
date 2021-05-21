@@ -109,6 +109,8 @@ workflows:
       - cypress/run:
           name: integration_test
           executor: integration-test
+          post-checkout:
+            - run: npm install -g npm
           build: npm run build
           start: npm run start:e2e
           wait-on: 'http://localhost:3007/health/ping'
