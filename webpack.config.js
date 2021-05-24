@@ -109,6 +109,11 @@ module.exports = function (options) {
           { from: 'node_modules/@ministryofjustice/frontend/moj/assets', to: 'assets' },
           { from: 'src/client/assets', to: 'assets' },
           { from: 'src/server/views', to: 'views' },
+          {
+            from: '!(views)/**/*.njk',
+            to: 'views',
+            context: path.resolve(__dirname, 'src', 'server'),
+          },
         ],
       }),
     ],

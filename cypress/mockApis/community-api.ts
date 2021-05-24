@@ -104,7 +104,7 @@ export class CommunityMockApi {
           surname: 'Cheese',
           dateOfBirth: '1970-01-01',
           gender: 'Female',
-          otherIds: { crn: 'X009923' },
+          otherIds: { crn },
           contactDetails: {
             phoneNumbers: [
               {

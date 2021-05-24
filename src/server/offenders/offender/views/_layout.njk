@@ -1,0 +1,36 @@
+{%- from "moj/components/sub-navigation/macro.njk" import mojSubNavigation -%}
+
+{% extends "partials/layout.njk" %}
+
+{% block content %}
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-4">
+        <span class="govuk-caption-l"><abbr title="Case reference number">CRN</abbr>: {{ ids.crn }}</span>
+        {{ displayName }}
+    </h1>
+
+    {{ mojSubNavigation({
+        items: [{
+            text: 'Overview',
+            href: links.overview,
+            active: page == 'overview'
+        }, {
+            text: 'Schedule',
+            href: links.schedule,
+            active: page == 'schedule'
+        }, {
+            text: 'Activity log',
+            href: links.activity,
+            active: page == 'activity'
+        }, {
+            text: 'Personal details',
+            href: links.personal,
+            active: page == 'personal'
+        }, {
+            text: 'Sentence',
+            href: links.sentence,
+            active: page == 'sentence'
+        }]
+    }) }}
+
+    {% block page %}{% endblock %}
+{% endblock %}

@@ -1,4 +1,5 @@
 import { AxiosError, AxiosRequestConfig } from 'axios'
+import { HttpStatus } from '@nestjs/common'
 
 export function getRequestName(request: AxiosRequestConfig): string {
   return [
@@ -15,8 +16,12 @@ export function getRequestName(request: AxiosRequestConfig): string {
  * Wraps an axios errors, that may contain sensitive request headers.
  */
 export class SanitisedAxiosError extends Error {
-  constructor(err: AxiosError) {
-    super(SanitisedAxiosError.getMessage(err))
+  constructor(private readonly inner: AxiosError) {
+    super(SanitisedAxiosError.getMessage(inner))
+  }
+
+  get status(): HttpStatus | null {
+    return (this.inner.response?.status as HttpStatus) || null
   }
 
   public static getMessage(err: AxiosError): string {

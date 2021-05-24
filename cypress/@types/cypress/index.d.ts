@@ -5,5 +5,6 @@ declare namespace Cypress {
     login(): Chainable<Element>
     home(): Chainable<Element>
     arrangeAppointment(crn: string): Chainable<Element>
+    viewOffender(crn: string): Chainable<Element>
   }
 }

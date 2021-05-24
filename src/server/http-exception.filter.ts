@@ -1,5 +1,6 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common'
 import type { Request, Response } from 'express'
+import { SanitisedAxiosError } from './common/rest'
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -10,6 +11,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return this.handleHttpException(exception, host)
     }
 
+    if (exception instanceof SanitisedAxiosError) {
+      return this.handleAxiosError(exception, host)
+    }
+
     return this.renderErrorPage(exception, host)
   }
 
@@ -17,6 +22,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const viewModel = { message: exception.message, status, stack: exception.stack }
     this.logger.error(JSON.stringify(viewModel))
     return host.switchToHttp().getResponse<Response>().status(status).render('pages/error', viewModel)
+  }
+
+  private handleAxiosError(exception: SanitisedAxiosError, host: ArgumentsHost) {
+    switch (exception.status) {
+      case HttpStatus.NOT_FOUND:
+        return this.renderErrorPage(exception, host, exception.status)
+
+      default:
+        return this.renderErrorPage(exception, host, 500)
+    }
   }
 
   private handleHttpException(exception: HttpException, host: ArgumentsHost) {
