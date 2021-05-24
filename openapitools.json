@@ -7,7 +7,7 @@
       "community-api": {
         "generatorName": "typescript-axios",
         "output": "src/server/community-api/client",
-        "glob": "community-api.json",
+        "glob": "src/server/community-api/client/community-api.json",
         "modelPackage": "model",
         "apiPackage": "api",
         "additionalProperties": {

@@ -38,11 +38,20 @@ Or with real Community API:
 docker-compose -f docker-compose.yml -f docker-compose.community-api.yml up redis hmpps-auth community-api
 ```
 
-Install dependencies using `npm install`, ensuring you are using >= `Node v14.x`
+Install dependencies using `npm install`, ensuring you are using >= `Node v14.x` & `npm v7.x`.
+
+Confirm that the [community API client](#community-api-client) was generated successfully.
 
 ```bash
 npm run start:dev
 ```
+
+### Community API client
+
+The community API client at [src/server/community-api/client](src/server/community-api/client) is generated via openapi tools.
+This is done on `postinstall` i.e. running `npm install` or can be run manually via `npm run openapi-generate`.
+
+The openapi tools require Java 11+.
 
 ### Run linter
 
