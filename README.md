@@ -53,6 +53,21 @@ This is done on `postinstall` i.e. running `npm install` or can be run manually 
 
 The openapi tools require Java 11+.
 
+You can update the community-api definition locally.
+
+```bash
+curl https://raw.githubusercontent.com/ministryofjustice/community-api/main/docker-compose.yml --output docker-compose.community-api-main.yml
+docker-compose -f docker-compose.community-api-main.yml pull
+docker-compose -f docker-compose.community-api-main.yml up -d
+
+# when ready
+curl http://localhost:8080/v2/api-docs?group=Community%20API --output src/server/community-api/client/community-api.json
+
+# clean up
+docker-compose -f docker-compose.community-api-main.yml down
+rm -f docker-compose.community-api-main.yml
+```
+
 ### Run linter
 
 ```bash
