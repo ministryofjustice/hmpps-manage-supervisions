@@ -4,13 +4,13 @@ import { fakeAppointmentBuilderDto } from './arrange-appointment.fake'
 import { IS_BOOLEAN, IS_INT, IS_NOT_EMPTY, IS_POSITIVE, IS_STRING, validate } from 'class-validator'
 import { AppointmentBuilderDto } from './AppointmentBuilderDto'
 import { flattenValidationErrors } from '../../util/flattenValidationErrors'
-import { RequiredOptional } from './AppointmentTypeDto'
 import { DateTime } from 'luxon'
 import * as faker from 'faker'
 import { plainToClass } from 'class-transformer'
 import { DEFAULT_GROUP } from '../../util/mapping'
 import { pick } from 'lodash'
 import { IS_AFTER, IS_DATE_INPUT, IS_FUTURE_DATE, IS_FUTURE_TIME, IS_TIME } from '../../validators'
+import { AppointmentTypeRequiresLocation } from '../../community-api/client'
 
 type Assertion = (subject: AppointmentBuilderDto) => void
 
@@ -77,7 +77,7 @@ describe('AppointmentBuilderDto validation & mapping', () => {
     const plain: DeepPartial<AppointmentBuilderDto> = {
       type: 'other',
       otherType: 'some-type',
-      requiresLocation: RequiredOptional.Required,
+      requiresLocation: AppointmentTypeRequiresLocation.Required,
       location: 'some-office-location',
       date: { day: future.day, month: future.month, year: future.year },
       startTime: '12:00pm',
@@ -118,7 +118,7 @@ describe('AppointmentBuilderDto validation & mapping', () => {
       Given.dto({ type: '' }).whenValidating().shouldTriggerConstraints('type', IS_NOT_EMPTY).run())
 
     it('is invalid from "where" group', async () =>
-      Given.dto({ requiresLocation: RequiredOptional.Required, location: '' })
+      Given.dto({ requiresLocation: AppointmentTypeRequiresLocation.Required, location: '' })
         .whenValidating()
         .shouldTriggerConstraints('location', IS_NOT_EMPTY)
         .run())
@@ -158,31 +158,31 @@ describe('AppointmentBuilderDto validation & mapping', () => {
 
   describe('where group', () => {
     it('is required & provided', async () =>
-      Given.dto({ requiresLocation: RequiredOptional.Required, location: 'code' })
+      Given.dto({ requiresLocation: AppointmentTypeRequiresLocation.Required, location: 'code' })
         .whenValidating(AppointmentWizardStep.Where)
         .shouldBeValid()
         .run())
 
     it('is optional & provided', async () =>
-      Given.dto({ requiresLocation: RequiredOptional.Optional, location: 'code' })
+      Given.dto({ requiresLocation: AppointmentTypeRequiresLocation.Optional, location: 'code' })
         .whenValidating(AppointmentWizardStep.Where)
         .shouldBeValid()
         .run())
 
     it('is optional & not provided', async () =>
-      Given.dto({ requiresLocation: RequiredOptional.Optional, location: '' })
+      Given.dto({ requiresLocation: AppointmentTypeRequiresLocation.Optional, location: '' })
         .whenValidating(AppointmentWizardStep.Where)
         .shouldBeValid()
         .run())
 
     it('is not required & not provided', async () =>
-      Given.dto({ requiresLocation: RequiredOptional.NotRequired, location: '' })
+      Given.dto({ requiresLocation: AppointmentTypeRequiresLocation.NotRequired, location: '' })
         .whenValidating(AppointmentWizardStep.Where)
         .whenValidating()
         .run())
 
     it('is required but not provided', async () =>
-      Given.dto({ requiresLocation: RequiredOptional.Required, location: '' })
+      Given.dto({ requiresLocation: AppointmentTypeRequiresLocation.Required, location: '' })
         .whenValidating(AppointmentWizardStep.Where)
         .shouldTriggerConstraints('location', IS_NOT_EMPTY)
         .run())

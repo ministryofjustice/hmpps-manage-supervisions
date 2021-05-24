@@ -2,10 +2,10 @@ import { Type } from 'class-transformer'
 import { DateTime } from 'luxon'
 import { IsBoolean, IsInt, IsNotEmpty, IsPositive, IsString, ValidateIf, ValidateNested } from 'class-validator'
 import { AppointmentWizardStep } from './AppointmentWizardViewModel'
-import { RequiredOptional } from './AppointmentTypeDto'
 import { DateInput, IsAfter, IsDateInput, IsFutureTime, ValidationGroup, IsFutureDate, IsTime } from '../../validators'
 import { getDateTime } from '../../util'
 import { ExposeDefault, ToBoolean } from '../../util/mapping'
+import { AppointmentTypeRequiresLocation } from '../../community-api/client'
 
 export const MESSAGES = {
   type: {
@@ -100,10 +100,10 @@ export class AppointmentBuilderDto {
   typeDescription?: string
 
   @ExposeDefault()
-  requiresLocation?: RequiredOptional
+  requiresLocation?: AppointmentTypeRequiresLocation
 
   @ExposeDefault({ groups: [AppointmentWizardStep.Where] })
-  @ValidateIf(object => object?.requiresLocation === RequiredOptional.Required, {
+  @ValidateIf(object => object?.requiresLocation === AppointmentTypeRequiresLocation.Required, {
     groups: [AppointmentWizardStep.Where],
   })
   @IsLocationCode()

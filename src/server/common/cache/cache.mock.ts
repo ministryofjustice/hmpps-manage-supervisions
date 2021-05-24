@@ -1,48 +1,23 @@
 import { CacheService, ICacheService, ValueFactory } from './cache.service'
-import { ClassConstructor, ClassTransformOptions, deserialize, deserializeArray, serialize } from 'class-transformer'
 import { DynamicModule, Module } from '@nestjs/common'
 
 export class MockCacheService implements ICacheService {
-  public readonly cache: Record<string, string> = {}
+  public readonly cache: Record<string, any> = {}
 
-  async get(key: string): Promise<string> {
-    return this.cache[key]
+  async get<T>(key: string): Promise<T> {
+    return this.cache[key] as T
   }
 
-  async set(key: string, value: string): Promise<void> {
+  async set<T>(key: string, value: T): Promise<void> {
     this.cache[key] = value
   }
 
-  async getOrSet(key: string, factory: ValueFactory): Promise<string> {
+  async getOrSet<T>(key: string, factory: ValueFactory<T>): Promise<T> {
     if (this.cache[key]) {
       return this.cache[key]
     }
     const { value } = await factory()
     return (this.cache[key] = value)
-  }
-
-  async getOrSetTransformed<T>(cls: ClassConstructor<T>, key: string, factory: ValueFactory<T>): Promise<T> {
-    const cached = await this.get(key)
-    if (cached) {
-      const transformOptions: ClassTransformOptions = { excludeExtraneousValues: true }
-      return deserialize(cls, cached, transformOptions)
-    }
-
-    const { value } = await factory()
-    await this.set(key, serialize(value))
-    return value
-  }
-
-  async getOrSetTransformedArray<T>(cls: ClassConstructor<T>, key: string, factory: ValueFactory<T[]>): Promise<T[]> {
-    const cached = await this.get(key)
-    if (cached) {
-      const transformOptions: ClassTransformOptions = { excludeExtraneousValues: true }
-      return deserializeArray(cls, cached, transformOptions)
-    }
-
-    const { value } = await factory()
-    await this.set(key, serialize(value))
-    return value
   }
 }
 

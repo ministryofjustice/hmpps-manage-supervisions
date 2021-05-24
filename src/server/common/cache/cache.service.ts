@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { ClassConstructor, ClassTransformOptions, deserialize, deserializeArray, serialize } from 'class-transformer'
 import { createNodeRedisClient, WrappedNodeRedisClient } from 'handy-redis'
 import { ConfigService } from '@nestjs/config'
 import { Config, RedisConfig } from '../../config'
@@ -8,18 +7,12 @@ export interface CacheSetOptions {
   durationSeconds?: number
 }
 
-export type ValueFactory<T = string> = () => Promise<{ value: T; options?: CacheSetOptions }>
+export type ValueFactory<T> = () => Promise<{ value: T; options?: CacheSetOptions }>
 
 export interface ICacheService {
-  get(key: string): Promise<string>
-  set(key: string, value: string, options: CacheSetOptions): Promise<void>
-  getOrSet(key: string, factory: ValueFactory): Promise<string>
-  getOrSetTransformed<T>(cls: ClassConstructor<T>, key: string, factory: ValueFactory<T>): Promise<T>
-  getOrSetTransformedArray<T>(cls: ClassConstructor<T>, key: string, factory: ValueFactory<T[]>): Promise<T[]>
-}
-
-enum TransformModifier {
-  Array = 'array',
+  get<T>(key: string): Promise<T>
+  set<T>(key: string, value: T, options: CacheSetOptions): Promise<void>
+  getOrSet<T>(key: string, factory: ValueFactory<T>): Promise<T>
 }
 
 @Injectable()
@@ -34,20 +27,30 @@ export class CacheService implements ICacheService {
     })
   }
 
-  async get(key: string): Promise<string> {
-    return this.client.get(key)
-  }
-
-  async set(key: string, value: string, { durationSeconds }: CacheSetOptions = {}): Promise<void> {
-    if (durationSeconds !== undefined) {
-      await this.client.set(key, value, ['EX', durationSeconds])
-    } else {
-      await this.client.set(key, value)
+  async get<T>(key: string): Promise<T> {
+    try {
+      return JSON.parse(await this.client.get(key))
+    } catch (err) {
+      this.logger.error(`failed to get ${key}: ${err.message}`)
+      return null
     }
   }
 
-  async getOrSet(key: string, factory: ValueFactory): Promise<string> {
-    const cached = await this.get(key)
+  async set<T>(key: string, value: T, { durationSeconds }: CacheSetOptions = {}): Promise<void> {
+    try {
+      const serial = JSON.stringify(value)
+      if (durationSeconds !== undefined) {
+        await this.client.set(key, serial, ['EX', durationSeconds])
+      } else {
+        await this.client.set(key, serial)
+      }
+    } catch (err) {
+      this.logger.error(`failed to set ${key}: ${err.message}`)
+    }
+  }
+
+  async getOrSet<T>(key: string, factory: ValueFactory<T>): Promise<T> {
+    const cached = await this.get<T>(key)
     if (cached) {
       return cached
     }
@@ -55,35 +58,5 @@ export class CacheService implements ICacheService {
     const { value, options } = await factory()
     await this.set(key, value, options)
     return value
-  }
-
-  getOrSetTransformed<T>(
-    cls: ClassConstructor<T>,
-    key: string,
-    factory: ValueFactory<T[]>,
-    modifier: TransformModifier.Array,
-  ): Promise<T[]>
-  getOrSetTransformed<T>(cls: ClassConstructor<T>, key: string, factory: ValueFactory<T>): Promise<T>
-  async getOrSetTransformed<T>(
-    cls: ClassConstructor<T>,
-    key: string,
-    factory: ValueFactory<T[]>,
-    modifier?: TransformModifier,
-  ): Promise<T | T[]> {
-    const cached = await this.get(key)
-    if (cached) {
-      const transformOptions: ClassTransformOptions = { excludeExtraneousValues: true }
-      return modifier === TransformModifier.Array
-        ? deserializeArray(cls, cached, transformOptions)
-        : deserialize(cls, cached, transformOptions)
-    }
-
-    const { value, options } = await factory()
-    await this.set(key, serialize(value), options)
-    return value
-  }
-
-  async getOrSetTransformedArray<T>(cls: ClassConstructor<T>, key: string, factory: ValueFactory<T[]>): Promise<T[]> {
-    return this.getOrSetTransformed(cls, key, factory, TransformModifier.Array)
   }
 }

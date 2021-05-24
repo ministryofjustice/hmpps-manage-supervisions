@@ -8,6 +8,7 @@ import { APP_FILTER } from '@nestjs/core'
 import { HttpExceptionFilter } from './http-exception.filter'
 import { ArrangeAppointmentModule } from './arrange-appointment/arrange-appointment.module'
 import { LoggerMiddleware } from './logger.middleware'
+import { CommunityApiModule } from './community-api/community-api.module'
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { LoggerMiddleware } from './logger.middleware'
     HomeModule,
     SecurityModule,
     ArrangeAppointmentModule,
+    CommunityApiModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: HttpExceptionFilter }],
 })

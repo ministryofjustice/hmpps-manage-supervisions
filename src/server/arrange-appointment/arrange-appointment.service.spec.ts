@@ -1,42 +1,34 @@
 import 'reflect-metadata'
-import { SinonStubbedInstance, match } from 'sinon'
+import { match } from 'sinon'
 import { ArrangeAppointmentService, DomainAppointmentType, DUMMY_DATA } from './arrange-appointment.service'
-import {
-  fakeAppointmentBuilderDto,
-  fakeAppointmentCreateResponse,
-  fakeAppointmentTypeDto,
-  fakeOffenderDetailsResponse,
-  fakeOfficeLocation,
-} from './dto/arrange-appointment.fake'
+import { fakeAppointmentBuilderDto } from './dto/arrange-appointment.fake'
 import * as faker from 'faker'
-import { AppointmentCreateResponse } from './dto/AppointmentCreateResponse'
-import { OffenderDetailsResponse } from './dto/OffenderDetailsResponse'
-import { AppointmentTypeDto } from './dto/AppointmentTypeDto'
 import { pick } from 'lodash'
-import { serialize } from 'class-transformer'
-import { RestClient } from '../common'
-import { fakeUser } from '../security/user/user.fake'
 import { MockCacheModule, MockCacheService } from '../common/cache/cache.mock'
 import { Test } from '@nestjs/testing'
-import { MockRestModule } from '../common/rest/rest.mock'
-import { OfficeLocation } from './dto/OfficeLocation'
+import { MockCommunityApiModule, MockCommunityApiService } from '../community-api/community-api.mock'
+import { CommunityApiService } from '../community-api'
+import {
+  fakeAppointmentCreateResponse,
+  fakeAppointmentType,
+  fakeOffenderDetail,
+  fakeOfficeLocation,
+} from '../community-api/community-api.fake'
+import { fakeOkResponse } from '../common/rest/rest.fake'
 
 describe('ArrangeAppointmentService', () => {
-  let client: SinonStubbedInstance<RestClient>
+  let community: MockCommunityApiService
   let cache: MockCacheService
-  let user: User
   let subject: ArrangeAppointmentService
 
   beforeEach(async () => {
-    user = fakeUser()
-
     const module = await Test.createTestingModule({
-      imports: [MockCacheModule.register(), MockRestModule.register('community', user)],
+      imports: [MockCacheModule.register(), MockCommunityApiModule.register()],
       providers: [ArrangeAppointmentService],
     }).compile()
 
     subject = module.get(ArrangeAppointmentService)
-    client = module.get(MockRestModule.CLIENT)
+    community = module.get(CommunityApiService)
     cache = module.get(MockCacheService)
   })
 
@@ -45,19 +37,15 @@ describe('ArrangeAppointmentService', () => {
     const response = fakeAppointmentCreateResponse()
     const crn = faker.datatype.uuid()
 
-    const stub = client.post
-      .withArgs(
-        AppointmentCreateResponse,
-        `/secure/offenders/crn/${crn}/sentence/${DUMMY_DATA.sentenceId}/appointments`,
-        match.any,
-      )
-      .resolves(response)
+    const stub = community.appointment.createAppointmentUsingPOST.withArgs(match.any).resolves(fakeOkResponse(response))
 
-    const returned = await subject.createAppointment(dto, crn, user)
+    const returned = await subject.createAppointment(dto, crn)
 
     expect(returned).toBe(response)
-    expect(stub.getCall(0).args[2]).toEqual({
-      data: {
+    expect(stub.getCall(0).args[0]).toEqual({
+      crn,
+      sentenceId: DUMMY_DATA.sentenceId,
+      appointmentCreateRequest: {
         contactType: dto.type,
         officeLocationCode: dto.location,
         appointmentStart: dto.appointmentStart.toISO(),
@@ -73,47 +61,54 @@ describe('ArrangeAppointmentService', () => {
   })
 
   it('gets offender details', async () => {
-    const response = fakeOffenderDetailsResponse()
+    const response = fakeOffenderDetail()
     const crn = faker.datatype.uuid()
 
-    client.get.withArgs(OffenderDetailsResponse, `/secure/offenders/crn/${crn}/all`).resolves(response)
+    community.offender.getOffenderDetailByCrnUsingGET.withArgs(match({ crn })).resolves(fakeOkResponse(response))
 
-    const returned = await subject.getOffenderDetails(crn, user)
+    const returned = await subject.getOffenderDetails(crn)
 
     expect(returned).toBe(response)
   })
 
   it('getting fresh appointment types', async () => {
-    const featured = fakeAppointmentTypeDto({ contactType: 'APAT' })
-    const other = fakeAppointmentTypeDto()
-    client.get.withArgs(AppointmentTypeDto, '/secure/appointment-types').resolves([featured, other])
-    const observed = await subject.getAppointmentTypes(user)
+    const featured = fakeAppointmentType({ contactType: 'APAT' })
+    const other = fakeAppointmentType()
+    community.appointment.getAllAppointmentTypesUsingGET.resolves(fakeOkResponse([featured, other]))
+    const observed = await subject.getAppointmentTypes()
     expect(observed).toEqual([
-      { isFeatured: true, name: 'Office visit', ...pick(featured, 'contactType', 'orderTypes', 'requiresLocation') },
-      { isFeatured: false, name: other.description, ...pick(other, 'contactType', 'orderTypes', 'requiresLocation') },
+      {
+        isFeatured: true,
+        description: 'Office visit',
+        ...pick(featured, 'contactType', 'orderTypes', 'requiresLocation'),
+      },
+      {
+        isFeatured: false,
+        description: other.description,
+        ...pick(other, 'contactType', 'orderTypes', 'requiresLocation'),
+      },
     ] as DomainAppointmentType[])
   })
 
   it('getting cached appointment types', async () => {
-    const other = fakeAppointmentTypeDto()
-    cache.cache['community:appointment-types'] = serialize([other])
-    const observed = await subject.getAppointmentTypes(user)
-    expect(observed).toEqual([
-      { isFeatured: false, name: other.description, ...pick(other, 'contactType', 'orderTypes', 'requiresLocation') },
-    ] as DomainAppointmentType[])
+    const types = (cache.cache['community:all-appointment-types'] = [{ ...fakeAppointmentType(), isFeatured: true }])
+    const observed = await subject.getAppointmentTypes()
+    expect(observed).toBe(types)
   })
 
   it('getting team office locations', async () => {
     const locations = [fakeOfficeLocation(), fakeOfficeLocation()]
-    client.get.withArgs(OfficeLocation, '/secure/teams/some-team-code/office-locations').resolves(locations)
-    const observed = await subject.getTeamOfficeLocations(user, 'some-team-code')
+    community.team.getAllOfficeLocationsUsingGET.resolves(fakeOkResponse(locations))
+    const observed = await subject.getTeamOfficeLocations('some-team-code')
     expect(observed).toBe(locations)
   })
 
   it('getting cached team office locations', async () => {
-    const locations = [fakeOfficeLocation(), fakeOfficeLocation()]
-    cache.cache['community:office-locations:some-team-code'] = serialize(locations)
-    const observed = await subject.getTeamOfficeLocations(user, 'some-team-code')
+    const locations = (cache.cache['community:team-office-locations:some-team-code'] = [
+      fakeOfficeLocation(),
+      fakeOfficeLocation(),
+    ])
+    const observed = await subject.getTeamOfficeLocations('some-team-code')
     expect(observed).toEqual(locations)
   })
 })

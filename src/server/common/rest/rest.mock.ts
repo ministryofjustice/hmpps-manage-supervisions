@@ -1,25 +1,27 @@
 import { DynamicModule, Module } from '@nestjs/common'
+import MockAdapter from 'axios-mock-adapter'
 import { createStubInstance } from 'sinon'
 import { AuthenticationMethod, RestService } from './rest.service'
 import { DependentApisConfig } from '../../config'
-import { RestClient } from './rest-client'
+import Axios from 'axios'
 
 @Module({})
 export class MockRestModule {
   static register(name: keyof DependentApisConfig, user: User, authMethod?: AuthenticationMethod): DynamicModule {
-    const client = createStubInstance(RestClient)
+    const client = Axios.create()
+    const mock = new MockAdapter(client)
     const service = createStubInstance(RestService)
 
     if (authMethod !== undefined) {
-      service.build.withArgs(name, user, authMethod).resolves(client as any)
+      service.build.withArgs(name, user, authMethod).returns(client)
     } else {
-      service.build.withArgs(name, user).resolves(client as any)
+      service.build.withArgs(name, user).returns(client)
     }
 
     return {
       module: MockRestModule,
       providers: [
-        { provide: MockRestModule.CLIENT, useValue: client },
+        { provide: MockRestModule.CLIENT, useValue: mock },
         { provide: RestService, useValue: service },
       ],
       exports: [MockRestModule.CLIENT, RestService],

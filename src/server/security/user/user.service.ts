@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { Expose } from 'class-transformer'
+import { Expose, plainToClass } from 'class-transformer'
 import { RestService } from '../../common'
 
 export class UserProfile {
@@ -22,8 +22,7 @@ export class UserProfile {
   uuid: string
 }
 
-export class UserRole {
-  @Expose()
+export interface UserRole {
   roleCode: string
 }
 
@@ -32,13 +31,14 @@ export class UserService {
   constructor(private readonly rest: RestService) {}
 
   async getUser(user: User): Promise<UserProfile> {
-    const client = await this.rest.build('hmppsAuth', user)
-    return client.get(UserProfile, '/api/user/me')
+    const client = this.rest.build('hmppsAuth', user)
+    const { data } = await client.get('/api/user/me')
+    return plainToClass(UserProfile, data)
   }
 
   async getUserRoles(user: User): Promise<string[]> {
-    const client = await this.rest.build('hmppsAuth', user)
-    const roles = await client.get<UserRole[]>(UserRole, '/api/user/me/roles')
-    return roles.map(x => x.roleCode)
+    const client = this.rest.build('hmppsAuth', user)
+    const { data } = await client.get<UserRole[]>('/api/user/me/roles')
+    return data.map(r => r.roleCode).filter(r => r)
   }
 }

@@ -1,7 +1,7 @@
 import { DomainAppointmentType } from '../arrange-appointment.service'
 import { ViewModel } from '../../common'
 import { AppointmentBuilderDto } from './AppointmentBuilderDto'
-import { OfficeLocation } from './OfficeLocation'
+import { OfficeLocation } from '../../community-api/client'
 
 export enum AppointmentWizardStep {
   Type = 'type',
