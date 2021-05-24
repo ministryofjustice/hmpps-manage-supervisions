@@ -131,3 +131,6 @@ cypress/screenshots/
 ### Local
 build-info.json
 test_results/
+
+src/server/community-api/client/
+!src/server/community-api/client/.openapi-generator-ignore
