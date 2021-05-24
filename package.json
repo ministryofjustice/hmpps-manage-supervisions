@@ -5,6 +5,7 @@
   "description": "Manage Supervisions",
   "license": "MIT",
   "scripts": {
+    "postinstall": "npm run openapi-generate",
     "prepare": "husky install",
     "prebuild": "rimraf dist",
     "clean": "rimraf dist",
@@ -24,7 +25,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "cypress run",
     "test:e2e-ui": "cypress open",
-    "security_audit": "npx audit-ci --config audit-ci.json"
+    "security_audit": "npx audit-ci --config audit-ci.json",
+    "openapi-generate": "openapi-generator-cli generate"
   },
   "dependencies": {
     "@ministryofjustice/frontend": "^0.2.4",
