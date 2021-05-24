@@ -87,7 +87,7 @@
     "@typescript-eslint/parser": "^4.24.0",
     "accessible-autocomplete": "^2.0.3",
     "axios-mock-adapter": "^1.19.0",
-    "copy-webpack-plugin": "^8.1.1",
+    "copy-webpack-plugin": "^9.0.0",
     "css-loader": "^5.2.5",
     "css-minimizer-webpack-plugin": "^3.0.0",
     "cypress": "^7.3.0",
