@@ -1,6 +1,6 @@
 import { merge } from 'lodash'
 import * as faker from 'faker'
-import { UserProfile, UserRole } from './user.service'
+import { UserProfile } from './user.service'
 import { plainToClass } from 'class-transformer'
 
 export function fakeUserProfile(partial: DeepPartial<UserProfile> = {}): UserProfile {
@@ -28,17 +28,5 @@ export function fakeUser(partial: DeepPartial<User> = {}): User {
       displayName: faker.name.findName(),
     } as User,
     partial,
-  )
-}
-
-export function fakeUserRole(partial: DeepPartial<UserRole> = {}): UserRole {
-  return plainToClass(
-    UserRole,
-    merge(
-      {
-        roleCode: faker.datatype.uuid(),
-      } as UserRole,
-      partial,
-    ),
   )
 }

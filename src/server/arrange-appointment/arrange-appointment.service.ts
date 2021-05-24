@@ -1,28 +1,17 @@
 import { AppointmentBuilderDto } from './dto/AppointmentBuilderDto'
-import { AppointmentCreateResponse } from './dto/AppointmentCreateResponse'
-import { OffenderDetailsResponse } from './dto/OffenderDetailsResponse'
-import { AppointmentTypeDto } from './dto/AppointmentTypeDto'
-import { Injectable, Logger } from '@nestjs/common'
-import { AuthenticationMethod, CacheService, RestService } from '../common'
-import { OfficeLocation } from './dto/OfficeLocation'
+import { Injectable } from '@nestjs/common'
+import { CacheService } from '../common'
+import {
+  CommunityApiService,
+  AppointmentCreateRequest,
+  AppointmentCreateResponse,
+  AppointmentType,
+  OffenderDetail,
+  OfficeLocation,
+} from '../community-api'
 
-export interface AppointmentCreateRequest {
-  requirementId: number
-  contactType: string
-  appointmentStart: string
-  appointmentEnd: string
-  officeLocationCode?: string
-  notes: string
-  providerCode: string
-  teamCode: string
-  staffCode: string
-  sensitive?: boolean
-}
-
-export interface DomainAppointmentType
-  extends Pick<AppointmentTypeDto, 'contactType' | 'requiresLocation' | 'orderTypes'> {
+export interface DomainAppointmentType extends AppointmentType {
   isFeatured: boolean
-  name: string
 }
 
 export const DUMMY_DATA = {
@@ -47,13 +36,11 @@ const featuredAppointmentTypes = {
 
 @Injectable()
 export class ArrangeAppointmentService {
-  private readonly logger = new Logger(ArrangeAppointmentService.name)
+  constructor(private readonly community: CommunityApiService, private readonly cache: CacheService) {}
 
-  constructor(private readonly factory: RestService, private readonly cache: CacheService) {}
-
-  async createAppointment(builder: AppointmentBuilderDto, crn: string, user: User): Promise<AppointmentCreateResponse> {
+  async createAppointment(builder: AppointmentBuilderDto, crn: string): Promise<AppointmentCreateResponse> {
     const { sentenceId, ...dummy } = DUMMY_DATA
-    const request: AppointmentCreateRequest = {
+    const appointmentCreateRequest: AppointmentCreateRequest = {
       ...dummy,
       appointmentStart: builder.appointmentStart.toISO(),
       appointmentEnd: builder.appointmentEnd.toISO(),
@@ -63,51 +50,42 @@ export class ArrangeAppointmentService {
       sensitive: builder.sensitive,
     }
 
-    // TODO pass the user token through where appropriate
-    const client = await this.factory.build('community', user, AuthenticationMethod.ReissueForDeliusUser)
-    return await client.post(
-      AppointmentCreateResponse,
-      `/secure/offenders/crn/${crn}/sentence/${sentenceId}/appointments`,
-      {
-        data: request,
-      },
-    )
+    const { data } = await this.community.appointment.createAppointmentUsingPOST({
+      appointmentCreateRequest,
+      sentenceId,
+      crn,
+    })
+
+    return data
   }
 
-  async getOffenderDetails(crn: string, user: User): Promise<OffenderDetailsResponse> {
-    const client = await this.factory.build('community', user, AuthenticationMethod.ReissueForDeliusUser)
-
-    return await client.get(OffenderDetailsResponse, `/secure/offenders/crn/${crn}/all`)
+  async getOffenderDetails(crn: string): Promise<OffenderDetail> {
+    const { data } = await this.community.offender.getOffenderDetailByCrnUsingGET({ crn })
+    return data
   }
 
-  async getAppointmentTypes(user: User): Promise<DomainAppointmentType[]> {
-    const types = await this.cache.getOrSetTransformedArray(
-      AppointmentTypeDto,
-      'community:appointment-types',
-      async () => {
-        const client = await this.factory.build('community', user, AuthenticationMethod.ReissueForDeliusUser)
-        const value = await client.get<AppointmentTypeDto[]>(AppointmentTypeDto, '/secure/appointment-types')
-        return { value, options: { durationSeconds: 600 } }
-      },
-    )
+  async getAppointmentTypes(): Promise<DomainAppointmentType[]> {
+    return await this.cache.getOrSet('community:all-appointment-types', async () => {
+      const { data } = await this.community.appointment.getAllAppointmentTypesUsingGET()
 
-    return types.map(type => {
-      const featured = featuredAppointmentTypes[type.contactType]
       return {
-        isFeatured: !!featured,
-        name: featured || type.description,
-        contactType: type.contactType,
-        orderTypes: type.orderTypes,
-        requiresLocation: type.requiresLocation,
+        value: data.map(type => {
+          const featured = featuredAppointmentTypes[type.contactType]
+          return {
+            ...type,
+            isFeatured: !!featured,
+            description: featured || type.description,
+          } as DomainAppointmentType
+        }),
+        options: { durationSeconds: 600 },
       }
     })
   }
 
-  async getTeamOfficeLocations(user: User, teamCode: string): Promise<OfficeLocation[]> {
-    return this.cache.getOrSetTransformedArray(OfficeLocation, `community:office-locations:${teamCode}`, async () => {
-      const client = await this.factory.build('community', user, AuthenticationMethod.ReissueForDeliusUser)
-      const value = await client.get<OfficeLocation[]>(OfficeLocation, `/secure/teams/${teamCode}/office-locations`)
-      return { value, options: { durationSeconds: 600 } }
+  async getTeamOfficeLocations(teamCode: string): Promise<OfficeLocation[]> {
+    return this.cache.getOrSet(`community:team-office-locations:${teamCode}`, async () => {
+      const { data } = await this.community.team.getAllOfficeLocationsUsingGET({ teamCode })
+      return { value: data, options: { durationSeconds: 600 } }
     })
   }
 }

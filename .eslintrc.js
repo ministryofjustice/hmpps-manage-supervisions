@@ -4,7 +4,7 @@ module.exports = {
     node: true,
     jest: true,
   },
-  ignorePatterns: ['*.js'],
+  ignorePatterns: ['*.js', 'src/server/community-api/client/**/*'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     sourceType: 'module',

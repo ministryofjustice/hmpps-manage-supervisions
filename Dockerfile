@@ -14,8 +14,7 @@ RUN addgroup --gid 2000 --system appgroup && \
 
 WORKDIR /app
 
-RUN apt-get update && \
-    apt-get upgrade -y
+RUN apt-get update && apt-get upgrade -y
 
 RUN npm install -g npm
 
@@ -24,12 +23,12 @@ FROM base as build
 ARG BUILD_NUMBER
 ARG GIT_REF
 
-RUN apt-get install -y make python g++
-
-COPY package*.json ./
-RUN CYPRESS_INSTALL_BINARY=0 npm ci --no-audit
+RUN mkdir -p /usr/share/man/man1 /usr/share/man/man2
+RUN apt-get install --no-install-recommends -y make python g++ openjdk-11-jre-headless
 
 COPY . .
+RUN CYPRESS_INSTALL_BINARY=0 npm ci --no-audit
+
 RUN npm run build
 
 ENV BUILD_NUMBER ${BUILD_NUMBER:-1_0_0}

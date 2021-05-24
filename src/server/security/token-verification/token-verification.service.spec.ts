@@ -1,20 +1,14 @@
 import { Test } from '@nestjs/testing'
 import { TokenVerificationResponse, TokenVerificationService } from './token-verification.service'
-import { SinonStubbedInstance } from 'sinon'
-import { RestClient, RestClientError } from '../../common'
 import { MockRestModule } from '../../common/rest/rest.mock'
 import { fakeUser } from '../user/user.fake'
-import { plainToClass } from 'class-transformer'
 import { FakeConfigModule } from '../../config/config.fake'
-
-function fakeTokenVerificationResponse(active = true): TokenVerificationResponse {
-  return plainToClass(TokenVerificationResponse, { active } as TokenVerificationResponse)
-}
+import MockAdapter from 'axios-mock-adapter'
 
 describe('TokenVerificationService', () => {
   let subject: TokenVerificationService
   let user: User
-  let client: SinonStubbedInstance<RestClient>
+  let client: MockAdapter
 
   beforeEach(async () => {
     user = fakeUser()
@@ -31,23 +25,19 @@ describe('TokenVerificationService', () => {
   })
 
   it('verifying active token', async () => {
-    const response = fakeTokenVerificationResponse()
-    client.post.withArgs(TokenVerificationResponse, '/token/verify').resolves(response)
+    client.onPost('/token/verify').reply<TokenVerificationResponse>(200, { active: true })
     const observed = await subject.verifyToken(user)
     expect(observed).toBe(true)
   })
 
   it('verifying inactive token', async () => {
-    const response = fakeTokenVerificationResponse(false)
-    client.post.withArgs(TokenVerificationResponse, '/token/verify').resolves(response)
+    client.onPost('/token/verify').reply<TokenVerificationResponse>(200, { active: false })
     const observed = await subject.verifyToken(user)
     expect(observed).toBe(false)
   })
 
   it('verifying expired token', async () => {
-    client.post
-      .withArgs(TokenVerificationResponse, '/token/verify')
-      .throws(new RestClientError('POST /token/verify', { message: 'it failed' } as any))
+    client.onPost('/token/verify').reply(403)
     const observed = await subject.verifyToken(user)
     expect(observed).toBe(false)
   })

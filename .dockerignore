@@ -7,3 +7,6 @@ README.md
 LICENSE
 .*
 docker-compose.*yml
+src/server/community-api/client/**/*
+!src/server/community-api/client/.openapi-generator-ignore
+!src/server/community-api/client/community-api.json

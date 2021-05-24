@@ -1,5 +1,4 @@
 export * from './types'
-export * from './rest/rest-client'
 export * from './rest/rest.service'
 export * from './cache/cache.service'
 export * from './hmpps-oidc/hmpps-oidc.service'

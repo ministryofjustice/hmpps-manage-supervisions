@@ -14,8 +14,26 @@ executors:
       - image: rodolpheche/wiremock
         command: ['/docker-entrypoint.sh', '--port', '9091']
 
+commands:
+  install-build-deps:
+    parameters:
+      sudo:
+        description: use sudo
+        type: boolean
+        default: true
+    steps:
+      - run:
+          name: Install java
+          command: |
+            <<# parameters.sudo >>sudo <</ parameters.sudo >>mkdir -p /usr/share/man/man1 /usr/share/man/man2
+            <<# parameters.sudo >>sudo <</ parameters.sudo >>apt-get update
+            <<# parameters.sudo >>sudo <</ parameters.sudo >>apt-get install --no-install-recommends -y openjdk-11-jre-headless
+      - run:
+          name: Update npm
+          command: <<# parameters.sudo >>sudo <</ parameters.sudo >>npm install -g npm
+
 jobs:
-  build:
+  build-test:
     executor:
       name: hmpps/node
       tag: 14.17-browsers
@@ -23,9 +41,7 @@ jobs:
       TZ: "Europe/London"
     steps:
       - checkout
-      - run:
-          name: Update npm
-          command: sudo npm install -g npm
+      - install-build-deps
       - restore_cache:
           key: dependencies-{{ checksum "package-lock.json" }}
       - run:
@@ -46,26 +62,6 @@ jobs:
       - run:
           name: Lint
           command: npm run lint
-      - persist_to_workspace:
-          root: .
-          paths:
-            - node_modules
-            - dist
-
-  unit_test:
-    executor:
-      name: hmpps/node
-      tag: 14.17-browsers
-    environment:
-      TZ: "Europe/London"
-      NODE_OPTIONS: "--max_old_space_size=4096"
-    steps:
-      - checkout
-      - run:
-          name: Update npm
-          command: sudo npm install -g npm
-      - attach_workspace:
-          at: ~/app
       - run:
           name: unit tests
           command: npm run test -- --maxWorkers=2 --ci
@@ -80,9 +76,7 @@ jobs:
       TZ: "Europe/London"
     steps:
       - checkout
-      - run:
-          name: Update npm
-          command: sudo npm install -g npm
+      - install-build-deps
       - restore_cache:
           key: dependencies-{{ checksum "package-lock.json" }}
       - run:
@@ -99,18 +93,16 @@ workflows:
   version: 2
   build-test-and-deploy:
     jobs:
-      - build:
-        filters:
-          tags:
-            ignore: /.*/
-      - unit_test:
-          requires:
-            - build
+      - build-test:
+          filters:
+            tags:
+              ignore: /.*/
       - cypress/run:
           name: integration_test
           executor: integration-test
           post-checkout:
-            - run: npm install -g npm
+            - install-build-deps:
+                sudo: false
           build: npm run build
           start: npm run start:e2e
           wait-on: 'http://localhost:3007/health/ping'
@@ -137,7 +129,7 @@ workflows:
                 - main
           requires:
             - helm_lint
-            - unit_test
+            - build-test
             - integration_test
             - build_docker
 

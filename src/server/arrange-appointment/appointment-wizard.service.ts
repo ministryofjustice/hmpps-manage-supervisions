@@ -4,9 +4,9 @@ import { difference } from 'lodash'
 import { Injectable } from '@nestjs/common'
 import { RedirectResponse } from '../common'
 import { AppointmentBuilderDto } from './dto/AppointmentBuilderDto'
-import { RequiredOptional } from './dto/AppointmentTypeDto'
 import { plainToClass } from 'class-transformer'
 import { DEFAULT_GROUP } from '../util/mapping'
+import { AppointmentTypeRequiresLocation } from '../community-api'
 
 export function getStepUrl({ crn }: AppointmentWizardSession, step: AppointmentWizardStep) {
   return `/arrange-appointment/${crn}/${step}`
@@ -27,8 +27,8 @@ const meta: {
   [AppointmentWizardStep.Type]: {
     next(model?: AppointmentBuilderDto) {
       switch (model?.requiresLocation) {
-        case RequiredOptional.Optional:
-        case RequiredOptional.Required:
+        case AppointmentTypeRequiresLocation.Optional:
+        case AppointmentTypeRequiresLocation.Required:
           return AppointmentWizardStep.Where
         default:
           return AppointmentWizardStep.When

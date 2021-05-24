@@ -4,7 +4,7 @@ import * as faker from 'faker'
 import { AppointmentWizardSession } from './dto/AppointmentWizardSession'
 import { RedirectResponse } from '../common'
 import { HttpStatus } from '@nestjs/common'
-import { RequiredOptional } from './dto/AppointmentTypeDto'
+import { AppointmentTypeRequiresLocation } from '../community-api'
 
 describe('AppointmentWizardService', () => {
   const subject = new AppointmentWizardService()
@@ -18,7 +18,7 @@ describe('AppointmentWizardService', () => {
       crn,
       completedSteps,
       appointment: {
-        requiresLocation: RequiredOptional.Required,
+        requiresLocation: AppointmentTypeRequiresLocation.Required,
       },
     }
   }
@@ -86,14 +86,14 @@ describe('AppointmentWizardService', () => {
 
   it('next step when location optional', () => {
     const session = fakeSession()
-    session.appointment.requiresLocation = RequiredOptional.Optional
+    session.appointment.requiresLocation = AppointmentTypeRequiresLocation.Optional
     const observed = subject.nextStep(session, FIRST_STEP)
     shouldRedirectToStep(observed, SECOND_STEP)
   })
 
   it('next step when location not required', () => {
     const session = fakeSession()
-    session.appointment.requiresLocation = RequiredOptional.NotRequired
+    session.appointment.requiresLocation = AppointmentTypeRequiresLocation.NotRequired
     const observed = subject.nextStep(session, FIRST_STEP)
     shouldRedirectToStep(observed, AppointmentWizardStep.When)
   })

@@ -1,41 +1,65 @@
-import { Test, TestingModule } from '@nestjs/testing'
-import { SinonStubbedInstance, createStubInstance } from 'sinon'
-import * as faker from 'faker'
-import { AuthenticationMethod, RestService } from './rest.service'
-import { HmppsOidcService } from '../hmpps-oidc/hmpps-oidc.service'
+import { Test } from '@nestjs/testing'
+import { RestService } from './rest.service'
+import * as nock from 'nock'
 import { FakeConfigModule } from '../../config/config.fake'
+import { ApiConfig } from '../../config'
+import { ConfigService } from '@nestjs/config'
 import { fakeUser } from '../../security/user/user.fake'
-import { RestClient } from './rest-client'
-import { HttpService } from '@nestjs/common'
+import { SanitisedAxiosError } from './SanitisedAxiosError'
+import { SinonStubbedInstance, createStubInstance } from 'sinon'
+import { HmppsOidcService } from '../hmpps-oidc/hmpps-oidc.service'
+import { Logger } from '@nestjs/common'
 
-describe('RestService', () => {
+const URL = '/some-url'
+const OK = Object.freeze({ hello: 'world' })
+
+describe('RestClientService', () => {
   let subject: RestService
-  let oidc: SinonStubbedInstance<HmppsOidcService>
   let user: User
+  let config: ApiConfig
+  let oidc: SinonStubbedInstance<HmppsOidcService>
 
   beforeEach(async () => {
     user = fakeUser()
     oidc = createStubInstance(HmppsOidcService)
-    const http = createStubInstance(HttpService)
-    const module: TestingModule = await Test.createTestingModule({
+
+    const module = await Test.createTestingModule({
       imports: [FakeConfigModule.register()],
-      providers: [RestService, { provide: HmppsOidcService, useValue: oidc }, { provide: HttpService, useValue: http }],
-    }).compile()
+      providers: [RestService, { provide: HmppsOidcService, useValue: oidc }],
+    })
+      .setLogger(new Logger())
+      .compile()
 
-    subject = module.get<RestService>(RestService)
+    subject = module.get(RestService)
+    config = module.get(ConfigService).get('apis.community')
   })
 
-  it('using token pass through', async () => {
-    const client = await subject.build('community', user)
-    expect(client).toBeInstanceOf(RestClient)
-    expect(oidc.getDeliusUserToken.called).toBeFalsy()
+  it('succeeds without retry', async () => {
+    nock(config.url).matchHeader('authorization', `Bearer ${user.token}`).get(URL).reply(200, OK)
+    const observed = await subject.build('community', user).get(URL)
+    expect(observed.data).toEqual(OK)
   })
 
-  it('using delius user token', async () => {
-    const token = faker.internet.password()
-    const stub = oidc.getDeliusUserToken.withArgs(user).resolves(token)
-    const client = await subject.build('community', user, AuthenticationMethod.ReissueForDeliusUser)
-    expect(client).toBeInstanceOf(RestClient)
-    expect(stub.calledOnce).toBeTruthy()
+  it('succeeds after single retry', async () => {
+    const bad = nock(config.url).matchHeader('authorization', `Bearer ${user.token}`).get(URL).reply(500)
+    const ok = bad.get(URL).reply(200, OK)
+    const observed = await subject.build('community', user).get(URL)
+    expect(observed.data).toEqual(OK)
+    expect(bad.isDone()).toBe(true)
+    expect(ok.isDone()).toBe(true)
+  })
+
+  it('fails after 3 retries', async () => {
+    nock(config.url)
+      .matchHeader('authorization', `Bearer ${user.token}`)
+      .get(URL)
+      .reply(500)
+      .get(URL)
+      .reply(500)
+      .get(URL)
+      .reply(500)
+      .get(URL)
+      .reply(500)
+    await expect(subject.build('community', user).get(URL)).rejects.toThrow(SanitisedAxiosError)
   })
 })

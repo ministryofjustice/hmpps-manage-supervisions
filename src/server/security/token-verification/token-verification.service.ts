@@ -1,11 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { RestService } from '../../common'
-import { Expose } from 'class-transformer'
 import { ConfigService } from '@nestjs/config'
 import { Config, DependentApisConfig } from '../../config'
+import { RestService } from '../../common'
 
-export class TokenVerificationResponse {
-  @Expose()
+export interface TokenVerificationResponse {
   active: boolean
 }
 
@@ -13,17 +11,17 @@ export class TokenVerificationResponse {
 export class TokenVerificationService {
   private readonly logger = new Logger()
 
-  constructor(private readonly rest: RestService, private readonly config: ConfigService<Config>) {}
+  constructor(private readonly config: ConfigService<Config>, private readonly rest: RestService) {}
 
   isEnabled(): boolean {
     return this.config.get<DependentApisConfig>('apis').tokenVerification.enabled
   }
 
   async verifyToken(user: User): Promise<boolean> {
+    const client = this.rest.build('tokenVerification', user)
     try {
-      const client = await this.rest.build('tokenVerification', user)
-      const result = await client.post(TokenVerificationResponse, '/token/verify')
-      return result?.active === true
+      const { data } = await client.post<TokenVerificationResponse>('/token/verify')
+      return data?.active === true
     } catch (e) {
       this.logger.log(`Token expired '${user.username}': ${e.message}`)
       return false
