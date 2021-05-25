@@ -9,6 +9,7 @@ import { HttpExceptionFilter } from './http-exception.filter'
 import { ArrangeAppointmentModule } from './arrange-appointment/arrange-appointment.module'
 import { LoggerMiddleware } from './logger.middleware'
 import { CommunityApiModule } from './community-api/community-api.module'
+import { OffendersModule } from './offenders/offenders.module'
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { CommunityApiModule } from './community-api/community-api.module'
     SecurityModule,
     ArrangeAppointmentModule,
     CommunityApiModule,
+    OffendersModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: HttpExceptionFilter }],
 })

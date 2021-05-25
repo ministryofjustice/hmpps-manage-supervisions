@@ -6,3 +6,5 @@ Cypress.Commands.add('login', () => {
 Cypress.Commands.add('home', () => cy.visit('/'))
 
 Cypress.Commands.add('arrangeAppointment', (crn: string) => cy.visit(`/arrange-appointment/${crn}`))
+
+Cypress.Commands.add('viewOffender', (crn: string) => cy.visit(`/offender/${crn}`))
