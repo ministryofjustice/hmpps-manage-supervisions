@@ -32,6 +32,7 @@ app.use(
     '/secure/offenders/crn/*/sentence/*/appointments': '/appointments',
     '/secure/appointment-types': '/appointment-types',
     '/secure/offenders/crn/:crn/all': '/offenders-by-crn/:crn',
+    '/secure/offenders/crn/:crn/convictions?activeOnly=true': '/convictions-by-crn?id=:crn',
     '/secure/teams/:teamCode/office-locations': '/team-office-locations?teamCode=:teamCode',
   }),
 )

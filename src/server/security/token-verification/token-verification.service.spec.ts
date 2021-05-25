@@ -14,7 +14,7 @@ describe('TokenVerificationService', () => {
     user = fakeUser()
     const module = await Test.createTestingModule({
       imports: [
-        MockRestModule.register('tokenVerification', user),
+        MockRestModule.register([{ name: 'tokenVerification', user }]),
         FakeConfigModule.register({ apis: { tokenVerification: { enabled: true } } }),
       ],
       providers: [TokenVerificationService],

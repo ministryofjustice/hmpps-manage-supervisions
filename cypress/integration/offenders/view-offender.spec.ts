@@ -9,6 +9,7 @@ context('ViewOffender', () => {
     cy.task('reset')
     cy.task('stubLogin')
     cy.task('stubAuthUser')
+    cy.task('stubGetStaffDetails')
   })
 
   it('requires authentication', () => {
@@ -25,7 +26,7 @@ context('ViewOffender', () => {
   })
 
   function havingOffender() {
-    cy.task('stubOffenderDetails', crn)
+    cy.task('stubOffenderDetails', { crn })
   }
 
   function havingLoggedInAndViewedOffender() {
@@ -39,6 +40,6 @@ context('ViewOffender', () => {
 
   function shouldDisplayCommonHeader() {
     page.pageTitle.contains(`CRN: ${crn}`)
-    page.pageTitle.contains('Beth Cheese')
+    page.pageTitle.contains('Brian Cheese')
   }
 })

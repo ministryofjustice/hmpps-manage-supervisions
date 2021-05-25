@@ -8,6 +8,7 @@ import { generateOauthClientToken } from '../common'
 import { titleCase } from '../util'
 import * as jwt from 'jsonwebtoken'
 
+const DELIUS_AUTH_SOURCE = 'delius'
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
   serializeUser(user: any, done: (err: Error, user: any) => void): any {
@@ -49,6 +50,10 @@ export class HmppsStrategy extends PassportStrategy(Strategy, 'hmpps') {
       scope: claims.scope,
     } as User
     const profile = await this.userService.getUser(user)
-    return { ...user, ...profile, displayName: titleCase(profile.name) }
+
+    const staffCode =
+      claims.auth_source == DELIUS_AUTH_SOURCE ? (await this.userService.getStaffDetails(user)).staffCode : null
+
+    return { ...user, ...profile, displayName: titleCase(profile.name), staffCode }
   }
 }

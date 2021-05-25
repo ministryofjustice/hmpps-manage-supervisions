@@ -87,6 +87,21 @@ export class AppointmentDateDto implements DateInput {
 }
 
 export class AppointmentBuilderDto {
+  @ExposeDefault()
+  providerCode?: string
+
+  @ExposeDefault()
+  requirementId?: number
+
+  @ExposeDefault()
+  staffCode?: string
+
+  @ExposeDefault()
+  teamCode?: string
+
+  @ExposeDefault()
+  convictionId?: number
+
   @ExposeDefault({ groups: [AppointmentWizardStep.Type] })
   @IsAppointmentType()
   type?: string | 'other'

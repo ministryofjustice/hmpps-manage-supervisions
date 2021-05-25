@@ -8,19 +8,12 @@ import {
   AppointmentType,
   OffenderDetail,
   OfficeLocation,
+  Conviction,
+  Requirement,
 } from '../community-api'
 
 export interface DomainAppointmentType extends AppointmentType {
   isFeatured: boolean
-}
-
-export const DUMMY_DATA = {
-  sentenceId: 2500443138,
-  notes: 'some notes',
-  providerCode: 'CRS',
-  requirementId: 2500199144,
-  staffCode: 'CRSUATU',
-  teamCode: 'CRSUAT',
 }
 
 /**
@@ -34,14 +27,19 @@ const featuredAppointmentTypes = {
   COPT: 'Phone call',
 }
 
+const RAR_REQUIREMENT_SUB_TYPE_CATEGORY_CODE = 'RARREQ'
+const RAR_REQUIREMENT_TYPE_MAIN_CATEGORY_CODE = 'F'
+
 @Injectable()
 export class ArrangeAppointmentService {
   constructor(private readonly community: CommunityApiService, private readonly cache: CacheService) {}
 
   async createAppointment(builder: AppointmentBuilderDto, crn: string): Promise<AppointmentCreateResponse> {
-    const { sentenceId, ...dummy } = DUMMY_DATA
     const appointmentCreateRequest: AppointmentCreateRequest = {
-      ...dummy,
+      providerCode: builder.providerCode,
+      requirementId: builder.requirementId,
+      staffCode: builder.staffCode,
+      teamCode: builder.teamCode,
       appointmentStart: builder.appointmentStart.toISO(),
       appointmentEnd: builder.appointmentEnd.toISO(),
       contactType: builder.contactType,
@@ -52,7 +50,8 @@ export class ArrangeAppointmentService {
 
     const { data } = await this.community.appointment.createAppointmentUsingPOST({
       appointmentCreateRequest,
-      sentenceId,
+      //TODO: This field is named wrongly on Community API - it's called sentence ID when in fact it's the conviction ID
+      sentenceId: builder.convictionId,
       crn,
     })
 
@@ -61,6 +60,11 @@ export class ArrangeAppointmentService {
 
   async getOffenderDetails(crn: string): Promise<OffenderDetail> {
     const { data } = await this.community.offender.getOffenderDetailByCrnUsingGET({ crn })
+
+    if (!data.activeProbationManagedSentence) {
+      throw new Error('This offender does not have an active probation managed sentence')
+    }
+
     return data
   }
 
@@ -87,5 +91,34 @@ export class ArrangeAppointmentService {
       const { data } = await this.community.team.getAllOfficeLocationsUsingGET({ teamCode })
       return { value: data, options: { durationSeconds: 600 } }
     })
+  }
+
+  async getOffenderConviction(crn: string): Promise<Conviction> {
+    const { data } = await this.community.offender.getConvictionsForOffenderByCrnUsingGET({ crn, activeOnly: true })
+    if (data.length == 1) {
+      return data[0]
+    } else {
+      throw new Error(`${data.length} convictions found`)
+    }
+  }
+
+  async getConvictionRarRequirement(crn: string, convictionId: number): Promise<Requirement> {
+    const { data } = await this.community.requirement.getRequirementsByConvictionIdUsingGET({
+      crn,
+      convictionId,
+      activeOnly: true,
+    })
+
+    const rarRequirements = data.requirements.filter(
+      r =>
+        r.requirementTypeMainCategory.code == RAR_REQUIREMENT_TYPE_MAIN_CATEGORY_CODE &&
+        r.requirementTypeSubCategory.code == RAR_REQUIREMENT_SUB_TYPE_CATEGORY_CODE,
+    )
+
+    // RAR requirements will only be found on ORA Community Order and ORA Suspended Sentence Order sentences
+    if (!rarRequirements.length) {
+      throw new Error(`No RAR requirements found for CRN ${crn} convictionId: ${convictionId}`)
+    }
+    return rarRequirements[0]
   }
 }
