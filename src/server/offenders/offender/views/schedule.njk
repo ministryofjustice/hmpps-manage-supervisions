@@ -1,0 +1,55 @@
+{% extends './_layout.njk' %}
+{% set pageTitle = displayName %}
+
+{% block page %}
+    <h1 class='govuk-heading-l govuk-!-margin-bottom-4'>Schedule</h1>
+
+    <a href='{{ links.arrangeAppointment }}' class='govuk-button govuk-!-margin-bottom-8' data-qa='offender/arrange-appointment-button'>
+        Arrange an appointment
+    </a>
+
+    {% set headers = [
+        { text: 'Date', attributes: { 'data-qa': 'date' } },
+        { text: 'Time', attributes: { 'data-qa': 'time' } },
+        { text: 'Appointment', attributes: { 'data-qa': 'appointment' } }
+    ] %}
+    {% set columns = [
+        { type: 'long-date', path: 'appointmentStart', attributes: { 'data-qa': 'date' } },
+        { type: 'time-range', from: 'appointmentStart', to: 'appointmentEnd', attributes: { 'data-qa': 'time' } },
+        { type: 'link', path: 'name', href: 'link', attributes: { 'data-qa': 'appointment' }
+    }] %}
+
+    {% if appointments.future.length %}
+        {{ govukTable({
+            attributes: { 'data-qa': 'offender/schedule/future' },
+            caption: 'Future appointments',
+            captionClasses: 'govuk-table__caption--m',
+            head: headers,
+            rows: appointments.future | toTableRows(columns)
+        }) }}
+    {% else %}
+        <div data-qa='offender/schedule/empty-future'>
+            <h2 class='govuk-heading-m'>Future appointments</h2>
+            <p class='govuk-body'>
+                There are no future appointments scheduled.
+            </p>
+        </div>
+    {% endif %}
+
+    {% if appointments.recent.length %}
+        {{ govukTable({
+            attributes: { 'data-qa': 'offender/schedule/recent' },
+            caption: 'Recent appointments',
+            captionClasses: 'govuk-table__caption--m',
+            head: headers,
+            rows: appointments.recent | toTableRows(columns)
+        }) }}
+    {% else %}
+        <div data-qa='offender/schedule/empty-recent'>
+            <h2 class='govuk-heading-m'>Recent appointments</h2>
+            <p class='govuk-body'>
+                There have been no recent appointments.
+            </p>
+        </div>
+    {% endif %}
+{% endblock %}

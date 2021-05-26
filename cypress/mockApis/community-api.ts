@@ -5,6 +5,16 @@ export interface CreateAppointmentArgs {
   convictionId: number
 }
 
+export interface StubOffenderAppointmentOptions {
+  crn: string
+  partials: {
+    start: string
+    end: string
+    type: { code: string; name: string }
+    staff: { forenames: string; surname: string }
+  }[]
+}
+
 export class CommunityMockApi {
   constructor(private readonly client: WireMockClient) {}
 
@@ -362,6 +372,65 @@ export class CommunityMockApi {
             },
           ],
         },
+      },
+    })
+  }
+
+  async stubOffenderAppointments({ crn, partials }: StubOffenderAppointmentOptions) {
+    return this.client.stub({
+      request: {
+        method: 'GET',
+        urlPath: `/community/secure/offenders/crn/${crn}/appointments`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: partials.map((x, i) => ({
+          appointmentId: i + 1,
+          appointmentStart: x.start,
+          appointmentEnd: x.end,
+          notes: 'monetize next-generation action-items',
+          officeLocation: {
+            code: '58c9c12a-8121-497d-b0ff-f576d3d7adc7',
+            buildingName: 'Odie',
+            buildingNumber: '430',
+            streetName: 'Larkin Mountain',
+            townCity: 'Shieldsland',
+            county: 'Buckinghamshire',
+            postcode: '34887',
+            description: '80664 Casper Plains',
+          },
+          outcome: {
+            code: '27524882-18fd-4a0e-b971-99a8f1b831e7',
+            attended: true,
+            complied: true,
+            description: 'e-enable out-of-the-box networks',
+            hoursCredited: 38436,
+          },
+          sensitive: false,
+          type: {
+            contactType: x.type.code,
+            description: x.type.name,
+            orderTypes: ['CJA', 'CJA'],
+            requiresLocation: 'NOT_REQUIRED',
+          },
+          provider: {
+            code: '21f0232b-1676-420a-92ec-9ebbd11e3f49',
+            description: 'morph granular infomediaries',
+          },
+          team: {
+            code: '96602333-b9a2-42d4-8d3e-0764ed2a6042',
+            description: 'repurpose next-generation solutions',
+          },
+          staff: {
+            code: '067232a5-96f4-436b-aa61-beb68cc0bc44',
+            forenames: x.staff.forenames,
+            surname: x.staff.surname,
+            unallocated: true,
+          },
+        })),
       },
     })
   }

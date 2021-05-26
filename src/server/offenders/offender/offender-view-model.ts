@@ -1,4 +1,4 @@
-import { ContactDetails } from '../../community-api'
+import { AppointmentDetail, ContactDetails } from '../../community-api'
 
 export enum OffenderPage {
   Overview = 'overview',
@@ -24,8 +24,20 @@ export interface OffenderOverviewViewModel extends OffenderViewModelBase {
   contactDetails?: ContactDetails
 }
 
+export interface AppointmentListViewModel extends AppointmentDetail {
+  name: string
+  href: string
+}
+
+export interface RecentAppointments {
+  future: AppointmentListViewModel[]
+  recent: AppointmentListViewModel[]
+  past: AppointmentListViewModel[]
+}
+
 export interface OffenderScheduleViewModel extends OffenderViewModelBase {
   page: OffenderPage.Schedule
+  appointments: RecentAppointments
 }
 
 export interface OffenderActivityViewModel extends OffenderViewModelBase {

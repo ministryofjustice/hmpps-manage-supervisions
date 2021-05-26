@@ -9,26 +9,32 @@
     </h1>
 
     {{ mojSubNavigation({
+        attributes: { 'data-qa': 'offender/sub-nav' },
         items: [{
             text: 'Overview',
             href: links.overview,
-            active: page == 'overview'
+            active: page == 'overview',
+            attributes: { 'data-qa': 'overview' }
         }, {
             text: 'Schedule',
             href: links.schedule,
-            active: page == 'schedule'
+            active: page == 'schedule',
+            attributes: { 'data-qa': 'schedule' }
         }, {
             text: 'Activity log',
             href: links.activity,
-            active: page == 'activity'
+            active: page == 'activity',
+            attributes: { 'data-qa': 'activity' }
         }, {
             text: 'Personal details',
             href: links.personal,
-            active: page == 'personal'
+            active: page == 'personal',
+            attributes: { 'data-qa': 'personal' }
         }, {
             text: 'Sentence',
             href: links.sentence,
-            active: page == 'sentence'
+            active: page == 'sentence',
+            attributes: { 'data-qa': 'sentence' }
         }]
     }) }}
 

@@ -1,7 +1,7 @@
 import { WireMockClient } from '../mockApis/wiremock-client'
 import { HmppsAuthMockApi } from '../mockApis/hmpps-auth'
 import { TokenVerificationMockApi } from '../mockApis/token-verification'
-import { CommunityMockApi, CreateAppointmentArgs } from '../mockApis/community-api'
+import { CommunityMockApi, CreateAppointmentArgs, StubOffenderAppointmentOptions } from '../mockApis/community-api'
 
 const pluginConfig: Cypress.PluginConfig = (on, config) => {
   const client = new WireMockClient()
@@ -42,6 +42,9 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
     },
     stubGetStaffDetails() {
       return communityApi.stubGetStaffDetails()
+    },
+    stubOffenderAppointments(options: StubOffenderAppointmentOptions) {
+      return communityApi.stubOffenderAppointments(options)
     },
     getCreatedAppointments(args: CreateAppointmentArgs) {
       return communityApi.getCreatedAppointments(args)
