@@ -21,7 +21,7 @@ These are:
  - Registrations
   - MAPPA
 
-The risk indicators and predictors are currently mastered by OASys, but then mirrored into NDelius. Registration information (i.e. which registers an offender might be on) is mastered by in NDelius.
+The risk indicators and predictors are currently mastered by OASys, but then mirrored into NDelius. Registration information (i.e. which registers an offender might be on) is mastered by NDelius.
 
 A new [*Offender Assessment API*](https://offender-dev.aks-dev-1.studio-hosting.service.justice.gov.uk/swagger-ui/) has been created which allows risk indicator and predictor data to be read directly from OASys or a future replacement service. This service is live and available in all environments.
 
