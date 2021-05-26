@@ -29,13 +29,13 @@ Confusingly, another API named the [*Assessments API*](https://github.com/minist
 
 ## Decision
 
-We will read and display risks data from the *Offender Assessments API*, which shows the latest data from OASys or equivalent.
+We will read and display risks data from the *Offender Assessments API* by default, which shows the latest data from OASys or equivalent.
 
-We can read ROSH and SARA scores from the [getRisksForOasysOffenderId endpoint](https://offender-dev.aks-dev-1.studio-hosting.service.justice.gov.uk/swagger-ui/#/Offender%20SARA%2C%20ROSH%20risk%20indicators/getRisksForOasysOffenderIdUsingGET), and predictors from the [etPredictorScoresForOasysOffenderId endpoint](https://offender-dev.aks-dev-1.studio-hosting.service.justice.gov.uk/swagger-ui/#/Offender%20OGP%2C%20OGRs%2C%20OVP%20Predictors/getPredictorScoresForOasysOffenderIdUsingGET).
+We can read ROSH and SARA scores from the [getRisksForOasysOffenderId endpoint](https://offender-dev.aks-dev-1.studio-hosting.service.justice.gov.uk/swagger-ui/#/Offender%20SARA%2C%20ROSH%20risk%20indicators/getRisksForOasysOffenderIdUsingGET), and predictors from the [getPredictorScoresForOasysOffenderId endpoint](https://offender-dev.aks-dev-1.studio-hosting.service.justice.gov.uk/swagger-ui/#/Offender%20OGP%2C%20OGRs%2C%20OVP%20Predictors/getPredictorScoresForOasysOffenderIdUsingGET).
 
 If we need to show changes, we can use the [getAssessmentsForOffender endpoint](https://offender-dev.aks-dev-1.studio-hosting.service.justice.gov.uk/swagger-ui/#/Assessments/getAssessmentsForOffenderUsingGET) to list assessments, then the [getRisksForOasysOffenderIdAndAssessmentId endpoint](https://offender-dev.aks-dev-1.studio-hosting.service.justice.gov.uk/swagger-ui/#/Offender%20SARA%2C%20ROSH%20risk%20indicators/getRisksForOasysOffenderIdAndAssessmentIdUsingGET) to get previous risk values to show a change. In future it may be possible to subscribe to a change event instead, but that isn't currently available.
 
-Data on registrations is held in NDelius, so we should read it from the [getOffenderRegistrationsByCrn endpoint](https://community-api-public.test.probation.service.justice.gov.uk/swagger-ui/index.html#/Risks%20and%20Registrations/getOffenderRegistrationsByCrnUsingGET) in the community API.
+Some other risk-related data, *registrations*, are held in NDelius. We will read them from the [getOffenderRegistrationsByCrn endpoint](https://community-api-public.test.probation.service.justice.gov.uk/swagger-ui/index.html#/Risks%20and%20Registrations/getOffenderRegistrationsByCrnUsingGET) in the community API. However, by default, any information that is available in OASys should be read from there, not from a copy of the data in NDelius.
 
 ## Consequences
 
