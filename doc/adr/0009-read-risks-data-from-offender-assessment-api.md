@@ -23,13 +23,13 @@ These are:
 
 The risk indicators and predictors are currently mastered by OASys, but then mirrored into NDelius. Registration information (i.e. which registers an offender might be on) is mastered by NDelius.
 
-A new [*Offender Assessment API*](https://github.com/ministryofjustice/offender-assessments-api-kotlin) has been created which allows risk indicator and predictor data to be read directly from OASys or a future replacement service. This service is live and available in all environments.
+A new [*Offender Assessments API*](https://github.com/ministryofjustice/offender-assessments-api-kotlin) has been created which allows risk indicator and predictor data to be read directly from OASys or a future replacement service. This service is live and available in all environments.
 
-Confusingly, another API named the *Assessments API* also exists, which allows clients to _perform_ assessments rather than read existing data. This service is not yet live, and is currently only intended to be used by the *Assess Risks & Needs* frontend.
+Confusingly, another API named the [*Assessments API*](https://github.com/ministryofjustice/hmpps-assessments-api) also exists, which allows clients to _perform_ assessments rather than read existing data. This service is not yet live, and is currently only intended to be used by the *Assess Risks & Needs* frontend.
 
 ## Decision
 
-We will read and display risks data from the *Offender Assessment API*, which shows the latest data from OASys or equivalent.
+We will read and display risks data from the *Offender Assessments API*, which shows the latest data from OASys or equivalent.
 
 We can read ROSH and SARA scores from the [getRisksForOasysOffenderId endpoint](https://offender-dev.aks-dev-1.studio-hosting.service.justice.gov.uk/swagger-ui/#/Offender%20SARA%2C%20ROSH%20risk%20indicators/getRisksForOasysOffenderIdUsingGET), and predictors from the [etPredictorScoresForOasysOffenderId endpoint](https://offender-dev.aks-dev-1.studio-hosting.service.justice.gov.uk/swagger-ui/#/Offender%20OGP%2C%20OGRs%2C%20OVP%20Predictors/getPredictorScoresForOasysOffenderIdUsingGET).
 
