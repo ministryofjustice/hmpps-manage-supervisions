@@ -1,7 +1,7 @@
-{% extends "../wizard-form.njk" %}
+{% extends "pages/wizard-form.njk" %}
 {% set buttonText = 'Arrange appointment' %}
 {% set title = 'Check your answers' %}
-{% from "../../partials/arrange-appointment/session-details.njk" import sessionDetails %}
+{% from "./partials/session-details.njk" import sessionDetails %}
 
 {% block form %}
   <h1 class="govuk-heading-xl">{{ title }}</h1>

@@ -57,7 +57,7 @@ export class ArrangeAppointmentController {
   }
 
   @Get('type')
-  @Render('pages/arrange-appointment/type')
+  @Render('arrange-appointment/views/type')
   @DynamicRedirect()
   async getType(@Param('crn') crn: string, @Session() session: AppointmentWizardSession): Promise<RenderOrRedirect> {
     const redirect = this.wizard.assertStep(session, AppointmentWizardStep.Type, crn)
@@ -69,7 +69,7 @@ export class ArrangeAppointmentController {
   }
 
   @Post('type')
-  @Render('pages/arrange-appointment/type')
+  @Render('arrange-appointment/views/type')
   @DynamicRedirect()
   async postType(
     @Param('crn') crn: string,
@@ -112,7 +112,7 @@ export class ArrangeAppointmentController {
   }
 
   @Get('where')
-  @Render('pages/arrange-appointment/where')
+  @Render('arrange-appointment/views/where')
   @DynamicRedirect()
   async getWhere(@Param('crn') crn: string, @Session() session: AppointmentWizardSession): Promise<RenderOrRedirect> {
     const redirect = this.wizard.assertStep(session, AppointmentWizardStep.Where, crn)
@@ -124,7 +124,7 @@ export class ArrangeAppointmentController {
   }
 
   @Post('where')
-  @Render('pages/arrange-appointment/where')
+  @Render('arrange-appointment/views/where')
   @DynamicRedirect()
   async postWhere(
     @Param('crn') crn: string,
@@ -159,7 +159,7 @@ export class ArrangeAppointmentController {
   }
 
   @Get('when')
-  @Render('pages/arrange-appointment/when')
+  @Render('arrange-appointment/views/when')
   @DynamicRedirect()
   async getWhen(@Param('crn') crn: string, @Session() session: AppointmentWizardSession): Promise<RenderOrRedirect> {
     const redirect = this.wizard.assertStep(session, AppointmentWizardStep.When, crn)
@@ -171,7 +171,7 @@ export class ArrangeAppointmentController {
   }
 
   @Post('when')
-  @Render('pages/arrange-appointment/when')
+  @Render('arrange-appointment/views/when')
   @DynamicRedirect()
   async postWhen(
     @Param('crn') crn: string,
@@ -191,7 +191,7 @@ export class ArrangeAppointmentController {
   }
 
   @Get('add-notes')
-  @Render('pages/arrange-appointment/add-notes')
+  @Render('arrange-appointment/views/add-notes')
   async getAddNotes(
     @Param('crn') crn: string,
     @Session() session: AppointmentWizardSession,
@@ -205,7 +205,7 @@ export class ArrangeAppointmentController {
   }
 
   @Post('add-notes')
-  @Render('pages/arrange-appointment/add-notes')
+  @Render('arrange-appointment/views/add-notes')
   @DynamicRedirect()
   async postAddNotes(
     @Param('crn') crn: string,
@@ -229,7 +229,7 @@ export class ArrangeAppointmentController {
   }
 
   @Get('notes')
-  @Render('pages/arrange-appointment/notes')
+  @Render('arrange-appointment/views/notes')
   async getNotes(@Param('crn') crn: string, @Session() session: AppointmentWizardSession): Promise<RenderOrRedirect> {
     const redirect = this.wizard.assertStep(session, AppointmentWizardStep.Notes, crn)
     if (redirect) {
@@ -240,7 +240,7 @@ export class ArrangeAppointmentController {
   }
 
   @Post('notes')
-  @Render('pages/arrange-appointment/notes')
+  @Render('arrange-appointment/views/notes')
   @DynamicRedirect()
   async postNotes(
     @Param('crn') crn: string,
@@ -263,7 +263,7 @@ export class ArrangeAppointmentController {
   }
 
   @Get('sensitive')
-  @Render('pages/arrange-appointment/sensitive')
+  @Render('arrange-appointment/views/sensitive')
   @DynamicRedirect()
   async getSensitive(
     @Param('crn') crn: string,
@@ -278,7 +278,7 @@ export class ArrangeAppointmentController {
   }
 
   @Post('sensitive')
-  @Render('pages/arrange-appointment/sensitive')
+  @Render('arrange-appointment/views/sensitive')
   @DynamicRedirect()
   async postSensitive(
     @Param('crn') crn: string,
@@ -301,7 +301,7 @@ export class ArrangeAppointmentController {
   }
 
   @Get('check')
-  @Render('pages/arrange-appointment/check')
+  @Render('arrange-appointment/views/check')
   @DynamicRedirect()
   async getCheck(@Param('crn') crn: string, @Session() session: AppointmentWizardSession): Promise<RenderOrRedirect> {
     const redirect = this.wizard.assertStep(session, AppointmentWizardStep.Check, crn)
@@ -347,7 +347,7 @@ export class ArrangeAppointmentController {
   }
 
   @Get('confirm')
-  @Render('pages/arrange-appointment/confirm')
+  @Render('arrange-appointment/views/confirm')
   @DynamicRedirect()
   async getConfirm(@Param('crn') crn: string, @Session() session: AppointmentWizardSession): Promise<RenderOrRedirect> {
     const redirect = this.wizard.assertStep(session, AppointmentWizardStep.Confirm, crn)
