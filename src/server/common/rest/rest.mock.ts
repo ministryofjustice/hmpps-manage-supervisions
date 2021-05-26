@@ -7,16 +7,20 @@ import Axios from 'axios'
 
 @Module({})
 export class MockRestModule {
-  static register(name: keyof DependentApisConfig, user: User, authMethod?: AuthenticationMethod): DynamicModule {
+  static register(
+    configurations: { name: keyof DependentApisConfig; user: User; authMethod?: AuthenticationMethod }[],
+  ): DynamicModule {
     const client = Axios.create()
     const mock = new MockAdapter(client)
     const service = createStubInstance(RestService)
 
-    if (authMethod !== undefined) {
-      service.build.withArgs(name, user, authMethod).returns(client)
-    } else {
-      service.build.withArgs(name, user).returns(client)
-    }
+    configurations.forEach(config => {
+      if (config.authMethod !== undefined) {
+        service.build.withArgs(config.name, config.user, config.authMethod).returns(client)
+      } else {
+        service.build.withArgs(config.name, config.user).returns(client)
+      }
+    })
 
     return {
       module: MockRestModule,

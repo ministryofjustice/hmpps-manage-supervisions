@@ -15,10 +15,10 @@ import {
 import { AppointmentWizardSession } from './dto/AppointmentWizardSession'
 import { AppointmentWizardService, getStepUrl } from './appointment-wizard.service'
 import { Controller, Get, Param, Post, Redirect, Render, Session } from '@nestjs/common'
-import { DynamicRedirect, RedirectResponse } from '../common'
+import { AuthenticatedUser, DynamicRedirect, RedirectResponse } from '../common'
 import { BodyClass } from '../common/meta/body-class.decorator'
 import { DEFAULT_GROUP } from '../util/mapping'
-import { AppointmentTypeRequiresLocation } from '../community-api'
+import { AppointmentTypeRequiresLocation, OffenderDetail, OffenderManager } from '../community-api'
 
 type RenderOrRedirect = AppointmentWizardViewModel | RedirectResponse
 
@@ -34,8 +34,26 @@ export class ArrangeAppointmentController {
 
   @Get()
   @Redirect()
-  get(@Param('crn') crn: string, @Session() session: AppointmentWizardSession): RedirectResponse {
-    return this.wizard.reset(session, crn)
+  async get(
+    @Param('crn') crn: string,
+    @Session() session: AppointmentWizardSession,
+    @AuthenticatedUser() user: User,
+  ): Promise<RedirectResponse> {
+    const response = this.wizard.reset(session, crn)
+
+    const offender = await await this.service.getOffenderDetails(crn)
+
+    const offenderManager = this.getOffenderManager(offender, user)
+
+    const conviction = await this.service.getOffenderConviction(crn)
+    const rarRequirement = await this.service.getConvictionRarRequirement(crn, conviction.convictionId)
+
+    session.appointment.staffCode = offenderManager.staff.code
+    session.appointment.teamCode = offenderManager.team.code
+    session.appointment.providerCode = offenderManager.probationArea.code
+    session.appointment.convictionId = conviction.convictionId
+    session.appointment.requirementId = rarRequirement.requirementId
+    return response
   }
 
   @Get('type')
@@ -433,9 +451,7 @@ export class ArrangeAppointmentController {
     body?: DeepPartial<AppointmentBuilderDto>,
     errors: ValidationError[] = [],
   ): Promise<AppointmentLocationViewModel> {
-    const offender = await this.service.getOffenderDetails(session.crn)
-    const offenderManager = offender.offenderManagers[0] // TODO what happens when we have >1? or 0?
-    const locations = await this.service.getTeamOfficeLocations(offenderManager.team.code)
+    const locations = await this.service.getTeamOfficeLocations(session.appointment.teamCode)
     const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
       groups: [DEFAULT_GROUP],
       excludeExtraneousValues: true,
@@ -510,5 +526,14 @@ export class ArrangeAppointmentController {
       errors,
       sensitive: body?.sensitive || appointment.sensitive,
     }
+  }
+
+  private getOffenderManager(offender: OffenderDetail, user: User): OffenderManager {
+    const offenderManager = offender.offenderManagers.find(om => om.staff.code == user.staffCode)
+
+    if (!offenderManager) {
+      throw new Error('Current user is not Offender Manager for this offender')
+    }
+    return offenderManager
   }
 }

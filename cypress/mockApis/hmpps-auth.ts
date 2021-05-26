@@ -5,7 +5,7 @@ function createToken(): string {
   const payload = {
     user_name: 'USER1',
     scope: ['read'],
-    auth_source: 'nomis',
+    auth_source: 'delius',
     authorities: [],
     jti: '83b50a10-cca6-41db-985f-e87efb303ddb',
     client_id: 'clientid',
@@ -108,7 +108,6 @@ export class HmppsAuthMockApi {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: {
-          staffId: 231232,
           username: 'USER1',
           active: true,
           name: 'john smith',

@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 import { match } from 'sinon'
-import { ArrangeAppointmentService, DomainAppointmentType, DUMMY_DATA } from './arrange-appointment.service'
+import { ArrangeAppointmentService, DomainAppointmentType } from './arrange-appointment.service'
 import { fakeAppointmentBuilderDto } from './dto/arrange-appointment.fake'
 import * as faker from 'faker'
 import { pick } from 'lodash'
@@ -44,7 +44,7 @@ describe('ArrangeAppointmentService', () => {
     expect(returned).toBe(response)
     expect(stub.getCall(0).args[0]).toEqual({
       crn,
-      sentenceId: DUMMY_DATA.sentenceId,
+      sentenceId: dto.convictionId,
       appointmentCreateRequest: {
         contactType: dto.type,
         officeLocationCode: dto.location,
@@ -52,10 +52,10 @@ describe('ArrangeAppointmentService', () => {
         appointmentEnd: dto.appointmentEnd.toISO(),
         sensitive: dto.sensitive,
         notes: dto.notes,
-        providerCode: DUMMY_DATA.providerCode,
-        requirementId: DUMMY_DATA.requirementId,
-        staffCode: DUMMY_DATA.staffCode,
-        teamCode: DUMMY_DATA.teamCode,
+        providerCode: dto.providerCode,
+        requirementId: dto.requirementId,
+        staffCode: dto.staffCode,
+        teamCode: dto.teamCode,
       },
     })
   })
@@ -69,6 +69,17 @@ describe('ArrangeAppointmentService', () => {
     const returned = await subject.getOffenderDetails(crn)
 
     expect(returned).toBe(response)
+  })
+
+  it('getting offender details throws exception if no active probation managed sentence', async () => {
+    const response = fakeOffenderDetail({ activeProbationManagedSentence: false })
+    const crn = faker.datatype.uuid()
+
+    community.offender.getOffenderDetailByCrnUsingGET.withArgs(match({ crn })).resolves(fakeOkResponse(response))
+
+    await expect(async () => {
+      await subject.getOffenderDetails(crn)
+    }).rejects.toThrowError('This offender does not have an active probation managed sentence')
   })
 
   it('getting fresh appointment types', async () => {

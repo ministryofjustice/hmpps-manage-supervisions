@@ -2,7 +2,7 @@ import { WireMockClient } from './wiremock-client'
 
 export interface CreateAppointmentArgs {
   crn: string
-  sentenceId: number
+  convictionId: number
 }
 
 export class CommunityMockApi {
@@ -65,11 +65,11 @@ export class CommunityMockApi {
     })
   }
 
-  async stubCreateAppointment({ crn, sentenceId }: CreateAppointmentArgs) {
+  async stubCreateAppointment({ crn, convictionId }: CreateAppointmentArgs) {
     return this.client.stub({
       request: {
         method: 'POST',
-        urlPath: `/community/secure/offenders/crn/${crn}/sentence/${sentenceId}/appointments`,
+        urlPath: `/community/secure/offenders/crn/${crn}/sentence/${convictionId}/appointments`,
       },
       response: {
         status: 200,
@@ -86,7 +86,7 @@ export class CommunityMockApi {
     })
   }
 
-  async stubOffenderDetails(crn: string) {
+  async stubOffenderDetails({ crn }: CreateAppointmentArgs) {
     return this.client.stub({
       request: {
         method: 'GET',
@@ -99,11 +99,11 @@ export class CommunityMockApi {
         },
         jsonBody: {
           offenderId: 2500011641,
-          title: 'Dr',
-          firstName: 'Beth',
+          title: 'Mr',
+          firstName: 'Brian',
           surname: 'Cheese',
           dateOfBirth: '1970-01-01',
-          gender: 'Female',
+          gender: 'Male',
           otherIds: { crn },
           contactDetails: {
             phoneNumbers: [
@@ -125,10 +125,10 @@ export class CommunityMockApi {
                 surname: 'Staff',
               },
               staff: {
-                code: 'N07UATU',
-                forenames: 'Unallocated Staff(N07)',
-                surname: 'Staff',
-                unallocated: true,
+                code: 'CRSSTAFF1',
+                forenames: 'John',
+                surname: 'Smith',
+                unallocated: false,
               },
               partitionArea: 'National Data',
               softDeleted: false,
@@ -167,6 +167,107 @@ export class CommunityMockApi {
           currentRestriction: false,
           currentExclusion: false,
           activeProbationManagedSentence: true,
+        },
+      },
+    })
+  }
+
+  async stubGetConvictions({ crn, convictionId }: CreateAppointmentArgs) {
+    return this.client.stub({
+      request: {
+        method: 'GET',
+        urlPath: `/community/secure/offenders/crn/${crn}/convictions`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: [
+          {
+            convictionId: convictionId,
+            index: '4',
+            active: true,
+            inBreach: false,
+            convictionDate: '2021-02-05',
+            referralDate: '2021-02-17',
+            offences: [
+              {
+                offenceId: 'M2500445193',
+                mainOffence: true,
+                detail: {
+                  code: '07539',
+                  description: 'Cheats at gambling or enables or assists person to cheat (Gambling Act 2005) - 07539',
+                  mainCategoryCode: '075',
+                  mainCategoryDescription: 'Betting, Gaming and Lotteries (Indictable)',
+                  mainCategoryAbbreviation: 'Betting, Gaming and Lotteries (Indictable)',
+                  ogrsOffenceCategory: 'Other offence',
+                  subCategoryCode: '39',
+                  subCategoryDescription:
+                    'Cheats at gambling or enables or assists person to cheat (Gambling Act 2005)',
+                  form20Code: '12',
+                },
+                offenceDate: '2021-02-01T00:00:00',
+                offenceCount: 1,
+                offenderId: 2500011641,
+                createdDatetime: '2021-03-25T14:52:23',
+                lastUpdatedDatetime: '2021-03-25T14:52:23',
+              },
+            ],
+            sentence: {
+              sentenceId: 2500427030,
+              description: 'ORA Community Order',
+              originalLength: 12,
+              originalLengthUnits: 'Months',
+              defaultLength: 12,
+              lengthInDays: 364,
+              expectedSentenceEndDate: '2022-02-16',
+              startDate: '2021-02-17',
+              sentenceType: {
+                code: 'SP',
+                description: 'ORA Community Order',
+              },
+            },
+            latestCourtAppearanceOutcome: {
+              code: '329',
+              description: 'ORA Community Order',
+            },
+          },
+        ],
+      },
+    })
+  }
+
+  async stubGetRequirements({ crn, convictionId }: CreateAppointmentArgs) {
+    return this.client.stub({
+      request: {
+        method: 'GET',
+        urlPath: `/community/secure/offenders/crn/${crn}/convictions/${convictionId}/requirements`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          requirements: [
+            {
+              requirementId: 2500199144,
+              startDate: '2021-01-03',
+              active: true,
+              requirementTypeSubCategory: {
+                code: 'RARREQ',
+                description: 'Rehabilitation Activity Requirement (RAR)',
+              },
+              requirementTypeMainCategory: {
+                code: 'F',
+                description: 'Rehabilitation Activity Requirement (RAR)',
+              },
+              length: 20,
+              lengthUnit: 'Days',
+              restrictive: false,
+            },
+          ],
         },
       },
     })
@@ -218,10 +319,58 @@ export class CommunityMockApi {
     })
   }
 
-  async getCreatedAppointments({ crn, sentenceId }: CreateAppointmentArgs) {
+  async stubGetStaffDetails() {
+    return this.client.stub({
+      request: {
+        method: 'GET',
+        urlPath: `/community/secure/staff/username/USER1`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          username: 'USER1',
+          email: 'john.smith@test',
+          staffCode: 'CRSSTAFF1',
+          staffIdentifier: 1234567,
+          staff: {
+            forenames: 'John',
+            surname: 'Smith',
+          },
+          teams: [
+            {
+              code: 'CRSUAT',
+              description: 'Unallocated',
+              localDeliveryUnit: {
+                code: 'CRSUAT',
+                description: 'Unallocated LDU',
+              },
+              teamType: {
+                code: 'CRSUAT',
+                description: 'Unallocated Team Type',
+              },
+              district: {
+                code: 'CRSUAT',
+                description: 'Unallocated LDU',
+              },
+              borough: {
+                code: 'CRSUAT',
+                description: 'Unallocated Cluster',
+              },
+            },
+          ],
+        },
+      },
+    })
+  }
+
+  async getCreatedAppointments({ crn, convictionId }: CreateAppointmentArgs) {
     const requests = await this.client.getRequests(
-      `/community/secure/offenders/crn/${crn}/sentence/${sentenceId}/appointments`,
+      `/community/secure/offenders/crn/${crn}/sentence/${convictionId}/appointments`,
     )
+    console.log(requests.map(x => JSON.parse(x.request.body)))
     return requests.map(x => JSON.parse(x.request.body))
   }
 }

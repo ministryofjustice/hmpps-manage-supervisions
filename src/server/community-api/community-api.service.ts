@@ -3,7 +3,14 @@ import { REQUEST } from '@nestjs/core'
 import { AxiosInstance } from 'axios'
 import { Request } from 'express'
 import { BaseAPI } from './client/base'
-import { AppointmentsApi, Configuration, CoreOffenderApi, TeamsApi } from './client'
+import {
+  AppointmentsApi,
+  Configuration,
+  CoreOffenderApi,
+  SentenceRequirementsAndBreachApi,
+  StaffApi,
+  TeamsApi,
+} from './client'
 import { AuthenticationMethod, RestService } from '../common'
 
 type ApiConstructor<Api> = {
@@ -28,6 +35,14 @@ export class CommunityApiService {
 
   get team() {
     return this.api(TeamsApi)
+  }
+
+  get requirement() {
+    return this.api(SentenceRequirementsAndBreachApi)
+  }
+
+  get staff() {
+    return this.api(StaffApi)
   }
 
   private api<Api extends BaseAPI>(type: ApiConstructor<Api>): Api {

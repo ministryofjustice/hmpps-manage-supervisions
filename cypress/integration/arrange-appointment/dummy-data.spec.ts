@@ -5,7 +5,7 @@ interface AppointmentBookingTestCase {
   start: DateTime
   end: DateTime
   crn: string
-  sentenceId: number
+  convictionId: number
   type: {
     code: string
     name: string
@@ -20,8 +20,8 @@ interface AppointmentBookingTestCase {
 }
 
 function testCase(partial: Omit<AppointmentBookingTestCase, 'start' | 'end'>) {
-  const start = DateTime.now().plus({ hours: 1 }).set({ minute: 0, second: 0, millisecond: 0 })
-  const end = start.plus({ hour: 1 })
+  const start = DateTime.now().plus({ hours: 1 }).set({ second: 0, millisecond: 0 })
+  const end = start.plus({ hour: 2 })
   return {
     ...partial,
     start,
@@ -46,7 +46,7 @@ context('CreateAppointment', () => {
   it('can book an office visit appointment', () => {
     const test = testCase({
       crn: 'ABC123',
-      sentenceId: 2500443138,
+      convictionId: 2500445193,
       type: { code: 'APAT', name: 'Office visit' },
       location: { code: 'LDN_BCR', name: '29/33 VICTORIA ROAD' },
       addNotes: true,
@@ -81,7 +81,7 @@ context('CreateAppointment', () => {
   it('can book an "other" appointment by searching', () => {
     const test = testCase({
       crn: 'ABC123',
-      sentenceId: 2500443138,
+      convictionId: 2500445193,
       type: { code: 'C243', name: 'Alcohol Group Work Session (NS)' },
       location: { code: 'LDN_BCR', name: '29/33 VICTORIA ROAD' },
       sensitive: false,
@@ -117,7 +117,7 @@ context('CreateAppointment', () => {
   it('validates appointment type', () => {
     const test = testCase({
       crn: 'ABC123',
-      sentenceId: 2500443138,
+      convictionId: 2500445193,
       type: { code: 'APAT', name: 'Office visit' },
       sensitive: true,
     })
@@ -142,7 +142,7 @@ context('CreateAppointment', () => {
   it('validates location', () => {
     const test = testCase({
       crn: 'ABC123',
-      sentenceId: 2500443138,
+      convictionId: 2500445193,
       type: { code: 'APAT', name: 'Office visit' },
       sensitive: true,
     })
@@ -161,7 +161,7 @@ context('CreateAppointment', () => {
   it('validates time and dates', () => {
     const test = testCase({
       crn: 'ABC123',
-      sentenceId: 2500443138,
+      convictionId: 2500445193,
       type: { code: 'CHVS', name: 'Home visit' },
       sensitive: true,
     })
@@ -200,7 +200,7 @@ context('CreateAppointment', () => {
   it('validates selecting to add notes', () => {
     const test = testCase({
       crn: 'ABC123',
-      sentenceId: 2500443138,
+      convictionId: 2500445193,
       type: { code: 'APAT', name: 'Office visit' },
       location: { code: 'LDN_BCR', name: '29/33 VICTORIA ROAD' },
       notes: 'Some note text',
@@ -237,7 +237,7 @@ context('CreateAppointment', () => {
   it('validates sensitive & sensitive help text', () => {
     const test = testCase({
       crn: 'ABC123',
-      sentenceId: 2500443138,
+      convictionId: 2500445193,
       type: { code: 'APAT', name: 'Office visit' },
       location: { code: 'LDN_BCR', name: '29/33 VICTORIA ROAD' },
       addNotes: true,
@@ -269,11 +269,14 @@ context('CreateAppointment', () => {
     page.sensitive.errorMessages.sensitive.contains('Select yes if the appointment contains sensitive information')
   })
 
-  function havingOffender({ crn, sentenceId }: AppointmentBookingTestCase) {
+  function havingOffender({ crn, convictionId }: AppointmentBookingTestCase) {
+    cy.task('stubGetStaffDetails')
     cy.task('stubGetAppointmentTypes')
     cy.task('stubGetLocations')
-    cy.task('stubCreateAppointment', { crn, sentenceId })
-    cy.task('stubOffenderDetails', crn)
+    cy.task('stubCreateAppointment', { crn, convictionId })
+    cy.task('stubOffenderDetails', { crn })
+    cy.task('stubGetConvictions', { crn, convictionId })
+    cy.task('stubGetRequirements', { crn, convictionId })
   }
 
   function havingLoggedInAndBeginBookingAppointmentFlow({ crn }: AppointmentBookingTestCase) {
@@ -356,13 +359,13 @@ context('CreateAppointment', () => {
     page.confirm.timeMessage.contains(
       `${new DateWithDayAndWithoutYear().filter(start)} from ${new Time().filter(start)}`,
     )
-    page.confirm.phoneMessage.contains('Beth')
+    page.confirm.phoneMessage.contains('Brian')
     page.confirm.phoneMessage.contains('07734 111992')
   }
 
   function shouldHaveBookedAppointment({
     crn,
-    sentenceId,
+    convictionId,
     start,
     end,
     type,
@@ -370,17 +373,17 @@ context('CreateAppointment', () => {
     notes,
     sensitive,
   }: AppointmentBookingTestCase) {
-    cy.task('getCreatedAppointments', { crn, sentenceId }).should('deep.eq', [
+    cy.task('getCreatedAppointments', { crn, convictionId }).should('deep.eq', [
       {
+        providerCode: 'N07',
         requirementId: 2500199144,
-        contactType: type.code,
+        staffCode: 'CRSSTAFF1',
+        teamCode: 'N07UAT',
         appointmentStart: start.toISO(),
         appointmentEnd: end.toISO(),
-        notes,
-        providerCode: 'CRS',
-        teamCode: 'CRSUAT',
-        staffCode: 'CRSUATU',
+        contactType: type.code,
         officeLocationCode: location?.code,
+        notes,
         sensitive,
       },
     ])

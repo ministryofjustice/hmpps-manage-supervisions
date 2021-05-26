@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { Expose, plainToClass } from 'class-transformer'
-import { RestService } from '../../common'
+import { StaffApi, StaffDetails } from '../../community-api'
+import { AuthenticationMethod, RestService } from '../../common'
 
 export class UserProfile {
   @Expose()
@@ -40,5 +41,15 @@ export class UserService {
     const client = this.rest.build('hmppsAuth', user)
     const { data } = await client.get<UserRole[]>('/api/user/me/roles')
     return data.map(r => r.roleCode).filter(r => r)
+  }
+
+  async getStaffDetails(user: User): Promise<StaffDetails> {
+    const staffApi = new StaffApi(
+      null,
+      '',
+      this.rest.build('community', user, AuthenticationMethod.ReissueForDeliusUser),
+    )
+    const { data } = await staffApi.getStaffDetailsForUsernameUsingGET({ username: user.username })
+    return data
   }
 }

@@ -28,11 +28,20 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
     stubCreateAppointment(args: CreateAppointmentArgs) {
       return communityApi.stubCreateAppointment(args)
     },
-    stubOffenderDetails(crn: string) {
-      return communityApi.stubOffenderDetails(crn)
+    stubOffenderDetails(args: CreateAppointmentArgs) {
+      return communityApi.stubOffenderDetails(args)
+    },
+    stubGetConvictions(args: CreateAppointmentArgs) {
+      return communityApi.stubGetConvictions(args)
+    },
+    stubGetRequirements(args: CreateAppointmentArgs) {
+      return communityApi.stubGetRequirements(args)
     },
     stubGetLocations() {
       return communityApi.stubGetLocations()
+    },
+    stubGetStaffDetails() {
+      return communityApi.stubGetStaffDetails()
     },
     getCreatedAppointments(args: CreateAppointmentArgs) {
       return communityApi.getCreatedAppointments(args)

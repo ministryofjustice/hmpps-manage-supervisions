@@ -17,7 +17,9 @@ describe('CommunityApiService', () => {
     user = fakeUser()
 
     const module = await Test.createTestingModule({
-      imports: [MockRestModule.register('community', user, AuthenticationMethod.ReissueForDeliusUser)],
+      imports: [
+        MockRestModule.register([{ name: 'community', user, authMethod: AuthenticationMethod.ReissueForDeliusUser }]),
+      ],
       providers: [CommunityApiService, { provide: REQUEST, useValue: { user } }],
     })
       .setLogger(new Logger())

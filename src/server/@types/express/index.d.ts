@@ -12,6 +12,7 @@ interface User {
   authSource: string
   userId: string
   uuid: string
+  staffCode?: string
 }
 
 declare namespace Express {

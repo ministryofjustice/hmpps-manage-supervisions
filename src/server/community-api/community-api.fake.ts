@@ -5,6 +5,7 @@ import {
   AppointmentTypeRequiresLocation,
   OffenderDetail,
   OfficeLocation,
+  StaffDetails,
 } from './client'
 import { merge } from 'lodash'
 import * as faker from 'faker'
@@ -38,6 +39,7 @@ export function fakeAppointmentCreateResponse(
 export function fakeOffenderDetail(partial: DeepPartial<OffenderDetail> = {}): OffenderDetail {
   return merge(
     {
+      activeProbationManagedSentence: true,
       firstName: faker.name.firstName(),
       surname: faker.name.lastName(),
       contactDetails: {
@@ -66,6 +68,18 @@ export function fakeOfficeLocation(partial: DeepPartial<OfficeLocation> = {}): O
       postcode: faker.address.zipCode(),
       description: faker.address.streetAddress(),
     } as OfficeLocation,
+    partial,
+  )
+}
+
+export function fakeStaffDetails(partial: DeepPartial<StaffDetails> = {}): StaffDetails {
+  return merge(
+    {
+      username: faker.lorem.slug(10),
+      staffIdentifier: faker.datatype.number({ min: 1, max: 999 }),
+      staffCode: faker.lorem.slug(10),
+      email: faker.internet.email(),
+    } as StaffDetails,
     partial,
   )
 }
