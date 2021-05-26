@@ -41,4 +41,4 @@ Data on registrations is held in NDelius, so we should read it from the [getOffe
 
 The Assess Risks & Needs team are very receptive to requests for changes to the API; we are one of the first users, so they want to provide us with what we need and will iterate their product to do so.
 
-As some data is currently held in both OASys and NDelius, there is the potential for conflicting data. We consider this to be a data quality problem. Fixing it is outside the scope of our team, but if it becomes an issue we will make sure to flag it to the appropriate data owners.
+As some data is currently held in both OASys and NDelius (with the NDelius data being maintained manually), there will be cases of conflicting data. We consider this to be a data quality problem which we will address through service design.
