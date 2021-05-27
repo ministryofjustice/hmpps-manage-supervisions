@@ -110,6 +110,16 @@ module.exports = function (options) {
           { from: 'src/client/assets', to: 'assets' },
           { from: 'src/server/views', to: 'views' },
           {
+            from: '**/*.(njk|html)',
+            to: 'views',
+            context: path.resolve(__dirname, 'node_modules', 'govuk-frontend'),
+          },
+          {
+            from: '**/*.(njk|html)',
+            to: 'views',
+            context: path.resolve(__dirname, 'node_modules', '@ministryofjustice', 'frontend'),
+          },
+          {
             from: '!(views)/**/*.njk',
             to: 'views',
             context: path.resolve(__dirname, 'src', 'server'),

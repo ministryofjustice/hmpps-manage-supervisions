@@ -8,27 +8,18 @@ import { camelCase } from 'lodash'
 import * as filters from './nunjucks/filters'
 
 export function useGovUkUi(app: NestExpressApplication) {
-  const serverConfig = app.get(ConfigService).get<ServerConfig>('server')
+  const { description, isProduction, staticResourceCacheDuration } = app.get(ConfigService).get<ServerConfig>('server')
   const logger = new Logger('view-engine')
 
-  app.setLocal('asset_path', '/assets/')
-  app.setLocal('applicationName', serverConfig.description)
+  app.setLocal('applicationName', description)
 
-  const environment = nunjucks.configure(
-    [
-      path.resolve(path.join(__dirname, 'views')),
-      'node_modules/govuk-frontend/',
-      'node_modules/govuk-frontend/components/',
-      'node_modules/@ministryofjustice/frontend/',
-      'node_modules/@ministryofjustice/frontend/moj/components/',
-    ],
-    {
-      express: app.getHttpAdapter().getInstance(),
-      autoescape: true,
-      noCache: !serverConfig.isProduction,
-      watch: !serverConfig.isProduction,
-    },
-  )
+  const viewsPath = path.resolve(__dirname, 'views')
+  const environment = nunjucks.configure([viewsPath], {
+    express: app.getHttpAdapter().getInstance(),
+    autoescape: true,
+    noCache: !isProduction,
+    watch: !isProduction,
+  })
 
   for (const Filter of Object.values(filters)) {
     const name = camelCase(Filter.name)
@@ -39,8 +30,8 @@ export function useGovUkUi(app: NestExpressApplication) {
 
   app.useStaticAssets(path.join(__dirname, 'assets'), {
     prefix: '/assets',
-    maxAge: serverConfig.staticResourceCacheDuration * 1000,
+    maxAge: staticResourceCacheDuration * 1000,
   })
-  app.setBaseViewsDir(path.join(__dirname, 'views'))
+  app.setBaseViewsDir(viewsPath)
   app.setViewEngine('njk')
 }
