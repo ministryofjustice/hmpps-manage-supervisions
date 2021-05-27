@@ -1,5 +1,11 @@
 import { Controller, Get, Param, Redirect, Render } from '@nestjs/common'
-import { OffenderLinks, OffenderOverviewViewModel, OffenderPage, OffenderViewModelBase } from './offender-view-model'
+import {
+  OffenderLinks,
+  OffenderOverviewViewModel,
+  OffenderPage,
+  OffenderScheduleViewModel,
+  OffenderViewModelBase,
+} from './offender-view-model'
 import { RedirectResponse } from '../../common'
 import { OffenderDetail } from '../../community-api'
 import { OffenderService } from './offender.service'
@@ -22,6 +28,20 @@ export class OffenderController {
       ...this.getBase(OffenderPage.Overview, offender),
       page: OffenderPage.Overview,
       contactDetails: offender.contactDetails,
+    }
+  }
+
+  @Get('schedule')
+  @Render('offenders/offender/views/schedule')
+  async getSchedule(@Param('crn') crn: string): Promise<OffenderScheduleViewModel> {
+    const [offender, appointments] = await Promise.all([
+      this.service.getOffenderDetail(crn),
+      this.service.getRecentAppointments(crn),
+    ])
+    return {
+      ...this.getBase(OffenderPage.Overview, offender),
+      page: OffenderPage.Schedule,
+      appointments,
     }
   }
 
