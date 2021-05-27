@@ -124,9 +124,21 @@ export class CommunityMockApi {
             ],
           },
           offenderProfile: {
-            offenderLanguages: {},
+            offenderLanguages: {
+              primaryLanguage: 'Bengali',
+            },
             remandStatus: 'Bail - Unconditional',
             previousConviction: {},
+            disabilities: [
+              {
+                disabilityId: 2500079588,
+                disabilityType: {
+                  code: 'LD',
+                  description: 'Learning Difficulties',
+                },
+                startDate: '2021-02-01',
+              },
+            ],
           },
           offenderManagers: [
             {
@@ -276,6 +288,43 @@ export class CommunityMockApi {
               length: 20,
               lengthUnit: 'Days',
               restrictive: false,
+            },
+          ],
+        },
+      },
+    })
+  }
+
+  async stubGetPersonalCircumstances({ crn }: CreateAppointmentArgs) {
+    return this.client.stub({
+      request: {
+        method: 'GET',
+        urlPath: `/community/secure/offenders/crn/${crn}/personalCircumstances`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          personalCircumstances: [
+            {
+              personalCircumstanceId: 2500140003,
+              offenderId: 2500530364,
+              personalCircumstanceType: {
+                code: 'B',
+                description: 'Employment',
+              },
+              personalCircumstanceSubType: {
+                code: 'B03A',
+                description: 'Temporary/casual work (30 or more hours per week)',
+              },
+              startDate: '2021-03-03',
+              probationArea: {
+                code: 'N07',
+                description: 'NPS London',
+              },
+              evidenced: false,
             },
           ],
         },

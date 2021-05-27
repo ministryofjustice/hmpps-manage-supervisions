@@ -13,6 +13,7 @@ import {
   fakeAppointmentType,
   fakeOffenderDetail,
   fakeOfficeLocation,
+  fakePersonalCircumstances,
 } from '../community-api/community-api.fake'
 import { fakeOkResponse } from '../common/rest/rest.fake'
 
@@ -121,5 +122,15 @@ describe('ArrangeAppointmentService', () => {
     ])
     const observed = await subject.getTeamOfficeLocations('some-team-code')
     expect(observed).toEqual(locations)
+  })
+
+  it('gets offender employment', async () => {
+    const personalCircumstances = fakePersonalCircumstances()
+    const stub = community.personalCircumstances.getOffenderPersonalCircumstancesByCrnUsingGET.resolves(
+      fakeOkResponse(personalCircumstances),
+    )
+    const observed = await subject.getCurrentEmploymentCircumstances('some-crn')
+    expect(observed).toBe(personalCircumstances.personalCircumstances[0].personalCircumstanceSubType.description)
+    expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn' })
   })
 })

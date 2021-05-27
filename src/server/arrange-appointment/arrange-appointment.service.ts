@@ -10,7 +10,9 @@ import {
   OfficeLocation,
   Conviction,
   Requirement,
+  PersonalCircumstance,
 } from '../community-api'
+import { DateTime } from 'luxon'
 
 export interface DomainAppointmentType extends AppointmentType {
   isFeatured: boolean
@@ -29,7 +31,7 @@ const featuredAppointmentTypes = {
 
 const RAR_REQUIREMENT_SUB_TYPE_CATEGORY_CODE = 'RARREQ'
 const RAR_REQUIREMENT_TYPE_MAIN_CATEGORY_CODE = 'F'
-
+const EMPLOYMENT_TYPE_CODE = 'B'
 @Injectable()
 export class ArrangeAppointmentService {
   constructor(private readonly community: CommunityApiService, private readonly cache: CacheService) {}
@@ -120,5 +122,22 @@ export class ArrangeAppointmentService {
       throw new Error(`No RAR requirements found for CRN ${crn} convictionId: ${convictionId}`)
     }
     return rarRequirements[0]
+  }
+
+  async getPersonalCircumstances(crn: string): Promise<Array<PersonalCircumstance>> {
+    const { data } = await this.community.personalCircumstances.getOffenderPersonalCircumstancesByCrnUsingGET({ crn })
+    return data.personalCircumstances || []
+  }
+
+  async getCurrentEmploymentCircumstances(crn: string): Promise<string> {
+    return (await this.getPersonalCircumstances(crn))
+      .filter(
+        c =>
+          (!c.endDate || DateTime.fromISO(c.endDate) > DateTime.now()) &&
+          DateTime.fromISO(c.startDate) < DateTime.now(),
+      )
+      .filter(c => c.personalCircumstanceType.code == EMPLOYMENT_TYPE_CODE)
+      .map(c => c.personalCircumstanceSubType.description)
+      .join(', ')
   }
 }

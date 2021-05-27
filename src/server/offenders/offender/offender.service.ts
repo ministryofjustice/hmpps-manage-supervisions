@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { CommunityApiService, OffenderDetail } from '../../community-api'
 import { DateTime } from 'luxon'
+import { CommunityApiService, OffenderDetail } from '../../community-api'
 import { AppointmentListViewModel, RecentAppointments } from './offender-view-model'
 
 export const MAX_RECENT_APPOINTMENTS = 20

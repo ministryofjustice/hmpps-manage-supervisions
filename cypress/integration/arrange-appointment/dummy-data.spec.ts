@@ -172,6 +172,8 @@ context('CreateAppointment', () => {
     whenSelectingTypeRadio(test.type.name)
     whenSubmittingCurrentStep()
 
+    offendersCircumstancesAreShown()
+
     whenEnteringDateStrings('80', '20', '6')
     whenSubmittingCurrentStep()
     aDateErrorIsShown('Enter a valid date')
@@ -277,6 +279,7 @@ context('CreateAppointment', () => {
     cy.task('stubOffenderDetails', { crn })
     cy.task('stubGetConvictions', { crn, convictionId })
     cy.task('stubGetRequirements', { crn, convictionId })
+    cy.task('stubGetPersonalCircumstances', { crn })
   }
 
   function havingLoggedInAndBeginBookingAppointmentFlow({ crn }: AppointmentBookingTestCase) {
@@ -431,5 +434,12 @@ context('CreateAppointment', () => {
 
   function aDateErrorIsShown(message: string) {
     page.when.dateErrorMessage.contains(message)
+  }
+
+  function offendersCircumstancesAreShown() {
+    page.when.circumstancesDetailLink.click()
+    page.when.preferredLaguageText.contains('Bengali')
+    page.when.disabilitiesText.contains('Learning Difficulties')
+    page.when.employmentText.contains('Temporary/casual work (30 or more hours per week)')
   }
 })

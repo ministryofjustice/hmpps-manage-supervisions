@@ -39,6 +39,15 @@ export interface AppointmentSchedulingViewModel extends AppointmentWizardViewMod
   date: { day: number; month: number; year: number }
   startTime: string
   endTime: string
+
+  offender: {
+    firstName: string
+    personalCircumstances: {
+      language: string
+      disabilities: string
+      employment: string
+    }
+  }
 }
 
 export interface AppointmentAddNotesViewModel extends AppointmentWizardViewModelBase {

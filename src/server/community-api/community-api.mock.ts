@@ -1,7 +1,14 @@
 import { DynamicModule, Module } from '@nestjs/common'
 import { CommunityApiService } from './community-api.service'
 import { SinonStubbedInstance, createStubInstance } from 'sinon'
-import { AppointmentsApi, CoreOffenderApi, SentenceRequirementsAndBreachApi, StaffApi, TeamsApi } from './client'
+import {
+  AppointmentsApi,
+  CoreOffenderApi,
+  PersonalCircumstancesApi,
+  SentenceRequirementsAndBreachApi,
+  StaffApi,
+  TeamsApi,
+} from './client'
 
 export type MockCommunityApiService = { [P in keyof CommunityApiService]: SinonStubbedInstance<CommunityApiService[P]> }
 
@@ -14,6 +21,7 @@ export class MockCommunityApiModule {
       team: createStubInstance(TeamsApi),
       requirement: createStubInstance(SentenceRequirementsAndBreachApi),
       staff: createStubInstance(StaffApi),
+      personalCircumstances: createStubInstance(PersonalCircumstancesApi),
     }
 
     return {

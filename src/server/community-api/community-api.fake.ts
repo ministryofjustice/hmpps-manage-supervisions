@@ -9,6 +9,7 @@ import {
   OffenderDetail,
   OfficeLocation,
   PhoneNumberType,
+  PersonalCircumstances,
   StaffDetails,
   StaffHuman,
 } from './client'
@@ -64,6 +65,32 @@ export const fakeOfficeLocation = fake<OfficeLocation>(() => ({
   postcode: faker.address.zipCode(),
   description: faker.address.streetAddress(),
 }))
+
+export function fakePersonalCircumstances(partial: DeepPartial<PersonalCircumstances> = {}): PersonalCircumstances {
+  return merge(
+    {
+      personalCircumstances: [
+        {
+          startDate: faker.date.past().toISOString(),
+          endDate: faker.date.future().toISOString(),
+          evidenced: faker.datatype.boolean(),
+          notes: faker.lorem.lines(),
+          offenderId: faker.datatype.number(),
+          personalCircumstanceId: faker.datatype.number(),
+          personalCircumstanceSubType: {
+            code: faker.lorem.slug(3),
+            description: faker.lorem.slug(10),
+          },
+          personalCircumstanceType: {
+            code: 'B',
+            description: faker.lorem.slug(10),
+          },
+        },
+      ],
+    } as PersonalCircumstances,
+    partial,
+  )
+}
 
 export const fakeStaffDetails = fake<StaffDetails>(() => ({
   username: faker.lorem.slug(10),
