@@ -3,7 +3,7 @@ import { Controller, Get, Render } from '@nestjs/common'
 @Controller()
 export class HomeController {
   @Get()
-  @Render('pages/index')
+  @Render('home/index')
   get(): {} {
     return {}
   }
