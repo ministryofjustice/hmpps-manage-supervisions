@@ -371,6 +371,9 @@ export class ArrangeAppointmentController {
     return {
       step: AppointmentWizardStep.Confirm,
       appointment,
+      paths: {
+        next: `/offender/${offenderDetails.otherIds.crn}/overview`,
+      },
       offender: {
         firstName: offenderDetails.firstName,
         phoneNumber: phoneNumber,

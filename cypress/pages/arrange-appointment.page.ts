@@ -213,7 +213,7 @@ export class ArrangeAppointmentPage extends PageBase {
       },
 
       get finishButton() {
-        return cy.get('button[data-qa="confirm-appointment/finish-button"]')
+        return cy.get('a[data-qa="confirm-appointment/finish-button"]')
       },
     }
   }

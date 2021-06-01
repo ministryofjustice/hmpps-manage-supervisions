@@ -356,7 +356,7 @@ context('CreateAppointment', () => {
     page.check.sensitiveChangeLink.should('have.attr', 'href').and('include', `${crn}/sensitive`)
   }
 
-  function shouldDisplayAppointmentBookingConfirmation({ start, type }: AppointmentBookingTestCase) {
+  function shouldDisplayAppointmentBookingConfirmation({ start, type, crn }: AppointmentBookingTestCase) {
     page.pageTitle.contains('Appointment arranged')
     page.confirm.descriptionMessage.contains(type.name)
     page.confirm.timeMessage.contains(
@@ -364,6 +364,7 @@ context('CreateAppointment', () => {
     )
     page.confirm.phoneMessage.contains('Brian')
     page.confirm.phoneMessage.contains('07734 111992')
+    page.confirm.finishButton.should('have.attr', 'href').and('include', `offender/${crn}/overview`)
   }
 
   function shouldHaveBookedAppointment({
