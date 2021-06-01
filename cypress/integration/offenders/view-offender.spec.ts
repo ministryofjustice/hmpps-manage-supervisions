@@ -33,7 +33,7 @@ context('ViewOffender', () => {
 
   it('displays populated offender schedule', () => {
     const future = getDateRange('future', { hour: 13, minute: 30 }, { minutes: 30 })
-    const recent = getDateRange('recent', { hour: 10, minute: 0 }, { hour: 1 })
+    const recent = getDateRange('past', { hour: 10, minute: 0 }, { hour: 1 })
     havingOffenderAppointments(
       {
         ...future,
