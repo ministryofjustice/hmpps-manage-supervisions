@@ -6,6 +6,26 @@
     {{ title }}
   </h1>
 
+  {% set circumstancesHTML %}
+    <p class="govuk-body">
+      <strong>Preferred language</strong><br>
+      <span data-qa="arrange-appointment/where/language">{{ offender.personalCircumstances.language  | default('<span class="govuk-hint-s">Not known</span>', true) | safe}}</span>
+    </p>
+    <p class="govuk-body">
+      <strong>Disabilities</strong><br>
+      <span data-qa="arrange-appointment/where/disabilities">{{ offender.personalCircumstances.disabilities | default('<span class="govuk-hint-s">None known</span>', true) | safe }}</span>
+    </p>
+    <p class="govuk-body">
+      <strong>Employment status</strong><br>
+      <span data-qa="arrange-appointment/where/employment">{{ offender.personalCircumstances.employment | default('<span class="govuk-hint-s">Not known</span>', true) | safe}}</span>
+    </p>
+  {% endset %}
+
+  {{ govukDetails({
+    summaryText: offender.firstName +"’s circumstances",
+    html: circumstancesHTML
+  }) }}
+
   {{ govukDateInput({
     id: "session-date",
     fieldset: {

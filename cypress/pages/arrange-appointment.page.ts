@@ -89,6 +89,18 @@ export class ArrangeAppointmentPage extends PageBase {
       get dateErrorMessage() {
         return cy.get('#session-date-error')
       },
+      get circumstancesDetailLink() {
+        return cy.get('.govuk-details__summary-text')
+      },
+      get preferredLaguageText() {
+        return cy.get('[data-qa="arrange-appointment/where/language"]')
+      },
+      get disabilitiesText() {
+        return cy.get('[data-qa="arrange-appointment/where/disabilities"]')
+      },
+      get employmentText() {
+        return cy.get('[data-qa="arrange-appointment/where/employment"]')
+      },
     }
   }
 

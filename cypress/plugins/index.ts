@@ -37,6 +37,9 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
     stubGetRequirements(args: CreateAppointmentArgs) {
       return communityApi.stubGetRequirements(args)
     },
+    stubGetPersonalCircumstances(args: CreateAppointmentArgs) {
+      return communityApi.stubGetPersonalCircumstances(args)
+    },
     stubGetLocations() {
       return communityApi.stubGetLocations()
     },

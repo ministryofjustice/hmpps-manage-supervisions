@@ -4,6 +4,7 @@ import { DateTime } from 'luxon'
 import { getDateRange } from '../../util/getDateRange'
 
 const crn = 'ABC123'
+const convictionId = 12345
 
 context('ViewOffender', () => {
   const page = new OffenderPage()
@@ -92,6 +93,8 @@ context('ViewOffender', () => {
 
   function havingViewedOffender() {
     cy.task('stubOffenderDetails', { crn })
+    cy.task('stubGetConvictions', { crn, convictionId })
+    cy.task('stubGetRequirements', { crn, convictionId })
     cy.login()
     cy.viewOffender(crn)
   }

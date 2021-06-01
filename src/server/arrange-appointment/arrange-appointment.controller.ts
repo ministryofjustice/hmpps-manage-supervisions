@@ -19,6 +19,7 @@ import { AuthenticatedUser, DynamicRedirect, RedirectResponse } from '../common'
 import { BodyClass } from '../common/meta/body-class.decorator'
 import { DEFAULT_GROUP } from '../util/mapping'
 import { AppointmentTypeRequiresLocation, OffenderDetail, OffenderManager } from '../community-api'
+import { DateTime } from 'luxon'
 
 type RenderOrRedirect = AppointmentWizardViewModel | RedirectResponse
 
@@ -167,7 +168,7 @@ export class ArrangeAppointmentController {
       return redirect
     }
 
-    return await this.getAppointmentSchedulingViewModel(session)
+    return await this.getAppointmentSchedulingViewModel(session, crn)
   }
 
   @Post('when')
@@ -182,7 +183,7 @@ export class ArrangeAppointmentController {
 
     const errors = await this.validateWithSession(body, session, AppointmentWizardStep.When)
     if (errors.length > 0) {
-      return await this.getAppointmentSchedulingViewModel(session, body, errors)
+      return await this.getAppointmentSchedulingViewModel(session, crn, body, errors)
     }
 
     Object.assign(session.appointment, body)
@@ -426,9 +427,26 @@ export class ArrangeAppointmentController {
 
   private async getAppointmentSchedulingViewModel(
     session: AppointmentWizardSession,
+    crn: string,
     body?: DeepPartial<AppointmentBuilderDto>,
     errors: ValidationError[] = [],
   ): Promise<AppointmentSchedulingViewModel> {
+    const [offender, employment] = await Promise.all([
+      this.service.getOffenderDetails(crn),
+      this.service.getCurrentEmploymentCircumstances(crn),
+    ])
+
+    const disabilities = (offender.offenderProfile.disabilities || [])
+      .filter(
+        d =>
+          (!d.endDate || DateTime.fromISO(d.endDate) > DateTime.now()) &&
+          DateTime.fromISO(d.startDate) < DateTime.now(),
+      )
+      .map(d => d.disabilityType.description)
+      .join(', ')
+
+    const language = offender.offenderProfile.offenderLanguages?.primaryLanguage
+
     const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
       groups: [DEFAULT_GROUP],
       excludeExtraneousValues: true,
@@ -443,6 +461,15 @@ export class ArrangeAppointmentController {
       date: (body?.date as any) || appointment.date,
       startTime: body?.startTime || appointment.startTime,
       endTime: body?.endTime || appointment.endTime,
+
+      offender: {
+        firstName: offender.firstName,
+        personalCircumstances: {
+          language,
+          employment,
+          disabilities,
+        },
+      },
     }
   }
 
