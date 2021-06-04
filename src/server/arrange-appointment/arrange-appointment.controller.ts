@@ -445,7 +445,20 @@ export class ArrangeAppointmentController {
           (!d.endDate || DateTime.fromISO(d.endDate) > DateTime.now()) &&
           DateTime.fromISO(d.startDate) < DateTime.now(),
       )
-      .map(d => d.disabilityType.description)
+      .map(d => {
+        const provisions = (d.provisions || [])
+          .filter(
+            p =>
+              (!p.finishDate || DateTime.fromISO(p.finishDate) > DateTime.now()) &&
+              DateTime.fromISO(d.startDate) < DateTime.now(),
+          )
+          .map(p => p.provisionType.description)
+
+        if (provisions.length > 0) {
+          return d.disabilityType.description + ` (adjustments: ${provisions?.join(', ')})`
+        }
+        return d.disabilityType.description
+      })
       .join(', ')
 
     const language = offender.offenderProfile.offenderLanguages?.primaryLanguage

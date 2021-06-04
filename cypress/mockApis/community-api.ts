@@ -137,6 +137,25 @@ export class CommunityMockApi {
                   description: 'Learning Difficulties',
                 },
                 startDate: '2021-02-01',
+                provisions: [
+                  {
+                    provisionId: 2500075159,
+                    startDate: '2021-05-10',
+                    provisionType: {
+                      code: '99',
+                      description: 'Other',
+                    },
+                    notes: 'Extra tuition',
+                  },
+                ],
+              },
+              {
+                disabilityId: 2500080089,
+                disabilityType: {
+                  code: 'SI',
+                  description: 'Speech Impairment',
+                },
+                startDate: '2021-02-01',
               },
             ],
           },
