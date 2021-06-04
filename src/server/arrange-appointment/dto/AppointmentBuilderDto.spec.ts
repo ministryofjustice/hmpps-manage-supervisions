@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { AppointmentWizardStep } from './AppointmentWizardViewModel'
 import { fakeAppointmentBuilderDto } from './arrange-appointment.fake'
-import { IS_BOOLEAN, IS_INT, IS_NOT_EMPTY, IS_POSITIVE, IS_STRING, validate } from 'class-validator'
+import { IS_BOOLEAN, IS_IN, IS_INT, IS_NOT_EMPTY, IS_POSITIVE, IS_STRING, validate } from 'class-validator'
 import { AppointmentBuilderDto } from './AppointmentBuilderDto'
 import { flattenValidationErrors } from '../../util/flattenValidationErrors'
 import { DateTime } from 'luxon'
@@ -10,7 +10,8 @@ import { plainToClass } from 'class-transformer'
 import { DEFAULT_GROUP } from '../../util/mapping'
 import { pick } from 'lodash'
 import { IS_AFTER, IS_DATE_INPUT, IS_FUTURE_DATE, IS_FUTURE_TIME, IS_TIME } from '../../validators'
-import { AppointmentTypeRequiresLocation } from '../../community-api/client'
+import { AppointmentTypeRequiresLocation } from '../../community-api'
+import { WellKnownAppointmentType } from '../../config'
 
 type Assertion = (subject: AppointmentBuilderDto) => void
 
@@ -115,7 +116,10 @@ describe('AppointmentBuilderDto validation & mapping', () => {
     it('is valid', async () => Given.dto({}).whenValidating().shouldBeValid().run())
 
     it('is invalid from "type" group', async () =>
-      Given.dto({ type: '' }).whenValidating().shouldTriggerConstraints('type', IS_NOT_EMPTY).run())
+      Given.dto({ type: '' as WellKnownAppointmentType })
+        .whenValidating()
+        .shouldTriggerConstraints('type', IS_NOT_EMPTY, IS_IN)
+        .run())
 
     it('is invalid from "where" group', async () =>
       Given.dto({ requiresLocation: AppointmentTypeRequiresLocation.Required, location: '' })
@@ -126,18 +130,27 @@ describe('AppointmentBuilderDto validation & mapping', () => {
 
   describe(`type group`, () => {
     it('is featured & valid', async () =>
-      Given.dto({ type: 'code' }).whenValidating(AppointmentWizardStep.Type).shouldBeValid().run())
+      Given.dto({ type: WellKnownAppointmentType.OfficeVisit })
+        .whenValidating(AppointmentWizardStep.Type)
+        .shouldBeValid()
+        .run())
+
+    it('is featured but not well known type', async () =>
+      Given.dto({ type: 'not-a-well-known-type' as WellKnownAppointmentType })
+        .whenValidating(AppointmentWizardStep.Type)
+        .shouldTriggerConstraints('type', IS_IN)
+        .run())
 
     it('is featured & empty', async () =>
-      Given.dto({ type: '' })
+      Given.dto({ type: '' as WellKnownAppointmentType })
         .whenValidating(AppointmentWizardStep.Type)
-        .shouldTriggerConstraints('type', IS_NOT_EMPTY)
+        .shouldTriggerConstraints('type', IS_NOT_EMPTY, IS_IN)
         .run())
 
     it('is featured & missing', async () =>
       Given.dto({ type: null })
         .whenValidating(AppointmentWizardStep.Type)
-        .shouldTriggerConstraints('type', IS_STRING, IS_NOT_EMPTY)
+        .shouldTriggerConstraints('type', IS_STRING, IS_NOT_EMPTY, IS_IN)
         .run())
 
     it('is other & valid', async () =>

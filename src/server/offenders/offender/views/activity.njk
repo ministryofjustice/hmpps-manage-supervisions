@@ -1,0 +1,87 @@
+{% extends "./_layout.njk" %}
+{% set pageName = 'Activity log' %}
+
+{% block page %}
+    <a href='{{ links.addActivity }}' class='govuk-button govuk-!-margin-bottom-8' data-qa='offender/add-activity-button'>
+        Add to log
+    </a>
+
+    <div class="govuk-grid-row">
+        <div class='govuk-grid-column-two-thirds'>
+            {% set hr = joiner('<hr class="govuk-section-break govuk-section-break--m">') %}
+
+            {% for contact in contacts %}
+                {{ hr() | safe }}
+
+                <div data-qa='offender/activity/{{ contact.id }}'>
+                    <h3 class="govuk-heading-m govuk-!-margin-bottom-2">
+                        {{ contact.start | longDate }}
+                        <span class="govuk-!-margin-left-1 govuk-!-font-size-19 govuk-!-font-weight-regular">
+                        {{ contact.start | time }}
+                            {% if contact.end %}
+                                to {{ contact.end | time }}
+                            {% endif %}
+                    </span>
+                        <br>
+                        <a href="{{ contact.links.view }}">
+                            {{ contact.name }}
+                        </a>
+                    </h3>
+
+                    <div class="govuk-!-margin-bottom-3">
+                        {% for tag in contact.tags %}
+                            {{ govukTag({
+                                text: tag.name,
+                                classes: "govuk-tag--" + tag.colour,
+                                attributes: { 'data-qa': 'tag' }
+                            }) }}
+                        {% endfor %}
+                    </div>
+
+                    <div class="note-panel">
+                        {% if contact.links.recordMissingAttendance %}
+                            {% set attendanceWarningHtml %}
+                                Attendance not recorded
+                                <br>
+                                <a href="{{ contact.links.recordMissingAttendance }}">
+                                    Record attendance
+                                </a>
+                            {% endset %}
+                            {{ govukWarningText({
+                                html: attendanceWarningHtml,
+                                iconFallbackText: "Warning",
+                                classes: 'govuk-!-margin-bottom-0',
+                                attributes: {
+                                    'data-qa': 'attendance-missing'
+                                }
+                            }) }}
+                        {% endif %}
+
+                        {% if contact.notes %}
+                            {% if contact.notes.length > 300 %}
+                                <p class="govuk-body" data-qa='notes'>
+                                    {{ contact.notes | truncate(250) }}
+                                </p>
+                                <p class="govuk-body govuk-!-margin-bottom-0" data-qa='view-link'>
+                                    <a href="{{ contact.links.view }}">View full details</a>
+                                </p>
+                            {% else %}
+                                <p class="govuk-body govuk-!-margin-bottom-0" data-qa='notes'>
+                                    {{ contact.notes }}
+                                </p>
+                            {% endif %}
+                        {% elif not contact.links.recordMissingAttendance %}
+                            <p class="govuk-body govuk-!-margin-bottom-0" data-qa='add-notes'>
+                                <a href="{{ contact.links.addNotes }}">Add notes</a>
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <p class='govuk-body' data-qa='offender/activity/empty'>
+                    There are no entries in the activity log.
+                </p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

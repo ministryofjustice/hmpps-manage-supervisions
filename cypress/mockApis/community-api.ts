@@ -1,4 +1,5 @@
 import { WireMockClient } from './wiremock-client'
+import { merge } from 'lodash'
 
 export interface CreateAppointmentArgs {
   crn: string
@@ -13,6 +14,12 @@ export interface StubOffenderAppointmentOptions {
     type: { code: string; name: string }
     staff: { forenames: string; surname: string }
   }[]
+}
+
+export interface StubContactSummaryOptions {
+  crn: string
+  partials: any[]
+  query: any
 }
 
 export class CommunityMockApi {
@@ -496,7 +503,7 @@ export class CommunityMockApi {
             code: '067232a5-96f4-436b-aa61-beb68cc0bc44',
             forenames: x.staff.forenames,
             surname: x.staff.surname,
-            unallocated: true,
+            unallocated: false,
           },
         })),
       },
@@ -509,5 +516,63 @@ export class CommunityMockApi {
     )
     console.log(requests.map(x => JSON.parse(x.request.body)))
     return requests.map(x => JSON.parse(x.request.body))
+  }
+
+  async stubContactSummary({ crn, partials, query = {} }: StubContactSummaryOptions) {
+    return this.client.stub({
+      request: {
+        method: 'GET',
+        urlPath: `/community/secure/offenders/crn/${crn}/contact-summary`,
+        queryParameters: Object.entries(query)
+          .map(([k, v]) => ({ [k]: { equalTo: v } }))
+          .reduce((x, y) => ({ ...x, ...y }), {}),
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          content: partials.map((partial, i) =>
+            merge(
+              {
+                contactId: i + 1,
+                contactStart: '2020-09-03T12:00:00+01:00',
+                contactEnd: '2020-09-03T13:00:00+01:00',
+                type: {
+                  code: 'CHVS',
+                  description: 'Home Visit to Case (NS)',
+                  appointment: true,
+                },
+                notes: 'Some home visit appointment',
+                provider: {
+                  code: 'N02',
+                  description: 'NPS North East',
+                },
+                team: {
+                  code: 'N02SP5',
+                  description: 'BRADFORD\\BULLS SP',
+                },
+                staff: {
+                  code: 'N02SP5U',
+                  forenames: 'Mark',
+                  surname: 'Berridge',
+                  unallocated: false,
+                },
+              },
+              partial,
+            ),
+          ),
+          number: 0,
+          size: partials.length || 10,
+          numberOfElements: partials.length,
+          totalPages: partials.length === 0 ? 0 : 1,
+          totalElements: partials.length,
+          first: true,
+          last: false,
+          empty: partials.length === 0,
+        },
+      },
+    })
   }
 }

@@ -2,13 +2,14 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PassportSerializer, PassportStrategy } from '@nestjs/passport'
 import { Strategy } from 'passport-oauth2'
-import { AuthApiConfig, ServerConfig } from '../config'
+import { AuthApiConfig, DebugFlags, ServerConfig } from '../config'
 import { UserService } from './user/user.service'
 import { generateOauthClientToken } from '../common'
 import { titleCase } from '../util'
 import * as jwt from 'jsonwebtoken'
 
 const DELIUS_AUTH_SOURCE = 'delius'
+
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
   serializeUser(user: any, done: (err: Error, user: any) => void): any {
@@ -51,9 +52,29 @@ export class HmppsStrategy extends PassportStrategy(Strategy, 'hmpps') {
     } as User
     const profile = await this.userService.getUser(user)
 
-    const staffCode =
-      claims.auth_source == DELIUS_AUTH_SOURCE ? (await this.userService.getStaffDetails(user)).staffCode : null
+    return {
+      ...user,
+      ...profile,
+      displayName: titleCase(profile.name),
+      staffCode: await this.getStaffCode(user, claims.auth_source),
+    }
+  }
 
-    return { ...user, ...profile, displayName: titleCase(profile.name), staffCode }
+  private async getStaffCode(user: User, authSource: string) {
+    if (authSource === DELIUS_AUTH_SOURCE) {
+      const staff = await this.userService.getStaffDetails(user)
+      if (!staff?.staffCode) {
+        throw new Error(`Delius user '${user.username}' has no staff record`)
+      }
+      return staff.staffCode
+    }
+
+    const debug = this.config.get<ServerConfig>('server').debug[DebugFlags.SetStaffCode]
+    if (debug) {
+      return debug
+    }
+
+    // TODO maybe we should not allow login unless delius auth is enabled
+    return null
   }
 }

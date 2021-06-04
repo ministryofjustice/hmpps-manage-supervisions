@@ -27,6 +27,10 @@ app.get('/health', (req, res, next) => {
 
 app.use(middlewares)
 
+const paginated = {
+  '/secure/offenders/crn/:crn/contact-summary*': '/contact-summary',
+}
+
 app.use(
   jsonServer.rewriter({
     '/secure/offenders/crn/:crn/sentence/*/appointments': '/new-appointments',
@@ -35,10 +39,31 @@ app.use(
     '/secure/offenders/crn/:crn/all': '/offenders-by-crn/:crn',
     '/secure/offenders/crn/:crn/convictions?activeOnly=true': '/convictions-by-crn?id=:crn',
     '/secure/teams/:teamCode/office-locations': '/team-office-locations?teamCode=:teamCode',
+    '/secure/offenders/crn/:crn/convictions/:conviction/requirements*': '/conviction-requirements-by-conviction/:conviction',
+    '/secure/offenders/crn/:crn/personalCircumstances': '/personal-circumstances',
+    ...paginated,
   }),
 )
 
 app.use(router)
+
+router.render = (req, res) => {
+  if (req.method === 'GET' && Object.values(paginated).some(x => req.url.startsWith(x))) {
+    res.jsonp({
+      content: res.locals.data,
+      number: 0,
+      size: res.locals.data.length || 10,
+      numberOfElements: res.locals.data.length,
+      totalPages: res.locals.data.length === 0 ? 0 : 1,
+      totalElements: res.locals.data.length,
+      first: true,
+      last: false,
+      empty: res.locals.data.length === 0,
+    })
+  } else {
+    res.jsonp(res.locals.data)
+  }
+}
 
 app.listen(8082, () => {
   console.log('JSON Server is running')

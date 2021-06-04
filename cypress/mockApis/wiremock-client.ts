@@ -70,6 +70,6 @@ export class WireMockClient {
   }
 
   async reset() {
-    await Promise.all([WireMockClient.deleteAll('mappings'), WireMockClient.deleteAll('requests')])
+    return Promise.all([WireMockClient.deleteAll('mappings'), WireMockClient.deleteAll('requests')])
   }
 }

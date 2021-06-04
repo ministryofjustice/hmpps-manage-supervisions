@@ -2,9 +2,11 @@ version: '3.1'
 
 services:
   redis-commander:
-    container_name: redis-commander
-    hostname: redis-commander
     image: rediscommander/redis-commander:latest
+    hostname: redis-commander
+    container_name: redis-commander
+    depends_on:
+      - redis
     networks:
       - hmpps
     restart: always

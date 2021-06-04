@@ -1,7 +1,7 @@
-import { DomainAppointmentType } from '../arrange-appointment.service'
 import { ViewModel } from '../../common'
 import { AppointmentBuilderDto } from './AppointmentBuilderDto'
-import { OfficeLocation } from '../../community-api/client'
+import { AppointmentType, OfficeLocation } from '../../community-api'
+import { WellKnownAppointmentType, WellKnownAppointmentTypeMeta } from '../../config'
 
 export enum AppointmentWizardStep {
   Type = 'type',
@@ -18,12 +18,23 @@ interface AppointmentWizardViewModelBase extends ViewModel<AppointmentBuilderDto
   step: AppointmentWizardStep
 }
 
+export interface FeaturedAppointmentType {
+  type: WellKnownAppointmentType
+  description: string
+  meta: WellKnownAppointmentTypeMeta
+  appointmentTypes: AppointmentType[]
+}
+
+export type OtherAppointmentType = AppointmentType
+
+export interface AvailableAppointmentTypes {
+  featured: FeaturedAppointmentType[]
+  other: OtherAppointmentType[]
+}
+
 export interface AppointmentTypeViewModel extends AppointmentWizardViewModelBase {
   step: AppointmentWizardStep.Type
-  types: {
-    featured: DomainAppointmentType[]
-    other: DomainAppointmentType[]
-  }
+  types: AvailableAppointmentTypes
   type: string | null
   other: string | null
 }

@@ -6,6 +6,7 @@ import { BaseAPI } from './client/base'
 import {
   AppointmentsApi,
   Configuration,
+  ContactAndAttendanceApi,
   CoreOffenderApi,
   PersonalCircumstancesApi,
   SentenceRequirementsAndBreachApi,
@@ -48,6 +49,10 @@ export class CommunityApiService {
 
   get personalCircumstances() {
     return this.api(PersonalCircumstancesApi)
+  }
+
+  get contactAndAttendance() {
+    return this.api(ContactAndAttendanceApi)
   }
 
   private api<Api extends BaseAPI>(type: ApiConstructor<Api>): Api {

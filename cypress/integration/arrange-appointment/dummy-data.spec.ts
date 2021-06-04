@@ -1,6 +1,6 @@
 import { ArrangeAppointmentPage } from '../../pages'
 import { DateTime } from 'luxon'
-import { Time, DateWithDayAndWithoutYear } from '../../../src/server/bootstrap/nunjucks/filters'
+import { getDateRange } from '../../util/getDateRange'
 interface AppointmentBookingTestCase {
   start: DateTime
   end: DateTime
@@ -20,12 +20,11 @@ interface AppointmentBookingTestCase {
 }
 
 function testCase(partial: Omit<AppointmentBookingTestCase, 'start' | 'end'>) {
-  const start = DateTime.now().plus({ hours: 1 }).set({ second: 0, millisecond: 0 })
-  const end = start.plus({ hour: 2 })
+  const { start, end } = getDateRange('future')
   return {
     ...partial,
-    start,
-    end,
+    start: DateTime.fromISO(start),
+    end: DateTime.fromISO(end),
   }
 }
 
@@ -343,10 +342,10 @@ context('CreateAppointment', () => {
     page.check.appointmentType.contains(type.name)
     page.check.appointmentTypeChangeLink.should('have.attr', 'href').and('include', `${crn}/type`)
 
-    page.check.appointmentDate.contains(new DateWithDayAndWithoutYear().filter(start))
+    page.check.appointmentDate.contains(longDate(start))
     page.check.appointmentDateChangeLink.should('have.attr', 'href').and('include', `${crn}/when`)
 
-    page.check.appointmentTime.contains(`${new Time().filter(start)} to ${new Time().filter(end)}`)
+    page.check.appointmentTime.contains(`${time(start)} to ${time(end)}`)
     page.check.appointmentTimeChangeLink.should('have.attr', 'href').and('include', `${crn}/when`)
 
     page.check.notes.contains(notes)
@@ -356,12 +355,20 @@ context('CreateAppointment', () => {
     page.check.sensitiveChangeLink.should('have.attr', 'href').and('include', `${crn}/sensitive`)
   }
 
+  function longDate(date: DateTime) {
+    const format = date.year === DateTime.now().year ? 'cccc d MMMM' : 'cccc d MMMM yyyy'
+    return date.toFormat(format)
+  }
+
+  function time(date: DateTime) {
+    const hourMinuteFormat = date.minute === 0 ? 'ha' : 'h:mma'
+    return date.toFormat(hourMinuteFormat).toLowerCase()
+  }
+
   function shouldDisplayAppointmentBookingConfirmation({ start, type, crn }: AppointmentBookingTestCase) {
     page.pageTitle.contains('Appointment arranged')
     page.confirm.descriptionMessage.contains(type.name)
-    page.confirm.timeMessage.contains(
-      `${new DateWithDayAndWithoutYear().filter(start)} from ${new Time().filter(start)}`,
-    )
+    page.confirm.timeMessage.contains(`${longDate(start)} from ${time(start)}`)
     page.confirm.phoneMessage.contains('Brian')
     page.confirm.phoneMessage.contains('07734 111992')
     page.confirm.finishButton.should('have.attr', 'href').and('include', `offender/${crn}/overview`)

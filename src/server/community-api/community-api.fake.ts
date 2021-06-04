@@ -12,16 +12,14 @@ import {
   PersonalCircumstances,
   StaffDetails,
   StaffHuman,
+  ContactSummary,
+  ContactType,
 } from './client'
 import { merge } from 'lodash'
 import * as faker from 'faker'
 import { DateTime } from 'luxon'
-
-type FakeFn<Faked, Options = any> = (partial?: DeepPartial<Faked>, options?: Options) => Faked
-
-function fake<Faked, Options = any>(factory: (options?: Options) => Faked): FakeFn<Faked> {
-  return (partial, options) => merge(factory(options), partial)
-}
+import { fake } from '../util/util.fake'
+import { Paginated } from './types'
 
 export const fakeAppointmentType = fake<AppointmentType>(() => ({
   contactType: faker.datatype.uuid(),
@@ -119,21 +117,62 @@ export const fakeStaffHuman = fake<StaffHuman>(() => ({
   unallocated: faker.datatype.boolean(),
 }))
 
-export const fakeAppointmentDetail = fake<AppointmentDetail, { when?: 'past' | 'recent' | 'soon' | 'future' }>(
+export interface FakeAppointmentDetailOptions {
+  when?: 'past' | 'recent' | 'soon' | 'future'
+}
+
+export const fakeAppointmentDetail = fake<AppointmentDetail, FakeAppointmentDetailOptions>(({ when = 'recent' }) => {
+  const date = DateTime.fromJSDate(faker.date[when]())
+  return {
+    appointmentId: faker.datatype.number(),
+    appointmentStart: date.toISO(),
+    appointmentEnd: date.plus({ hour: 1 }).toISO(),
+    notes: faker.company.bs(),
+    officeLocation: fakeOfficeLocation(),
+    outcome: fakeAppointmentOutcome(),
+    sensitive: faker.datatype.boolean(),
+    type: fakeAppointmentType(),
+    provider: fakeKeyValue(),
+    team: fakeKeyValue(),
+    staff: fakeStaffHuman(),
+  }
+})
+
+export const fakeContactType = fake<ContactType>(() => ({
+  code: faker.datatype.uuid(),
+  description: faker.company.bs(),
+  shortDescription: faker.company.bs(),
+  appointment: faker.datatype.boolean(),
+}))
+
+export const fakeContactSummary = fake<ContactSummary, { when?: 'past' | 'recent' | 'soon' | 'future' }>(
   ({ when = 'recent' }) => {
     const date = DateTime.fromJSDate(faker.date[when]())
     return {
-      appointmentId: faker.datatype.number(),
-      appointmentStart: date.toISO(),
-      appointmentEnd: date.plus({ hour: 1 }).toISO(),
+      contactId: faker.datatype.number(),
+      contactStart: date.toISO(),
+      contactEnd: date.plus({ hour: 1 }).toISO(),
       notes: faker.company.bs(),
       officeLocation: fakeOfficeLocation(),
       outcome: fakeAppointmentOutcome(),
       sensitive: faker.datatype.boolean(),
-      type: fakeAppointmentType(),
+      type: fakeContactType(),
       provider: fakeKeyValue(),
       team: fakeKeyValue(),
       staff: fakeStaffHuman(),
     }
   },
 )
+
+export function fakePaginated<T>(content: T[], partial?: Partial<Omit<Paginated<T>, 'content'>>): Paginated<T> {
+  return {
+    totalElements: content.length,
+    size: content.length,
+    number: 0,
+    first: true,
+    last: false,
+    totalPages: 1,
+    ...partial,
+    content,
+  }
+}

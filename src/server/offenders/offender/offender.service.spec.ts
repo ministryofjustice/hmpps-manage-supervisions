@@ -1,40 +1,50 @@
 import { Test } from '@nestjs/testing'
+import * as faker from 'faker'
 import { orderBy } from 'lodash'
+import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { MAX_RECENT_APPOINTMENTS, OffenderService } from './offender.service'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../community-api/community-api.mock'
-import { AppointmentDetail, CommunityApiService } from '../../community-api'
-import { fakeAppointmentDetail, fakeOffenderDetail } from '../../community-api/community-api.fake'
+import { AppointmentDetail, CommunityApiService, ContactSummary, Paginated } from '../../community-api'
+import {
+  fakeAppointmentDetail,
+  fakeContactSummary,
+  fakeOffenderDetail,
+  fakePaginated,
+} from '../../community-api/community-api.fake'
 import { fakeOkResponse } from '../../common/rest/rest.fake'
 import { RecentAppointments } from './offender-view-model'
+import { ContactMappingService } from '../../common'
+import { WellKnownContactTypeCategory } from '../../config'
+import { ActivityLogEntry, ActivityLogEntryTag } from './activity-log-entry'
+import { DateTime } from 'luxon'
 
 describe('OffenderService', () => {
-  let service: OffenderService
+  let subject: OffenderService
   let community: MockCommunityApiService
+  let contactMapping: SinonStubbedInstance<ContactMappingService>
 
   beforeEach(async () => {
+    contactMapping = createStubInstance(ContactMappingService)
+
     const module = await Test.createTestingModule({
-      providers: [OffenderService],
+      providers: [OffenderService, { provide: ContactMappingService, useValue: contactMapping }],
       imports: [MockCommunityApiModule.register()],
     }).compile()
 
-    service = module.get(OffenderService)
+    subject = module.get(OffenderService)
     community = module.get(CommunityApiService)
   })
 
   it('gets offender detail', async () => {
     const offender = fakeOffenderDetail()
     const stub = community.offender.getOffenderDetailByCrnUsingGET.resolves(fakeOkResponse(offender))
-    const observed = await service.getOffenderDetail('some-crn')
+    const observed = await subject.getOffenderDetail('some-crn')
     expect(observed).toBe(offender)
     expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn' })
   })
 
   it('gets offender appointments', async () => {
-    const partial: DeepPartial<AppointmentDetail> = {
-      appointmentId: 12345,
-      type: { description: 'some-appointment-type' },
-      staff: { forenames: 'some-first-name', surname: 'some-last-name' },
-    }
+    const partial: DeepPartial<AppointmentDetail> = { appointmentId: 12345 }
     const appointments = orderBy(
       [
         fakeAppointmentDetail(partial, { when: 'future' }),
@@ -44,18 +54,128 @@ describe('OffenderService', () => {
       'appointmentStart',
       'desc',
     )
+
+    for (const apt of appointments) {
+      contactMapping.getTypeMeta.withArgs(apt).returns({
+        type: null,
+        value: { appointment: true },
+        name: 'some-appointment-type',
+      })
+    }
+
     const expected = appointments.map(x => ({
       ...x,
-      name: 'some-appointment-type with some-first-name some-last-name',
-      href: '/offender/some-crn/appointment/12345',
+      name: 'some-appointment-type',
+      link: '/offender/some-crn/appointment/12345',
     }))
     const stub = community.appointment.getOffenderAppointmentsByCrnUsingGET.resolves(fakeOkResponse(appointments))
-    const observed = await service.getRecentAppointments('some-crn')
+    const observed = await subject.getRecentAppointments('some-crn')
     expect(observed).toEqual({
       future: expected.slice(0, 1),
       recent: expected.slice(1, MAX_RECENT_APPOINTMENTS + 1),
       past: expected.slice(MAX_RECENT_APPOINTMENTS + 1),
     } as RecentAppointments)
     expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn' })
+  })
+
+  it('gets activity log page', async () => {
+    const start = DateTime.fromJSDate(faker.date.past()).set({ hour: 12, minute: 0, second: 0, millisecond: 0 })
+    const end = start.plus({ hour: 1 })
+    const contacts: ContactSummary[] = []
+    function havingContact(
+      partial: DeepPartial<ContactSummary> & { notes: string },
+      type: WellKnownContactTypeCategory | null,
+      meta: any = {},
+    ) {
+      const contact = fakeContactSummary({
+        contactId: contacts.length + 1,
+        contactStart: start.toISO(),
+        contactEnd: end.toISO(),
+        ...partial,
+      })
+      contacts.push(contact)
+      contactMapping.getTypeMeta.withArgs(contact).returns({
+        name: `some ${contact.notes}`,
+        type,
+        value: meta,
+      })
+    }
+
+    havingContact(
+      { notes: 'well known, complied appointment', outcome: { complied: true } },
+      WellKnownContactTypeCategory.Appointment,
+    )
+    havingContact(
+      { notes: 'well known, not complied appointment', outcome: { complied: false } },
+      WellKnownContactTypeCategory.Appointment,
+    )
+    havingContact({ notes: 'other appointment, not recorded', outcome: null }, null, { appointment: true })
+    havingContact({ notes: 'well known communication' }, WellKnownContactTypeCategory.Communication)
+    havingContact({ notes: 'unknown' }, null, { appointment: false })
+
+    const stub = community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET.resolves(
+      fakeOkResponse(fakePaginated(contacts)),
+    )
+
+    const observed = await subject.getActivityLogPage('some-crn', { appointmentsOnly: true })
+
+    function expectedAppointment(
+      id: number,
+      notes: string,
+      tags: ActivityLogEntryTag[],
+      recorded = true,
+    ): ActivityLogEntry {
+      return {
+        id,
+        type: WellKnownContactTypeCategory.Appointment,
+        name: `some ${notes}`,
+        start,
+        end,
+        notes,
+        tags,
+        links: {
+          view: `/offender/some-crn/appointment/${id}`,
+          addNotes: `/offender/some-crn/appointment/${id}/add-notes`,
+          recordMissingAttendance: recorded ? null : `/offender/some-crn/appointment/${id}/record-outcome`,
+        },
+      }
+    }
+
+    expect(observed).toEqual({
+      totalPages: 1,
+      first: true,
+      last: false,
+      number: 0,
+      size: 5,
+      totalElements: 5,
+      content: [
+        expectedAppointment(1, 'well known, complied appointment', [{ colour: 'green', name: 'complied' }]),
+        expectedAppointment(2, 'well known, not complied appointment', [{ colour: 'red', name: 'failed to comply' }]),
+        expectedAppointment(3, 'other appointment, not recorded', [], false),
+        {
+          id: 4,
+          type: WellKnownContactTypeCategory.Communication,
+          name: 'some well known communication',
+          start,
+          notes: 'well known communication',
+          tags: [],
+          links: {
+            view: `/offender/some-crn/communication/4`,
+            addNotes: `/offender/some-crn/communication/4/add-notes`,
+          },
+        },
+        {
+          id: 5,
+          type: null,
+          name: 'some unknown',
+          start,
+          notes: 'unknown',
+          tags: [],
+          links: null,
+        },
+      ],
+    } as Paginated<ActivityLogEntry>)
+
+    expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn', appointmentsOnly: true })
   })
 })

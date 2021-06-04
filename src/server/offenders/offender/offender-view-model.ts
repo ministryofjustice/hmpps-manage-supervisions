@@ -1,4 +1,5 @@
 import { AppointmentDetail, ContactDetails } from '../../community-api'
+import { ActivityLogEntry } from './activity-log-entry'
 
 export enum OffenderPage {
   Overview = 'overview',
@@ -8,7 +9,12 @@ export enum OffenderPage {
   Sentence = 'sentence',
 }
 
-export type OffenderLinks = { [Page in OffenderPage]: string } & { arrangeAppointment: string }
+export type OffenderPageLinks = { [Page in OffenderPage]: string }
+
+export interface OffenderLinks extends OffenderPageLinks {
+  arrangeAppointment: string
+  addActivity: string
+}
 
 export interface OffenderViewModelBase {
   page: OffenderPage
@@ -26,7 +32,7 @@ export interface OffenderOverviewViewModel extends OffenderViewModelBase {
 
 export interface AppointmentListViewModel extends AppointmentDetail {
   name: string
-  href: string
+  link: string
 }
 
 export interface RecentAppointments {
@@ -42,6 +48,11 @@ export interface OffenderScheduleViewModel extends OffenderViewModelBase {
 
 export interface OffenderActivityViewModel extends OffenderViewModelBase {
   page: OffenderPage.Activity
+  contacts: ActivityLogEntry[]
+  pagination: {
+    page?: number
+    size?: number
+  }
 }
 
 export interface OffenderPersonalViewModel extends OffenderViewModelBase {
