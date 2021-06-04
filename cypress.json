@@ -8,5 +8,7 @@
   "videoUploadOnPasses": false,
   "taskTimeout": 5000,
   "video": false,
-  "env": {}
+  "env": {},
+  "viewportWidth": 1920,
+  "viewportHeight": 1080
 }
