@@ -1,9 +1,8 @@
 import 'reflect-metadata'
 import { match } from 'sinon'
-import { ArrangeAppointmentService, DomainAppointmentType } from './arrange-appointment.service'
-import { fakeAppointmentBuilderDto } from './dto/arrange-appointment.fake'
+import { ArrangeAppointmentService } from './arrange-appointment.service'
+import { fakeAppointmentBuilderDto, fakeFeaturedAppointmentType } from './dto/arrange-appointment.fake'
 import * as faker from 'faker'
-import { pick } from 'lodash'
 import { MockCacheModule, MockCacheService } from '../common/cache/cache.mock'
 import { Test } from '@nestjs/testing'
 import { MockCommunityApiModule, MockCommunityApiService } from '../community-api/community-api.mock'
@@ -16,28 +15,38 @@ import {
   fakePersonalCircumstances,
 } from '../community-api/community-api.fake'
 import { fakeOkResponse } from '../common/rest/rest.fake'
+import { WellKnownAppointmentType, WellKnownContactTypeCategory, WellKnownContactTypeConfig } from '../config'
+import { AvailableAppointmentTypes } from './dto/AppointmentWizardViewModel'
+import { FakeConfigModule } from '../config/config.fake'
+import { ConfigService } from '@nestjs/config'
 
 describe('ArrangeAppointmentService', () => {
   let community: MockCommunityApiService
   let cache: MockCacheService
   let subject: ArrangeAppointmentService
+  let config: WellKnownContactTypeConfig
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      imports: [MockCacheModule.register(), MockCommunityApiModule.register()],
+      imports: [MockCacheModule.register(), MockCommunityApiModule.register(), FakeConfigModule.register()],
       providers: [ArrangeAppointmentService],
     }).compile()
 
     subject = module.get(ArrangeAppointmentService)
     community = module.get(CommunityApiService)
     cache = module.get(MockCacheService)
+    config = module.get(ConfigService).get('contacts')
   })
 
   it('creates appointment', async () => {
-    const dto = fakeAppointmentBuilderDto()
+    const dto = fakeAppointmentBuilderDto({ type: WellKnownAppointmentType.OfficeVisit })
     const response = fakeAppointmentCreateResponse()
     const crn = faker.datatype.uuid()
-
+    const type = fakeFeaturedAppointmentType({ type: WellKnownAppointmentType.OfficeVisit })
+    cache.cache['community:available-appointment-types'] = {
+      featured: [type],
+      other: [],
+    } as AvailableAppointmentTypes
     const stub = community.appointment.createAppointmentUsingPOST.withArgs(match.any).resolves(fakeOkResponse(response))
 
     const returned = await subject.createAppointment(dto, crn)
@@ -47,7 +56,7 @@ describe('ArrangeAppointmentService', () => {
       crn,
       sentenceId: dto.convictionId,
       appointmentCreateRequest: {
-        contactType: dto.type,
+        contactType: type.appointmentTypes[0].contactType,
         officeLocationCode: dto.location,
         appointmentStart: dto.appointmentStart.toISO(),
         appointmentEnd: dto.appointmentEnd.toISO(),
@@ -88,22 +97,23 @@ describe('ArrangeAppointmentService', () => {
     const other = fakeAppointmentType()
     community.appointment.getAllAppointmentTypesUsingGET.resolves(fakeOkResponse([featured, other]))
     const observed = await subject.getAppointmentTypes()
-    expect(observed).toEqual([
-      {
-        isFeatured: true,
-        description: 'Office visit',
-        ...pick(featured, 'contactType', 'orderTypes', 'requiresLocation'),
-      },
-      {
-        isFeatured: false,
-        description: other.description,
-        ...pick(other, 'contactType', 'orderTypes', 'requiresLocation'),
-      },
-    ] as DomainAppointmentType[])
+    expect(observed).toEqual({
+      featured: [
+        {
+          type: WellKnownAppointmentType.OfficeVisit,
+          description: 'Office visit',
+          meta: config[WellKnownContactTypeCategory.Appointment][WellKnownAppointmentType.OfficeVisit],
+          appointmentTypes: [featured],
+        },
+      ],
+      other: [other],
+    } as AvailableAppointmentTypes)
   })
 
   it('getting cached appointment types', async () => {
-    const types = (cache.cache['community:all-appointment-types'] = [{ ...fakeAppointmentType(), isFeatured: true }])
+    const types = (cache.cache['community:available-appointment-types'] = [
+      { ...fakeAppointmentType(), isFeatured: true },
+    ])
     const observed = await subject.getAppointmentTypes()
     expect(observed).toBe(types)
   })

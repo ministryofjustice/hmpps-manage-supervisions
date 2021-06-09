@@ -1,13 +1,36 @@
 import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { CommunityApiService, OffenderDetail } from '../../community-api'
+import {
+  AppointmentOutcome,
+  CommunityApiService,
+  ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
+  ContactSummary,
+  OffenderDetail,
+  Paginated,
+} from '../../community-api'
 import { AppointmentListViewModel, RecentAppointments } from './offender-view-model'
+import { ContactMappingService, isAppointment } from '../../common'
+import { ActivityLogEntry, ActivityLogEntryBase, ActivityLogEntryTag } from './activity-log-entry'
+import { WellKnownContactTypeCategory } from '../../config'
 
 export const MAX_RECENT_APPOINTMENTS = 20
 
+export type GetContactsOptions = Omit<ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest, 'crn'>
+
+function getOutcomeFlags(outcome?: AppointmentOutcome): ActivityLogEntryTag[] {
+  switch (outcome?.complied) {
+    case true:
+      return [{ name: 'complied', colour: 'green' }]
+    case false:
+      return [{ name: 'failed to comply', colour: 'red' }]
+    default:
+      return []
+  }
+}
+
 @Injectable()
 export class OffenderService {
-  constructor(private readonly community: CommunityApiService) {}
+  constructor(private readonly community: CommunityApiService, private readonly contacts: ContactMappingService) {}
 
   async getOffenderDetail(crn: string): Promise<OffenderDetail> {
     const { data } = await this.community.offender.getOffenderDetailByCrnUsingGET({ crn })
@@ -27,14 +50,84 @@ export class OffenderService {
             : agg.past
         const view: AppointmentListViewModel = {
           ...apt,
-          // TODO map description through well known contact types...
-          name: `${apt.type.description} with ${[apt.staff.forenames, apt.staff.surname].join(' ')}`,
-          href: `/offender/${crn}/appointment/${apt.appointmentId}`,
+          name: this.contacts.getTypeMeta(apt).name,
+          link: `/offender/${crn}/appointment/${apt.appointmentId}`,
         }
         collection.push(view)
         return agg
       },
       { future: [], recent: [], past: [] },
     )
+  }
+
+  async getActivityLogPage(crn: string, options: GetContactsOptions = {}): Promise<Paginated<ActivityLogEntry>> {
+    const { data } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET({
+      crn,
+      ...options,
+    })
+
+    return {
+      totalPages: data.totalPages,
+      first: data.first,
+      last: data.last,
+      number: data.number,
+      size: data.size,
+      totalElements: data.totalElements,
+      content: data.content.map(contact => this.getActivityLogEntry(crn, contact)),
+    }
+  }
+
+  private getActivityLogEntry(crn: string, contact: ContactSummary): ActivityLogEntry {
+    const start = DateTime.fromISO(contact.contactStart)
+    const base = {
+      id: contact.contactId,
+      start,
+      notes: contact.notes,
+    } as ActivityLogEntryBase
+
+    const meta = this.contacts.getTypeMeta(contact)
+
+    if (isAppointment(meta)) {
+      // is either a well-known or 'other' appointment
+      const outcomeFlags = getOutcomeFlags(contact.outcome)
+      const missingOutcome = outcomeFlags.length === 0 && start <= DateTime.now()
+      return {
+        ...base,
+        type: WellKnownContactTypeCategory.Appointment,
+        name: meta.name,
+        end: DateTime.fromISO(contact.contactEnd),
+        tags: [...outcomeFlags],
+        links: {
+          view: `/offender/${crn}/appointment/${contact.contactId}`,
+          addNotes: `/offender/${crn}/appointment/${contact.contactId}/add-notes`,
+          recordMissingAttendance: missingOutcome
+            ? `/offender/${crn}/appointment/${contact.contactId}/record-outcome`
+            : null,
+        },
+      }
+    }
+
+    if (meta.type === WellKnownContactTypeCategory.Communication) {
+      // is a well known communication
+      return {
+        ...base,
+        type: meta.type,
+        name: meta.name,
+        tags: [],
+        links: {
+          view: `/offender/${crn}/communication/${contact.contactId}`,
+          addNotes: `/offender/${crn}/communication/${contact.contactId}/add-notes`,
+        },
+      }
+    }
+
+    // is unknown contact
+    return {
+      ...base,
+      type: null,
+      name: meta.name,
+      tags: [],
+      links: null,
+    }
   }
 }

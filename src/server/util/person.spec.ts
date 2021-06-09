@@ -1,4 +1,4 @@
-import { titleCase } from './titleCase'
+import { titleCase } from './person'
 
 describe('Convert to title case', () => {
   it('null string', () => {
@@ -18,12 +18,6 @@ describe('Convert to title case', () => {
   })
   it('Multiple words', () => {
     expect(titleCase('RobeRT SMiTH')).toEqual('Robert Smith')
-  })
-  it('Leading spaces', () => {
-    expect(titleCase('  RobeRT')).toEqual('  Robert')
-  })
-  it('Trailing spaces', () => {
-    expect(titleCase('RobeRT  ')).toEqual('Robert  ')
   })
   it('Hyphenated', () => {
     expect(titleCase('Robert-John SmiTH-jONes-WILSON')).toEqual('Robert-John Smith-Jones-Wilson')

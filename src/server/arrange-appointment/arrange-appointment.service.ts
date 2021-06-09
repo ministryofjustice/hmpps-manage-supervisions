@@ -2,41 +2,58 @@ import { AppointmentBuilderDto } from './dto/AppointmentBuilderDto'
 import { Injectable } from '@nestjs/common'
 import { CacheService } from '../common'
 import {
-  CommunityApiService,
   AppointmentCreateRequest,
   AppointmentCreateResponse,
   AppointmentType,
+  CommunityApiService,
+  Conviction,
   OffenderDetail,
   OfficeLocation,
-  Conviction,
-  Requirement,
   PersonalCircumstance,
+  Requirement,
 } from '../community-api'
 import { DateTime } from 'luxon'
-
-export interface DomainAppointmentType extends AppointmentType {
-  isFeatured: boolean
-}
-
-/**
- * TODO these are subject to change and my need more complexity around selecting based on say RAR requirement
- *      should these be in config anyway?
- */
-const featuredAppointmentTypes = {
-  APAT: 'Office visit',
-  CHVS: 'Home visit',
-  COVC: 'Video call',
-  COPT: 'Phone call',
-}
+import { Config, WellKnownAppointmentType, WellKnownContactTypeCategory, WellKnownContactTypeConfig } from '../config'
+import { AvailableAppointmentTypes, FeaturedAppointmentType } from './dto/AppointmentWizardViewModel'
+import { ConfigService } from '@nestjs/config'
 
 const RAR_REQUIREMENT_SUB_TYPE_CATEGORY_CODE = 'RARREQ'
 const RAR_REQUIREMENT_TYPE_MAIN_CATEGORY_CODE = 'F'
 const EMPLOYMENT_TYPE_CODE = 'B'
+
 @Injectable()
 export class ArrangeAppointmentService {
-  constructor(private readonly community: CommunityApiService, private readonly cache: CacheService) {}
+  constructor(
+    private readonly community: CommunityApiService,
+    private readonly cache: CacheService,
+    private readonly config: ConfigService<Config>,
+  ) {}
+
+  async getAppointmentType(
+    builder: AppointmentBuilderDto,
+  ): Promise<(AppointmentType & { wellKnownType?: WellKnownAppointmentType }) | null> {
+    const selected = builder.appointmentType
+    if (!selected) {
+      return null
+    }
+
+    const { featured, other } = await this.getAppointmentTypes()
+    if (selected.featured) {
+      const type = featured.find(x => x.type === selected.value)
+      if (!type) {
+        throw new Error(`'${selected.value}' is not a 'featured' appointment type`)
+      }
+      // TODO select the correct appointment type here based on rar etc
+      return { ...type.appointmentTypes[0], description: type.description, wellKnownType: type.type }
+    }
+    return other.find(x => x.contactType === selected.value) || null
+  }
 
   async createAppointment(builder: AppointmentBuilderDto, crn: string): Promise<AppointmentCreateResponse> {
+    const appointmentType = await this.getAppointmentType(builder)
+    if (!appointmentType) {
+      throw new Error('appointment type is not set')
+    }
     const appointmentCreateRequest: AppointmentCreateRequest = {
       providerCode: builder.providerCode,
       requirementId: builder.requirementId,
@@ -44,7 +61,7 @@ export class ArrangeAppointmentService {
       teamCode: builder.teamCode,
       appointmentStart: builder.appointmentStart.toISO(),
       appointmentEnd: builder.appointmentEnd.toISO(),
-      contactType: builder.contactType,
+      contactType: appointmentType.contactType,
       officeLocationCode: builder.location,
       notes: builder.notes,
       sensitive: builder.sensitive,
@@ -70,19 +87,36 @@ export class ArrangeAppointmentService {
     return data
   }
 
-  async getAppointmentTypes(): Promise<DomainAppointmentType[]> {
-    return await this.cache.getOrSet('community:all-appointment-types', async () => {
+  async getAppointmentTypes(): Promise<AvailableAppointmentTypes> {
+    return await this.cache.getOrSet('community:available-appointment-types', async () => {
       const { data } = await this.community.appointment.getAllAppointmentTypesUsingGET()
 
-      return {
-        value: data.map(type => {
-          const featured = featuredAppointmentTypes[type.contactType]
+      const config = this.config.get<WellKnownContactTypeConfig>('contacts')[WellKnownContactTypeCategory.Appointment]
+      const featured: FeaturedAppointmentType[] = Object.entries(config)
+        .map(([type, meta]) => {
+          const appointmentTypes = Object.values(meta.codes)
+            .map(code => data.find(x => x.contactType.toUpperCase() === code))
+            .filter(x => x)
+
+          if (appointmentTypes.length === 0) {
+            return null
+          }
+
+          for (const appointmentType of appointmentTypes) {
+            data.splice(data.indexOf(appointmentType), 1)
+          }
+
           return {
-            ...type,
-            isFeatured: !!featured,
-            description: featured || type.description,
-          } as DomainAppointmentType
-        }),
+            type,
+            description: meta.name,
+            meta,
+            appointmentTypes,
+          } as FeaturedAppointmentType
+        })
+        .filter(x => x)
+
+      return {
+        value: { featured, other: data },
         options: { durationSeconds: 600 },
       }
     })
@@ -111,17 +145,17 @@ export class ArrangeAppointmentService {
       activeOnly: true,
     })
 
-    const rarRequirements = data.requirements.filter(
+    const rarRequirement = data.requirements.find(
       r =>
         r.requirementTypeMainCategory.code == RAR_REQUIREMENT_TYPE_MAIN_CATEGORY_CODE &&
         r.requirementTypeSubCategory.code == RAR_REQUIREMENT_SUB_TYPE_CATEGORY_CODE,
     )
 
     // RAR requirements will only be found on ORA Community Order and ORA Suspended Sentence Order sentences
-    if (!rarRequirements.length) {
+    if (!rarRequirement) {
       throw new Error(`No RAR requirements found for CRN ${crn} convictionId: ${convictionId}`)
     }
-    return rarRequirements[0]
+    return rarRequirement
   }
 
   async getPersonalCircumstances(crn: string): Promise<Array<PersonalCircumstance>> {

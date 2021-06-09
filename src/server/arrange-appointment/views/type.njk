@@ -33,7 +33,7 @@
                 classes: "govuk-label--xl govuk-!-margin-bottom-6"
             }
         },
-        items: types.featured | toRadioList(type, "contactType", "description", { otherHtml: otherHtml }),
+        items: types.featured | toRadioList(type, "type", "description", { otherHtml: otherHtml }),
         errorMessage: errors | findErrorMessages("type")
     }) }}
 

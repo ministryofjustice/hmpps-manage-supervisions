@@ -40,4 +40,44 @@ export class OffenderPage extends PageBase {
       },
     }
   }
+
+  get activity() {
+    return {
+      get addToLogButton() {
+        return cy.get('[data-qa="offender/add-activity-button"]')
+      },
+
+      get emptyMessage() {
+        return cy.get('[data-qa="offender/activity/empty"]')
+      },
+
+      entry(id: number) {
+        return {
+          select(selector: string) {
+            return cy.get(`[data-qa="offender/activity/${id}"] ${selector}`)
+          },
+
+          get title() {
+            return this.select('h3')
+          },
+
+          get tags() {
+            return this.select('[data-qa="tag"]')
+          },
+
+          get notes() {
+            return this.select('.note-panel')
+          },
+
+          get longNotesLink() {
+            return this.select('.note-panel [data-qa="view-link"] a')
+          },
+
+          get attendanceMissing() {
+            return this.select('[data-qa="attendance-missing"]')
+          },
+        }
+      },
+    }
+  }
 }

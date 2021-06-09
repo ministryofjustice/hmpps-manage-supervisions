@@ -1,18 +1,5 @@
 {
-  "new-appointments": [
-    {
-      "providerCode": "N07",
-      "staffCode": "N07UATU",
-      "teamCode": "N07UAT",
-      "appointmentStart": "2021-11-01T09:30:00.000+00:00",
-      "appointmentEnd": "2021-11-01T11:15:00.000+00:00",
-      "contactType": "COPT",
-      "officeLocationCode": "LDN_BCR",
-      "notes": null,
-      "sensitive": false,
-      "id": 1
-    }
-  ],
+  "new-appointments": [],
   "offenders-by-crn": [
     {
       "id": "X009923",
@@ -106,6 +93,23 @@
       "exclusionMessage": "You are excluded from viewing this offender record. Please contact a system administrator",
       "currentTier": "D2",
       "activeProbationManagedSentence": true
+    }
+  ],
+  "personal-circumstances": [],
+  "conviction-requirements-by-conviction": [
+    {
+      "id": 2500445193,
+      "requirements": [
+        {
+          "requirementId": 123456,
+          "requirementTypeMainCategory": {
+            "code": "F"
+          },
+          "requirementTypeSubCategory": {
+            "code": "RARREQ"
+          }
+        }
+      ]
     }
   ],
   "convictions-by-crn": [
@@ -3344,6 +3348,174 @@
         "forenames": "Myrtie",
         "surname": "Collins",
         "unallocated": true
+      }
+    }
+  ],
+  "contact-summary": [
+    {
+      "contactId": 2500000001,
+      "contactStart": "2100-06-01T12:00:00+01:00",
+      "contactEnd": "2100-06-01T13:00:00+01:00",
+      "type": {
+        "code": "APAT",
+        "description": "Programme Session (NS)",
+        "appointment": true
+      },
+      "notes": "A future office visit appointment",
+      "provider": {
+        "code": "N02",
+        "description": "NPS North East"
+      },
+      "team": {
+        "code": "N02SP5",
+        "description": "BRADFORD\\BULLS SP"
+      },
+      "staff": {
+        "code": "N02SP5U",
+        "forenames": "Mark",
+        "surname": "Berridge",
+        "unallocated": false
+      }
+    },
+    {
+      "contactId": 2500000002,
+      "contactStart": "2021-09-03T12:00:00+01:00",
+      "contactEnd": "2021-09-03T13:00:00+01:00",
+      "type": {
+        "code": "CHVS",
+        "description": "Home Visit to Case (NS)",
+        "appointment": true
+      },
+      "notes": "A past home visit appointment with a complied outcome set",
+      "provider": {
+        "code": "N02",
+        "description": "NPS North East"
+      },
+      "team": {
+        "code": "N02SP5",
+        "description": "BRADFORD\\BULLS SP"
+      },
+      "staff": {
+        "code": "N02SP5U",
+        "forenames": "Mark",
+        "surname": "Berridge",
+        "unallocated": false
+      },
+      "outcome": {
+        "code": "APPK",
+        "description": "Appointment Kept",
+        "attended": true,
+        "complied": true
+      }
+    },
+    {
+      "contactId": 2500000003,
+      "contactStart": "2021-09-04T12:00:00+01:00",
+      "contactEnd": "2021-09-04T13:00:00+01:00",
+      "type": {
+        "code": "APAT",
+        "description": "Programme Session (NS)",
+        "appointment": true
+      },
+      "notes": "A past office visit appointment with an unallocated staff member & no outcome set",
+      "provider": {
+        "code": "N02",
+        "description": "NPS North East"
+      },
+      "team": {
+        "code": "N02SP5",
+        "description": "BRADFORD\\BULLS SP"
+      },
+      "staff": {
+        "code": "N02SP5U",
+        "forenames": "Unallocated",
+        "surname": "Staff",
+        "unallocated": true
+      }
+    },
+    {
+      "contactId": 2500000004,
+      "contactStart": "2021-09-05T10:30:00+01:00",
+      "contactEnd": "2021-09-05T11:00:00+01:00",
+      "type": {
+        "code": "COPT",
+        "description": "Planned Telephone Contact (NS)",
+        "appointment": true
+      },
+      "notes": "A past phone call appointment with an a not complied outcome set",
+      "provider": {
+        "code": "N02",
+        "description": "NPS North East"
+      },
+      "team": {
+        "code": "N02SP5",
+        "description": "BRADFORD\\BULLS SP"
+      },
+      "staff": {
+        "code": "N02SP5U",
+        "forenames": "Mark",
+        "surname": "Berridge",
+        "unallocated": false
+      },
+      "outcome": {
+        "code": "APPK",
+        "description": "Appointment Kept",
+        "attended": true,
+        "complied": false
+      }
+    },
+    {
+      "contactId": 2500000005,
+      "contactStart": "2020-12-12T11:00:00+00:00",
+      "contactEnd": "2020-12-12T13:00:00+00:00",
+      "type": {
+        "code": "COPT",
+        "description": "Planned Telephone Contact (NS)",
+        "appointment": true
+      },
+      "provider": {
+        "code": "N02",
+        "description": "NPS North East"
+      },
+      "team": {
+        "code": "N02SP5",
+        "description": "BRADFORD\\BULLS SP"
+      },
+      "staff": {
+        "code": "N02SP5U",
+        "forenames": "Mark",
+        "surname": "Berridge",
+        "unallocated": false
+      },
+      "outcome": {
+        "code": "APPK",
+        "description": "Appointment Kept",
+        "attended": true,
+        "complied": false
+      }
+    },
+    {
+      "contactId": 2500000006,
+      "contactStart": "2020-12-13T11:00:00+00:00",
+      "contactEnd": "2020-12-13T13:00:00+00:00",
+      "type": {
+        "code": "APAT",
+        "description": "Programme Session (NS)",
+        "appointment": true
+      },
+      "provider": {
+        "code": "N02",
+        "description": "NPS North East"
+      },
+      "team": {
+        "code": "N02SP5",
+        "description": "BRADFORD\\BULLS SP"
+      },
+      "staff": {
+        "code": "N02SP5U",
+        "forenames": "Mark",
+        "surname": "Berridge",
+        "unallocated": false
       }
     }
   ]

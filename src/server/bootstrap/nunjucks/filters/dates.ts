@@ -1,5 +1,6 @@
 import { NunjucksFilter } from './types'
 import { DateTime } from 'luxon'
+import { safeGetDateTime } from '../../../util'
 
 export class ToIsoDate implements NunjucksFilter {
   filter(date: DateTime): string {
@@ -9,8 +10,7 @@ export class ToIsoDate implements NunjucksFilter {
 
 export class DateFormat implements NunjucksFilter {
   filter(value: string | DateTime, format: string): string {
-    const date = value instanceof DateTime ? value : DateTime.fromISO(value)
-    return date.toFormat(format)
+    return safeGetDateTime(value).toFormat(format)
   }
 }
 
@@ -22,8 +22,10 @@ export class Time implements NunjucksFilter {
   }
 }
 
-export class DateWithDayAndWithoutYear extends DateFormat {
+export class LongDate implements NunjucksFilter {
   filter(value: string | DateTime): string {
-    return super.filter(value, 'cccc d MMMM')
+    const date = safeGetDateTime(value)
+    const format = date.year === DateTime.now().year ? 'cccc d MMMM' : 'cccc d MMMM yyyy'
+    return date.toFormat(format)
   }
 }

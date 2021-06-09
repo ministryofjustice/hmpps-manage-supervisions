@@ -1,4 +1,4 @@
-import { getDateTime } from './getDateTime'
+import { getDateTime } from './dates'
 import { DateTime } from 'luxon'
 
 describe('getDateTime', () => {

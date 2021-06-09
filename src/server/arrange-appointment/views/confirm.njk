@@ -6,9 +6,9 @@
   {% set panelHtml %}
     <strong><span data-qa="confirm-appointment/description">{{ appointment.typeDescription }}</span></strong><br />
     <span data-qa="confirm-appointment/times">
-      {{ appointment.appointmentStart | dateWithDayAndWithoutYear() }}
+      {{ appointment.appointmentStart | longDate }}
       from
-      {{ appointment.appointmentStart | time() }}
+      {{ appointment.appointmentStart | time }}
     </span>
   {% endset %}
 

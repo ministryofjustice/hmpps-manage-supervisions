@@ -20,6 +20,8 @@ import { BodyClass } from '../common/meta/body-class.decorator'
 import { DEFAULT_GROUP } from '../util/mapping'
 import { AppointmentTypeRequiresLocation, OffenderDetail, OffenderManager } from '../community-api'
 import { DateTime } from 'luxon'
+import { ConfigService } from '@nestjs/config'
+import { Config, DebugFlags, ServerConfig } from '../config'
 
 type RenderOrRedirect = AppointmentWizardViewModel | RedirectResponse
 
@@ -31,7 +33,11 @@ type RenderOrRedirect = AppointmentWizardViewModel | RedirectResponse
  */
 @Controller(`/arrange-appointment/:crn(\\w+)`)
 export class ArrangeAppointmentController {
-  constructor(private readonly service: ArrangeAppointmentService, private readonly wizard: AppointmentWizardService) {}
+  constructor(
+    private readonly service: ArrangeAppointmentService,
+    private readonly wizard: AppointmentWizardService,
+    private readonly config: ConfigService<Config>,
+  ) {}
 
   @Get()
   @Redirect()
@@ -87,9 +93,7 @@ export class ArrangeAppointmentController {
       return await this.getAppointmentTypeViewModel(session, body, errors)
     }
 
-    const types = await this.service.getAppointmentTypes()
-    const type = types.find(x => x.contactType === body.contactType)
-
+    const type = await this.service.getAppointmentType(body)
     if (!type) {
       return await this.getAppointmentTypeViewModel(session, body, [
         {
@@ -404,14 +408,13 @@ export class ArrangeAppointmentController {
       excludeExtraneousValues: true,
     })
     const types = await this.service.getAppointmentTypes()
-    const currentType = appointment?.contactType
-      ? types.find(x => x.contactType === appointment?.contactType) || null
-      : null
+    const currentType = await this.service.getAppointmentType(appointment)
     const [type, other] = currentType
-      ? currentType.isFeatured
-        ? [currentType.contactType, null]
+      ? currentType.wellKnownType
+        ? [currentType.wellKnownType, null]
         : ['other', currentType.contactType]
       : [null, null]
+
     return {
       step: AppointmentWizardStep.Type,
       errors,
@@ -419,10 +422,7 @@ export class ArrangeAppointmentController {
       paths: {
         back: this.wizard.getBackUrl(session, AppointmentWizardStep.Type),
       },
-      types: types.reduce((agg, type) => (type.isFeatured ? agg.featured : agg.other).push(type) && agg, {
-        featured: [],
-        other: [],
-      }),
+      types,
       type: body?.type || type,
       other: body?.otherType || other,
     }
@@ -575,6 +575,14 @@ export class ArrangeAppointmentController {
     const offenderManager = offender.offenderManagers.find(om => om.staff.code == user.staffCode)
 
     if (!offenderManager) {
+      const debug = this.config.get<ServerConfig>('server').debug
+      if (DebugFlags.SetTeamCode in debug) {
+        return {
+          staff: { code: user.staffCode },
+          team: { code: debug[DebugFlags.SetTeamCode] },
+          probationArea: { code: debug[DebugFlags.SetProviderCode] || 'unknown-provider' } as any,
+        }
+      }
       throw new Error('Current user is not Offender Manager for this offender')
     }
     return offenderManager

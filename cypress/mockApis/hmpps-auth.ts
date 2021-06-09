@@ -1,5 +1,6 @@
 import { WireMockClient } from './wiremock-client'
 import * as jwt from 'jsonwebtoken'
+import PluginConfigOptions = Cypress.PluginConfigOptions
 
 function createToken(): string {
   const payload = {
@@ -15,7 +16,11 @@ function createToken(): string {
 }
 
 export class HmppsAuthMockApi {
-  constructor(private readonly client: WireMockClient, private readonly baseUrl: string) {}
+  private readonly baseUrl: string
+
+  constructor(private readonly client: WireMockClient, config: PluginConfigOptions) {
+    this.baseUrl = config.baseUrl
+  }
 
   async stubPing() {
     await this.client.stubPing('auth')

@@ -1,3 +1,20 @@
+export enum DebugFlags {
+  /**
+   * The staff code will be set for non-delius users.
+   */
+  SetStaffCode = 'set-staff',
+
+  /**
+   * The team code will be set for non-delius users.
+   */
+  SetTeamCode = 'set-team',
+
+  /**
+   * The provider code will be set for non-delius users.
+   */
+  SetProviderCode = 'set-provider',
+}
+
 export interface ServerConfig {
   name: string
   description: string
@@ -11,6 +28,7 @@ export interface ServerConfig {
   https: boolean
   domain: string
   staticResourceCacheDuration: number
+  debug: Partial<Record<DebugFlags, string>>
 }
 
 export interface RedisConfig {
@@ -49,9 +67,45 @@ export interface DependentApisConfig {
   community: ApiConfig
 }
 
+export enum WellKnownAppointmentType {
+  OfficeVisit = 'office-visit',
+  HomeVisit = 'home-visit',
+  VideoCall = 'video-call',
+  PhoneCall = 'phone-call',
+}
+
+export interface WellKnownAppointmentTypeMeta {
+  name: string
+  codes: {
+    nonRar: string
+  }
+}
+
+export enum WellKnownCommunicationType {
+  Email = 'email',
+  PhoneCall = 'phone-call',
+  TextMessage = 'text-message',
+}
+
+export interface WellKnownCommunicationTypeMeta {
+  name: string
+  code: string
+}
+
+export enum WellKnownContactTypeCategory {
+  Appointment = 'appointment',
+  Communication = 'communication',
+}
+
+export interface WellKnownContactTypeConfig {
+  [WellKnownContactTypeCategory.Appointment]: { [Type in WellKnownAppointmentType]: WellKnownAppointmentTypeMeta }
+  [WellKnownContactTypeCategory.Communication]: { [Type in WellKnownCommunicationType]: WellKnownCommunicationTypeMeta }
+}
+
 export interface Config {
   server: ServerConfig
   redis: RedisConfig
   session: SessionConfig
   apis: DependentApisConfig
+  contacts: WellKnownContactTypeConfig
 }

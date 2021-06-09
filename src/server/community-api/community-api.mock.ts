@@ -3,6 +3,7 @@ import { CommunityApiService } from './community-api.service'
 import { SinonStubbedInstance, createStubInstance } from 'sinon'
 import {
   AppointmentsApi,
+  ContactAndAttendanceApi,
   CoreOffenderApi,
   PersonalCircumstancesApi,
   SentenceRequirementsAndBreachApi,
@@ -22,6 +23,7 @@ export class MockCommunityApiModule {
       requirement: createStubInstance(SentenceRequirementsAndBreachApi),
       staff: createStubInstance(StaffApi),
       personalCircumstances: createStubInstance(PersonalCircumstancesApi),
+      contactAndAttendance: createStubInstance(ContactAndAttendanceApi),
     }
 
     return {

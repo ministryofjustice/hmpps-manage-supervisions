@@ -3,6 +3,7 @@ import { DynamicModule, Module } from '@nestjs/common'
 import * as faker from 'faker'
 import { merge } from 'lodash'
 import { ApiConfig, ClientCredentials, Config } from './types'
+import { CONTACT_DEFAULTS } from './factory'
 
 export function fakeApiConfig(partial: DeepPartial<ApiConfig> = {}): ApiConfig {
   return merge(
@@ -43,6 +44,7 @@ export function fakeConfig(partial: DeepPartial<Config> = {}): Config {
         https: faker.datatype.boolean(),
         domain: faker.internet.domainName(),
         staticResourceCacheDuration: faker.datatype.number({ min: 60, max: 6000 }),
+        debug: {},
       },
       redis: {
         host: faker.internet.domainName(),
@@ -65,6 +67,7 @@ export function fakeConfig(partial: DeepPartial<Config> = {}): Config {
         tokenVerification: fakeApiConfig(),
         community: fakeApiConfig(),
       },
+      contacts: CONTACT_DEFAULTS,
     },
     partial,
   )

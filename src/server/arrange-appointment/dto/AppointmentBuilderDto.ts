@@ -1,11 +1,12 @@
 import { Type } from 'class-transformer'
 import { DateTime } from 'luxon'
-import { IsBoolean, IsInt, IsNotEmpty, IsPositive, IsString, ValidateIf, ValidateNested } from 'class-validator'
+import { IsBoolean, IsIn, IsInt, IsNotEmpty, IsPositive, IsString, ValidateIf, ValidateNested } from 'class-validator'
 import { AppointmentWizardStep } from './AppointmentWizardViewModel'
 import { DateInput, IsAfter, IsDateInput, IsFutureTime, ValidationGroup, IsFutureDate, IsTime } from '../../validators'
 import { getDateTime } from '../../util'
 import { ExposeDefault, ToBoolean } from '../../util/mapping'
-import { AppointmentTypeRequiresLocation } from '../../community-api/client'
+import { AppointmentTypeRequiresLocation } from '../../community-api'
+import { WellKnownAppointmentType } from '../../config'
 
 export const MESSAGES = {
   type: {
@@ -25,12 +26,12 @@ export const MESSAGES = {
   },
 }
 
-function IsAppointmentType() {
-  return ValidationGroup(
-    { message: MESSAGES.type.required, groups: [AppointmentWizardStep.Type] },
-    IsString,
-    IsNotEmpty,
-  )
+function IsAppointmentType(featured: boolean) {
+  const decorators = [IsString, IsNotEmpty]
+  if (featured) {
+    decorators.push(options => IsIn([...Object.values(WellKnownAppointmentType), 'other'], options))
+  }
+  return ValidationGroup({ message: MESSAGES.type.required, groups: [AppointmentWizardStep.Type] }, ...decorators)
 }
 
 function IsLocationCode() {
@@ -103,12 +104,12 @@ export class AppointmentBuilderDto {
   convictionId?: number
 
   @ExposeDefault({ groups: [AppointmentWizardStep.Type] })
-  @IsAppointmentType()
-  type?: string | 'other'
+  @IsAppointmentType(true)
+  type?: WellKnownAppointmentType | 'other'
 
   @ExposeDefault({ groups: [AppointmentWizardStep.Type] })
   @ValidateIf(object => object?.type === 'other', { groups: [AppointmentWizardStep.Type] })
-  @IsAppointmentType()
+  @IsAppointmentType(false)
   otherType?: string
 
   @ExposeDefault()
@@ -157,8 +158,28 @@ export class AppointmentBuilderDto {
   @ExposeDefault({ groups: [AppointmentWizardStep.Notes] })
   notes?: string
 
-  get contactType() {
-    return this.type === 'other' ? this.otherType : this.type
+  /*
+  getAppointmentType(available: AvailableAppointmentTypes): null | (AppointmentType & { featured: boolean }) {
+    if (!this.type) {
+      return null
+    }
+
+    if (this.type !== 'other') {
+      const featured = available.featured.find(x => x.type === this.type)
+      // TODO select the correct appointment type here based on rar etc
+      return { ...featured.appointmentTypes[0], featured: true }
+    }
+    return { ...available.other.find(x => x.contactType === this.otherType), featured: false }
+  }*/
+
+  get appointmentType(): null | { value: WellKnownAppointmentType | string; featured: boolean } {
+    if (!this.type) {
+      return null
+    }
+    if (this.type === 'other') {
+      return this.otherType ? { value: this.otherType, featured: false } : null
+    }
+    return { value: this.type, featured: true }
   }
 
   get appointmentStart(): DateTime | null {

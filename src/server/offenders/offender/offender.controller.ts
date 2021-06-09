@@ -1,8 +1,9 @@
 import { Controller, Get, Param, Redirect, Render } from '@nestjs/common'
 import {
-  OffenderLinks,
+  OffenderActivityViewModel,
   OffenderOverviewViewModel,
   OffenderPage,
+  OffenderPageLinks,
   OffenderScheduleViewModel,
   OffenderViewModelBase,
 } from './offender-view-model'
@@ -45,19 +46,43 @@ export class OffenderController {
     }
   }
 
+  @Get('activity')
+  @Render('offenders/offender/views/activity')
+  async getActivity(@Param('crn') crn: string): Promise<OffenderActivityViewModel> {
+    const [offender, contacts] = await Promise.all([
+      this.service.getOffenderDetail(crn),
+      this.service.getActivityLogPage(crn, { appointmentsOnly: true }), // TODO just getting appointment contacts for now
+    ])
+    return {
+      ...this.getBase(OffenderPage.Activity, offender),
+      page: OffenderPage.Activity,
+      contacts: contacts.content,
+      pagination: {
+        page: contacts.number,
+        size: contacts.size,
+      },
+    }
+  }
+
   private getBase(page: OffenderPage, offender: OffenderDetail): OffenderViewModelBase {
     const crn = offender.otherIds.crn
     const displayName = [offender.firstName, ...(offender.middleNames || []), offender.surname].filter(x => x).join(' ')
-    const links = Object.values(OffenderPage).reduce((agg, x) => ({ ...agg, [x]: `/offender/${crn}/${x}` }), {
-      arrangeAppointment: `/arrange-appointment/${crn}`,
-    } as OffenderLinks)
+
+    const pageLinks = Object.values(OffenderPage).reduce(
+      (agg, x) => ({ ...agg, [x]: `/offender/${crn}/${x}` }),
+      {} as OffenderPageLinks,
+    )
     return {
       page,
       ids: {
         crn: crn.toUpperCase(),
       },
       displayName,
-      links,
+      links: {
+        ...pageLinks,
+        arrangeAppointment: `/arrange-appointment/${crn}`,
+        addActivity: `/offender/${crn}/activity/new`,
+      },
     }
   }
 }

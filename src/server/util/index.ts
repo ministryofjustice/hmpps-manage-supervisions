@@ -1,4 +1,4 @@
-export * from './titleCase'
+export * from './person'
 export * from './urlJoin'
 export * from './applicationVersion'
-export * from './getDateTime'
+export * from './dates'
