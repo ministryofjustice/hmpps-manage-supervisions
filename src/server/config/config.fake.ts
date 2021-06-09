@@ -42,7 +42,7 @@ export function fakeConfig(partial: DeepPartial<Config> = {}): Config {
         port: faker.datatype.number({ min: 3000, max: 5000 }),
         isProduction: false,
         https: faker.datatype.boolean(),
-        domain: faker.internet.domainName(),
+        domain: new URL(faker.internet.url()),
         staticResourceCacheDuration: faker.datatype.number({ min: 60, max: 6000 }),
         debug: {},
       },

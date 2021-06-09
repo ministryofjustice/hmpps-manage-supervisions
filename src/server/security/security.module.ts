@@ -11,6 +11,7 @@ import { LogoutController } from './logout/logout.controller'
 import { AuthenticatedGuard } from './guards/authenticated.guard'
 import { TokenVerificationService } from './token-verification/token-verification.service'
 import { setLocals, csp } from './middleware'
+import { UrlService } from './url/url.service'
 
 /**
  * Applies HMPPS authentication to all routes via passport-oauth.
@@ -29,6 +30,7 @@ import { setLocals, csp } from './middleware'
       useExisting: AuthenticatedGuard,
     },
     TokenVerificationService,
+    UrlService,
   ],
   controllers: [LoginController, LogoutController],
 })

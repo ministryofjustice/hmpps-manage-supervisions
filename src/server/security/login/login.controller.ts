@@ -1,11 +1,15 @@
-import { Controller, Get, Res, UseGuards } from '@nestjs/common'
-import { Response } from 'express'
+import { Controller, Get, Redirect, Req, UseGuards } from '@nestjs/common'
+import { Request } from 'express'
 import { LoginGuard } from '../guards/login.guard'
 import { Public } from '../meta/public.decorator'
+import { UrlService } from '../url/url.service'
+import { RedirectResponse } from '../../common'
 
 @Public()
 @Controller('login')
 export class LoginController {
+  constructor(private readonly url: UrlService) {}
+
   @Get()
   @UseGuards(LoginGuard)
   public get(): void {
@@ -14,7 +18,8 @@ export class LoginController {
 
   @Get('callback')
   @UseGuards(LoginGuard)
-  public async getCallback(@Res() res: Response): Promise<void> {
-    res.redirect('/') // TODO redirect based on session
+  @Redirect()
+  public getCallback(@Req() req: Request): RedirectResponse {
+    return RedirectResponse.found(this.url.sanitiseRedirectUrl(req))
   }
 }
