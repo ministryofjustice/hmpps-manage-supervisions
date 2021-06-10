@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing'
 import * as faker from 'faker'
-import { orderBy } from 'lodash'
+import { orderBy, sortBy } from 'lodash'
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { MAX_RECENT_APPOINTMENTS, OffenderService } from './offender.service'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../community-api/community-api.mock'
@@ -44,10 +44,11 @@ describe('OffenderService', () => {
   })
 
   it('gets offender appointments', async () => {
+    const futureAppointments = 5
     const partial: DeepPartial<AppointmentDetail> = { appointmentId: 12345 }
     const appointments = orderBy(
       [
-        fakeAppointmentDetail(partial, { when: 'future' }),
+        ...[...Array(futureAppointments)].map(() => fakeAppointmentDetail(partial, { when: 'future' })),
         ...[...Array(MAX_RECENT_APPOINTMENTS)].map(() => fakeAppointmentDetail(partial, { when: 'recent' })),
         fakeAppointmentDetail(partial, { when: 'past' }),
       ],
@@ -71,9 +72,9 @@ describe('OffenderService', () => {
     const stub = community.appointment.getOffenderAppointmentsByCrnUsingGET.resolves(fakeOkResponse(appointments))
     const observed = await subject.getRecentAppointments('some-crn')
     expect(observed).toEqual({
-      future: expected.slice(0, 1),
-      recent: expected.slice(1, MAX_RECENT_APPOINTMENTS + 1),
-      past: expected.slice(MAX_RECENT_APPOINTMENTS + 1),
+      future: sortBy(expected.slice(0, futureAppointments), 'appointmentStart', 'appointmentEnd'),
+      recent: expected.slice(futureAppointments, MAX_RECENT_APPOINTMENTS + futureAppointments),
+      past: expected.slice(MAX_RECENT_APPOINTMENTS + futureAppointments),
     } as RecentAppointments)
     expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn' })
   })
