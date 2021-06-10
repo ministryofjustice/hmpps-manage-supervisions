@@ -1,6 +1,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common'
 import type { Request, Response } from 'express'
 import { SanitisedAxiosError } from './common/rest'
+import { UrlService } from './security/url/url.service'
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -40,9 +41,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const meta: any = exception.getResponse()
 
     switch (status) {
-      case HttpStatus.FORBIDDEN:
-        host.switchToHttp().getRequest<Request>().logout()
-        return response.redirect('/login')
+      case HttpStatus.FORBIDDEN: {
+        const request = host.switchToHttp().getRequest<Request>()
+        request.logout()
+        return response.redirect(`/login?${UrlService.REDIRECT_PARAM}=${encodeURIComponent(request.originalUrl)}`)
+      }
 
       case HttpStatus.MOVED_PERMANENTLY:
       case HttpStatus.FOUND:

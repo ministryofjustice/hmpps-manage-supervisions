@@ -1,3 +1,5 @@
+import { URL } from 'url'
+
 export enum DebugFlags {
   /**
    * The staff code will be set for non-delius users.
@@ -26,7 +28,7 @@ export interface ServerConfig {
   isProduction: boolean
   port: number
   https: boolean
-  domain: string
+  domain: URL
   staticResourceCacheDuration: number
   debug: Partial<Record<DebugFlags, string>>
 }

@@ -108,7 +108,7 @@ export function configFactory(): Config {
       port: int('PORT', fallback(3000)),
       isProduction: isProduction(),
       https: bool('PROTOCOL_HTTPS', fallback(isProduction())),
-      domain: string('INGRESS_URL', developmentOnly('http://localhost:3000')),
+      domain: Object.freeze(new URL(string('INGRESS_URL', developmentOnly('http://localhost:3000')))),
       staticResourceCacheDuration: int('STATIC_RESOURCE_CACHE_DURATION', fallback(20)),
       debug: string('DEBUG', fallback(''))
         .split(',')
