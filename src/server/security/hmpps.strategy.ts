@@ -46,10 +46,12 @@ export class HmppsStrategy extends PassportStrategy(Strategy, 'hmpps') {
     const user = {
       token,
       refreshToken,
+      expiresAt: claims.exp,
       username: claims.user_name,
       authorities: claims.authorities,
       scope: claims.scope,
     } as User
+
     const profile = await this.userService.getUser(user)
 
     return {

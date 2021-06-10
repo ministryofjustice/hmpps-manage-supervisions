@@ -19,7 +19,6 @@ export function useRedisSession(app: NestExpressApplication) {
       cookie: {
         secure: serverConfig.https,
         sameSite: 'lax',
-        maxAge: sessionConfig.expiryMinutes * 60 * 1000,
       },
       secret: sessionConfig.secret,
       resave: false, // redis implements touch so shouldn't need this

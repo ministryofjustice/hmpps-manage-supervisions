@@ -80,6 +80,7 @@ export class RestService {
     switch (authMethod) {
       case AuthenticationMethod.PassThroughUserToken:
         return user.token
+
       case AuthenticationMethod.ReissueForDeliusUser:
         // TODO assert this is really a delius user token?
         return await this.oidc.getDeliusUserToken(user)

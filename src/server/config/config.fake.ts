@@ -53,7 +53,6 @@ export function fakeConfig(partial: DeepPartial<Config> = {}): Config {
         tls: faker.datatype.boolean(),
       },
       session: {
-        expiryMinutes: faker.datatype.number({ min: 60, max: 120 }),
         secret: faker.internet.password(),
       },
       apis: {

@@ -127,7 +127,6 @@ export function configFactory(): Config {
     },
     session: {
       secret: string('SESSION_SECRET', developmentOnly('app-insecure-default-session')),
-      expiryMinutes: int('WEB_SESSION_TIMEOUT_IN_MINUTES', fallback(120)),
     },
     apis: {
       hmppsAuth: {

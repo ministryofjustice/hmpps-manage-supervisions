@@ -3,6 +3,7 @@
 interface User {
   token: string
   refreshToken?: string
+  expiresAt: number
   authorities: string[]
   scope: string[]
   name: string

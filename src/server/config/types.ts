@@ -42,7 +42,6 @@ export interface RedisConfig {
 
 export interface SessionConfig {
   secret: string
-  expiryMinutes: number
 }
 
 export interface ApiConfig {

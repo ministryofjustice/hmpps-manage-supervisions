@@ -4,6 +4,8 @@ import { SinonStubbedInstance, createStubInstance, match } from 'sinon'
 import { TokenVerificationService } from '../token-verification/token-verification.service'
 import { fakeUser } from '../user/user.fake'
 import { PUBLIC_KEY } from '../meta/public.decorator'
+import { Test } from '@nestjs/testing'
+import { HmppsOidcService } from '../../common'
 
 const handler = 'handler'
 const cls = 'cls'
@@ -12,6 +14,7 @@ describe('AuthenticatedGuard', () => {
   let subject: AuthenticatedGuard
   let reflector: SinonStubbedInstance<Reflector>
   let tokenVerification: SinonStubbedInstance<TokenVerificationService>
+  let oidc: SinonStubbedInstance<HmppsOidcService>
   let user: User
   let isAuthenticated: boolean
   const context: any = {
@@ -27,7 +30,18 @@ describe('AuthenticatedGuard', () => {
     isAuthenticated = true
     reflector = createStubInstance(Reflector)
     tokenVerification = createStubInstance(TokenVerificationService)
-    subject = new AuthenticatedGuard(reflector as any, tokenVerification as any)
+    oidc = createStubInstance(HmppsOidcService)
+
+    const module = await Test.createTestingModule({
+      providers: [
+        AuthenticatedGuard,
+        { provide: Reflector, useValue: reflector },
+        { provide: TokenVerificationService, useValue: tokenVerification },
+        { provide: HmppsOidcService, useValue: oidc },
+      ],
+    }).compile()
+
+    subject = module.get(AuthenticatedGuard)
   })
 
   it('is public', async () => {
@@ -42,17 +56,40 @@ describe('AuthenticatedGuard', () => {
     expect(result).toBe(false)
   })
 
+  it('is expired & refresh fails', async () => {
+    user = fakeUser({}, { expired: true })
+    oidc.tryRefresh.withArgs(user).resolves(false)
+    const result = await subject.canActivate(context)
+    expect(result).toBe(false)
+  })
+
+  it('is expired & refresh succeeds', async () => {
+    user = fakeUser({}, { expired: true })
+    oidc.tryRefresh.withArgs(user).resolves(true)
+    const result = await subject.canActivate(context)
+    expect(result).toBe(true)
+  })
+
   it('token verification is disabled', async () => {
     tokenVerification.isEnabled.returns(false)
     const result = await subject.canActivate(context)
     expect(result).toBe(true)
   })
 
-  it('token is invalid', async () => {
+  it('token is invalid & refresh fails', async () => {
     tokenVerification.isEnabled.returns(true)
     tokenVerification.verifyToken.withArgs(user).resolves(false)
+    oidc.tryRefresh.withArgs(user).resolves(false)
     const result = await subject.canActivate(context)
     expect(result).toBe(false)
+  })
+
+  it('token is invalid & refresh succeeds', async () => {
+    tokenVerification.isEnabled.returns(true)
+    tokenVerification.verifyToken.withArgs(user).resolves(false)
+    oidc.tryRefresh.withArgs(user).resolves(true)
+    const result = await subject.canActivate(context)
+    expect(result).toBe(true)
   })
 
   it('token is valid', async () => {
