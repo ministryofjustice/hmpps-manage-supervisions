@@ -45,6 +45,7 @@ export function fakeConfig(partial: DeepPartial<Config> = {}): Config {
         domain: new URL(faker.internet.url()),
         staticResourceCacheDuration: faker.datatype.number({ min: 60, max: 6000 }),
         debug: {},
+        refreshEnabled: faker.datatype.boolean(),
       },
       redis: {
         host: faker.internet.domainName(),

@@ -6,6 +6,9 @@ import { fakeUser } from '../user/user.fake'
 import { PUBLIC_KEY } from '../meta/public.decorator'
 import { Test } from '@nestjs/testing'
 import { HmppsOidcService } from '../../common'
+import { FakeConfigModule } from '../../config/config.fake'
+import { ServerConfig } from '../../config'
+import { ConfigService } from '@nestjs/config'
 
 const handler = 'handler'
 const cls = 'cls'
@@ -16,6 +19,7 @@ describe('AuthenticatedGuard', () => {
   let tokenVerification: SinonStubbedInstance<TokenVerificationService>
   let oidc: SinonStubbedInstance<HmppsOidcService>
   let user: User
+  let config: ServerConfig
   let isAuthenticated: boolean
   const context: any = {
     switchToHttp: () => ({
@@ -33,6 +37,7 @@ describe('AuthenticatedGuard', () => {
     oidc = createStubInstance(HmppsOidcService)
 
     const module = await Test.createTestingModule({
+      imports: [FakeConfigModule.register({ server: { refreshEnabled: true } })],
       providers: [
         AuthenticatedGuard,
         { provide: Reflector, useValue: reflector },
@@ -42,6 +47,7 @@ describe('AuthenticatedGuard', () => {
     }).compile()
 
     subject = module.get(AuthenticatedGuard)
+    config = module.get(ConfigService).get('server')
   })
 
   it('is public', async () => {
@@ -90,6 +96,15 @@ describe('AuthenticatedGuard', () => {
     oidc.tryRefresh.withArgs(user).resolves(true)
     const result = await subject.canActivate(context)
     expect(result).toBe(true)
+  })
+
+  it('token is invalid & refresh disabled', async () => {
+    config.refreshEnabled = false
+    tokenVerification.isEnabled.returns(true)
+    tokenVerification.verifyToken.withArgs(user).resolves(false)
+    const result = await subject.canActivate(context)
+    expect(result).toBe(false)
+    expect(oidc.tryRefresh.called).toBe(false)
   })
 
   it('token is valid', async () => {

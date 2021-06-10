@@ -118,6 +118,7 @@ export function configFactory(): Config {
           agg[k] = v || DEBUG_DEFAULTS[k]
           return agg
         }, {}),
+      refreshEnabled: bool('REFRESH_ENABLED', fallback(false)),
     },
     redis: {
       host: string('REDIS_HOST', developmentOnly('localhost')),

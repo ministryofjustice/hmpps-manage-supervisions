@@ -5,6 +5,8 @@ import { PUBLIC_KEY } from '../meta/public.decorator'
 import { TokenVerificationService } from '../token-verification/token-verification.service'
 import { HmppsOidcService } from '../../common'
 import { DateTime } from 'luxon'
+import { ConfigService } from '@nestjs/config'
+import { Config, ServerConfig } from '../../config'
 
 /**
  * The minimum validity in seconds of an access token before it should be refreshed.
@@ -14,11 +16,16 @@ const TOKEN_GRACE_SECONDS = 60
 
 @Injectable()
 export class AuthenticatedGuard implements CanActivate {
+  private readonly config: ServerConfig
+
   constructor(
     private readonly reflector: Reflector,
     private readonly tokenVerification: TokenVerificationService,
     private readonly oidc: HmppsOidcService,
-  ) {}
+    config: ConfigService<Config>,
+  ) {
+    this.config = config.get('server')
+  }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest()
@@ -37,7 +44,7 @@ export class AuthenticatedGuard implements CanActivate {
       return true
     }
 
-    return await this.oidc.tryRefresh(user)
+    return this.config.refreshEnabled ? await this.oidc.tryRefresh(user) : false
   }
 
   private async assertToken(user: User): Promise<boolean> {

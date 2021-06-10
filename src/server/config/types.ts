@@ -31,6 +31,7 @@ export interface ServerConfig {
   domain: URL
   staticResourceCacheDuration: number
   debug: Partial<Record<DebugFlags, string>>
+  refreshEnabled: boolean
 }
 
 export interface RedisConfig {
