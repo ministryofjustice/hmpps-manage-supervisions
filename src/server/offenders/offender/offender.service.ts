@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { sortBy } from 'lodash'
 import { DateTime } from 'luxon'
 import {
   AppointmentOutcome,
@@ -40,7 +41,7 @@ export class OffenderService {
   async getRecentAppointments(crn: string): Promise<RecentAppointments> {
     const { data } = await this.community.appointment.getOffenderAppointmentsByCrnUsingGET({ crn })
     const now = DateTime.now()
-    return data.reduce(
+    const result: RecentAppointments = data.reduce(
       (agg, apt) => {
         const collection =
           DateTime.fromISO(apt.appointmentStart) > now
@@ -58,6 +59,14 @@ export class OffenderService {
       },
       { future: [], recent: [], past: [] },
     )
+
+    result.future = sortBy(
+      result.future,
+      x => x.appointmentStart,
+      x => x.appointmentEnd,
+    )
+
+    return result
   }
 
   async getActivityLogPage(crn: string, options: GetContactsOptions = {}): Promise<Paginated<ActivityLogEntry>> {
