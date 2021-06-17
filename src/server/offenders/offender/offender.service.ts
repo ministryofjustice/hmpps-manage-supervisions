@@ -29,6 +29,19 @@ function getOutcomeFlags(outcome?: AppointmentOutcome): ActivityLogEntryTag[] {
   }
 }
 
+function getAppointmentFlags(contact: ContactSummary): ActivityLogEntryTag[] {
+  const tags = []
+  if (contact.sensitive) {
+    tags.push({ name: 'sensitive', colour: 'grey' })
+  }
+
+  if (contact.rarActivity) {
+    tags.push({ name: 'rar', colour: 'purple' })
+  }
+
+  return tags
+}
+
 @Injectable()
 export class OffenderService {
   constructor(private readonly community: CommunityApiService, private readonly contacts: ContactMappingService) {}
@@ -98,7 +111,7 @@ export class OffenderService {
 
     if (isAppointment(meta)) {
       // is either a well-known or 'other' appointment
-      const outcomeFlags = getOutcomeFlags(contact.outcome)
+      const outcomeFlags = [...getOutcomeFlags(contact.outcome), ...getAppointmentFlags(contact)]
       const missingOutcome = outcomeFlags.length === 0 && start <= DateTime.now()
       return {
         ...base,

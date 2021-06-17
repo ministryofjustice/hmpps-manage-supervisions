@@ -8,7 +8,7 @@ export interface ActivityLogEntryLinks {
 
 export interface ActivityLogEntryTag {
   name: string
-  colour: 'red' | 'green'
+  colour: 'red' | 'green' | 'purple' | 'grey'
 }
 
 export interface ActivityLogEntryBase<Links extends ActivityLogEntryLinks = ActivityLogEntryLinks> {
