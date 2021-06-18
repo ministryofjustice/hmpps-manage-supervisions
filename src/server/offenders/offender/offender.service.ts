@@ -111,7 +111,7 @@ export class OffenderService {
 
     if (isAppointment(meta)) {
       // is either a well-known or 'other' appointment
-      const outcomeFlags = [...getOutcomeFlags(contact.outcome), ...getAppointmentFlags(contact)]
+      const outcomeFlags = [...getAppointmentFlags(contact), ...getOutcomeFlags(contact.outcome)]
       const missingOutcome = outcomeFlags.length === 0 && start <= DateTime.now()
       return {
         ...base,

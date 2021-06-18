@@ -119,9 +119,11 @@ describe('OffenderService', () => {
       },
       WellKnownContactTypeCategory.Appointment,
     )
-    havingContact({ notes: 'other appointment, not recorded', outcome: null }, null, { appointment: true })
-    havingContact({ notes: 'well known communication' }, WellKnownContactTypeCategory.Communication)
-    havingContact({ notes: 'unknown' }, null, { appointment: false })
+    havingContact({ notes: 'other appointment, not recorded', outcome: null, sensitive: false }, null, {
+      appointment: true,
+    })
+    havingContact({ notes: 'well known communication', sensitive: false }, WellKnownContactTypeCategory.Communication)
+    havingContact({ notes: 'unknown', sensitive: false }, null, { appointment: false })
     havingContact(
       {
         notes: 'well known, unacceptable absence appointment',
@@ -176,12 +178,12 @@ describe('OffenderService', () => {
       totalElements: 7,
       content: [
         expectedAppointment(1, 'well known, complied RAR appointment', [
-          { colour: 'green', name: 'complied' },
           { colour: 'purple', name: 'rar' },
+          { colour: 'green', name: 'complied' },
         ]),
         expectedAppointment(2, 'well known, not complied sensitive appointment', [
-          { colour: 'red', name: 'failed to comply' },
           { colour: 'grey', name: 'sensitive' },
+          { colour: 'red', name: 'failed to comply' },
         ]),
         expectedAppointment(3, 'other appointment, not recorded', [], false),
         {

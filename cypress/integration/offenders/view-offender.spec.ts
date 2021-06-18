@@ -112,7 +112,7 @@ context('ViewOffender', () => {
         contactStart: '2020-09-04T12:00:00+01:00',
         contactEnd: '2020-09-04T13:00:00+01:00',
         notes: 'Some home visit appointment',
-        outcome: { complied: true },
+        outcome: { complied: true, attended: true },
       },
       {
         type: { code: 'APAT' },
@@ -120,7 +120,25 @@ context('ViewOffender', () => {
         contactEnd: '2020-09-03T11:15:00+01:00',
         notes: longNotes,
         staff: { unallocated: true },
-        outcome: { complied: false },
+        outcome: { complied: false, attended: true },
+      },
+      {
+        type: { code: 'APAT' },
+        contactStart: '2020-09-03T10:30:00+01:00',
+        contactEnd: '2020-09-03T11:15:00+01:00',
+        notes: longNotes,
+        staff: { unallocated: true },
+        outcome: { complied: true, attended: false },
+        sensitive: true,
+      },
+      {
+        type: { code: 'APAT' },
+        contactStart: '2020-09-03T10:30:00+01:00',
+        contactEnd: '2020-09-03T11:15:00+01:00',
+        notes: longNotes,
+        staff: { unallocated: true },
+        outcome: { complied: false, attended: false },
+        rarActivity: true,
       },
       {
         type: { code: 'NOT_WELL_KNOWN', description: 'Not a well known appointment', appointment: true },
@@ -155,6 +173,32 @@ context('ViewOffender', () => {
 
     shouldRenderActivity({
       id: 3,
+      date: 'Thursday 3 September 2020',
+      time: '10:30am to 11:15am',
+      name: 'Office visit',
+      notes: longNotes,
+      tags: [
+        { colour: 'grey', text: 'sensitive' },
+        { colour: 'green', text: 'acceptable absence' },
+      ],
+      havingLongNotes: true,
+    })
+
+    shouldRenderActivity({
+      id: 4,
+      date: 'Thursday 3 September 2020',
+      time: '10:30am to 11:15am',
+      name: 'Office visit',
+      notes: longNotes,
+      tags: [
+        { colour: 'purple', text: 'rar' },
+        { colour: 'red', text: 'unacceptable absence' },
+      ],
+      havingLongNotes: true,
+    })
+
+    shouldRenderActivity({
+      id: 5,
       date: 'Wednesday 2 September 2020',
       time: '11am to 1pm',
       name: 'Not a well known appointment with Mark Berridge',
