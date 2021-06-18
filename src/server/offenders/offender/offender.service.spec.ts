@@ -103,16 +103,43 @@ describe('OffenderService', () => {
     }
 
     havingContact(
-      { notes: 'well known, complied RAR appointment', outcome: { complied: true }, rarActivity: true },
+      {
+        notes: 'well known, complied RAR appointment',
+        outcome: { complied: true, attended: true },
+        rarActivity: true,
+        sensitive: false,
+      },
       WellKnownContactTypeCategory.Appointment,
     )
     havingContact(
-      { notes: 'well known, not complied sensitive appointment', outcome: { complied: false }, sensitive: true },
+      {
+        notes: 'well known, not complied sensitive appointment',
+        outcome: { complied: false, attended: true },
+        sensitive: true,
+      },
       WellKnownContactTypeCategory.Appointment,
     )
-    havingContact({ notes: 'other appointment, not recorded', outcome: null }, null, { appointment: true })
-    havingContact({ notes: 'well known communication' }, WellKnownContactTypeCategory.Communication)
-    havingContact({ notes: 'unknown' }, null, { appointment: false })
+    havingContact({ notes: 'other appointment, not recorded', outcome: null, sensitive: false }, null, {
+      appointment: true,
+    })
+    havingContact({ notes: 'well known communication', sensitive: false }, WellKnownContactTypeCategory.Communication)
+    havingContact({ notes: 'unknown', sensitive: false }, null, { appointment: false })
+    havingContact(
+      {
+        notes: 'well known, unacceptable absence appointment',
+        outcome: { complied: false, attended: false },
+        sensitive: false,
+      },
+      WellKnownContactTypeCategory.Appointment,
+    )
+    havingContact(
+      {
+        notes: 'well known, acceptable absence appointment',
+        outcome: { complied: true, attended: false },
+        sensitive: false,
+      },
+      WellKnownContactTypeCategory.Appointment,
+    )
 
     const stub = community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET.resolves(
       fakeOkResponse(fakePaginated(contacts)),
@@ -147,16 +174,16 @@ describe('OffenderService', () => {
       first: true,
       last: false,
       number: 0,
-      size: 5,
-      totalElements: 5,
+      size: 7,
+      totalElements: 7,
       content: [
         expectedAppointment(1, 'well known, complied RAR appointment', [
-          { colour: 'green', name: 'complied' },
           { colour: 'purple', name: 'rar' },
+          { colour: 'green', name: 'complied' },
         ]),
         expectedAppointment(2, 'well known, not complied sensitive appointment', [
-          { colour: 'red', name: 'failed to comply' },
           { colour: 'grey', name: 'sensitive' },
+          { colour: 'red', name: 'failed to comply' },
         ]),
         expectedAppointment(3, 'other appointment, not recorded', [], false),
         {
@@ -180,6 +207,12 @@ describe('OffenderService', () => {
           tags: [],
           links: null,
         },
+        expectedAppointment(6, 'well known, unacceptable absence appointment', [
+          { colour: 'red', name: 'unacceptable absence' },
+        ]),
+        expectedAppointment(7, 'well known, acceptable absence appointment', [
+          { colour: 'green', name: 'acceptable absence' },
+        ]),
       ],
     } as Paginated<ActivityLogEntry>)
 

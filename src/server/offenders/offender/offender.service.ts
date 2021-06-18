@@ -21,9 +21,9 @@ export type GetContactsOptions = Omit<ContactAndAttendanceApiGetOffenderContactS
 function getOutcomeFlags(outcome?: AppointmentOutcome): ActivityLogEntryTag[] {
   switch (outcome?.complied) {
     case true:
-      return [{ name: 'complied', colour: 'green' }]
+      return [{ name: outcome.attended ? 'complied' : 'acceptable absence', colour: 'green' }]
     case false:
-      return [{ name: 'failed to comply', colour: 'red' }]
+      return [{ name: outcome.attended ? 'failed to comply' : 'unacceptable absence', colour: 'red' }]
     default:
       return []
   }
@@ -111,7 +111,7 @@ export class OffenderService {
 
     if (isAppointment(meta)) {
       // is either a well-known or 'other' appointment
-      const outcomeFlags = [...getOutcomeFlags(contact.outcome), ...getAppointmentFlags(contact)]
+      const outcomeFlags = [...getAppointmentFlags(contact), ...getOutcomeFlags(contact.outcome)]
       const missingOutcome = outcomeFlags.length === 0 && start <= DateTime.now()
       return {
         ...base,
