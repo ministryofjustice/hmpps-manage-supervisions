@@ -80,4 +80,12 @@ export class OffenderPage extends PageBase {
       },
     }
   }
+
+  get personal() {
+    return {
+      tableValue(table: 'contact' | 'personal', title: string) {
+        return cy.get(`dl[data-qa="offender/personal-details/${table}"] dt`).contains(title).siblings('dd')
+      },
+    }
+  }
 }

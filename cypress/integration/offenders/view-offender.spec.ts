@@ -207,6 +207,24 @@ context('ViewOffender', () => {
     })
   })
 
+  it('displays personal details', () => {
+    havingViewedOffender()
+    whenClickingSubNavTab('personal')
+    shouldDisplayCommonHeader()
+
+    page.personal.tableValue('contact', 'Address').contains('1 High Street Sheffield South Yorkshire S10 1AG')
+    page.personal.tableValue('contact', 'Phone number').contains('07734 111992 01234 111222')
+    page.personal.tableValue('contact', 'Email').contains('example@example.com example2@example2.com')
+
+    page.personal.tableValue('personal', 'Name').contains('Brian Cheese')
+    page.personal.tableValue('personal', 'Aliases').contains('Dylan Meyer Romario Montgomery')
+    page.personal.tableValue('personal', 'Date of birth').contains('10 June 1980')
+    page.personal.tableValue('personal', 'Preferred language').contains('Bengali')
+    page.personal
+      .tableValue('personal', 'Disabilities and adjustments')
+      .contains('Learning Difficulties Speech Impairment')
+  })
+
   function shouldRenderActivity({
     id,
     date,

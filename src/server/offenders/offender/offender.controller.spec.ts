@@ -5,7 +5,12 @@ import { OffenderService } from './offender.service'
 import { OffenderPage, OffenderViewModel } from './offender-view-model'
 import { RedirectResponse } from '../../common'
 import { fakeOffenderDetail, fakePaginated } from '../../community-api/community-api.fake'
-import { fakeActivityLogEntry, fakeRecentAppointments } from './offender.fake'
+import {
+  fakeActivityLogEntry,
+  fakeContactDetailsViewModel,
+  fakePersonalDetailsViewModel,
+  fakeRecentAppointments,
+} from './offender.fake'
 
 describe('OffenderController', () => {
   let subject: OffenderController
@@ -65,6 +70,23 @@ describe('OffenderController', () => {
         page: contacts.number,
         size: contacts.size,
       },
+    })
+  })
+
+  it('gets personal', async () => {
+    const offender = havingOffender()
+
+    const contactDetails = fakeContactDetailsViewModel()
+    const personalDetails = fakePersonalDetailsViewModel()
+
+    service.getPersonalDetails.withArgs(offender).returns({ contactDetails, personalDetails })
+
+    const observed = await subject.getPersonal('some-crn')
+
+    shouldReturnViewModel(observed, {
+      page: OffenderPage.Personal,
+      contactDetails,
+      personalDetails,
     })
   })
 

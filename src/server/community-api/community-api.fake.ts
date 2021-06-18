@@ -14,6 +14,10 @@ import {
   StaffHuman,
   ContactSummary,
   ContactType,
+  Address,
+  Disability,
+  OffenderAlias,
+  PhoneNumber,
 } from './client'
 import { merge } from 'lodash'
 import * as faker from 'faker'
@@ -37,19 +41,61 @@ export const fakeAppointmentCreateResponse = fake<AppointmentCreateResponse>(() 
   type: faker.datatype.uuid(),
 }))
 
-export const fakeOffenderDetail = fake<OffenderDetail>(() => ({
+export const fakeAddress = fake<Address>(() => ({
+  from: faker.date.past().toISOString(),
+  notes: faker.company.bs(),
+  addressNumber: faker.datatype.number().toString(),
+  streetName: faker.address.streetName(),
+  buildingName: faker.commerce.department(),
+  town: faker.address.city(),
+  county: faker.address.county(),
+  postcode: faker.address.zipCode(),
+  status: {
+    code: 'M',
+    description: 'Main',
+  },
+  noFixedAbode: false,
+  telephoneNumber: faker.phone.phoneNumber(),
+}))
+
+export const fakePhoneNumber = fake<PhoneNumber>(() => ({
+  type: PhoneNumberType.Mobile,
+  number: faker.phone.phoneNumber(),
+}))
+
+export const fakeDisability = fake<Disability>(() => ({
+  disabilityId: faker.datatype.number(),
+  disabilityType: {
+    code: faker.random.alphaNumeric(3).toUpperCase(),
+    description: faker.company.bs(),
+  },
+  startDate: faker.date.past().toISOString(),
+  notes: faker.company.bs(),
+}))
+
+export const fakeOffenderAlias = fake<OffenderAlias>(() => ({
+  firstName: faker.name.firstName(),
+  surname: faker.name.lastName(),
+}))
+
+export const fakeOffenderDetail = fake<OffenderDetail>((options, partial) => ({
   offenderId: faker.datatype.number(),
   activeProbationManagedSentence: true,
   firstName: faker.name.firstName(),
   surname: faker.name.lastName(),
+  dateOfBirth: faker.date.past().toISOString(),
   contactDetails: {
-    phoneNumbers: [
-      {
-        type: PhoneNumberType.Mobile,
-        number: faker.phone.phoneNumber(),
-      },
-    ],
+    addresses: (partial?.contactDetails?.addresses as Address[]) || [fakeAddress()],
+    phoneNumbers: partial?.contactDetails?.phoneNumbers || [fakePhoneNumber()],
+    emailAddresses: partial?.contactDetails?.emailAddresses || [faker.internet.email()],
   },
+  offenderProfile: {
+    offenderLanguages: {
+      primaryLanguage: faker.address.country(),
+    },
+    disabilities: partial?.offenderProfile?.disabilities || [fakeDisability()],
+  },
+  offenderAliases: partial?.offenderAliases || [fakeOffenderAlias()],
   offenderManagers: [{ team: { code: faker.datatype.uuid() } }],
 }))
 

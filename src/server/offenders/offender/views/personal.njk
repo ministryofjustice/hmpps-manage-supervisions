@@ -1,0 +1,77 @@
+{% extends "./_layout.njk" %}
+{% set pageName = 'Personal details' %}
+{% from "./_join.njk" import join %}
+
+{% block page %}
+    <div class="govuk-grid-row">
+        <div class='govuk-grid-column-two-thirds'>
+            <h2 class="govuk-heading-m">
+                Contact details
+            </h2>
+
+            {{ govukSummaryList({
+                classes: 'govuk-summary-list--no-border govuk-!-margin-bottom-7',
+                attributes: {
+                    'data-qa': 'offender/personal-details/contact'
+                },
+                rows: [
+                    {
+                        key: { text: "Address" },
+                        value: { html: join(contactDetails.address) },
+                        classes: 'qa-address'
+                    } if contactDetails.address,
+                    {
+                        key: { text: "Phone number" },
+                        value: { html: join(contactDetails.phoneNumbers) },
+                        classes: 'qa-phone-number'
+                    } if contactDetails.phoneNumbers.length > 0,
+                    {
+                        key: { text: "Email" },
+                        value: { html: join(contactDetails.emailAddresses) },
+                        classes: 'qa-email'
+                    } if contactDetails.emailAddresses.length > 0
+                ]
+            }) }}
+
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+            <h2 class="govuk-heading-m">
+                Personal details
+            </h2>
+
+            {{ govukSummaryList({
+                classes: 'govuk-summary-list--no-border govuk-!-margin-bottom-7',
+                attributes: {
+                    'data-qa': 'offender/personal-details/personal'
+                },
+                rows: [
+                    {
+                        key: { text: "Name" },
+                        value: { text: personalDetails.name },
+                        classes: 'qa-name'
+                    },
+                    {
+                        key: { text: "Aliases" },
+                        value: { html: join(personalDetails.aliases) },
+                        classes: 'qa-aliases'
+                    } if personalDetails.aliases.length > 0,
+                    {
+                        key: { text: "Date of birth" },
+                        value: { text: personalDetails.dateOfBirth | dob },
+                        classes: 'qa-dob'
+                    } if personalDetails.dateOfBirth,
+                    {
+                        key: { text: "Preferred language" },
+                        value: { text: personalDetails.preferredLanguage },
+                        classes: 'qa-language'
+                    } if personalDetails.preferredLanguage,
+                    {
+                        key: { text: "Disabilities and adjustments" },
+                        value: { html: join(personalDetails.disabilities) },
+                        classes: 'qa-disabilities'
+                    } if personalDetails.disabilities.length > 0
+                ]
+            }) }}
+        </div>
+    </div>
+{% endblock %}

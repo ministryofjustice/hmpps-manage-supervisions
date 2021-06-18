@@ -4,12 +4,14 @@ import {
   OffenderOverviewViewModel,
   OffenderPage,
   OffenderPageLinks,
+  OffenderPersonalViewModel,
   OffenderScheduleViewModel,
   OffenderViewModelBase,
 } from './offender-view-model'
 import { RedirectResponse } from '../../common'
 import { OffenderDetail } from '../../community-api'
 import { OffenderService } from './offender.service'
+import { getOffenderDisplayName } from '../../util'
 
 @Controller('offender/:crn(\\w+)')
 export class OffenderController {
@@ -64,9 +66,19 @@ export class OffenderController {
     }
   }
 
+  @Get('personal')
+  @Render('offenders/offender/views/personal')
+  async getPersonal(@Param('crn') crn: string): Promise<OffenderPersonalViewModel> {
+    const offender = await this.service.getOffenderDetail(crn)
+    return {
+      ...this.getBase(OffenderPage.Personal, offender),
+      ...this.service.getPersonalDetails(offender),
+      page: OffenderPage.Personal,
+    }
+  }
+
   private getBase(page: OffenderPage, offender: OffenderDetail): OffenderViewModelBase {
     const crn = offender.otherIds.crn
-    const displayName = [offender.firstName, ...(offender.middleNames || []), offender.surname].filter(x => x).join(' ')
 
     const pageLinks = Object.values(OffenderPage).reduce(
       (agg, x) => ({ ...agg, [x]: `/offender/${crn}/${x}` }),
@@ -77,7 +89,7 @@ export class OffenderController {
       ids: {
         crn: crn.toUpperCase(),
       },
-      displayName,
+      displayName: getOffenderDisplayName(offender),
       links: {
         ...pageLinks,
         arrangeAppointment: `/arrange-appointment/${crn}`,

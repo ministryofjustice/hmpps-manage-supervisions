@@ -6,13 +6,16 @@ import { MAX_RECENT_APPOINTMENTS, OffenderService } from './offender.service'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../community-api/community-api.mock'
 import { AppointmentDetail, CommunityApiService, ContactSummary, Paginated } from '../../community-api'
 import {
+  fakeAddress,
   fakeAppointmentDetail,
   fakeContactSummary,
+  fakeDisability,
   fakeOffenderDetail,
   fakePaginated,
+  fakePhoneNumber,
 } from '../../community-api/community-api.fake'
 import { fakeOkResponse } from '../../common/rest/rest.fake'
-import { RecentAppointments } from './offender-view-model'
+import { ContactDetailsViewModel, PersonalDetailsViewModel, RecentAppointments } from './offender-view-model'
 import { ContactMappingService } from '../../common'
 import { WellKnownContactTypeCategory } from '../../config'
 import { ActivityLogEntry, ActivityLogEntryTag } from './activity-log-entry'
@@ -83,6 +86,7 @@ describe('OffenderService', () => {
     const start = DateTime.fromJSDate(faker.date.past()).set({ hour: 12, minute: 0, second: 0, millisecond: 0 })
     const end = start.plus({ hour: 1 })
     const contacts: ContactSummary[] = []
+
     function havingContact(
       partial: DeepPartial<ContactSummary> & { notes: string },
       type: WellKnownContactTypeCategory | null,
@@ -92,6 +96,7 @@ describe('OffenderService', () => {
         contactId: contacts.length + 1,
         contactStart: start.toISO(),
         contactEnd: end.toISO(),
+        sensitive: false,
         ...partial,
       })
       contacts.push(contact)
@@ -217,5 +222,55 @@ describe('OffenderService', () => {
     } as Paginated<ActivityLogEntry>)
 
     expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn', appointmentsOnly: true })
+  })
+
+  it('gets offender personal details', () => {
+    const offender = fakeOffenderDetail({
+      firstName: 'Some',
+      surname: 'Offender',
+      dateOfBirth: '2001-05-06',
+      contactDetails: {
+        addresses: [
+          fakeAddress({
+            addressNumber: '123',
+            buildingName: 'Some building',
+            streetName: 'Some street',
+            town: 'Some town',
+            county: 'Some county',
+            postcode: 'Some postcode',
+            noFixedAbode: false,
+            status: { code: 'M' },
+          }),
+        ],
+        phoneNumbers: [fakePhoneNumber({ number: '0123456789' }), fakePhoneNumber({ number: '9876543210' })],
+        emailAddresses: ['some.email@address.com', 'some.other.email@address.com'],
+      },
+      offenderAliases: [
+        { firstName: 'A1', middleNames: ['A2'], surname: 'A3' },
+        { firstName: 'B1', middleNames: ['B2'], surname: 'B3' },
+      ],
+      offenderProfile: {
+        offenderLanguages: { primaryLanguage: 'English' },
+        disabilities: [
+          fakeDisability({ disabilityType: { description: 'Some disability' } }),
+          fakeDisability({ disabilityType: { description: 'Some other disability' } }),
+        ],
+      },
+    })
+    const observed = subject.getPersonalDetails(offender)
+    expect(observed).toEqual({
+      contactDetails: {
+        address: ['123 Some building Some street', 'Some town', 'Some county', 'Some postcode'],
+        phoneNumbers: ['0123456789', '9876543210'],
+        emailAddresses: ['some.email@address.com', 'some.other.email@address.com'],
+      } as ContactDetailsViewModel,
+      personalDetails: {
+        name: 'Some Offender',
+        preferredLanguage: 'English',
+        dateOfBirth: DateTime.fromObject({ year: 2001, month: 5, day: 6 }),
+        aliases: ['A1 A2 A3', 'B1 B2 B3'],
+        disabilities: ['Some disability', 'Some other disability'],
+      } as PersonalDetailsViewModel,
+    })
   })
 })

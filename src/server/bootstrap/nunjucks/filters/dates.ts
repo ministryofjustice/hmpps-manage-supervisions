@@ -29,3 +29,11 @@ export class LongDate implements NunjucksFilter {
     return date.toFormat(format)
   }
 }
+
+export class Dob implements NunjucksFilter {
+  filter(value: string | DateTime): string {
+    const date = safeGetDateTime(value)
+    const age = DateTime.now().diff(date, 'years')
+    return `${date.toFormat('d MMMM yyyy')} (${Math.floor(age.years)} years old)`
+  }
+}
