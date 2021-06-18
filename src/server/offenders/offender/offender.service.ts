@@ -21,9 +21,9 @@ export type GetContactsOptions = Omit<ContactAndAttendanceApiGetOffenderContactS
 function getOutcomeFlags(outcome?: AppointmentOutcome): ActivityLogEntryTag[] {
   switch (outcome?.complied) {
     case true:
-      return [{ name: 'complied', colour: 'green' }]
+      return [{ name: outcome.attended ? 'complied' : 'acceptable absence', colour: 'green' }]
     case false:
-      return [{ name: 'failed to comply', colour: 'red' }]
+      return [{ name: outcome.attended ? 'failed to comply' : 'unacceptable absence', colour: 'red' }]
     default:
       return []
   }
