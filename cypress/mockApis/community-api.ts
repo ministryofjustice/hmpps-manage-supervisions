@@ -119,16 +119,36 @@ export class CommunityMockApi {
           title: 'Mr',
           firstName: 'Brian',
           surname: 'Cheese',
-          dateOfBirth: '1970-01-01',
+          dateOfBirth: '1980-06-10',
           gender: 'Male',
           otherIds: { crn },
           contactDetails: {
+            addresses: [
+              {
+                from: '2015-07-16',
+                noFixedAbode: false,
+                addressNumber: '1',
+                streetName: 'High Street',
+                town: 'Sheffield',
+                county: 'South Yorkshire',
+                postcode: 'S10 1AG',
+                status: {
+                  code: 'M',
+                  description: 'Main',
+                },
+              },
+            ],
             phoneNumbers: [
               {
                 type: 'MOBILE',
                 number: '07734 111992',
               },
+              {
+                type: 'TELEPHONE',
+                number: '01234 111222',
+              },
             ],
+            emailAddresses: ['example@example.com', 'example2@example2.com'],
           },
           offenderProfile: {
             offenderLanguages: {
@@ -166,6 +186,10 @@ export class CommunityMockApi {
               },
             ],
           },
+          offenderAliases: [
+            { firstName: 'Dylan', surname: 'Meyer' },
+            { firstName: 'Romario', surname: 'Montgomery' },
+          ],
           offenderManagers: [
             {
               trustOfficer: {

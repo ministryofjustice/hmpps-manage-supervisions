@@ -24,23 +24,28 @@
             "from": "2015-07-16",
             "noFixedAbode": false,
             "addressNumber": "1",
-            "streetName": "Hight Street",
+            "streetName": "High Street",
             "district": "Dis",
-            "town": "Tow",
-            "county": "Cou",
-            "postcode": "AA1 1AA",
+            "town": "Sheffield",
+            "county": "South Yorkshire",
+            "postcode": "S10 1AG",
             "status": {
               "code": "M",
               "description": "Main"
             }
           }
-        ]
+        ],
+        "emailAddresses": ["example@example.com"]
       },
       "offenderProfile": {
-        "offenderLanguages": {},
+        "offenderLanguages": {
+          "primaryLanguage": "English"
+        },
         "remandStatus": "Bail - Unconditional",
-        "previousConviction": {}
+        "previousConviction": {},
+        "disabilities": [{ "disabilityType": { "description": "Autism spectrum condition" } }]
       },
+      "offenderAliases": [{ "firstName": "Liz", "surname": "Whiskey" }],
       "offenderManagers": [
         {
           "trustOfficer": {

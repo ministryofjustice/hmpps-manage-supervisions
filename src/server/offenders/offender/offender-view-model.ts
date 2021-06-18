@@ -1,5 +1,6 @@
 import { AppointmentDetail, ContactDetails } from '../../community-api'
 import { ActivityLogEntry } from './activity-log-entry'
+import { DateTime } from 'luxon'
 
 export enum OffenderPage {
   Overview = 'overview',
@@ -55,8 +56,25 @@ export interface OffenderActivityViewModel extends OffenderViewModelBase {
   }
 }
 
+export interface ContactDetailsViewModel {
+  address?: string[]
+  phoneNumbers: string[]
+  emailAddresses: string[]
+  lastUpdated?: DateTime
+}
+
+export interface PersonalDetailsViewModel {
+  name: string
+  aliases: string[]
+  dateOfBirth?: DateTime
+  preferredLanguage?: string
+  disabilities: string[]
+}
+
 export interface OffenderPersonalViewModel extends OffenderViewModelBase {
   page: OffenderPage.Personal
+  contactDetails: ContactDetailsViewModel
+  personalDetails: PersonalDetailsViewModel
 }
 
 export interface OffenderSentenceViewModel extends OffenderViewModelBase {

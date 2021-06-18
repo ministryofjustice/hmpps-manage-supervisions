@@ -1,0 +1,7 @@
+{% macro join(items) %}
+    {% for item in items %}
+        <p class="govuk-body govuk-!-margin-bottom-0">
+            {{ item }}
+        </p>
+    {% endfor %}
+{% endmacro %}
