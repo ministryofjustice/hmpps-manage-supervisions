@@ -6,16 +6,25 @@ import {
   OffenderPageLinks,
   OffenderPersonalViewModel,
   OffenderScheduleViewModel,
+  OffenderSentenceViewModel,
   OffenderViewModelBase,
 } from './offender-view-model'
 import { RedirectResponse } from '../../common'
 import { OffenderDetail } from '../../community-api'
 import { OffenderService } from './offender.service'
 import { getOffenderDisplayName } from '../../util'
+import { SentenceService } from './sentence'
+import { ScheduleService } from './schedule'
+import { ActivityService } from './activity'
 
 @Controller('offender/:crn(\\w+)')
 export class OffenderController {
-  constructor(private readonly service: OffenderService) {}
+  constructor(
+    private readonly offenderService: OffenderService,
+    private readonly scheduleService: ScheduleService,
+    private readonly activityService: ActivityService,
+    private readonly sentenceService: SentenceService,
+  ) {}
 
   @Get()
   @Redirect()
@@ -26,7 +35,7 @@ export class OffenderController {
   @Get('overview')
   @Render('offenders/offender/views/overview')
   async getOverview(@Param('crn') crn: string): Promise<OffenderOverviewViewModel> {
-    const offender = await this.service.getOffenderDetail(crn)
+    const offender = await this.offenderService.getOffenderDetail(crn)
     return {
       ...this.getBase(OffenderPage.Overview, offender),
       page: OffenderPage.Overview,
@@ -38,8 +47,8 @@ export class OffenderController {
   @Render('offenders/offender/views/schedule')
   async getSchedule(@Param('crn') crn: string): Promise<OffenderScheduleViewModel> {
     const [offender, appointments] = await Promise.all([
-      this.service.getOffenderDetail(crn),
-      this.service.getRecentAppointments(crn),
+      this.offenderService.getOffenderDetail(crn),
+      this.scheduleService.getRecentAppointments(crn),
     ])
     return {
       ...this.getBase(OffenderPage.Overview, offender),
@@ -52,8 +61,8 @@ export class OffenderController {
   @Render('offenders/offender/views/activity')
   async getActivity(@Param('crn') crn: string): Promise<OffenderActivityViewModel> {
     const [offender, contacts] = await Promise.all([
-      this.service.getOffenderDetail(crn),
-      this.service.getActivityLogPage(crn, { appointmentsOnly: true }), // TODO just getting appointment contacts for now
+      this.offenderService.getOffenderDetail(crn),
+      this.activityService.getActivityLogPage(crn, { appointmentsOnly: true }), // TODO just getting appointment contacts for now
     ])
     return {
       ...this.getBase(OffenderPage.Activity, offender),
@@ -69,11 +78,25 @@ export class OffenderController {
   @Get('personal')
   @Render('offenders/offender/views/personal')
   async getPersonal(@Param('crn') crn: string): Promise<OffenderPersonalViewModel> {
-    const offender = await this.service.getOffenderDetail(crn)
+    const offender = await this.offenderService.getOffenderDetail(crn)
     return {
       ...this.getBase(OffenderPage.Personal, offender),
-      ...this.service.getPersonalDetails(offender),
+      ...this.offenderService.getPersonalDetails(offender),
       page: OffenderPage.Personal,
+    }
+  }
+
+  @Get('sentence')
+  @Render('offenders/offender/views/sentence')
+  async getSentence(@Param('crn') crn: string): Promise<OffenderSentenceViewModel> {
+    const [offender, sentenceDetail] = await Promise.all([
+      this.offenderService.getOffenderDetail(crn),
+      this.sentenceService.getSentenceDetails(crn),
+    ])
+    return {
+      ...this.getBase(OffenderPage.Sentence, offender),
+      ...sentenceDetail,
+      page: OffenderPage.Sentence,
     }
   }
 

@@ -88,4 +88,36 @@ export class OffenderPage extends PageBase {
       },
     }
   }
+
+  get sentence() {
+    return {
+      mainOffence(title: string) {
+        return cy.get(`dl[data-qa="offender/sentence/main-offence"] dt`).contains(title).siblings('dd')
+      },
+
+      get noOffences() {
+        return cy.get(`[data-qa="offender/sentence/no-offences"]`)
+      },
+
+      additionalOffence(id: string, title: string) {
+        return cy.get(`dl[data-qa="offender/sentence/additional-offence/${id}"] dt`).contains(title).siblings('dd')
+      },
+
+      get noDetails() {
+        return cy.get(`[data-qa="offender/sentence/no-details"]`)
+      },
+
+      details(title: string) {
+        return cy.get(`dl[data-qa="offender/sentence/details"] dt`).contains(title).siblings('dd')
+      },
+
+      requirements(title: string) {
+        return cy.get(`dl[data-qa="offender/sentence/requirements"] dt`).contains(title).siblings('dd')
+      },
+
+      get previous() {
+        return cy.get('[data-qa="offender/sentence/previous-orders"')
+      },
+    }
+  }
 }

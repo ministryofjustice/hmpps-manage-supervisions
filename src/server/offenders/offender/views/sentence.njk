@@ -1,0 +1,154 @@
+{% extends "./_layout.njk" %}
+{% set pageName = 'Sentence' %}
+
+{% block page %}
+    <div class="govuk-grid-row">
+        <div class='govuk-grid-column-two-thirds'>
+            <h2 class="govuk-heading-m">
+                Offences
+            </h2>
+
+            {% if mainOffence %}
+                {{ govukSummaryList({
+                    classes: 'govuk-summary-list--no-border',
+                    attributes: {
+                        'data-qa': 'offender/sentence/main-offence'
+                    },
+                    rows: [
+                        {
+                            key: { text: "Main offence" },
+                            value: { text: mainOffence.description },
+                            classes: 'qa-description'
+                        },
+                        {
+                            key: { text: "Offence date" },
+                            value: { text: mainOffence.date | shortDate },
+                            classes: 'qa-date'
+                        }
+                    ]
+                }) }}
+
+                {% for offence in additionalOffences %}
+                    {{ govukSummaryList({
+                        classes: 'govuk-summary-list--no-border',
+                        attributes: {
+                            'data-qa': 'offender/sentence/additional-offence/' + offence.id
+                        },
+                        rows: [
+                            {
+                                key: { text: "Additional offence" },
+                                value: { text: offence.description },
+                                classes: 'qa-description'
+                            },
+                            {
+                                key: { text: "Offence date" },
+                                value: { text: offence.date | shortDate },
+                                classes: 'qa-date'
+                            }
+                        ]
+                    }) }}
+                {% endfor %}
+            {% else %}
+                <p class='govuk-body' data-qa='offender/sentence/no-offences'>
+                    Offence details are unavailable.
+                </p>
+            {% endif %}
+
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+            <h2 class="govuk-heading-m">
+                Sentence details
+            </h2>
+
+            {% if sentence %}
+                {{ govukSummaryList({
+                    classes: 'govuk-summary-list--no-border',
+                    attributes: {
+                        'data-qa': 'offender/sentence/details'
+                    },
+                    rows: [
+                        {
+                            key: { text: "Sentence" },
+                            value: { text: sentence.description },
+                            classes: 'qa-description'
+                        },
+                        {
+                            key: { text: "Length" },
+                            value: { text: sentence.length },
+                            classes: 'qa-length'
+                        },
+                        {
+                            key: { text: "Start date" },
+                            value: { text: sentence.startDate | shortDate },
+                            classes: 'qa-start-date'
+                        },
+                        {
+                            key: { text: "End date" },
+                            value: { text: sentence.endDate | shortDate },
+                            classes: 'qa-end-date'
+                        },
+                        {
+                            key: { text: "Time elapsed" },
+                            value: { text: sentence.elapsed },
+                            classes: 'qa-elapsed'
+                        },
+                        {
+                            key: { text: "Conviction date" },
+                            value: { text: sentence.convictionDate | shortDate },
+                            classes: 'qa-conviction-date'
+                        },
+                        {
+                            key: { text: "Court" },
+                            value: { text: sentence.courtAppearance },
+                            classes: 'qa-court'
+                        } if sentence.courtAppearance,
+                        {
+                            key: { text: "Responsible court" },
+                            value: { text: sentence.responsibleCourt },
+                            classes: 'qa-responsible-court'
+                        } if sentence.responsibleCourt
+                    ]
+                }) }}
+            {% else %}
+                <p class='govuk-body' data-qa='offender/sentence/no-details'>
+                    Sentence details are unavailable.
+                </p>
+            {% endif %}
+
+            {% if requirement %}
+                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+                <h2 class="govuk-heading-m">
+                    Requirements
+                </h2>
+
+                {{ govukSummaryList({
+                    classes: 'govuk-summary-list--no-border',
+                    attributes: {
+                        'data-qa': 'offender/sentence/requirements'
+                    },
+                    rows: [
+                        {
+                            key: { text: "RAR" },
+                            value: { text: requirement.length },
+                            classes: 'qa-length'
+                        }
+                    ]
+                }) }}
+            {% endif %}
+        </div>
+        <div class='govuk-grid-column-one-third'>
+            {% if previousConvictions %}
+                <h2 class="govuk-heading-m">
+                    Probation history
+                </h2>
+                <p class="govuk-body" data-qa='offender/sentence/previous-orders'>
+                    <a class="govuk-heading-s govuk-!-margin-top-0 govuk-!-margin-bottom-1" href="{{ previousConvictions.link }}">
+                        Previous orders ({{ previousConvictions.count }})
+                    </a>
+                    Last ended on {{ previousConvictions.lastEnded | shortDate }}
+                </p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

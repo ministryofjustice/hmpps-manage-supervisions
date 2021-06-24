@@ -7,6 +7,8 @@ import {
   AppointmentType,
   CommunityApiService,
   Conviction,
+  EMPLOYMENT_TYPE_CODE,
+  isRar,
   OffenderDetail,
   OfficeLocation,
   PersonalCircumstance,
@@ -16,10 +18,6 @@ import { DateTime } from 'luxon'
 import { Config, WellKnownAppointmentType, WellKnownContactTypeCategory, WellKnownContactTypeConfig } from '../config'
 import { AvailableAppointmentTypes, FeaturedAppointmentType } from './dto/AppointmentWizardViewModel'
 import { ConfigService } from '@nestjs/config'
-
-const RAR_REQUIREMENT_SUB_TYPE_CATEGORY_CODE = 'RARREQ'
-const RAR_REQUIREMENT_TYPE_MAIN_CATEGORY_CODE = 'F'
-const EMPLOYMENT_TYPE_CODE = 'B'
 
 @Injectable()
 export class ArrangeAppointmentService {
@@ -145,11 +143,7 @@ export class ArrangeAppointmentService {
       activeOnly: true,
     })
 
-    const rarRequirement = data.requirements.find(
-      r =>
-        r.requirementTypeMainCategory.code == RAR_REQUIREMENT_TYPE_MAIN_CATEGORY_CODE &&
-        r.requirementTypeSubCategory.code == RAR_REQUIREMENT_SUB_TYPE_CATEGORY_CODE,
-    )
+    const rarRequirement = data.requirements.find(isRar)
 
     // RAR requirements will only be found on ORA Community Order and ORA Suspended Sentence Order sentences
     if (!rarRequirement) {

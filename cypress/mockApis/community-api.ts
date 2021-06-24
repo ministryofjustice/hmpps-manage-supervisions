@@ -4,6 +4,8 @@ import { merge } from 'lodash'
 export interface CreateAppointmentArgs {
   crn: string
   convictionId: number
+  current?: boolean
+  previous?: boolean
 }
 
 export interface StubOffenderAppointmentOptions {
@@ -244,7 +246,202 @@ export class CommunityMockApi {
     })
   }
 
-  async stubGetConvictions({ crn, convictionId }: CreateAppointmentArgs) {
+  async stubGetConvictions({ crn, convictionId = 1, current = true, previous = false }: CreateAppointmentArgs) {
+    const convictions = []
+    if (current) {
+      convictions.push({
+        convictionId: convictionId,
+        index: '4',
+        active: true,
+        inBreach: false,
+        convictionDate: '2020-02-05',
+        referralDate: '2020-02-17',
+        offences: [
+          {
+            offenceId: 'M2500445193',
+            mainOffence: true,
+            detail: {
+              code: '07539',
+              description: 'Cheats at gambling or enables or assists person to cheat (Gambling Act 2005) - 07539',
+              mainCategoryCode: '075',
+              mainCategoryDescription: 'Betting, Gaming and Lotteries (Indictable)',
+              mainCategoryAbbreviation: 'Betting, Gaming and Lotteries (Indictable)',
+              ogrsOffenceCategory: 'Other offence',
+              subCategoryCode: '39',
+              subCategoryDescription: 'Cheats at gambling or enables or assists person to cheat (Gambling Act 2005)',
+              form20Code: '12',
+            },
+            offenceDate: '2021-02-01T00:00:00',
+            offenceCount: 1,
+            offenderId: 2500011641,
+            createdDatetime: '2021-03-25T14:52:23',
+            lastUpdatedDatetime: '2021-03-25T14:52:23',
+          },
+          {
+            offenceId: 'M2500297061',
+            mainOffence: false,
+            detail: {
+              code: '10400',
+              description: 'Assault on Police Officer - 10400',
+              mainCategoryCode: '104',
+              mainCategoryDescription: 'Assault on Police Officer',
+              mainCategoryAbbreviation: 'Assault on Police Officer',
+              ogrsOffenceCategory: 'Violence',
+              subCategoryCode: '00',
+              subCategoryDescription: 'Assault on Police Officer',
+              form20Code: '88',
+            },
+            offenceDate: '2019-09-09T00:00:00',
+            offenceCount: 1,
+            offenderId: 2500343964,
+            createdDatetime: '2019-09-17T00:00:00',
+            lastUpdatedDatetime: '2019-09-17T00:00:00',
+          },
+        ],
+        sentence: {
+          sentenceId: 2500427030,
+          description: 'ORA Community Order',
+          originalLength: 12,
+          originalLengthUnits: 'Months',
+          defaultLength: 12,
+          lengthInDays: 364,
+          expectedSentenceEndDate: '2021-02-16',
+          startDate: '2020-02-17',
+          sentenceType: {
+            code: 'SP',
+            description: 'ORA Community Order',
+          },
+        },
+        latestCourtAppearanceOutcome: {
+          code: '329',
+          description: 'ORA Community Order',
+        },
+        responsibleCourt: {
+          courtId: 1500004905,
+          code: 'SHEFMC',
+          selectable: true,
+          courtName: 'Sheffield Magistrates Court',
+          telephoneNumber: '0300 047 0777',
+          fax: '0114 2756 373',
+          buildingName: 'Castle Street',
+          town: 'Sheffield',
+          county: 'South Yorkshire',
+          postcode: 'S3 8LU',
+          country: 'England',
+          courtTypeId: 310,
+          createdDatetime: '2014-05-29T21:50:16',
+          lastUpdatedDatetime: '2019-05-10T23:24:48',
+          probationAreaId: 1500001001,
+          probationArea: {
+            code: 'N02',
+            description: 'NPS North East',
+          },
+          courtType: {
+            code: 'MAG',
+            description: 'Magistrates Court',
+          },
+        },
+        courtAppearance: {
+          courtAppearanceId: 2500316926,
+          appearanceDate: '2019-09-04T00:00:00',
+          courtCode: 'NOTTS',
+          courtName: 'Nottingham Crown Court',
+          appearanceType: {
+            code: 'S',
+            description: 'Sentence',
+          },
+          crn: 'X320741',
+        },
+      })
+    }
+
+    if (previous) {
+      convictions.push({
+        convictionId: convictionId + 1,
+        index: '1',
+        active: false,
+        inBreach: false,
+        convictionDate: '2020-12-01',
+        referralDate: '2020-12-04',
+        offences: [
+          {
+            offenceId: 'M2500445194',
+            mainOffence: true,
+            detail: {
+              code: '07539',
+              description: 'Cheats at gambling or enables or assists person to cheat (Gambling Act 2005) - 07539',
+              mainCategoryCode: '075',
+              mainCategoryDescription: 'Betting, Gaming and Lotteries (Indictable)',
+              mainCategoryAbbreviation: 'Betting, Gaming and Lotteries (Indictable)',
+              ogrsOffenceCategory: 'Other offence',
+              subCategoryCode: '39',
+              subCategoryDescription: 'Cheats at gambling or enables or assists person to cheat (Gambling Act 2005)',
+              form20Code: '12',
+            },
+            offenceDate: '2020-11-01T00:00:00',
+            offenceCount: 1,
+            offenderId: 2500011641,
+            createdDatetime: '2021-03-25T14:52:23',
+            lastUpdatedDatetime: '2021-03-25T14:52:23',
+          },
+        ],
+        sentence: {
+          sentenceId: 2500427031,
+          description: 'ORA Community Order',
+          originalLength: 12,
+          originalLengthUnits: 'Months',
+          defaultLength: 12,
+          lengthInDays: 364,
+          expectedSentenceEndDate: '2021-01-31',
+          startDate: '2020-12-01',
+          sentenceType: {
+            code: 'SP',
+            description: 'ORA Community Order',
+          },
+        },
+        latestCourtAppearanceOutcome: {
+          code: '329',
+          description: 'ORA Community Order',
+        },
+        responsibleCourt: {
+          courtId: 1500004905,
+          code: 'SHEFMC',
+          selectable: true,
+          courtName: 'Sheffield Magistrates Court',
+          telephoneNumber: '0300 047 0777',
+          fax: '0114 2756 373',
+          buildingName: 'Castle Street',
+          town: 'Sheffield',
+          county: 'South Yorkshire',
+          postcode: 'S3 8LU',
+          country: 'England',
+          courtTypeId: 310,
+          createdDatetime: '2014-05-29T21:50:16',
+          lastUpdatedDatetime: '2019-05-10T23:24:48',
+          probationAreaId: 1500001001,
+          probationArea: {
+            code: 'N02',
+            description: 'NPS North East',
+          },
+          courtType: {
+            code: 'MAG',
+            description: 'Magistrates Court',
+          },
+        },
+        courtAppearance: {
+          courtAppearanceId: 2500316926,
+          appearanceDate: '2020-12-01T00:00:00',
+          courtCode: 'SHEFMC',
+          courtName: 'Sheffield Magistrates Court',
+          appearanceType: {
+            code: 'S',
+            description: 'Sentence',
+          },
+          crn: 'X320741',
+        },
+      })
+    }
+
     return this.client.stub({
       request: {
         method: 'GET',
@@ -255,62 +452,12 @@ export class CommunityMockApi {
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
         },
-        jsonBody: [
-          {
-            convictionId: convictionId,
-            index: '4',
-            active: true,
-            inBreach: false,
-            convictionDate: '2021-02-05',
-            referralDate: '2021-02-17',
-            offences: [
-              {
-                offenceId: 'M2500445193',
-                mainOffence: true,
-                detail: {
-                  code: '07539',
-                  description: 'Cheats at gambling or enables or assists person to cheat (Gambling Act 2005) - 07539',
-                  mainCategoryCode: '075',
-                  mainCategoryDescription: 'Betting, Gaming and Lotteries (Indictable)',
-                  mainCategoryAbbreviation: 'Betting, Gaming and Lotteries (Indictable)',
-                  ogrsOffenceCategory: 'Other offence',
-                  subCategoryCode: '39',
-                  subCategoryDescription:
-                    'Cheats at gambling or enables or assists person to cheat (Gambling Act 2005)',
-                  form20Code: '12',
-                },
-                offenceDate: '2021-02-01T00:00:00',
-                offenceCount: 1,
-                offenderId: 2500011641,
-                createdDatetime: '2021-03-25T14:52:23',
-                lastUpdatedDatetime: '2021-03-25T14:52:23',
-              },
-            ],
-            sentence: {
-              sentenceId: 2500427030,
-              description: 'ORA Community Order',
-              originalLength: 12,
-              originalLengthUnits: 'Months',
-              defaultLength: 12,
-              lengthInDays: 364,
-              expectedSentenceEndDate: '2022-02-16',
-              startDate: '2021-02-17',
-              sentenceType: {
-                code: 'SP',
-                description: 'ORA Community Order',
-              },
-            },
-            latestCourtAppearanceOutcome: {
-              code: '329',
-              description: 'ORA Community Order',
-            },
-          },
-        ],
+        jsonBody: convictions,
       },
     })
   }
 
-  async stubGetRequirements({ crn, convictionId }: CreateAppointmentArgs) {
+  async stubGetRequirements({ crn, convictionId = 1 }: CreateAppointmentArgs) {
     return this.client.stub({
       request: {
         method: 'GET',
@@ -538,7 +685,6 @@ export class CommunityMockApi {
     const requests = await this.client.getRequests(
       `/community/secure/offenders/crn/${crn}/sentence/${convictionId}/appointments`,
     )
-    console.log(requests.map(x => JSON.parse(x.request.body)))
     return requests.map(x => JSON.parse(x.request.body))
   }
 

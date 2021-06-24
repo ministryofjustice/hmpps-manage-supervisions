@@ -112,7 +112,9 @@
           },
           "requirementTypeSubCategory": {
             "code": "RARREQ"
-          }
+          },
+          "length": 15,
+          "lengthUnit": "Days"
         }
       ]
     }
@@ -121,7 +123,7 @@
     {
       "id": "X009923",
       "convictionId": 2500445193,
-      "index": "4",
+      "index": "1",
       "active": true,
       "inBreach": false,
       "convictionDate": "2021-02-05",
@@ -146,6 +148,46 @@
           "offenderId": 2500011641,
           "createdDatetime": "2021-03-25T14:52:23",
           "lastUpdatedDatetime": "2021-03-25T14:52:23"
+        },
+        {
+          "offenceId": "M2500297061",
+          "mainOffence": false,
+          "detail": {
+            "code": "10400",
+            "description": "Assault on Police Officer - 10400",
+            "mainCategoryCode": "104",
+            "mainCategoryDescription": "Assault on Police Officer",
+            "mainCategoryAbbreviation": "Assault on Police Officer",
+            "ogrsOffenceCategory": "Violence",
+            "subCategoryCode": "00",
+            "subCategoryDescription": "Assault on Police Officer",
+            "form20Code": "88"
+          },
+          "offenceDate": "2019-09-09T00:00:00",
+          "offenceCount": 1,
+          "offenderId": 2500343964,
+          "createdDatetime": "2019-09-17T00:00:00",
+          "lastUpdatedDatetime": "2019-09-17T00:00:00"
+        },
+        {
+          "offenceId": "M2500295343",
+          "mainOffence": false,
+          "detail": {
+            "code": "00102",
+            "description": "Murder (incl abroad) of infants under 1 year of age - 00102",
+            "mainCategoryCode": "001",
+            "mainCategoryDescription": "Murder",
+            "mainCategoryAbbreviation": "Murder",
+            "ogrsOffenceCategory": "Violence",
+            "subCategoryCode": "02",
+            "subCategoryDescription": "Murder of infants under 1 year of age",
+            "form20Code": "20"
+          },
+          "offenceDate": "2018-08-04T00:00:00",
+          "offenceCount": 1,
+          "offenderId": 2500343964,
+          "createdDatetime": "2019-09-04T00:00:00",
+          "lastUpdatedDatetime": "2019-09-04T00:00:00"
         }
       ],
       "sentence": {
@@ -155,8 +197,8 @@
         "originalLengthUnits": "Months",
         "defaultLength": 12,
         "lengthInDays": 364,
-        "expectedSentenceEndDate": "2022-02-16",
-        "startDate": "2021-02-17",
+        "expectedSentenceEndDate": "2021-02-16",
+        "startDate": "2020-02-17",
         "sentenceType": {
           "code": "SP",
           "description": "ORA Community Order"
@@ -165,6 +207,127 @@
       "latestCourtAppearanceOutcome": {
         "code": "329",
         "description": "ORA Community Order"
+      },
+      "responsibleCourt": {
+        "courtId": 1500004905,
+        "code": "SHEFMC",
+        "selectable": true,
+        "courtName": "Sheffield Magistrates Court",
+        "telephoneNumber": "0300 047 0777",
+        "fax": "0114 2756 373",
+        "buildingName": "Castle Street",
+        "town": "Sheffield",
+        "county": "South Yorkshire",
+        "postcode": "S3 8LU",
+        "country": "England",
+        "courtTypeId": 310,
+        "createdDatetime": "2014-05-29T21:50:16",
+        "lastUpdatedDatetime": "2019-05-10T23:24:48",
+        "probationAreaId": 1500001001,
+        "probationArea": {
+          "code": "N02",
+          "description": "NPS North East"
+        },
+        "courtType": {
+          "code": "MAG",
+          "description": "Magistrates Court"
+        }
+      },
+      "courtAppearance": {
+        "courtAppearanceId": 2500316926,
+        "appearanceDate": "2019-09-04T00:00:00",
+        "courtCode": "SHEFMC",
+        "courtName": "Sheffield Magistrates Court",
+        "appearanceType": {
+          "code": "S",
+          "description": "Sentence"
+        },
+        "crn": "X320741"
+      }
+    },
+    {
+      "id": "X009923",
+      "convictionId": 2500445194,
+      "index": "1",
+      "active": false,
+      "inBreach": false,
+      "convictionDate": "2020-12-01",
+      "referralDate": "2020-12-04",
+      "offences": [
+        {
+          "offenceId": "M2500445194",
+          "mainOffence": true,
+          "detail": {
+            "code": "07539",
+            "description": "Cheats at gambling or enables or assists person to cheat (Gambling Act 2005) - 07539",
+            "mainCategoryCode": "075",
+            "mainCategoryDescription": "Betting, Gaming and Lotteries (Indictable)",
+            "mainCategoryAbbreviation": "Betting, Gaming and Lotteries (Indictable)",
+            "ogrsOffenceCategory": "Other offence",
+            "subCategoryCode": "39",
+            "subCategoryDescription": "Cheats at gambling or enables or assists person to cheat (Gambling Act 2005)",
+            "form20Code": "12"
+          },
+          "offenceDate": "2020-11-01T00:00:00",
+          "offenceCount": 1,
+          "offenderId": 2500011641,
+          "createdDatetime": "2021-03-25T14:52:23",
+          "lastUpdatedDatetime": "2021-03-25T14:52:23"
+        }
+      ],
+      "sentence": {
+        "sentenceId": 2500427031,
+        "description": "ORA Community Order",
+        "originalLength": 12,
+        "originalLengthUnits": "Months",
+        "defaultLength": 12,
+        "lengthInDays": 364,
+        "expectedSentenceEndDate": "2021-01-31",
+        "startDate": "2020-12-01",
+        "sentenceType": {
+          "code": "SP",
+          "description": "ORA Community Order"
+        }
+      },
+      "latestCourtAppearanceOutcome": {
+        "code": "329",
+        "description": "ORA Community Order"
+      },
+      "responsibleCourt": {
+        "courtId": 1500004905,
+        "code": "SHEFMC",
+        "selectable": true,
+        "courtName": "Sheffield Magistrates Court",
+        "telephoneNumber": "0300 047 0777",
+        "fax": "0114 2756 373",
+        "buildingName": "Castle Street",
+        "town": "Sheffield",
+        "county": "South Yorkshire",
+        "postcode": "S3 8LU",
+        "country": "England",
+        "courtTypeId": 310,
+        "createdDatetime": "2014-05-29T21:50:16",
+        "lastUpdatedDatetime": "2019-05-10T23:24:48",
+        "probationAreaId": 1500001001,
+        "probationArea": {
+          "code": "N02",
+          "description": "NPS North East"
+        },
+        "courtType": {
+          "code": "MAG",
+          "description": "Magistrates Court"
+        }
+      },
+      "courtAppearance": {
+        "courtAppearanceId": 2500316926,
+        "appearanceDate": "2020-12-01T00:00:00",
+        "courtCode": "SHEFMC",
+        "courtName": "Sheffield Magistrates Court",
+        "appearanceType": {
+          "code": "S",
+          "description": "Sentence"
+        },
+        "crn": "X320741"
       }
     }
   ],
