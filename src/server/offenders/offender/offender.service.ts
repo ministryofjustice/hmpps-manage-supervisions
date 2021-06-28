@@ -23,7 +23,7 @@ export class OffenderService {
     const address = offender.contactDetails.addresses?.find(x => x.status?.code === 'M')
     return {
       contactDetails: {
-        address: getAddressLines(address),
+        address: address && getAddressLines(address),
         phoneNumbers: offender.contactDetails.phoneNumbers?.map(x => x.number).filter(x => x) || [],
         emailAddresses: offender.contactDetails.emailAddresses?.filter(x => x) || [],
       },
