@@ -30,6 +30,12 @@ export class LongDate implements NunjucksFilter {
   }
 }
 
+export class ShortDate implements NunjucksFilter {
+  filter(value: string | DateTime): string {
+    return safeGetDateTime(value).toFormat('d MMMM yyyy')
+  }
+}
+
 export class Dob implements NunjucksFilter {
   filter(value: string | DateTime): string {
     const date = safeGetDateTime(value)

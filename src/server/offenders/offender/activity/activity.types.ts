@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { WellKnownContactTypeCategory } from '../../config'
+import { WellKnownContactTypeCategory } from '../../../config'
 
 export interface ActivityLogEntryLinks {
   view: string

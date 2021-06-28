@@ -18,12 +18,20 @@ import {
   Disability,
   OffenderAlias,
   PhoneNumber,
+  Conviction,
+  Offence,
+  Requirement,
 } from './client'
 import { merge } from 'lodash'
 import * as faker from 'faker'
 import { DateTime } from 'luxon'
 import { fake } from '../util/util.fake'
 import { Paginated } from './types'
+import { RAR_REQUIREMENT_SUB_TYPE_CATEGORY_CODE, RAR_REQUIREMENT_TYPE_MAIN_CATEGORY_CODE } from './well-known'
+
+function fakeIsoDate(type: 'past' | 'recent' | 'soon' | 'future' = 'past'): string {
+  return faker.date[type]().toISOString().substr(0, 10)
+}
 
 export const fakeAppointmentType = fake<AppointmentType>(() => ({
   contactType: faker.datatype.uuid(),
@@ -42,7 +50,7 @@ export const fakeAppointmentCreateResponse = fake<AppointmentCreateResponse>(() 
 }))
 
 export const fakeAddress = fake<Address>(() => ({
-  from: faker.date.past().toISOString(),
+  from: fakeIsoDate(),
   notes: faker.company.bs(),
   addressNumber: faker.datatype.number().toString(),
   streetName: faker.address.streetName(),
@@ -69,7 +77,7 @@ export const fakeDisability = fake<Disability>(() => ({
     code: faker.random.alphaNumeric(3).toUpperCase(),
     description: faker.company.bs(),
   },
-  startDate: faker.date.past().toISOString(),
+  startDate: fakeIsoDate(),
   notes: faker.company.bs(),
 }))
 
@@ -83,7 +91,7 @@ export const fakeOffenderDetail = fake<OffenderDetail>((options, partial) => ({
   activeProbationManagedSentence: true,
   firstName: faker.name.firstName(),
   surname: faker.name.lastName(),
-  dateOfBirth: faker.date.past().toISOString(),
+  dateOfBirth: fakeIsoDate(),
   contactDetails: {
     addresses: (partial?.contactDetails?.addresses as Address[]) || [fakeAddress()],
     phoneNumbers: partial?.contactDetails?.phoneNumbers || [fakePhoneNumber()],
@@ -115,8 +123,8 @@ export function fakePersonalCircumstances(partial: DeepPartial<PersonalCircumsta
     {
       personalCircumstances: [
         {
-          startDate: faker.date.past().toISOString(),
-          endDate: faker.date.future().toISOString(),
+          startDate: fakeIsoDate(),
+          endDate: fakeIsoDate('future'),
           evidenced: faker.datatype.boolean(),
           notes: faker.lorem.lines(),
           offenderId: faker.datatype.number(),
@@ -222,3 +230,104 @@ export function fakePaginated<T>(content: T[], partial?: Partial<Omit<Paginated<
     content,
   }
 }
+
+export const fakeOffence = fake<Offence>(() => ({
+  offenceId: faker.datatype.uuid(),
+  mainOffence: true,
+  detail: {
+    code: faker.random.alphaNumeric(5),
+    description: faker.commerce.product(),
+    mainCategoryCode: faker.random.alphaNumeric(3),
+    mainCategoryDescription: faker.commerce.productDescription(),
+    mainCategoryAbbreviation: faker.lorem.word(),
+    ogrsOffenceCategory: faker.commerce.department(),
+    subCategoryCode: faker.random.alphaNumeric(2),
+    subCategoryDescription: faker.commerce.productName(),
+    form20Code: faker.random.alphaNumeric(2),
+  },
+  offenceDate: fakeIsoDate(),
+  offenceCount: faker.datatype.number({ min: 1, max: 10 }),
+  offenderId: faker.datatype.number(),
+  createdDatetime: faker.date.past().toISOString(),
+  lastUpdatedDatetime: faker.date.past().toISOString(),
+}))
+
+export const fakeConviction = fake<Conviction, { additionalOffences?: number }>(({ additionalOffences = 0 }) => ({
+  convictionId: faker.datatype.number(),
+  index: faker.datatype.number().toString(),
+  active: true,
+  inBreach: faker.datatype.boolean(),
+  convictionDate: fakeIsoDate(),
+  referralDate: fakeIsoDate(),
+  offences: [
+    fakeOffence({ mainOffence: true }),
+    ...[...Array(additionalOffences)].map(() => fakeOffence({ mainOffence: false })),
+  ],
+  sentence: {
+    sentenceId: faker.datatype.number(),
+    description: faker.commerce.productDescription(),
+    originalLength: 12,
+    originalLengthUnits: 'Months',
+    defaultLength: 12,
+    lengthInDays: 364,
+    expectedSentenceEndDate: fakeIsoDate('future'),
+    startDate: fakeIsoDate('recent'),
+    sentenceType: {
+      code: faker.random.alphaNumeric(2),
+      description: faker.commerce.productMaterial(),
+    },
+  },
+  latestCourtAppearanceOutcome: {
+    code: faker.random.alphaNumeric(3),
+    description: faker.commerce.productMaterial(),
+  },
+  responsibleCourt: {
+    courtId: faker.datatype.number(),
+    code: faker.random.alphaNumeric(5),
+    selectable: true,
+    courtName: faker.address.streetAddress(),
+    telephoneNumber: faker.phone.phoneNumber(),
+    fax: faker.phone.phoneNumber(),
+    buildingName: faker.lorem.words(3),
+    town: faker.address.city(),
+    county: faker.address.county(),
+    postcode: faker.address.zipCode(),
+    country: faker.address.country(),
+    courtTypeId: faker.datatype.number(),
+    createdDatetime: faker.date.past().toISOString(),
+    lastUpdatedDatetime: faker.date.past().toISOString(),
+    probationAreaId: faker.datatype.number(),
+    probationArea: {
+      code: faker.random.alphaNumeric(3),
+      description: faker.address.city(),
+    },
+    courtType: {
+      code: faker.random.alphaNumeric(3),
+      description: faker.commerce.productMaterial(),
+    },
+  },
+  courtAppearance: {
+    courtAppearanceId: faker.datatype.number(),
+    appearanceDate: fakeIsoDate(),
+    courtCode: faker.random.alphaNumeric(5),
+    courtName: faker.address.streetAddress(),
+    appearanceType: {
+      code: faker.random.alphaNumeric(2),
+      description: faker.commerce.productMaterial(),
+    },
+    crn: faker.random.alphaNumeric(7),
+  },
+}))
+
+export const fakeRequirement = fake<Requirement>(() => ({
+  requirementId: faker.datatype.number(),
+  length: faker.datatype.number({ min: 1, max: 100 }),
+  lengthUnit: 'Days',
+  active: true,
+  startDate: fakeIsoDate(),
+  expectedStartDate: fakeIsoDate(),
+  expectedEndDate: fakeIsoDate('future'),
+  requirementNotes: faker.lorem.sentence(),
+  requirementTypeMainCategory: { code: RAR_REQUIREMENT_TYPE_MAIN_CATEGORY_CODE, description: 'RAR category' },
+  requirementTypeSubCategory: { code: RAR_REQUIREMENT_SUB_TYPE_CATEGORY_CODE, description: 'RAR sub category' },
+}))

@@ -5,22 +5,35 @@ import { OffenderService } from './offender.service'
 import { OffenderPage, OffenderViewModel } from './offender-view-model'
 import { RedirectResponse } from '../../common'
 import { fakeOffenderDetail, fakePaginated } from '../../community-api/community-api.fake'
-import {
-  fakeActivityLogEntry,
-  fakeContactDetailsViewModel,
-  fakePersonalDetailsViewModel,
-  fakeRecentAppointments,
-} from './offender.fake'
+import { fakeContactDetailsViewModel, fakePersonalDetailsViewModel } from './offender.fake'
+import { SentenceService } from './sentence'
+import { ScheduleService } from './schedule'
+import { ActivityService } from './activity'
+import { fakeConvictionDetails } from './sentence/sentence.fake'
+import { fakeActivityLogEntry } from './activity/activity.fake'
+import { fakeRecentAppointments } from './schedule/schedule.fake'
 
 describe('OffenderController', () => {
   let subject: OffenderController
-  let service: SinonStubbedInstance<OffenderService>
+  let offenderService: SinonStubbedInstance<OffenderService>
+  let scheduleService: SinonStubbedInstance<ScheduleService>
+  let activityService: SinonStubbedInstance<ActivityService>
+  let sentenceService: SinonStubbedInstance<SentenceService>
 
   beforeEach(async () => {
-    service = createStubInstance(OffenderService)
+    offenderService = createStubInstance(OffenderService)
+    scheduleService = createStubInstance(ScheduleService)
+    activityService = createStubInstance(ActivityService)
+    sentenceService = createStubInstance(SentenceService)
+
     const module = await Test.createTestingModule({
       controllers: [OffenderController],
-      providers: [{ provide: OffenderService, useValue: service }],
+      providers: [
+        { provide: OffenderService, useValue: offenderService },
+        { provide: SentenceService, useValue: sentenceService },
+        { provide: ScheduleService, useValue: scheduleService },
+        { provide: ActivityService, useValue: activityService },
+      ],
     }).compile()
 
     subject = module.get(OffenderController)
@@ -46,7 +59,7 @@ describe('OffenderController', () => {
     havingOffender()
 
     const appointments = fakeRecentAppointments()
-    service.getRecentAppointments.withArgs('some-crn').resolves(appointments)
+    scheduleService.getRecentAppointments.withArgs('some-crn').resolves(appointments)
 
     const observed = await subject.getSchedule('some-crn')
     shouldReturnViewModel(observed, {
@@ -60,7 +73,7 @@ describe('OffenderController', () => {
 
     const contacts = fakePaginated([fakeActivityLogEntry(), fakeActivityLogEntry()])
 
-    service.getActivityLogPage.withArgs('some-crn', match({ appointmentsOnly: true })).resolves(contacts)
+    activityService.getActivityLogPage.withArgs('some-crn', match({ appointmentsOnly: true })).resolves(contacts)
 
     const observed = await subject.getActivity('some-crn')
     shouldReturnViewModel(observed, {
@@ -79,7 +92,7 @@ describe('OffenderController', () => {
     const contactDetails = fakeContactDetailsViewModel()
     const personalDetails = fakePersonalDetailsViewModel()
 
-    service.getPersonalDetails.withArgs(offender).returns({ contactDetails, personalDetails })
+    offenderService.getPersonalDetails.withArgs(offender).returns({ contactDetails, personalDetails })
 
     const observed = await subject.getPersonal('some-crn')
 
@@ -90,6 +103,20 @@ describe('OffenderController', () => {
     })
   })
 
+  it('gets sentence', async () => {
+    havingOffender()
+
+    const detail = fakeConvictionDetails()
+    sentenceService.getSentenceDetails.withArgs('some-crn').resolves(detail)
+
+    const observed = await subject.getSentence('some-crn')
+
+    shouldReturnViewModel(observed, {
+      page: OffenderPage.Sentence,
+      ...detail,
+    })
+  })
+
   function havingOffender() {
     const offender = fakeOffenderDetail({
       otherIds: { crn: 'some-crn' },
@@ -97,7 +124,7 @@ describe('OffenderController', () => {
       middleNames: ['Danger'],
       surname: 'Berridge',
     })
-    service.getOffenderDetail.withArgs('some-crn').resolves(offender)
+    offenderService.getOffenderDetail.withArgs('some-crn').resolves(offender)
     return offender
   }
 

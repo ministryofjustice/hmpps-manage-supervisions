@@ -225,6 +225,47 @@ context('ViewOffender', () => {
       .contains('Learning Difficulties Speech Impairment')
   })
 
+  it('displays sentence details', () => {
+    havingViewedOffender()
+    cy.task('stubGetConvictions', { crn, previous: true })
+    cy.task('stubGetRequirements', { crn })
+
+    whenClickingSubNavTab('sentence')
+    shouldDisplayCommonHeader()
+
+    page.sentence
+      .mainOffence('Main offence')
+      .contains('Cheats at gambling or enables or assists person to cheat (Gambling Act 2005) - 07539')
+    page.sentence.mainOffence('Offence date').contains('1 February 2021')
+    page.sentence.additionalOffence('M2500297061', 'Additional offence').contains('Assault on Police Officer - 10400')
+    page.sentence.additionalOffence('M2500297061', 'Offence date').contains('9 September 2019')
+
+    page.sentence.details('Sentence').contains('ORA Community Order')
+    page.sentence.details('Length').contains('12 months')
+    page.sentence.details('Start date').contains('17 February 2020')
+    page.sentence.details('End date').contains('16 February 2021')
+    page.sentence.details('Time elapsed').contains('12 months elapsed (of 12 months)')
+    page.sentence.details('Conviction date').contains('5 February 2020')
+    page.sentence.details('Court').contains('Nottingham Crown Court')
+    page.sentence.details('Responsible court').contains('Sheffield Magistrates Court')
+
+    page.sentence.requirements('RAR').contains('20 days')
+
+    page.sentence.previous.contains('Previous orders (1) Last ended on 1 December 2020')
+  })
+
+  it('displays empty sentence details', () => {
+    havingViewedOffender()
+    cy.task('stubGetConvictions', { crn, current: false })
+
+    whenClickingSubNavTab('sentence')
+    shouldDisplayCommonHeader()
+
+    page.sentence.noOffences.contains('Offence details are unavailable.')
+    page.sentence.noDetails.contains('Sentence details are unavailable.')
+    page.sentence.previous.should('not.exist')
+  })
+
   function shouldRenderActivity({
     id,
     date,

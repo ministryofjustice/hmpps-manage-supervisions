@@ -48,7 +48,7 @@ export class ArrangeAppointmentController {
   ): Promise<RedirectResponse> {
     const response = this.wizard.reset(session, crn)
 
-    const offender = await await this.service.getOffenderDetails(crn)
+    const offender = await this.service.getOffenderDetails(crn)
 
     const offenderManager = this.getOffenderManager(offender, user)
 

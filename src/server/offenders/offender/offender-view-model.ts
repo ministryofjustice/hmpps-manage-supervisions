@@ -1,6 +1,8 @@
-import { AppointmentDetail, ContactDetails } from '../../community-api'
-import { ActivityLogEntry } from './activity-log-entry'
+import { ContactDetails } from '../../community-api'
+import { ActivityLogEntry } from './activity'
 import { DateTime } from 'luxon'
+import { ConvictionDetails } from './sentence'
+import { RecentAppointments } from './schedule'
 
 export enum OffenderPage {
   Overview = 'overview',
@@ -29,17 +31,6 @@ export interface OffenderViewModelBase {
 export interface OffenderOverviewViewModel extends OffenderViewModelBase {
   page: OffenderPage.Overview
   contactDetails?: ContactDetails
-}
-
-export interface AppointmentListViewModel extends AppointmentDetail {
-  name: string
-  link: string
-}
-
-export interface RecentAppointments {
-  future: AppointmentListViewModel[]
-  recent: AppointmentListViewModel[]
-  past: AppointmentListViewModel[]
 }
 
 export interface OffenderScheduleViewModel extends OffenderViewModelBase {
@@ -77,7 +68,7 @@ export interface OffenderPersonalViewModel extends OffenderViewModelBase {
   personalDetails: PersonalDetailsViewModel
 }
 
-export interface OffenderSentenceViewModel extends OffenderViewModelBase {
+export interface OffenderSentenceViewModel extends OffenderViewModelBase, ConvictionDetails {
   page: OffenderPage.Sentence
 }
 
