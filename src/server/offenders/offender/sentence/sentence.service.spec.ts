@@ -40,7 +40,7 @@ describe('SentenceService', () => {
       .withArgs({ crn: 'some-crn' })
       .resolves(fakeOkResponse([conviction, previousConviction]))
 
-    const requirement = fakeRequirement({ length: 27 })
+    const requirement = fakeRequirement({ length: 27, rarCount: 5 })
     community.requirement.getRequirementsByConvictionIdUsingGET
       .withArgs({
         crn: 'some-crn',
@@ -53,7 +53,7 @@ describe('SentenceService', () => {
         }),
       )
 
-    const observed = await subject.getSentenceDetails('some-crn')
+    const observed = await subject.getConvictionDetails('some-crn')
 
     const {
       sentence,
@@ -88,7 +88,7 @@ describe('SentenceService', () => {
         courtAppearance: conviction.courtAppearance.courtName,
         responsibleCourt: conviction.responsibleCourt.courtName,
       },
-      requirement: { length: '27 days' },
+      requirement: { length: '27 days', progress: '5 days' },
     } as ConvictionDetails)
   })
 })

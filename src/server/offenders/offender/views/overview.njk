@@ -1,8 +1,128 @@
 {% extends "./_layout.njk" %}
 {% set pageName = 'Overview' %}
+{% from './_personal.njk' import contactDetailsSummary, personalDetailsSummary %}
+{% from './_sentence.njk' import probationHistorySummary %}
 
 {% block page %}
-    <a href="{{ links.arrangeAppointment }}" class="govuk-button govuk-!-margin-bottom-0">
-        Arrange an appointment
-    </a>
+    <div class="govuk-grid-row">
+        <div class='govuk-grid-column-two-thirds'>
+            {% if conviction %}
+                {% if conviction.mainOffence %}
+                    <h2 class="govuk-heading-m">
+                        Offences
+                    </h2>
+                    <p class='govuk-body' data-qa='offender/overview/offence'>
+                        {{ conviction.mainOffence.description }}
+                    </p>
+
+                    <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+                {% endif %}
+
+                {% if conviction.sentence %}
+                    <h2 class="govuk-heading-m">
+                        Sentence
+                    </h2>
+                    <p class='govuk-body' data-qa='offender/overview/sentence'>
+                        {{ conviction.sentence.description }}
+                    </p>
+
+                    <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+                    <h2 class="govuk-heading-m">
+                        Progress
+                    </h2>
+                    {{ govukSummaryList({
+                        classes: 'govuk-summary-list--no-border govuk-!-margin-bottom-6',
+                        attributes: {
+                            'data-qa': 'offender/overview/progress'
+                        },
+                        rows: [
+                            {
+                                key: { text: "Sentence" },
+                                value: { text: conviction.sentence.elapsed },
+                                classes: 'qa-sentence'
+                            },
+                            {
+                                key: { text: "RAR" },
+                                value: { text: conviction.requirement.progress + ' completed (of ' + conviction.requirement.length + ')' },
+                                classes: 'qa-rar'
+                            } if conviction.requirement
+                        ]
+                    }) }}
+
+                    <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+                {% endif %}
+            {% endif %}
+
+            {{ contactDetailsSummary({
+                model: contactDetails,
+                attributes: {
+                    'data-qa': 'offender/overview/contact'
+                }
+            }) }}
+
+            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+            {{ personalDetailsSummary({
+                model: personalDetails,
+                attributes: {
+                    'data-qa': 'offender/overview/personal'
+                }
+            }) }}
+
+            {% if conviction and conviction.previousConvictions %}
+                <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+                {{ probationHistorySummary({
+                    model: conviction,
+                    attributes: {
+                        'data-qa': 'offender/overview/probation-history'
+                    }
+                }) }}
+            {% endif %}
+        </div>
+        <div class='govuk-grid-column-one-third'>
+            {% if appointmentSummary.next %}
+                <div class="app-card app-card--blue govuk-!-margin-bottom-3" data-qa='offender/overview/next-appointment'>
+                    <strong>
+                        The next appointment is
+                    </strong><br>
+
+                    <strong>
+                        {{ appointmentSummary.next.date | longDate }} at {{ appointmentSummary.next.date | time }}
+                    </strong>
+                    <br>
+                    <strong>{{ appointmentSummary.next.name }}</strong>
+                </div>
+            {% endif %}
+
+            <h2 class="govuk-heading-m govuk-!-margin-top-6">
+                Appointment attendance
+            </h2>
+
+            <ul class="govuk-list" data-qa='offender/overview/appointment-attendance'>
+                <li>
+                    {{govukTag({
+                        text: appointmentSummary.attendance.complied,
+                        classes: 'govuk-tag--green govuk-!-margin-right-1'
+                    })}}
+                    Complied
+                </li>
+                <li>
+                    {{govukTag({
+                        text: appointmentSummary.attendance.acceptableAbsence,
+                        classes: 'govuk-tag--green govuk-!-margin-right-1'
+                    })}}
+                    Acceptable absence
+                </li>
+                <li>
+                    {{govukTag({
+                        text: appointmentSummary.attendance.failureToComply,
+                        classes: 'govuk-tag--red govuk-!-margin-right-1'
+                    })}}
+                    Failure to comply
+                </li>
+            </ul>
+        </div>
+    </div>
 {% endblock %}

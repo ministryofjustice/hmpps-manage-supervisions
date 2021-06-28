@@ -1,11 +1,14 @@
 import { OffenderPage, TABLE, TABS } from '../../pages/offender.page'
-import { StubContactSummaryOptions, StubOffenderAppointmentOptions } from '../../mockApis/community-api'
+import {
+  StubContactSummaryOptions,
+  StubGetConvictionsOptions,
+  StubOffenderAppointmentOptions,
+} from '../../mockApis/community-api'
 import { DateTime } from 'luxon'
 import { getDateRange } from '../../util/getDateRange'
 import * as faker from 'faker'
 
 const crn = 'ABC123'
-const convictionId = 12345
 
 context('ViewOffender', () => {
   const page = new OffenderPage()
@@ -23,31 +26,69 @@ context('ViewOffender', () => {
   })
 
   it('displays offender overview', () => {
-    havingViewedOffender()
+    const past = getDateRange('past', { hour: 10, minute: 0 }, { hour: 1 })
+    havingOffender({
+      convictions: { previous: true },
+      appointments: [
+        { start: '2100-05-25T12:00:00+01:00', end: '2100-05-25T13:00:00+01:00' },
+        { ...past, outcome: { complied: true, attended: true } },
+        { ...past, outcome: { complied: false, attended: true } },
+        { ...past, outcome: { complied: true, attended: false } },
+      ],
+    })
+    whenViewedOffender()
 
     // redirects to overview page by default
     page.currentTab.should('eq', 'overview')
 
     whenClickingSubNavTab('overview')
     shouldDisplayCommonHeader()
+
+    page.overview.offences.contains(
+      'Cheats at gambling or enables or assists person to cheat (Gambling Act 2005) - 07539',
+    )
+    page.overview.sentence.contains('ORA Community Order')
+    page.overview.progress('Sentence').contains('12 months elapsed (of 12 months)')
+    page.overview.progress('RAR').contains('5 days completed (of 20 days)')
+
+    page.overview.contactDetails('Address').contains('1 High Street Sheffield South Yorkshire S10 1AG')
+    page.overview.contactDetails('Phone number').contains('07734 111992 01234 111222')
+    page.overview.contactDetails('Email').contains('example@example.com example2@example2.com')
+
+    page.overview.personalDetails('Name').contains('Brian Cheese')
+    page.overview.personalDetails('Aliases').contains('Dylan Meyer Romario Montgomery')
+    page.overview.personalDetails('Date of birth').contains('10 June 1980')
+    page.overview.personalDetails('Preferred language').contains('Bengali')
+    page.overview.personalDetails('Disabilities and adjustments').contains('Learning Difficulties Speech Impairment')
+
+    page.overview.previousOrders.contains('Previous orders (1) Last ended on 1 December 2020')
+
+    page.overview.nextAppointment.contains(
+      `The next appointment is Tuesday 25 May 2100 at 12pm Office visit with Some Staff`,
+    )
+    page.overview.appointmentAttendance.contains('1 Complied')
+    page.overview.appointmentAttendance.contains('1 Acceptable absence')
+    page.overview.appointmentAttendance.contains('1 Failure to comply')
   })
 
   it('displays populated offender schedule', () => {
     const future = getDateRange('future', { hour: 13, minute: 30 }, { minutes: 30 })
     const recent = getDateRange('past', { hour: 10, minute: 0 }, { hour: 1 })
-    havingOffenderAppointments(
-      {
-        ...future,
-        type: { code: 'F123', name: 'Future appointment' },
-        staff: { forenames: 'Future First', surname: 'Future Last' },
-      },
-      {
-        ...recent,
-        type: { code: 'P123', name: 'Recent appointment' },
-        staff: { forenames: 'Recent First', surname: 'Recent Last' },
-      },
-    )
-    havingViewedOffender()
+    havingOffender({
+      appointments: [
+        {
+          ...future,
+          type: { code: 'F123', name: 'Future appointment' },
+          staff: { forenames: 'Future First', surname: 'Future Last' },
+        },
+        {
+          ...recent,
+          type: { code: 'P123', name: 'Recent appointment' },
+          staff: { forenames: 'Recent First', surname: 'Recent Last' },
+        },
+      ],
+    })
+    whenViewedOffender()
     whenClickingSubNavTab('schedule')
     shouldDisplayCommonHeader()
 
@@ -71,8 +112,8 @@ context('ViewOffender', () => {
   })
 
   it('displays empty offender schedule', () => {
-    havingOffenderAppointments()
-    havingViewedOffender()
+    havingOffender()
+    whenViewedOffender()
     whenClickingSubNavTab('schedule')
     shouldDisplayCommonHeader()
 
@@ -81,24 +122,26 @@ context('ViewOffender', () => {
   })
 
   it('can arrange an appointment from offender schedule', () => {
-    havingOffenderAppointments()
-    havingViewedOffender()
+    havingOffender()
+    whenViewedOffender()
     whenClickingSubNavTab('schedule')
     page.arrangeAppointmentButton.contains('Arrange an appointment').click()
     cy.url().should('include', `/arrange-appointment/${crn}`)
   })
 
   it('can add log entry from activity log', () => {
+    havingOffender()
     havingOffenderContacts()
-    havingViewedOffender()
+    whenViewedOffender()
     whenClickingSubNavTab('activity')
     page.activity.addToLogButton.contains('Add to log').click()
     cy.url().should('include', `/offender/${crn}/activity/new`)
   })
 
   it('displays empty activity log', () => {
+    havingOffender()
     havingOffenderContacts()
-    havingViewedOffender()
+    whenViewedOffender()
     whenClickingSubNavTab('activity')
     shouldDisplayCommonHeader()
     page.activity.emptyMessage.contains('There are no entries in the activity log.')
@@ -106,6 +149,7 @@ context('ViewOffender', () => {
 
   it('displays activity log', () => {
     const longNotes = faker.lorem.sentence(300)
+    havingOffender()
     havingOffenderContacts(
       {
         type: { code: 'CHVS' },
@@ -148,8 +192,10 @@ context('ViewOffender', () => {
         outcome: null,
       },
     )
-    havingViewedOffender()
+
+    whenViewedOffender()
     whenClickingSubNavTab('activity')
+
     shouldDisplayCommonHeader()
 
     shouldRenderActivity({
@@ -208,7 +254,8 @@ context('ViewOffender', () => {
   })
 
   it('displays personal details', () => {
-    havingViewedOffender()
+    havingOffender()
+    whenViewedOffender()
     whenClickingSubNavTab('personal')
     shouldDisplayCommonHeader()
 
@@ -226,11 +273,11 @@ context('ViewOffender', () => {
   })
 
   it('displays sentence details', () => {
-    havingViewedOffender()
-    cy.task('stubGetConvictions', { crn, previous: true })
-    cy.task('stubGetRequirements', { crn })
+    havingOffender({ convictions: { previous: true } })
 
+    whenViewedOffender()
     whenClickingSubNavTab('sentence')
+
     shouldDisplayCommonHeader()
 
     page.sentence
@@ -255,8 +302,8 @@ context('ViewOffender', () => {
   })
 
   it('displays empty sentence details', () => {
-    havingViewedOffender()
-    cy.task('stubGetConvictions', { crn, current: false })
+    havingOffender({ convictions: { current: false } })
+    whenViewedOffender()
 
     whenClickingSubNavTab('sentence')
     shouldDisplayCommonHeader()
@@ -310,18 +357,23 @@ context('ViewOffender', () => {
     }
   }
 
-  function havingOffenderAppointments(...partials: StubOffenderAppointmentOptions['partials']) {
-    cy.task('stubOffenderAppointments', { crn, partials })
-  }
-
   function havingOffenderContacts(...partials: StubContactSummaryOptions['partials']) {
     cy.task('stubContactSummary', { crn, partials })
   }
 
-  function havingViewedOffender() {
+  function havingOffender(
+    options: {
+      convictions?: Omit<StubGetConvictionsOptions, 'crn'>
+      appointments?: StubOffenderAppointmentOptions['partials']
+    } = {},
+  ) {
     cy.task('stubOffenderDetails', { crn })
-    cy.task('stubGetConvictions', { crn, convictionId })
-    cy.task('stubGetRequirements', { crn, convictionId })
+    cy.task('stubGetConvictions', { crn, ...options.convictions })
+    cy.task('stubGetRequirements', { crn })
+    cy.task('stubOffenderAppointments', { crn, partials: options.appointments })
+  }
+
+  function whenViewedOffender() {
     cy.login()
     cy.viewOffender(crn)
   }

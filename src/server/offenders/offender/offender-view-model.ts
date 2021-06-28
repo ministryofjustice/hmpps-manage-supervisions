@@ -1,8 +1,7 @@
-import { ContactDetails } from '../../community-api'
 import { ActivityLogEntry } from './activity'
 import { DateTime } from 'luxon'
 import { ConvictionDetails } from './sentence'
-import { RecentAppointments } from './schedule'
+import { AppointmentSummary, RecentAppointments } from './schedule'
 
 export enum OffenderPage {
   Overview = 'overview',
@@ -30,7 +29,10 @@ export interface OffenderViewModelBase {
 
 export interface OffenderOverviewViewModel extends OffenderViewModelBase {
   page: OffenderPage.Overview
-  contactDetails?: ContactDetails
+  conviction?: ConvictionDetails
+  contactDetails: ContactDetailsViewModel
+  personalDetails: PersonalDetailsViewModel
+  appointmentSummary: AppointmentSummary
 }
 
 export interface OffenderScheduleViewModel extends OffenderViewModelBase {
@@ -68,8 +70,9 @@ export interface OffenderPersonalViewModel extends OffenderViewModelBase {
   personalDetails: PersonalDetailsViewModel
 }
 
-export interface OffenderSentenceViewModel extends OffenderViewModelBase, ConvictionDetails {
+export interface OffenderSentenceViewModel extends OffenderViewModelBase {
   page: OffenderPage.Sentence
+  conviction?: ConvictionDetails
 }
 
 export type OffenderViewModel =

@@ -1,0 +1,15 @@
+{% macro probationHistorySummary(params) %}
+    {% if params.model.previousConvictions %}
+        <div{% for attribute, value in params.attributes %} {{attribute}}="{{value}}"{% endfor %}>
+            <h2 class="govuk-heading-m">
+                Probation history
+            </h2>
+            <p class="govuk-body" data-qa='previous-orders'>
+                <a class="govuk-heading-s govuk-!-margin-top-0 govuk-!-margin-bottom-1" href="{{ params.model.previousConvictions.link }}">
+                    Previous orders ({{ params.model.previousConvictions.count }})
+                </a>
+                Last ended on {{ params.model.previousConvictions.lastEnded | shortDate }}
+            </p>
+        </div>
+    {% endif %}
+{% endmacro %}

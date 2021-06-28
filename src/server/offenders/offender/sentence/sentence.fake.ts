@@ -29,6 +29,6 @@ export const fakeConvictionDetails = fake<ConvictionDetails>(() => {
       responsibleCourt: faker.address.streetAddress(),
       courtAppearance: faker.address.streetAddress(),
     },
-    requirement: { length: `${faker.datatype.number()} days` },
+    requirement: { length: `${faker.datatype.number()} days`, progress: `${faker.datatype.number()} days` },
   }
 })

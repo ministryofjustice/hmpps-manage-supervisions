@@ -114,7 +114,8 @@
             "code": "RARREQ"
           },
           "length": 15,
-          "lengthUnit": "Days"
+          "lengthUnit": "Days",
+          "rarCount": 5
         }
       ]
     }

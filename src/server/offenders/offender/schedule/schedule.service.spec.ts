@@ -4,10 +4,11 @@ import { AppointmentDetail, CommunityApiService } from '../../../community-api'
 import { orderBy, sortBy } from 'lodash'
 import { fakeAppointmentDetail } from '../../../community-api/community-api.fake'
 import { fakeOkResponse } from '../../../common/rest/rest.fake'
-import { RecentAppointments } from './schedule.types'
+import { AppointmentSummary, RecentAppointments } from './schedule.types'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../../community-api/community-api.mock'
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { ContactMappingService } from '../../../common'
+import { DateTime } from 'luxon'
 
 describe('ScheduleService', () => {
   let subject: ScheduleService
@@ -59,6 +60,40 @@ describe('ScheduleService', () => {
       recent: expected.slice(futureAppointments, MAX_RECENT_APPOINTMENTS + futureAppointments),
       past: expected.slice(MAX_RECENT_APPOINTMENTS + futureAppointments),
     } as RecentAppointments)
+    expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn' })
+  })
+
+  it('gets appointment summary', async () => {
+    const appointments = [
+      fakeAppointmentDetail({}, { when: 'future' }),
+      fakeAppointmentDetail({ outcome: { complied: false } }),
+      fakeAppointmentDetail({ outcome: { complied: true, attended: false } }),
+      fakeAppointmentDetail({ outcome: { complied: true, attended: true } }),
+    ]
+
+    for (const apt of appointments) {
+      contactMapping.getTypeMeta.withArgs(apt).returns({
+        type: null,
+        value: { appointment: true },
+        name: 'some-appointment-type',
+      })
+    }
+
+    const stub = community.appointment.getOffenderAppointmentsByCrnUsingGET.resolves(fakeOkResponse(appointments))
+    const observed = await subject.getAppointmentSummary('some-crn')
+
+    expect(observed).toEqual({
+      next: {
+        name: 'some-appointment-type',
+        date: DateTime.fromISO(appointments[0].appointmentStart),
+      },
+      attendance: {
+        acceptableAbsence: 1,
+        failureToComply: 1,
+        complied: 1,
+      },
+    } as AppointmentSummary)
+
     expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn' })
   })
 })

@@ -1,5 +1,6 @@
 {% extends "./_layout.njk" %}
 {% set pageName = 'Sentence' %}
+{% from './_sentence.njk' import probationHistorySummary %}
 
 {% block page %}
     <div class="govuk-grid-row">
@@ -8,7 +9,7 @@
                 Offences
             </h2>
 
-            {% if mainOffence %}
+            {% if conviction and conviction.mainOffence %}
                 {{ govukSummaryList({
                     classes: 'govuk-summary-list--no-border',
                     attributes: {
@@ -17,18 +18,18 @@
                     rows: [
                         {
                             key: { text: "Main offence" },
-                            value: { text: mainOffence.description },
+                            value: { text: conviction.mainOffence.description },
                             classes: 'qa-description'
                         },
                         {
                             key: { text: "Offence date" },
-                            value: { text: mainOffence.date | shortDate },
+                            value: { text: conviction.mainOffence.date | shortDate },
                             classes: 'qa-date'
                         }
                     ]
                 }) }}
 
-                {% for offence in additionalOffences %}
+                {% for offence in conviction.additionalOffences %}
                     {{ govukSummaryList({
                         classes: 'govuk-summary-list--no-border',
                         attributes: {
@@ -54,59 +55,59 @@
                 </p>
             {% endif %}
 
-            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
 
             <h2 class="govuk-heading-m">
                 Sentence details
             </h2>
 
-            {% if sentence %}
+            {% if conviction and conviction.sentence %}
                 {{ govukSummaryList({
-                    classes: 'govuk-summary-list--no-border',
+                    classes: 'govuk-summary-list--no-border govuk-!-margin-bottom-6',
                     attributes: {
                         'data-qa': 'offender/sentence/details'
                     },
                     rows: [
                         {
                             key: { text: "Sentence" },
-                            value: { text: sentence.description },
+                            value: { text: conviction.sentence.description },
                             classes: 'qa-description'
                         },
                         {
                             key: { text: "Length" },
-                            value: { text: sentence.length },
+                            value: { text: conviction.sentence.length },
                             classes: 'qa-length'
                         },
                         {
                             key: { text: "Start date" },
-                            value: { text: sentence.startDate | shortDate },
+                            value: { text: conviction.sentence.startDate | shortDate },
                             classes: 'qa-start-date'
                         },
                         {
                             key: { text: "End date" },
-                            value: { text: sentence.endDate | shortDate },
+                            value: { text: conviction.sentence.endDate | shortDate },
                             classes: 'qa-end-date'
                         },
                         {
                             key: { text: "Time elapsed" },
-                            value: { text: sentence.elapsed },
+                            value: { text: conviction.sentence.elapsed },
                             classes: 'qa-elapsed'
                         },
                         {
                             key: { text: "Conviction date" },
-                            value: { text: sentence.convictionDate | shortDate },
+                            value: { text: conviction.sentence.convictionDate | shortDate },
                             classes: 'qa-conviction-date'
                         },
                         {
                             key: { text: "Court" },
-                            value: { text: sentence.courtAppearance },
+                            value: { text: conviction.sentence.courtAppearance },
                             classes: 'qa-court'
-                        } if sentence.courtAppearance,
+                        } if conviction.sentence.courtAppearance,
                         {
                             key: { text: "Responsible court" },
-                            value: { text: sentence.responsibleCourt },
+                            value: { text: conviction.sentence.responsibleCourt },
                             classes: 'qa-responsible-court'
-                        } if sentence.responsibleCourt
+                        } if conviction.sentence.responsibleCourt
                     ]
                 }) }}
             {% else %}
@@ -115,22 +116,22 @@
                 </p>
             {% endif %}
 
-            {% if requirement %}
-                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+            {% if conviction and conviction.requirement %}
+                <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
 
                 <h2 class="govuk-heading-m">
                     Requirements
                 </h2>
 
                 {{ govukSummaryList({
-                    classes: 'govuk-summary-list--no-border',
+                    classes: 'govuk-summary-list--no-border govuk-!-margin-bottom-6',
                     attributes: {
                         'data-qa': 'offender/sentence/requirements'
                     },
                     rows: [
                         {
                             key: { text: "RAR" },
-                            value: { text: requirement.length },
+                            value: { text: conviction.requirement.length },
                             classes: 'qa-length'
                         }
                     ]
@@ -138,16 +139,13 @@
             {% endif %}
         </div>
         <div class='govuk-grid-column-one-third'>
-            {% if previousConvictions %}
-                <h2 class="govuk-heading-m">
-                    Probation history
-                </h2>
-                <p class="govuk-body" data-qa='offender/sentence/previous-orders'>
-                    <a class="govuk-heading-s govuk-!-margin-top-0 govuk-!-margin-bottom-1" href="{{ previousConvictions.link }}">
-                        Previous orders ({{ previousConvictions.count }})
-                    </a>
-                    Last ended on {{ previousConvictions.lastEnded | shortDate }}
-                </p>
+            {% if conviction and conviction.previousConvictions %}
+                {{ probationHistorySummary({
+                    model: conviction,
+                    attributes: {
+                        'data-qa': 'offender/sentence/probation-history'
+                    }
+                }) }}
             {% endif %}
         </div>
     </div>
