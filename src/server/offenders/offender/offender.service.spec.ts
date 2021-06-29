@@ -83,4 +83,12 @@ describe('OffenderService', () => {
       } as PersonalDetailsViewModel,
     })
   })
+
+  it('gets offender personal details without address', () => {
+    const offender = fakeOffenderDetail({
+      contactDetails: { addresses: [] },
+    })
+    const observed = subject.getPersonalDetails(offender)
+    expect(observed.contactDetails.address).toBeFalsy()
+  })
 })
