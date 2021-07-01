@@ -385,6 +385,8 @@ context('ViewOffender', () => {
     cy.task('stubOffenderAppointments', { crn, partials: options.appointments })
     cy.task('stubGetPersonalCircumstances', { crn })
     cy.task('stubGetPersonalContacts', { crn })
+    cy.task('stubOffenderRegistrations', { crn })
+    cy.task('stubOffenderRisks', { crn })
   }
 
   function whenViewedOffender() {
@@ -400,6 +402,10 @@ context('ViewOffender', () => {
   function shouldDisplayCommonHeader() {
     page.pageTitle.contains(`CRN: ${crn}`)
     page.pageTitle.contains('Brian Cheese (Bob)')
+    page.registrations.should('have.length', 2)
+    console.log(page.registrations)
+    page.registrations.contains('High RoSH').parent().should('have.class', 'govuk-tag--red')
+    page.registrations.contains('Restraining Order').parent().should('have.class', 'govuk-tag--orange')
   }
 
   function shouldRenderAppointmentTableFurniture(table: TABLE, caption: string) {

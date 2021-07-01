@@ -6,6 +6,7 @@ import {
   ContactAndAttendanceApi,
   CoreOffenderApi,
   PersonalCircumstancesApi,
+  RisksAndRegistrationsApi,
   SentenceRequirementsAndBreachApi,
   StaffApi,
   TeamsApi,
@@ -24,6 +25,7 @@ export class MockCommunityApiModule {
       staff: createStubInstance(StaffApi),
       personalCircumstances: createStubInstance(PersonalCircumstancesApi),
       contactAndAttendance: createStubInstance(ContactAndAttendanceApi),
+      risks: createStubInstance(RisksAndRegistrationsApi),
     }
 
     return {

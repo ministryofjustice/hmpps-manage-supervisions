@@ -51,7 +51,9 @@
             "lastUpdatedDatetime": "2021-06-11T14:00:00"
           }
         ],
-        "emailAddresses": ["example@example.com"]
+        "emailAddresses": [
+          "example@example.com"
+        ]
       },
       "offenderProfile": {
         "religion": "Christian",
@@ -87,7 +89,12 @@
         "selfDescribedGender": "Jedi",
         "sexualOrientation": "Bisexual"
       },
-      "offenderAliases": [{ "firstName": "Liz", "surname": "Whiskey" }],
+      "offenderAliases": [
+        {
+          "firstName": "Liz",
+          "surname": "Whiskey"
+        }
+      ],
       "offenderManagers": [
         {
           "trustOfficer": {
@@ -3830,6 +3837,128 @@
         "forenames": "Mark",
         "surname": "Berridge",
         "unallocated": false
+      }
+    }
+  ],
+  "registrations": [
+    {
+      "id": "X009923",
+      "registrations": [
+        {
+          "registrationId": 2500203758,
+          "offenderId": 2500530364,
+          "register": {
+            "code": "2",
+            "description": "Alerts"
+          },
+          "type": {
+            "code": "RSTO",
+            "description": "Restraining Order"
+          },
+          "riskColour": "Amber",
+          "startDate": "2021-07-02",
+          "nextReviewDate": "2022-01-02",
+          "reviewPeriodMonths": 6,
+          "registeringTeam": {
+            "code": "N07T01",
+            "description": "OMU A"
+          },
+          "registeringOfficer": {
+            "code": "N07P007",
+            "forenames": "Archibald ZZ",
+            "surname": "Queeny",
+            "unallocated": false
+          },
+          "registeringProbationArea": {
+            "code": "N07",
+            "description": "NPS London"
+          },
+          "warnUser": false,
+          "active": true,
+          "numberOfPreviousDeregistrations": 0
+        }
+      ]
+    }
+  ],
+  "rosh": [
+    {
+      "id": "X009923",
+      "riskToSelf": {
+        "suicide": {
+          "risk": "YES",
+          "previous": "YES",
+          "previousConcernsText": "lkdlskf;k",
+          "current": "YES",
+          "currentConcernsText": "fskdkf;lk"
+        },
+        "selfHarm": {
+          "risk": "YES",
+          "previous": "YES",
+          "previousConcernsText": "lkdlskf;k",
+          "current": "YES",
+          "currentConcernsText": "fskdkf;lk"
+        },
+        "custody": {
+          "risk": "YES",
+          "previous": "YES",
+          "previousConcernsText": "dsjflksdkljfksdj",
+          "current": "YES",
+          "currentConcernsText": "skjdfkljlksd"
+        },
+        "hostelSetting": {
+          "risk": "YES",
+          "previous": "YES",
+          "previousConcernsText": "dsjflksdkljfksdj",
+          "current": "YES",
+          "currentConcernsText": "skjdfkljlksd"
+        },
+        "vulnerability": {
+          "risk": "YES",
+          "previous": "YES",
+          "previousConcernsText": "lksdlfkd;lk",
+          "current": "YES",
+          "currentConcernsText": "jdshfkhskdjhfksd"
+        }
+      },
+      "otherRisks": {
+        "escapeOrAbscond": "YES",
+        "controlIssuesDisruptiveBehaviour": "YES",
+        "breachOfTrust": "YES",
+        "riskToOtherPrisoners": "YES"
+      },
+      "summary": {
+        "whoIsAtRisk": "kjlkj",
+        "natureOfRisk": "jjlklkkj",
+        "riskImminence": "kjjkjlkj",
+        "riskIncreaseFactors": "kjkjlk",
+        "riskMitigationFactors": "jbjkhk",
+        "riskInCommunity": {
+          "VERY_HIGH": [
+            "Children",
+            "Staff"
+          ],
+          "HIGH": [
+            "Public"
+          ],
+          "LOW": [
+            "Known Adult"
+          ]
+        },
+        "riskInCustody": {
+          "MEDIUM": [
+            "Children"
+          ],
+          "VERY_HIGH": [
+            "Public",
+            "Staff"
+          ],
+          "LOW": [
+            "Known Adult"
+          ],
+          "HIGH": [
+            "Prisoners"
+          ]
+        }
       }
     }
   ]

@@ -2,6 +2,7 @@ import { ActivityLogEntry } from './activity'
 import { DateTime } from 'luxon'
 import { ConvictionDetails } from './sentence'
 import { AppointmentSummary, RecentAppointments } from './schedule'
+import { RegistrationFlag, Risks } from './risk/risk.types'
 
 export enum OffenderPage {
   Overview = 'overview',
@@ -29,6 +30,7 @@ export interface OffenderViewModelBase {
   }
   displayName: string
   links: OffenderLinks
+  registrations?: RegistrationFlag[]
 }
 
 export interface OffenderOverviewViewModel extends OffenderViewModelBase {
@@ -37,6 +39,7 @@ export interface OffenderOverviewViewModel extends OffenderViewModelBase {
   contactDetails: ContactDetailsViewModel
   personalDetails: PersonalDetailsViewModel
   appointmentSummary: AppointmentSummary
+  risks: Risks
 }
 
 export interface OffenderScheduleViewModel extends OffenderViewModelBase {

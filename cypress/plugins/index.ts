@@ -3,6 +3,7 @@ import { HmppsAuthMockApi } from '../mockApis/hmpps-auth'
 import { TokenVerificationMockApi } from '../mockApis/token-verification'
 import { CommunityMockApi } from '../mockApis/community-api'
 import PluginConfigOptions = Cypress.PluginConfigOptions
+import { AssessRisksAndNeedsMockApi } from '../mockApis/assess-risks-and-needs-api'
 
 const pluginConfig: Cypress.PluginConfig = (on, config) => {
   const client = new WireMockClient()
@@ -31,6 +32,7 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
   mergeTasks(HmppsAuthMockApi)
   mergeTasks(TokenVerificationMockApi)
   mergeTasks(CommunityMockApi)
+  mergeTasks(AssessRisksAndNeedsMockApi)
 
   on('task', tasks)
 }
