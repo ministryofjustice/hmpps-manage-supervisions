@@ -16,12 +16,16 @@ export type OffenderPageLinks = { [Page in OffenderPage]: string }
 export interface OffenderLinks extends OffenderPageLinks {
   arrangeAppointment: string
   addActivity: string
+  addressBook: string
+  circumstances: string
+  disabilities: string
 }
 
 export interface OffenderViewModelBase {
   page: OffenderPage
   ids: {
     crn: string
+    pnc?: string
   }
   displayName: string
   links: OffenderLinks
@@ -50,18 +54,43 @@ export interface OffenderActivityViewModel extends OffenderViewModelBase {
 }
 
 export interface ContactDetailsViewModel {
-  address?: string[]
-  phoneNumbers: string[]
+  address?: {
+    lines: string[]
+    type?: string
+    phone?: string
+    startDate: DateTime
+  }
+  otherAddresses: {
+    current: number
+    previous: number
+  }
+  phoneNumbers: {
+    mobile?: string
+    other?: string
+  }
   emailAddresses: string[]
+  personalContacts: {
+    link: string
+    type: string
+    name: string
+  }[]
   lastUpdated?: DateTime
 }
 
 export interface PersonalDetailsViewModel {
   name: string
-  aliases: string[]
   dateOfBirth?: DateTime
+  preferredName?: string
+  aliases: string[]
+  previousName?: string
   preferredLanguage?: string
+  currentCircumstances: string[]
   disabilities: string[]
+  religion?: string
+  sex?: string
+  genderIdentity?: string
+  selfDescribedGender?: string
+  sexualOrientation?: string
 }
 
 export interface OffenderPersonalViewModel extends OffenderViewModelBase {

@@ -1,6 +1,5 @@
 {% extends "./_layout.njk" %}
 {% set pageName = 'Overview' %}
-{% from './_personal.njk' import contactDetailsSummary, personalDetailsSummary %}
 {% from './_sentence.njk' import probationHistorySummary %}
 
 {% block page %}
@@ -11,9 +10,15 @@
                     <h2 class="govuk-heading-m">
                         Offences
                     </h2>
-                    <p class='govuk-body' data-qa='offender/overview/offence'>
+                    <p class='govuk-body' data-qa='offender/overview/main-offence'>
                         {{ conviction.mainOffence.description }}
                     </p>
+
+                    {% for offence in conviction.additionalOffences %}
+                        <p class='govuk-body' data-qa='offender/overview/additional-offence'>
+                            {{ offence.description }}
+                        </p>
+                    {% endfor %}
 
                     <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
                 {% endif %}
@@ -54,25 +59,7 @@
                 {% endif %}
             {% endif %}
 
-            {{ contactDetailsSummary({
-                model: contactDetails,
-                attributes: {
-                    'data-qa': 'offender/overview/contact'
-                }
-            }) }}
-
-            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
-
-            {{ personalDetailsSummary({
-                model: personalDetails,
-                attributes: {
-                    'data-qa': 'offender/overview/personal'
-                }
-            }) }}
-
             {% if conviction and conviction.previousConvictions %}
-                <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
-
                 {{ probationHistorySummary({
                     model: conviction,
                     attributes: {
@@ -81,6 +68,7 @@
                 }) }}
             {% endif %}
         </div>
+
         <div class='govuk-grid-column-one-third'>
             {% if appointmentSummary.next %}
                 <div class="app-card app-card--blue govuk-!-margin-bottom-3" data-qa='offender/overview/next-appointment'>

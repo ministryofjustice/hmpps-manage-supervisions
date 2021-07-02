@@ -1,7 +1,12 @@
-{% macro join(items) %}
+{% macro join(items, options) %}
     {% for item in items %}
         <p class="govuk-body govuk-!-margin-bottom-0">
             {{ item }}
         </p>
     {% endfor %}
+    {% if options and options.link and options.linkText %}
+        <p class='govuk-!-margin-top-4'>
+            <a href='{{ options.link }}'>{{ options.linkText }}</a>
+        </p>
+    {% endif %}
 {% endmacro %}

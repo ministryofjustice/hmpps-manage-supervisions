@@ -14,10 +14,10 @@ import {
   PersonalCircumstance,
   Requirement,
 } from '../community-api'
-import { DateTime } from 'luxon'
 import { Config, WellKnownAppointmentType, WellKnownContactTypeCategory, WellKnownContactTypeConfig } from '../config'
 import { AvailableAppointmentTypes, FeaturedAppointmentType } from './dto/AppointmentWizardViewModel'
 import { ConfigService } from '@nestjs/config'
+import { isActiveDateRange } from '../util'
 
 @Injectable()
 export class ArrangeAppointmentService {
@@ -159,11 +159,7 @@ export class ArrangeAppointmentService {
 
   async getCurrentEmploymentCircumstances(crn: string): Promise<string> {
     return (await this.getPersonalCircumstances(crn))
-      .filter(
-        c =>
-          (!c.endDate || DateTime.fromISO(c.endDate) > DateTime.now()) &&
-          DateTime.fromISO(c.startDate) < DateTime.now(),
-      )
+      .filter(isActiveDateRange)
       .filter(c => c.personalCircumstanceType.code == EMPLOYMENT_TYPE_CODE)
       .map(c => c.personalCircumstanceSubType.description)
       .join(', ')

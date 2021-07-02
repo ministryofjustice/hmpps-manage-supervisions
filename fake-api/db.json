@@ -6,7 +6,10 @@
       "offenderId": 2500011641,
       "title": "Dr",
       "firstName": "Liz",
+      "middleNames": ["Danger"],
       "surname": "Haggis",
+      "previousSurname": "Scotland",
+      "preferredName": "Bob",
       "dateOfBirth": "1970-01-01",
       "gender": "Female",
       "otherIds": {
@@ -17,6 +20,10 @@
           {
             "type": "MOBILE",
             "number": "07834 671224"
+          },
+          {
+            "type": "TELEPHONE",
+            "number": "01234 567890"
           }
         ],
         "addresses": [
@@ -25,25 +32,60 @@
             "noFixedAbode": false,
             "addressNumber": "1",
             "streetName": "High Street",
-            "district": "Dis",
             "town": "Sheffield",
             "county": "South Yorkshire",
             "postcode": "S10 1AG",
+            "notes": "Sleeping on sofa",
+            "telephoneNumber": "0123456789",
             "status": {
               "code": "M",
               "description": "Main"
-            }
+            },
+            "type": {
+              "code": "A02",
+              "description": "Approved Premises"
+            },
+            "typeVerified": true,
+            "latestAssessmentDate": "2021-06-11T12:00:00",
+            "createdDatetime": "2021-06-11T13:00:00",
+            "lastUpdatedDatetime": "2021-06-11T14:00:00"
           }
         ],
         "emailAddresses": ["example@example.com"]
       },
       "offenderProfile": {
+        "religion": "Christian",
         "offenderLanguages": {
-          "primaryLanguage": "English"
+          "primaryLanguage": "Chinese",
+          "requiresInterpreter": true
         },
         "remandStatus": "Bail - Unconditional",
         "previousConviction": {},
-        "disabilities": [{ "disabilityType": { "description": "Autism spectrum condition" } }]
+        "disabilities": [
+          {
+            "disabilityId": 2500029000,
+            "disabilityType": {
+              "code": "PC",
+              "description": "Progressive Condition"
+            },
+            "startDate": "2021-01-05",
+            "notes": "Some notes",
+            "provisions": [
+              {
+                "provisionId": 2500022000,
+                "notes": "stair lift",
+                "startDate": "2021-01-13",
+                "provisionType": {
+                  "code": "99",
+                  "description": "Other"
+                }
+              }
+            ]
+          }
+        ],
+        "genderIdentity": "Prefer to self-describe",
+        "selfDescribedGender": "Jedi",
+        "sexualOrientation": "Bisexual"
       },
       "offenderAliases": [{ "firstName": "Liz", "surname": "Whiskey" }],
       "offenderManagers": [
@@ -100,7 +142,63 @@
       "activeProbationManagedSentence": true
     }
   ],
-  "personal-circumstances": [],
+  "personal-contacts": [
+    {
+      "personalContactId": 2500058493,
+      "relationship": "Wife",
+      "startDate": "2019-09-13T00:00:00",
+      "title": "Dr",
+      "firstName": "Pippa",
+      "surname": "Wade",
+      "gender": "Female",
+      "relationshipType": {
+        "code": "NK",
+        "description": "Next of Kin"
+      },
+      "createdDatetime": "2019-09-13T00:00:00",
+      "lastUpdatedDatetime": "2019-09-13T00:00:00"
+    },
+    {
+      "personalContactId": 2500058494,
+      "relationship": "Father",
+      "startDate": "2019-09-13T00:00:00",
+      "title": "Mr",
+      "firstName": "Jonathon",
+      "surname": "Bacon",
+      "gender": "Male",
+      "relationshipType": {
+        "code": "OF",
+        "description": "Family member"
+      },
+      "createdDatetime": "2019-09-13T00:00:00",
+      "lastUpdatedDatetime": "2019-09-13T00:00:00"
+    }
+  ],
+  "personal-circumstances-by-crn": [
+    {
+      "id": "X009923",
+      "personalCircumstances": [
+        {
+          "personalCircumstanceId": 2500147503,
+          "offenderId": 2500184815,
+          "personalCircumstanceType": {
+            "code": "H",
+            "description": "Relationship"
+          },
+          "personalCircumstanceSubType": {
+            "code": "H02",
+            "description": "Married / Civil partnership"
+          },
+          "startDate": "2021-07-02",
+          "probationArea": {
+            "code": "N07",
+            "description": "NPS London"
+          },
+          "evidenced": true
+        }
+      ]
+    }
+  ],
   "conviction-requirements-by-conviction": [
     {
       "id": 2500445193,

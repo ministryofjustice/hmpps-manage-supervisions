@@ -41,7 +41,8 @@ app.use(
     '/secure/offenders/crn/:crn/convictions?activeOnly=true': '/convictions-by-crn?id=:crn',
     '/secure/teams/:teamCode/office-locations': '/team-office-locations?teamCode=:teamCode',
     '/secure/offenders/crn/:crn/convictions/:conviction/requirements*': '/conviction-requirements-by-conviction/:conviction',
-    '/secure/offenders/crn/:crn/personalCircumstances': '/personal-circumstances',
+    '/secure/offenders/crn/:crn/personalCircumstances': '/personal-circumstances-by-crn/:crn',
+    '/secure/offenders/crn/:crn/personalContacts': '/personal-contacts',
     ...paginated,
   }),
 )
