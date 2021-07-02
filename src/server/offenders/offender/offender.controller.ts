@@ -12,7 +12,7 @@ import {
 import { RedirectResponse } from '../../common'
 import { OffenderDetail } from '../../community-api'
 import { OffenderService } from './offender.service'
-import { getOffenderDisplayName } from '../../util'
+import { getDisplayName } from '../../util'
 import { SentenceService } from './sentence'
 import { ScheduleService } from './schedule'
 import { ActivityService } from './activity'
@@ -43,7 +43,7 @@ export class OffenderController {
     return {
       ...this.getBase(OffenderPage.Overview, offender),
       page: OffenderPage.Overview,
-      ...this.offenderService.getPersonalDetails(offender),
+      ...(await this.offenderService.getPersonalDetails(offender)),
       conviction,
       appointmentSummary,
     }
@@ -87,7 +87,7 @@ export class OffenderController {
     const offender = await this.offenderService.getOffenderDetail(crn)
     return {
       ...this.getBase(OffenderPage.Personal, offender),
-      ...this.offenderService.getPersonalDetails(offender),
+      ...(await this.offenderService.getPersonalDetails(offender)),
       page: OffenderPage.Personal,
     }
   }
@@ -117,12 +117,16 @@ export class OffenderController {
       page,
       ids: {
         crn: crn.toUpperCase(),
+        pnc: offender.otherIds.pncNumber,
       },
-      displayName: getOffenderDisplayName(offender),
+      displayName: getDisplayName(offender, { preferredName: true }),
       links: {
         ...pageLinks,
         arrangeAppointment: `/arrange-appointment/${crn}`,
         addActivity: `/offender/${crn}/activity/new`,
+        addressBook: `/offender/${crn}/address-book`,
+        circumstances: `/offender/${crn}/circumstances`,
+        disabilities: `/offender/${crn}/disabilities`,
       },
     }
   }

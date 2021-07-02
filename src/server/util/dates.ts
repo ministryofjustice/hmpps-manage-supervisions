@@ -37,3 +37,18 @@ export function safeGetDateTime(raw: RawDate): DateTime {
       throw new Error(`Unknown date type '${raw}'`)
   }
 }
+
+export function isActiveDateRange(range: { startDate?: RawDate; endDate?: RawDate }): boolean {
+  if (!range.startDate) {
+    return false
+  }
+
+  const now = DateTime.now()
+  const startDate = safeGetDateTime(range.startDate)
+  if (startDate > now) {
+    return false
+  }
+
+  const endDate = safeGetDateTime(range.endDate)
+  return !endDate || endDate > now
+}

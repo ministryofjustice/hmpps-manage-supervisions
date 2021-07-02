@@ -10,3 +10,9 @@ export function isRar(requirement: Requirement) {
     requirement.requirementTypeSubCategory.code == RAR_REQUIREMENT_SUB_TYPE_CATEGORY_CODE
   )
 }
+
+export enum WellKnownAddressTypes {
+  Main = 'M',
+  Previous = 'P',
+  Secondary = 'S',
+}

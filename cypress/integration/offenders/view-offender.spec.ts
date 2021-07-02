@@ -44,22 +44,14 @@ context('ViewOffender', () => {
     whenClickingSubNavTab('overview')
     shouldDisplayCommonHeader()
 
-    page.overview.offences.contains(
+    page.overview.mainOffence.contains(
       'Cheats at gambling or enables or assists person to cheat (Gambling Act 2005) - 07539',
     )
+    page.overview.additionalOffences.contains('Assault on Police Officer - 10400')
+
     page.overview.sentence.contains('ORA Community Order')
     page.overview.progress('Sentence').contains('12 months elapsed (of 12 months)')
     page.overview.progress('RAR').contains('5 days completed (of 20 days)')
-
-    page.overview.contactDetails('Address').contains('1 High Street Sheffield South Yorkshire S10 1AG')
-    page.overview.contactDetails('Phone number').contains('07734 111992 01234 111222')
-    page.overview.contactDetails('Email').contains('example@example.com example2@example2.com')
-
-    page.overview.personalDetails('Name').contains('Brian Cheese')
-    page.overview.personalDetails('Aliases').contains('Dylan Meyer Romario Montgomery')
-    page.overview.personalDetails('Date of birth').contains('10 June 1980')
-    page.overview.personalDetails('Preferred language').contains('Bengali')
-    page.overview.personalDetails('Disabilities and adjustments').contains('Learning Difficulties Speech Impairment')
 
     page.overview.previousOrders.contains('Previous orders (1) Last ended on 1 December 2020')
 
@@ -259,17 +251,37 @@ context('ViewOffender', () => {
     whenClickingSubNavTab('personal')
     shouldDisplayCommonHeader()
 
-    page.personal.tableValue('contact', 'Address').contains('1 High Street Sheffield South Yorkshire S10 1AG')
-    page.personal.tableValue('contact', 'Phone number').contains('07734 111992 01234 111222')
-    page.personal.tableValue('contact', 'Email').contains('example@example.com example2@example2.com')
+    page.personal.tableValue('contact', 'Mobile number').contains('07734 111992')
+    page.personal.tableValue('contact', 'Telephone number').contains('01234 111222')
+    page.personal.tableValue('contact', 'Email address').contains('example2@example2.com example@example.com')
+    page.personal.tableValue('contact', 'Main address').contains('1 High Street Sheffield South Yorkshire S10 1AG')
+
+    // TODO main address details
+
+    page.personal.tableValue('contact', 'Other addresses').contains('1 other current address 1 previous address')
+    page.personal.tableValue('contact', 'Personal contacts').contains('Next of Kin: Pippa Wade - Wife')
+    page.personal.tableValue('contact', 'Personal contacts').contains('Family member: Jonathon Bacon - Father')
 
     page.personal.tableValue('personal', 'Name').contains('Brian Cheese')
-    page.personal.tableValue('personal', 'Aliases').contains('Dylan Meyer Romario Montgomery')
     page.personal.tableValue('personal', 'Date of birth').contains('10 June 1980')
-    page.personal.tableValue('personal', 'Preferred language').contains('Bengali')
+    page.personal.tableValue('personal', 'Preferred name/Known as').contains('Bob')
+    page.personal.tableValue('personal', 'Aliases').contains('Dylan Meyer Romario Montgomery')
+    page.personal.tableValue('personal', 'Previous name').contains('Smith')
+    page.personal.tableValue('personal', 'Preferred language').contains('Bengali (interpreter required)')
+    page.personal
+      .tableValue('personal', 'Current circumstances')
+      .contains('Employment: Temporary/casual work (30 or more hours per week)')
     page.personal
       .tableValue('personal', 'Disabilities and adjustments')
-      .contains('Learning Difficulties Speech Impairment')
+      .contains('Learning Difficulties: Other Speech Impairment: None')
+    page.personal.tableValue('personal', 'CRN').contains(crn)
+    page.personal.tableValue('personal', 'PNC').contains('2012/123400000F')
+
+    page.personal.tableValue('equality', 'Religion or belief').contains('Christian')
+    page.personal.tableValue('equality', 'Sex').contains('Male')
+    page.personal.tableValue('equality', 'Gender identity').contains('Prefer to self-describe')
+    page.personal.tableValue('equality', 'Self-described gender').contains('Jedi')
+    page.personal.tableValue('equality', 'Sexual orientation').contains('Bisexual')
   })
 
   it('displays sentence details', () => {
@@ -371,6 +383,8 @@ context('ViewOffender', () => {
     cy.task('stubGetConvictions', { crn, ...options.convictions })
     cy.task('stubGetRequirements', { crn })
     cy.task('stubOffenderAppointments', { crn, partials: options.appointments })
+    cy.task('stubGetPersonalCircumstances', { crn })
+    cy.task('stubGetPersonalContacts', { crn })
   }
 
   function whenViewedOffender() {
@@ -385,7 +399,7 @@ context('ViewOffender', () => {
 
   function shouldDisplayCommonHeader() {
     page.pageTitle.contains(`CRN: ${crn}`)
-    page.pageTitle.contains('Brian Cheese')
+    page.pageTitle.contains('Brian Cheese (Bob)')
   }
 
   function shouldRenderAppointmentTableFurniture(table: TABLE, caption: string) {

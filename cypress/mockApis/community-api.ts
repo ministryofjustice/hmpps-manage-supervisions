@@ -6,6 +6,14 @@ export interface CreateAppointmentArgs {
   convictionId: number
 }
 
+export interface StubGetPersonalCircumstancesOptions {
+  crn: string
+}
+
+export interface StubGetPersonalContactsOptions {
+  crn: string
+}
+
 export interface StubOffenderAppointmentOptions {
   crn: string
   partials: {
@@ -135,9 +143,11 @@ export class CommunityMockApi {
           title: 'Mr',
           firstName: 'Brian',
           surname: 'Cheese',
+          preferredName: 'Bob',
           dateOfBirth: '1980-06-10',
+          previousSurname: 'Smith',
           gender: 'Male',
-          otherIds: { crn },
+          otherIds: { crn, pncNumber: '2012/123400000F' },
           contactDetails: {
             addresses: [
               {
@@ -151,6 +161,33 @@ export class CommunityMockApi {
                 status: {
                   code: 'M',
                   description: 'Main',
+                },
+              },
+              {
+                from: '2001-07-16',
+                to: '2015-07-16',
+                noFixedAbode: false,
+                addressNumber: '2',
+                streetName: 'High Street',
+                town: 'Sheffield',
+                county: 'South Yorkshire',
+                postcode: 'S10 1AG',
+                status: {
+                  code: 'M',
+                  description: 'Main',
+                },
+              },
+              {
+                from: '2001-07-16',
+                noFixedAbode: false,
+                addressNumber: '3',
+                streetName: 'High Street',
+                town: 'Sheffield',
+                county: 'South Yorkshire',
+                postcode: 'S10 1AG',
+                status: {
+                  code: 'S',
+                  description: 'Secondary',
                 },
               },
             ],
@@ -169,9 +206,14 @@ export class CommunityMockApi {
           offenderProfile: {
             offenderLanguages: {
               primaryLanguage: 'Bengali',
+              requiresInterpreter: true,
             },
             remandStatus: 'Bail - Unconditional',
             previousConviction: {},
+            religion: 'Christian',
+            genderIdentity: 'Prefer to self-describe',
+            selfDescribedGender: 'Jedi',
+            sexualOrientation: 'Bisexual',
             disabilities: [
               {
                 disabilityId: 2500079588,
@@ -507,7 +549,54 @@ export class CommunityMockApi {
     })
   }
 
-  async stubGetPersonalCircumstances({ crn }: CreateAppointmentArgs) {
+  async stubGetPersonalContacts({ crn }: StubGetPersonalContactsOptions) {
+    return this.client.stub({
+      request: {
+        method: 'GET',
+        urlPath: `/community/secure/offenders/crn/${crn}/personalContacts`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: [
+          {
+            personalContactId: 2500058493,
+            relationship: 'Wife',
+            startDate: '2019-09-13T00:00:00',
+            title: 'Dr',
+            firstName: 'Pippa',
+            surname: 'Wade',
+            gender: 'Female',
+            relationshipType: {
+              code: 'NK',
+              description: 'Next of Kin',
+            },
+            createdDatetime: '2019-09-13T00:00:00',
+            lastUpdatedDatetime: '2019-09-13T00:00:00',
+          },
+          {
+            personalContactId: 2500058494,
+            relationship: 'Father',
+            startDate: '2019-09-13T00:00:00',
+            title: 'Mr',
+            firstName: 'Jonathon',
+            surname: 'Bacon',
+            gender: 'Male',
+            relationshipType: {
+              code: 'OF',
+              description: 'Family member',
+            },
+            createdDatetime: '2019-09-13T00:00:00',
+            lastUpdatedDatetime: '2019-09-13T00:00:00',
+          },
+        ],
+      },
+    })
+  }
+
+  async stubGetPersonalCircumstances({ crn }: StubGetPersonalCircumstancesOptions) {
     return this.client.stub({
       request: {
         method: 'GET',

@@ -1,26 +1,189 @@
 {% extends "./_layout.njk" %}
 {% set pageName = 'Personal details' %}
 {% from './_join.njk' import join %}
-{% from './_personal.njk' import contactDetailsSummary, personalDetailsSummary %}
+{% from 'components/summary-card.njk' import appSummaryCard %}
 
 {% block page %}
-    <div class="govuk-grid-row">
-        <div class='govuk-grid-column-two-thirds'>
-            {{ contactDetailsSummary({
-                model: contactDetails,
-                attributes: {
-                    'data-qa': 'offender/personal-details/contact'
-                }
-            }) }}
+    {% call appSummaryCard({ titleText: 'Contact details', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
+        {% if contactDetails.address %}
+            {% set mainAddress %}
+                {{ join(contactDetails.address.lines) }}
+                {{ govukDetails({
+                    summaryText: "View address details",
+                    classes: 'govuk-!-margin-top-2 govuk-!-margin-bottom-0',
+                    attributes: {
+                        'data-qa': 'offender/personal-details/address-details'
+                    },
+                    html: govukSummaryList({
+                        rows: [
+                            {
+                                key: { text: "Address telephone" },
+                                value: { text: contactDetails.address.phone }
+                            } if contactDetails.address.phone,
+                            {
+                                key: { text: "Type of address" },
+                                value: { text: contactDetails.address.type if contactDetails.address.type else 'Unknown' }
+                            },
+                            {
+                                key: { text: "Start date" },
+                                value: { text: contactDetails.address.startDate | shortDate }
+                            },
+                            {
+                                key: { text: "Notes" },
+                                value: { html: contactDetails.address.notes | nl2br }
+                            } if contactDetails.address.notes
+                        ]
+                    })
+                }) }}
+            {% endset %}
+        {% endif %}
 
-            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+        {% set otherAddresses %}
+            <ul class="govuk-list">
+                {% if contactDetails.otherAddresses.current %}
+                    <li>{{ contactDetails.otherAddresses.current | quantity('other current address', 'other current addresses') }}</li>
+                {% endif %}
+                {% if contactDetails.otherAddresses.previous %}
+                    <li>{{ contactDetails.otherAddresses.previous | quantity('previous address', 'previous addresses') }}</li>
+                {% endif %}
+                {% if not contactDetails.otherAddresses.current and not contactDetails.otherAddresses.previous %}
+                    <li>No other addresses</li>
+                {% endif %}
+            </ul>
+            <p><a href="{{ links.addressBook }}">View all addresses</a></p>
+        {% endset %}
 
-            {{ personalDetailsSummary({
-                model: personalDetails,
-                attributes: {
-                    'data-qa': 'offender/personal-details/personal'
+        {% if contactDetails.personalContacts.length %}
+            {% set personalContacts %}
+                {% for personalContact in contactDetails.personalContacts %}
+                    <p>
+                        {{ personalContact.type }}:<br>
+                        <a href="{{ personalContact.link }}">{{ personalContact.name }}</a>
+                    </p>
+                {% endfor %}
+            {% endset %}
+        {% endif %}
+
+        {{ govukSummaryList({
+            attributes: {
+                'data-qa': 'offender/personal-details/contact'
+            },
+            rows: [
+                {
+                    key: { text: 'Mobile number' if contactDetails.phoneNumbers.other else 'Phone number' },
+                    value: { html: contactDetails.phoneNumbers.mobile }
+                } if contactDetails.phoneNumbers.mobile,
+                {
+                    key: { text: 'Telephone number' if contactDetails.phoneNumbers.mobile else 'Phone number' },
+                    value: { html: contactDetails.phoneNumbers.other }
+                } if contactDetails.phoneNumbers.other,
+                {
+                    key: { text: "Email address" },
+                    value: { html: join(contactDetails.emailAddresses) }
+                } if contactDetails.emailAddresses.length > 0,
+                {
+                    key: { text: "Main address" },
+                    value: { html: mainAddress if mainAddress else 'No main address' }
+                },
+                {
+                    key: { text: "Other addresses" },
+                    value: { html: otherAddresses }
+                },
+                {
+                    key: { text: 'Personal contacts' },
+                    value: { html: personalContacts if personalContacts else 'No personal contacts' }
                 }
-            }) }}
-        </div>
-    </div>
+            ]
+        }) }}
+    {%- endcall %}
+
+    {% call appSummaryCard({ titleText: 'Personal details', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
+        {{ govukSummaryList({
+            attributes: {
+                'data-qa': 'offender/personal-details/personal'
+            },
+            rows: [
+                {
+                    key: { text: "Name" },
+                    value: { text: personalDetails.name }
+                },
+                {
+                    key: { text: "Date of birth" },
+                    value: { text: personalDetails.dateOfBirth | dob if personalDetails.dateOfBirth else 'Unknown' }
+                },
+                {
+                    key: { text: "Preferred name/Known as" },
+                    value: { text: personalDetails.preferredName }
+                } if personalDetails.preferredName,
+                {
+                    key: { text: "Aliases" },
+                    value: { html: join(personalDetails.aliases) if personalDetails.aliases.length > 0 else 'None known' }
+                },
+                {
+                    key: { text: "Previous name" },
+                    value: { text: personalDetails.previousName }
+                } if personalDetails.previousName,
+                {
+                    key: { text: "Preferred language" },
+                    value: { text: personalDetails.preferredLanguage }
+                } if personalDetails.preferredLanguage,
+                {
+                    key: { text: "Current circumstances" },
+                    value: {
+                        html: join(personalDetails.currentCircumstances, {
+                                linkText: 'View details and previous circumstances',
+                                link: links.circumstances
+                            }) if personalDetails.currentCircumstances.length > 0 else 'None'
+                    }
+                },
+                {
+                    key: { text: "Disabilities and adjustments" },
+                    value: {
+                        html: join(personalDetails.disabilities, {
+                                linkText: 'View details and notes',
+                                link: links.disabilities
+                            }) if personalDetails.disabilities.length > 0 else 'None'
+                    }
+                },
+                {
+                    key: { text: "PNC" },
+                    value: { text: ids.pnc }
+                } if ids.pnc,
+                {
+                    key: { text: "CRN" },
+                    value: { text: ids.crn }
+                } if ids.crn
+            ]
+        }) }}
+    {%- endcall %}
+
+    {% call appSummaryCard({ titleText: 'Equality monitoring', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
+        {{ govukSummaryList({
+            attributes: {
+                'data-qa': 'offender/personal-details/equality'
+            },
+            rows: [
+                {
+                    key: { text: "Religion or belief" },
+                    value: { text: personalDetails.religion if personalDetails.religion else 'Unknown' }
+                },
+                {
+                    key: { text: "Sex" },
+                    value: { text: personalDetails.sex if personalDetails.sex else 'Unknown' }
+                },
+                {
+                    key: { text: "Gender identity" },
+                    value: { text: personalDetails.genderIdentity }
+                } if personalDetails.genderIdentity,
+                {
+                    key: { text: "Self-described gender" },
+                    value: { text: personalDetails.selfDescribedGender }
+                } if personalDetails.selfDescribedGender,
+                {
+                    key: { text: "Sexual orientation" },
+                    value: { text: personalDetails.sexualOrientation if personalDetails.sexualOrientation else 'Unknown' }
+                }
+            ]
+        }) }}
+    {%- endcall %}
 {% endblock %}

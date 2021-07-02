@@ -27,9 +27,13 @@ import * as faker from 'faker'
 import { DateTime } from 'luxon'
 import { fake } from '../util/util.fake'
 import { Paginated } from './types'
-import { RAR_REQUIREMENT_SUB_TYPE_CATEGORY_CODE, RAR_REQUIREMENT_TYPE_MAIN_CATEGORY_CODE } from './well-known'
+import {
+  RAR_REQUIREMENT_SUB_TYPE_CATEGORY_CODE,
+  RAR_REQUIREMENT_TYPE_MAIN_CATEGORY_CODE,
+  WellKnownAddressTypes,
+} from './well-known'
 
-function fakeIsoDate(type: 'past' | 'recent' | 'soon' | 'future' = 'past'): string {
+export function fakeIsoDate(type: 'past' | 'recent' | 'soon' | 'future' = 'past'): string {
   return faker.date[type]().toISOString().substr(0, 10)
 }
 
@@ -59,11 +63,19 @@ export const fakeAddress = fake<Address>(() => ({
   county: faker.address.county(),
   postcode: faker.address.zipCode(),
   status: {
-    code: 'M',
+    code: WellKnownAddressTypes.Main,
     description: 'Main',
   },
   noFixedAbode: false,
   telephoneNumber: faker.phone.phoneNumber(),
+  latestAssessmentDate: faker.date.past().toISOString(),
+  type: {
+    code: faker.random.alphaNumeric(3),
+    description: faker.company.bs(),
+  },
+  typeVerified: true,
+  lastUpdatedDatetime: faker.date.past().toISOString(),
+  createdDatetime: faker.date.past().toISOString(),
 }))
 
 export const fakePhoneNumber = fake<PhoneNumber>(() => ({
@@ -71,7 +83,7 @@ export const fakePhoneNumber = fake<PhoneNumber>(() => ({
   number: faker.phone.phoneNumber(),
 }))
 
-export const fakeDisability = fake<Disability>(() => ({
+export const fakeDisability = fake<Disability>((options, partial) => ({
   disabilityId: faker.datatype.number(),
   disabilityType: {
     code: faker.random.alphaNumeric(3).toUpperCase(),
@@ -79,6 +91,17 @@ export const fakeDisability = fake<Disability>(() => ({
   },
   startDate: fakeIsoDate(),
   notes: faker.company.bs(),
+  provisions: partial?.provisions || [
+    {
+      provisionId: faker.datatype.number(),
+      notes: faker.lorem.sentence(),
+      startDate: fakeIsoDate(),
+      provisionType: {
+        code: faker.random.alphaNumeric(3),
+        description: faker.company.bs(),
+      },
+    },
+  ],
 }))
 
 export const fakeOffenderAlias = fake<OffenderAlias>(() => ({
@@ -88,20 +111,29 @@ export const fakeOffenderAlias = fake<OffenderAlias>(() => ({
 
 export const fakeOffenderDetail = fake<OffenderDetail>((options, partial) => ({
   offenderId: faker.datatype.number(),
+  otherIds: { crn: 'some-crn' },
   activeProbationManagedSentence: true,
   firstName: faker.name.firstName(),
   surname: faker.name.lastName(),
+  preferredName: faker.name.findName(),
+  previousSurname: faker.name.lastName(),
+  gender: faker.random.arrayElement(['Male', 'Female']),
   dateOfBirth: fakeIsoDate(),
   contactDetails: {
-    addresses: (partial?.contactDetails?.addresses as Address[]) || [fakeAddress()],
-    phoneNumbers: partial?.contactDetails?.phoneNumbers || [fakePhoneNumber()],
+    addresses: partial?.contactDetails?.addresses?.map(fakeAddress) || [fakeAddress()],
+    phoneNumbers: partial?.contactDetails?.phoneNumbers?.map(fakePhoneNumber) || [fakePhoneNumber()],
     emailAddresses: partial?.contactDetails?.emailAddresses || [faker.internet.email()],
   },
   offenderProfile: {
     offenderLanguages: {
       primaryLanguage: faker.address.country(),
+      requiresInterpreter: true,
     },
-    disabilities: partial?.offenderProfile?.disabilities || [fakeDisability()],
+    disabilities: partial?.offenderProfile?.disabilities?.map(fakeDisability) || [fakeDisability()],
+    genderIdentity: 'Prefer to self-describe',
+    selfDescribedGender: 'Jedi',
+    sexualOrientation: 'Bisexual',
+    religion: 'Christian',
   },
   offenderAliases: partial?.offenderAliases || [fakeOffenderAlias()],
   offenderManagers: [{ team: { code: faker.datatype.uuid() } }],

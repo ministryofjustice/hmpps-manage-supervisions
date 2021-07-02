@@ -51,7 +51,7 @@ describe('OffenderController', () => {
 
     const contactDetails = fakeContactDetailsViewModel()
     const personalDetails = fakePersonalDetailsViewModel()
-    offenderService.getPersonalDetails.withArgs(offender).returns({ contactDetails, personalDetails })
+    offenderService.getPersonalDetails.withArgs(offender).resolves({ contactDetails, personalDetails })
 
     const conviction = fakeConvictionDetails()
     sentenceService.getConvictionDetails.withArgs('some-crn').resolves(conviction)
@@ -106,7 +106,7 @@ describe('OffenderController', () => {
     const contactDetails = fakeContactDetailsViewModel()
     const personalDetails = fakePersonalDetailsViewModel()
 
-    offenderService.getPersonalDetails.withArgs(offender).returns({ contactDetails, personalDetails })
+    offenderService.getPersonalDetails.withArgs(offender).resolves({ contactDetails, personalDetails })
 
     const observed = await subject.getPersonal('some-crn')
 
@@ -134,9 +134,10 @@ describe('OffenderController', () => {
   function havingOffender() {
     const offender = fakeOffenderDetail({
       otherIds: { crn: 'some-crn' },
-      firstName: 'Mark',
+      firstName: 'Liz',
       middleNames: ['Danger'],
-      surname: 'Berridge',
+      surname: 'Haggis',
+      preferredName: 'Bob',
     })
     offenderService.getOffenderDetail.withArgs('some-crn').resolves(offender)
     return offender
@@ -147,7 +148,7 @@ describe('OffenderController', () => {
       ids: {
         crn: 'SOME-CRN',
       },
-      displayName: 'Mark Danger Berridge',
+      displayName: 'Liz Danger Haggis (Bob)',
       links: {
         [OffenderPage.Overview]: '/offender/some-crn/overview',
         [OffenderPage.Schedule]: '/offender/some-crn/schedule',
@@ -156,6 +157,9 @@ describe('OffenderController', () => {
         [OffenderPage.Sentence]: '/offender/some-crn/sentence',
         arrangeAppointment: '/arrange-appointment/some-crn',
         addActivity: '/offender/some-crn/activity/new',
+        addressBook: '/offender/some-crn/address-book',
+        circumstances: '/offender/some-crn/circumstances',
+        disabilities: '/offender/some-crn/disabilities',
       },
       ...expected,
     } as OffenderViewModel)

@@ -19,8 +19,12 @@ export class OffenderPage extends PageBase {
 
   get overview() {
     return {
-      get offences() {
-        return cy.get('[data-qa="offender/overview/offence"]')
+      get mainOffence() {
+        return cy.get('[data-qa="offender/overview/main-offence"]')
+      },
+
+      get additionalOffences() {
+        return cy.get('[data-qa="offender/overview/additional-offence"]')
       },
 
       get sentence() {
@@ -29,14 +33,6 @@ export class OffenderPage extends PageBase {
 
       progress(title: string) {
         return cy.get(`dl[data-qa="offender/overview/progress"] dt`).contains(title).siblings('dd')
-      },
-
-      contactDetails(title: string) {
-        return cy.get('dl[data-qa="offender/overview/contact"] dt').contains(title).siblings('dd')
-      },
-
-      personalDetails(title: string) {
-        return cy.get('dl[data-qa="offender/overview/personal"] dt').contains(title).siblings('dd')
       },
 
       get previousOrders() {
@@ -119,7 +115,7 @@ export class OffenderPage extends PageBase {
 
   get personal() {
     return {
-      tableValue(table: 'contact' | 'personal', title: string) {
+      tableValue(table: 'contact' | 'personal' | 'equality', title: string) {
         return cy.get(`dl[data-qa="offender/personal-details/${table}"] dt`).contains(title).siblings('dd')
       },
     }

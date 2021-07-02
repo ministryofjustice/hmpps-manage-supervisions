@@ -22,6 +22,7 @@ import { AppointmentTypeRequiresLocation, OffenderDetail, OffenderManager } from
 import { DateTime } from 'luxon'
 import { ConfigService } from '@nestjs/config'
 import { Config, DebugFlags, ServerConfig } from '../config'
+import { isActiveDateRange } from '../util'
 
 type RenderOrRedirect = AppointmentWizardViewModel | RedirectResponse
 
@@ -440,11 +441,7 @@ export class ArrangeAppointmentController {
     ])
 
     const disabilities = (offender.offenderProfile.disabilities || [])
-      .filter(
-        d =>
-          (!d.endDate || DateTime.fromISO(d.endDate) > DateTime.now()) &&
-          DateTime.fromISO(d.startDate) < DateTime.now(),
-      )
+      .filter(isActiveDateRange)
       .map(d => {
         const provisions = (d.provisions || [])
           .filter(
