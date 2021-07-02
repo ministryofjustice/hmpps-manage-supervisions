@@ -11,7 +11,7 @@ export class SentenceService {
 
   constructor(private readonly community: CommunityApiService) {}
 
-  async getSentenceDetails(crn: string): Promise<ConvictionDetails | null> {
+  async getConvictionDetails(crn: string): Promise<ConvictionDetails | null> {
     const { data: convictions } = await this.community.offender.getConvictionsForOffenderByCrnUsingGET({ crn })
 
     // TODO we are assuming only a single active conviction per offender at this time
@@ -31,7 +31,13 @@ export class SentenceService {
       convictionId: conviction.convictionId,
       activeOnly: true,
     })
-    const rarDays = requirements.map(x => this.getRarDays(x)).reduce((x, y) => x + y, 0)
+    const rar = requirements
+      .map(x => this.getRarMeta(x))
+      .filter(x => x)
+      .reduce((x, y) => ({ length: x.length + y.length, progress: x.progress + y.progress }), {
+        length: 0,
+        progress: 0,
+      })
 
     function toOffenceView(offence?: Offence): ConvictionOffence | null {
       if (!offence) {
@@ -68,25 +74,34 @@ export class SentenceService {
             responsibleCourt: conviction.responsibleCourt?.courtName,
           }
         : null,
-      requirement: rarDays > 0 ? { length: quantity(rarDays, 'days') } : null,
+      requirement:
+        rar.length > 0
+          ? {
+              length: quantity(rar.length, 'days'),
+              progress: quantity(rar.progress, 'days'),
+            }
+          : null,
     }
   }
 
-  private getRarDays(requirement: Requirement): number {
+  private getRarMeta(requirement: Requirement): { length: number; progress: number } | null {
     if (!isRar(requirement) || !requirement.lengthUnit || !requirement.length) {
-      return 0
+      return null
     }
 
     const units = requirement.lengthUnit.toLowerCase().trim()
     if (units === 'day' || units === 'days') {
-      return requirement.length
+      return { length: requirement.length, progress: requirement.rarCount || 0 }
     }
 
     try {
-      return Math.floor(Duration.fromObject({ [units]: requirement.length }).as('days'))
+      return {
+        length: Math.floor(Duration.fromObject({ [units]: requirement.length }).as('days')),
+        progress: requirement.rarCount || 0,
+      }
     } catch (err) {
       this.logger.error(`Cannot determine rar days ${JSON.stringify(requirement)}: ${err.message}`)
-      return 0
+      return null
     }
   }
 

@@ -17,6 +17,42 @@ export class OffenderPage extends PageBase {
     return cy.get('[data-qa="offender/arrange-appointment-button"]')
   }
 
+  get overview() {
+    return {
+      get offences() {
+        return cy.get('[data-qa="offender/overview/offence"]')
+      },
+
+      get sentence() {
+        return cy.get('[data-qa="offender/overview/sentence"]')
+      },
+
+      progress(title: string) {
+        return cy.get(`dl[data-qa="offender/overview/progress"] dt`).contains(title).siblings('dd')
+      },
+
+      contactDetails(title: string) {
+        return cy.get('dl[data-qa="offender/overview/contact"] dt').contains(title).siblings('dd')
+      },
+
+      personalDetails(title: string) {
+        return cy.get('dl[data-qa="offender/overview/personal"] dt').contains(title).siblings('dd')
+      },
+
+      get previousOrders() {
+        return cy.get('[data-qa="offender/overview/probation-history"] [data-qa="previous-orders"]')
+      },
+
+      get nextAppointment() {
+        return cy.get('[data-qa="offender/overview/next-appointment"]')
+      },
+
+      get appointmentAttendance() {
+        return cy.get('[data-qa="offender/overview/appointment-attendance"]')
+      },
+    }
+  }
+
   get schedule() {
     return {
       tableCaption(table: TABLE) {
@@ -116,7 +152,7 @@ export class OffenderPage extends PageBase {
       },
 
       get previous() {
-        return cy.get('[data-qa="offender/sentence/previous-orders"')
+        return cy.get('[data-qa="offender/sentence/probation-history"] [data-qa="previous-orders"]')
       },
     }
   }

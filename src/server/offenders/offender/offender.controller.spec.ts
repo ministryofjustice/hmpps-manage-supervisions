@@ -11,7 +11,7 @@ import { ScheduleService } from './schedule'
 import { ActivityService } from './activity'
 import { fakeConvictionDetails } from './sentence/sentence.fake'
 import { fakeActivityLogEntry } from './activity/activity.fake'
-import { fakeRecentAppointments } from './schedule/schedule.fake'
+import { fakeAppointmentSummary, fakeRecentAppointments } from './schedule/schedule.fake'
 
 describe('OffenderController', () => {
   let subject: OffenderController
@@ -48,10 +48,24 @@ describe('OffenderController', () => {
 
   it('gets overview', async () => {
     const offender = havingOffender()
+
+    const contactDetails = fakeContactDetailsViewModel()
+    const personalDetails = fakePersonalDetailsViewModel()
+    offenderService.getPersonalDetails.withArgs(offender).returns({ contactDetails, personalDetails })
+
+    const conviction = fakeConvictionDetails()
+    sentenceService.getConvictionDetails.withArgs('some-crn').resolves(conviction)
+
+    const appointmentSummary = fakeAppointmentSummary()
+    scheduleService.getAppointmentSummary.withArgs('some-crn').resolves(appointmentSummary)
+
     const observed = await subject.getOverview('some-crn')
     shouldReturnViewModel(observed, {
       page: OffenderPage.Overview,
-      contactDetails: offender.contactDetails,
+      conviction,
+      contactDetails,
+      personalDetails,
+      appointmentSummary,
     })
   })
 
@@ -106,14 +120,14 @@ describe('OffenderController', () => {
   it('gets sentence', async () => {
     havingOffender()
 
-    const detail = fakeConvictionDetails()
-    sentenceService.getSentenceDetails.withArgs('some-crn').resolves(detail)
+    const conviction = fakeConvictionDetails()
+    sentenceService.getConvictionDetails.withArgs('some-crn').resolves(conviction)
 
     const observed = await subject.getSentence('some-crn')
 
     shouldReturnViewModel(observed, {
       page: OffenderPage.Sentence,
-      ...detail,
+      conviction,
     })
   })
 

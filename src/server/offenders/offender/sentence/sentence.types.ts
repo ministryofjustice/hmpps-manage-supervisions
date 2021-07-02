@@ -19,6 +19,7 @@ export interface ConvictionSentenceDetail {
 
 export interface ConvictionRequirementDetail {
   length: string
+  progress: string
 }
 
 export interface PreviousConvictions {

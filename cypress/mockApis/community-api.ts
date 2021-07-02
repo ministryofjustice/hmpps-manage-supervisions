@@ -4,8 +4,6 @@ import { merge } from 'lodash'
 export interface CreateAppointmentArgs {
   crn: string
   convictionId: number
-  current?: boolean
-  previous?: boolean
 }
 
 export interface StubOffenderAppointmentOptions {
@@ -13,8 +11,12 @@ export interface StubOffenderAppointmentOptions {
   partials: {
     start: string
     end: string
-    type: { code: string; name: string }
-    staff: { forenames: string; surname: string }
+    type?: { code?: string; name?: string }
+    staff?: { forenames?: string; surname?: string }
+    outcome?: {
+      attended?: boolean
+      complied?: boolean
+    }
   }[]
 }
 
@@ -22,6 +24,18 @@ export interface StubContactSummaryOptions {
   crn: string
   partials: any[]
   query: any
+}
+
+export interface StubGetRequirementsOptions {
+  crn: string
+  convictionId?: number
+}
+
+export interface StubGetConvictionsOptions {
+  crn: string
+  convictionId?: number
+  current?: boolean
+  previous?: boolean
 }
 
 export class CommunityMockApi {
@@ -246,7 +260,7 @@ export class CommunityMockApi {
     })
   }
 
-  async stubGetConvictions({ crn, convictionId = 1, current = true, previous = false }: CreateAppointmentArgs) {
+  async stubGetConvictions({ crn, convictionId = 1, current = true, previous = false }: StubGetConvictionsOptions) {
     const convictions = []
     if (current) {
       convictions.push({
@@ -457,7 +471,7 @@ export class CommunityMockApi {
     })
   }
 
-  async stubGetRequirements({ crn, convictionId = 1 }: CreateAppointmentArgs) {
+  async stubGetRequirements({ crn, convictionId = 1 }: StubGetRequirementsOptions) {
     return this.client.stub({
       request: {
         method: 'GET',
@@ -485,6 +499,7 @@ export class CommunityMockApi {
               length: 20,
               lengthUnit: 'Days',
               restrictive: false,
+              rarCount: 5,
             },
           ],
         },
@@ -622,7 +637,7 @@ export class CommunityMockApi {
     })
   }
 
-  async stubOffenderAppointments({ crn, partials }: StubOffenderAppointmentOptions) {
+  async stubOffenderAppointments({ crn, partials = [] }: StubOffenderAppointmentOptions) {
     return this.client.stub({
       request: {
         method: 'GET',
@@ -650,15 +665,15 @@ export class CommunityMockApi {
           },
           outcome: {
             code: '27524882-18fd-4a0e-b971-99a8f1b831e7',
-            attended: true,
-            complied: true,
+            attended: x.outcome?.attended === undefined ? true : x.outcome?.attended,
+            complied: x.outcome?.complied === undefined ? true : x.outcome?.complied,
             description: 'e-enable out-of-the-box networks',
             hoursCredited: 38436,
           },
           sensitive: false,
           type: {
-            contactType: x.type.code,
-            description: x.type.name,
+            contactType: x.type?.code || 'APAT',
+            description: x.type?.name || 'Some office visit',
             orderTypes: ['CJA', 'CJA'],
             requiresLocation: 'NOT_REQUIRED',
           },
@@ -672,8 +687,8 @@ export class CommunityMockApi {
           },
           staff: {
             code: '067232a5-96f4-436b-aa61-beb68cc0bc44',
-            forenames: x.staff.forenames,
-            surname: x.staff.surname,
+            forenames: x.staff?.forenames || 'Some',
+            surname: x.staff?.surname || 'Staff',
             unallocated: false,
           },
         })),

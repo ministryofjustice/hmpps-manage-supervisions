@@ -35,11 +35,17 @@ export class OffenderController {
   @Get('overview')
   @Render('offenders/offender/views/overview')
   async getOverview(@Param('crn') crn: string): Promise<OffenderOverviewViewModel> {
-    const offender = await this.offenderService.getOffenderDetail(crn)
+    const [offender, conviction, appointmentSummary] = await Promise.all([
+      this.offenderService.getOffenderDetail(crn),
+      this.sentenceService.getConvictionDetails(crn),
+      this.scheduleService.getAppointmentSummary(crn),
+    ])
     return {
       ...this.getBase(OffenderPage.Overview, offender),
       page: OffenderPage.Overview,
-      contactDetails: offender.contactDetails,
+      ...this.offenderService.getPersonalDetails(offender),
+      conviction,
+      appointmentSummary,
     }
   }
 
@@ -89,14 +95,14 @@ export class OffenderController {
   @Get('sentence')
   @Render('offenders/offender/views/sentence')
   async getSentence(@Param('crn') crn: string): Promise<OffenderSentenceViewModel> {
-    const [offender, sentenceDetail] = await Promise.all([
+    const [offender, conviction] = await Promise.all([
       this.offenderService.getOffenderDetail(crn),
-      this.sentenceService.getSentenceDetails(crn),
+      this.sentenceService.getConvictionDetails(crn),
     ])
     return {
       ...this.getBase(OffenderPage.Sentence, offender),
-      ...sentenceDetail,
       page: OffenderPage.Sentence,
+      conviction,
     }
   }
 
