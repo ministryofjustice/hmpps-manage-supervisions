@@ -4,7 +4,7 @@ Date: 2021-05-25
 
 ## Status
 
-Accepted
+Superceded by [10. use-assess-risks-and-needs-api](0010-use-assess-risks-and-needs-api.md)
 
 ## Context
 
