@@ -155,6 +155,11 @@ export function configFactory(): Config {
         url: string('COMMUNITY_API_URL', developmentOnly('http://localhost:8082')),
         timeout: int('COMMUNITY_API_TIMEOUT', fallback(30000)),
       },
+      assessRisksAndNeeds: {
+        enabled: true,
+        url: string('ASSESS_RISKS_AND_NEEDS_API_URL', developmentOnly('http://localhost:8082/arn')),
+        timeout: int('ASSESS_RISKS_AND_NEEDS_API_TIMEOUT', fallback(30000)),
+      },
     },
     contacts: {
       appointment,

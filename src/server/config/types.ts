@@ -67,6 +67,7 @@ export interface DependentApisConfig {
   hmppsAuth: AuthApiConfig
   tokenVerification: ApiConfig
   community: ApiConfig
+  assessRisksAndNeeds: ApiConfig
 }
 
 export enum WellKnownAppointmentType {

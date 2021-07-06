@@ -45,6 +45,9 @@ export interface StubGetConvictionsOptions {
   current?: boolean
   previous?: boolean
 }
+export interface StubOffenderRegistrationOptions {
+  crn: string
+}
 
 export class CommunityMockApi {
   constructor(private readonly client: WireMockClient) {}
@@ -845,6 +848,91 @@ export class CommunityMockApi {
           first: true,
           last: false,
           empty: partials.length === 0,
+        },
+      },
+    })
+  }
+
+  async stubOffenderRegistrations({ crn }: StubOffenderRegistrationOptions) {
+    return this.client.stub({
+      request: {
+        method: 'GET',
+        urlPath: `/community/secure/offenders/crn/${crn}/registrations`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          registrations: [
+            {
+              registrationId: 2500203758,
+              offenderId: 2500530364,
+              register: {
+                code: '2',
+                description: 'Alerts',
+              },
+              type: {
+                code: 'RSTO',
+                description: 'Restraining Order',
+              },
+              riskColour: 'Amber',
+              startDate: '2021-07-02',
+              nextReviewDate: '2022-01-02',
+              reviewPeriodMonths: 6,
+              registeringTeam: {
+                code: 'N07T01',
+                description: 'OMU A',
+              },
+              registeringOfficer: {
+                code: 'N07P007',
+                forenames: 'Archibald ZZ',
+                surname: 'Queeny',
+                unallocated: false,
+              },
+              registeringProbationArea: {
+                code: 'N07',
+                description: 'NPS London',
+              },
+              warnUser: false,
+              active: true,
+              numberOfPreviousDeregistrations: 0,
+            },
+            {
+              registrationId: 2500204257,
+              offenderId: 2500530364,
+              register: {
+                code: '1',
+                description: 'RoSH',
+              },
+              type: {
+                code: 'RMRH',
+                description: 'High RoSH',
+              },
+              riskColour: 'Red',
+              startDate: '2021-07-05',
+              nextReviewDate: '2022-01-05',
+              reviewPeriodMonths: 6,
+              registeringTeam: {
+                code: 'N07CHT',
+                description: 'Automation SPG',
+              },
+              registeringOfficer: {
+                code: 'N07A060',
+                forenames: 'NDelius26',
+                surname: 'NDelius26',
+                unallocated: false,
+              },
+              registeringProbationArea: {
+                code: 'N07',
+                description: 'NPS London',
+              },
+              warnUser: false,
+              active: true,
+              numberOfPreviousDeregistrations: 0,
+            },
+          ],
         },
       },
     })

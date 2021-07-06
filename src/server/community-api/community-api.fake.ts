@@ -21,6 +21,7 @@ import {
   Conviction,
   Offence,
   Requirement,
+  Registration,
 } from './client'
 import { merge } from 'lodash'
 import * as faker from 'faker'
@@ -363,3 +364,16 @@ export const fakeRequirement = fake<Requirement>(() => ({
   requirementTypeMainCategory: { code: RAR_REQUIREMENT_TYPE_MAIN_CATEGORY_CODE, description: 'RAR category' },
   requirementTypeSubCategory: { code: RAR_REQUIREMENT_SUB_TYPE_CATEGORY_CODE, description: 'RAR sub category' },
 }))
+
+export const fakeRegistration = fake<Registration>((partial: DeepPartial<Registration> = {}) => {
+  return merge(
+    {
+      riskColour: faker.random.arrayElement(['Red', 'Amber', 'Green', 'White']),
+      type: {
+        code: faker.random.alphaNumeric(4),
+        description: faker.commerce.productMaterial(),
+      },
+    } as Registration,
+    partial,
+  )
+})

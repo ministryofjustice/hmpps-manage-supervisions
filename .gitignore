@@ -135,3 +135,7 @@ test_results/
 src/server/community-api/client/**/*
 !src/server/community-api/client/.openapi-generator-ignore
 !src/server/community-api/client/community-api.json
+
+src/server/assess-risks-and-needs-api/client/**/*
+!src/server/assess-risks-and-needs-api/client/.openapi-generator-ignore
+!src/server/assess-risks-and-needs-api/client/assess-risks-and-needs-api.json

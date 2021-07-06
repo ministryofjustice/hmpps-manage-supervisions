@@ -9,6 +9,7 @@ import { fakeContactDetailsViewModel, fakePersonalDetailsViewModel } from './off
 import { SentenceService } from './sentence'
 import { ScheduleService } from './schedule'
 import { ActivityService } from './activity'
+import { RiskService } from './risk'
 import { fakeConvictionDetails } from './sentence/sentence.fake'
 import { fakeActivityLogEntry } from './activity/activity.fake'
 import { fakeAppointmentSummary, fakeRecentAppointments } from './schedule/schedule.fake'
@@ -19,12 +20,14 @@ describe('OffenderController', () => {
   let scheduleService: SinonStubbedInstance<ScheduleService>
   let activityService: SinonStubbedInstance<ActivityService>
   let sentenceService: SinonStubbedInstance<SentenceService>
+  let riskService: SinonStubbedInstance<RiskService>
 
   beforeEach(async () => {
     offenderService = createStubInstance(OffenderService)
     scheduleService = createStubInstance(ScheduleService)
     activityService = createStubInstance(ActivityService)
     sentenceService = createStubInstance(SentenceService)
+    riskService = createStubInstance(RiskService)
 
     const module = await Test.createTestingModule({
       controllers: [OffenderController],
@@ -33,6 +36,7 @@ describe('OffenderController', () => {
         { provide: SentenceService, useValue: sentenceService },
         { provide: ScheduleService, useValue: scheduleService },
         { provide: ActivityService, useValue: activityService },
+        { provide: RiskService, useValue: riskService },
       ],
     }).compile()
 

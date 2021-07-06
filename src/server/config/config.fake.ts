@@ -66,6 +66,7 @@ export function fakeConfig(partial: DeepPartial<Config> = {}): Config {
         },
         tokenVerification: fakeApiConfig(),
         community: fakeApiConfig(),
+        assessRisksAndNeeds: fakeApiConfig(),
       },
       contacts: CONTACT_DEFAULTS,
     },

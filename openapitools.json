@@ -16,6 +16,32 @@
           "withSeparateModelsAndApi": true,
           "enumNameSuffix": null
         }
+      },
+      "offender-assessments-api": {
+        "generatorName": "typescript-axios",
+        "output": "src/server/offender-assessments-api/client",
+        "glob": "src/server/offender-assessments-api/client/offender-assessments-api.json",
+        "modelPackage": "model",
+        "apiPackage": "api",
+        "additionalProperties": {
+          "useSingleRequestParameter": true,
+          "supportsES6": true,
+          "withSeparateModelsAndApi": true,
+          "enumNameSuffix": null
+        }
+      },
+      "assess-risks-and-needs-api": {
+        "generatorName": "typescript-axios",
+        "output": "src/server/assess-risks-and-needs-api/client",
+        "glob": "src/server/assess-risks-and-needs-api/client/assess-risks-and-needs-api.json",
+        "modelPackage": "model",
+        "apiPackage": "api",
+        "additionalProperties": {
+          "useSingleRequestParameter": true,
+          "supportsES6": true,
+          "withSeparateModelsAndApi": true,
+          "enumNameSuffix": null
+        }
       }
     }
   }

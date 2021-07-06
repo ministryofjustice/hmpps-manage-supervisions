@@ -9,6 +9,7 @@ import {
   ContactAndAttendanceApi,
   CoreOffenderApi,
   PersonalCircumstancesApi,
+  RisksAndRegistrationsApi,
   SentenceRequirementsAndBreachApi,
   StaffApi,
   TeamsApi,
@@ -53,6 +54,10 @@ export class CommunityApiService {
 
   get contactAndAttendance() {
     return this.api(ContactAndAttendanceApi)
+  }
+
+  get risks() {
+    return this.api(RisksAndRegistrationsApi)
   }
 
   private api<Api extends BaseAPI>(type: ApiConstructor<Api>): Api {

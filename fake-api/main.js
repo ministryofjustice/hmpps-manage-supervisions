@@ -43,6 +43,8 @@ app.use(
     '/secure/offenders/crn/:crn/convictions/:conviction/requirements*': '/conviction-requirements-by-conviction/:conviction',
     '/secure/offenders/crn/:crn/personalCircumstances': '/personal-circumstances-by-crn/:crn',
     '/secure/offenders/crn/:crn/personalContacts': '/personal-contacts',
+    '/secure/offenders/crn/:crn/registrations?activeOnly=true': '/registrations/:crn',
+    '/arn/risks/crn/:crn': '/rosh/:crn',
     ...paginated,
   }),
 )

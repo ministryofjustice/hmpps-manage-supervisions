@@ -17,6 +17,10 @@ export class OffenderPage extends PageBase {
     return cy.get('[data-qa="offender/arrange-appointment-button"]')
   }
 
+  get registrations() {
+    return cy.get('[data-qa="registration"]')
+  }
+
   get overview() {
     return {
       get mainOffence() {

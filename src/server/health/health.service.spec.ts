@@ -39,10 +39,11 @@ describe('HealthService', () => {
   it('should be healthy when all services are healthy', async () => {
     havingHealthyApi('hmppsAuth')
     havingHealthyApi('community')
+    havingHealthyApi('assessRisksAndNeeds')
     const { uptime, ...observed } = await service.getHealth().toPromise()
     expect(observed).toEqual({
       healthy: true,
-      checks: { hmppsAuth: 'OK', community: 'OK' },
+      checks: { hmppsAuth: 'OK', community: 'OK', assessRisksAndNeeds: 'OK' },
       build: server.build,
       version: server.version,
     })
@@ -51,10 +52,11 @@ describe('HealthService', () => {
   it('should be unhealthy when any service is unhealthy', async () => {
     havingHealthyApi('hmppsAuth', false)
     havingHealthyApi('community')
+    havingHealthyApi('assessRisksAndNeeds')
     const { uptime, ...observed } = await service.getHealth().toPromise()
     expect(observed).toEqual({
       healthy: false,
-      checks: { hmppsAuth: { status: 'DOWN' }, community: 'OK' },
+      checks: { hmppsAuth: { status: 'DOWN' }, community: 'OK', assessRisksAndNeeds: 'OK' },
       build: server.build,
       version: server.version,
     })
