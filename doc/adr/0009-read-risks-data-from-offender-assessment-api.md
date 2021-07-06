@@ -41,4 +41,4 @@ Some other risk-related data, *registrations*, are held in NDelius. We will read
 
 The Assess Risks & Needs team are very receptive to requests for changes to the API; we are one of the first users, so they want to provide us with what we need and will iterate their product to do so.
 
-As some data is currently held in both OASys and NDelius (with the NDelius data being maintained manually), there will be cases of conflicting data. We consider this to be a data quality problem which we will address through service design.
+Some data is currently held in both OASys and NDelius (e.g. RoSH scores that have corresponding registrations in Delius), with [an automated sync process that updates the Delius data](https://github.com/ministryofjustice/oasys-ndh-delius-replacement). Since the update is scheduled, rather than being instantaneous, the scores in Delius are eventually consistent, but there could be brief periods when Delius and OASys return conflicting information.
