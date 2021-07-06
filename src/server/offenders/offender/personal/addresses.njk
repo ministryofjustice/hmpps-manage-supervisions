@@ -1,0 +1,37 @@
+{% extends "partials/layout.njk" %}
+{% set pageTitle = 'Addresses - ' + displayName %}
+
+{% from './_address.njk' import addressCard %}
+
+{% block content %}
+    <h1 class="govuk-heading-xl">Addresses</h1>
+
+    {% if mainAddress %}
+        {{ addressCard(mainAddress, { qa: 'main' }) }}
+    {% else %}
+        {% set mainAddressWarning %}
+            There is no main address<br>
+            <a href='TODO'>Add a main address in Delius</a>
+        {% endset %}
+        {{ govukWarningText({
+            html: mainAddressWarning,
+            iconFallbackText: "Warning"
+        }) }}
+    {% endif %}
+
+    {% if otherAddresses.length > 0 %}
+        <h2 class="govuk-heading-l">Other addresses</h2>
+
+        {% for address in otherAddresses %}
+            {{ addressCard(address, { qa: 'other' }) }}
+        {% endfor %}
+    {% endif %}
+
+    {% if previousAddresses.length > 0 %}
+        <h2 class="govuk-heading-l">Previous addresses</h2>
+
+        {% for address in previousAddresses %}
+            {{ addressCard(address, { qa: 'previous' }) }}
+        {% endfor %}
+    {% endif %}
+{% endblock %}

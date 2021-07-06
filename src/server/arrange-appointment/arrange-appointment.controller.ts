@@ -23,6 +23,7 @@ import { DateTime } from 'luxon'
 import { ConfigService } from '@nestjs/config'
 import { Config, DebugFlags, ServerConfig } from '../config'
 import { isActiveDateRange } from '../util'
+import { Breadcrumb, BreadcrumbType, LinksService } from '../common/links'
 
 type RenderOrRedirect = AppointmentWizardViewModel | RedirectResponse
 
@@ -38,10 +39,16 @@ export class ArrangeAppointmentController {
     private readonly service: ArrangeAppointmentService,
     private readonly wizard: AppointmentWizardService,
     private readonly config: ConfigService<Config>,
+    private readonly links: LinksService,
   ) {}
 
   @Get()
   @Redirect()
+  @Breadcrumb({
+    type: BreadcrumbType.NewAppointment,
+    parent: BreadcrumbType.Case,
+    title: 'New appointment',
+  })
   async get(
     @Param('crn') crn: string,
     @Session() session: AppointmentWizardSession,
@@ -377,7 +384,7 @@ export class ArrangeAppointmentController {
       step: AppointmentWizardStep.Confirm,
       appointment,
       paths: {
-        next: `/offender/${offenderDetails.otherIds.crn}/overview`,
+        next: this.links.getUrl(BreadcrumbType.Case, { crn: offenderDetails.otherIds.crn }),
       },
       offender: {
         firstName: offenderDetails.firstName,

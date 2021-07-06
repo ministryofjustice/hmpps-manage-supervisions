@@ -2,6 +2,7 @@ import { ViewModel } from '../../common'
 import { AppointmentBuilderDto } from './AppointmentBuilderDto'
 import { AppointmentType, OfficeLocation } from '../../community-api'
 import { WellKnownAppointmentType, WellKnownAppointmentTypeMeta } from '../../config'
+import { ValidationError } from 'class-validator'
 
 export enum AppointmentWizardStep {
   Type = 'type',
@@ -14,8 +15,19 @@ export enum AppointmentWizardStep {
   Confirm = 'confirm',
 }
 
-interface AppointmentWizardViewModelBase extends ViewModel<AppointmentBuilderDto, 'appointment'> {
+interface AppointmentWizardViewModelBase extends ViewModel {
   step: AppointmentWizardStep
+  errors?: ValidationError[] | null
+  paths?: {
+    back?: string
+    type?: string
+    where?: string
+    when?: string
+    next?: string
+    sensitive?: string
+    notes?: string
+  }
+  appointment: AppointmentBuilderDto
 }
 
 export interface FeaturedAppointmentType {

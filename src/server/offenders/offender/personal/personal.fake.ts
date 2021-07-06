@@ -1,15 +1,42 @@
 import * as faker from 'faker'
-import { ContactDetailsViewModel, PersonalDetailsViewModel } from './offender-view-model'
-import { fake } from '../../util/util.fake'
+import { fake } from '../../../util/util.fake'
 import { DateTime } from 'luxon'
+import {
+  AddressDetail,
+  ContactDetailsViewModel,
+  GetAddressDetailResult,
+  PersonalDetailsViewModel,
+} from './personal.types'
 
-export const fakeContactDetailsViewModel = fake<ContactDetailsViewModel>(() => ({
-  address: {
+function fakeFullName() {
+  return `${faker.name.firstName()} ${faker.name.lastName()}`
+}
+
+export const fakeAddressDetail = fake<AddressDetail>((partial = {}) => {
+  const active = partial.active === undefined ? faker.datatype.boolean() : partial.active
+  return {
+    name: faker.lorem.sentence(),
     lines: [faker.address.streetAddress(), faker.address.city(), faker.address.zipCode()],
     phone: faker.phone.phoneNumber(),
     type: 'Approved Premises',
     startDate: DateTime.fromJSDate(faker.date.past()),
-  },
+    endDate: active ? null : DateTime.fromJSDate(faker.date.recent()),
+    lastUpdated: DateTime.fromJSDate(faker.date.past()),
+    active,
+    main: false,
+    notes: faker.lorem.sentence(),
+    status: faker.company.bs(),
+  }
+})
+
+export const fakeGetAddressDetailResult = fake<GetAddressDetailResult>(() => ({
+  mainAddress: fakeAddressDetail({ main: true, active: true }),
+  otherAddresses: [fakeAddressDetail({ main: false, active: true })],
+  previousAddresses: [fakeAddressDetail({ main: false, active: false })],
+}))
+
+export const fakeContactDetailsViewModel = fake<ContactDetailsViewModel>(() => ({
+  address: fakeAddressDetail({ main: true, active: true }),
   phoneNumbers: {
     mobile: faker.phone.phoneNumber(),
     other: faker.phone.phoneNumber(),
@@ -29,10 +56,6 @@ export const fakeContactDetailsViewModel = fake<ContactDetailsViewModel>(() => (
   ],
   lastUpdated: DateTime.fromJSDate(faker.date.past()),
 }))
-
-function fakeFullName() {
-  return `${faker.name.firstName()} ${faker.name.lastName()}`
-}
 
 export const fakePersonalDetailsViewModel = fake<PersonalDetailsViewModel>(() => ({
   name: fakeFullName(),

@@ -1,8 +1,9 @@
 import { ActivityLogEntry } from './activity'
-import { DateTime } from 'luxon'
 import { ConvictionDetails } from './sentence'
 import { AppointmentSummary, RecentAppointments } from './schedule'
 import { RegistrationFlag, Risks } from './risk/risk.types'
+import { GetPersonalDetailsResult } from './personal'
+import { ViewModel } from '../../common'
 
 export enum OffenderPage {
   Overview = 'overview',
@@ -22,7 +23,7 @@ export interface OffenderLinks extends OffenderPageLinks {
   disabilities: string
 }
 
-export interface OffenderViewModelBase {
+export interface OffenderViewModelBase extends ViewModel {
   page: OffenderPage
   ids: {
     crn: string
@@ -33,11 +34,9 @@ export interface OffenderViewModelBase {
   registrations?: RegistrationFlag[]
 }
 
-export interface OffenderOverviewViewModel extends OffenderViewModelBase {
+export interface OffenderOverviewViewModel extends OffenderViewModelBase, GetPersonalDetailsResult {
   page: OffenderPage.Overview
   conviction?: ConvictionDetails
-  contactDetails: ContactDetailsViewModel
-  personalDetails: PersonalDetailsViewModel
   appointmentSummary: AppointmentSummary
   risks: Risks
 }
@@ -56,50 +55,8 @@ export interface OffenderActivityViewModel extends OffenderViewModelBase {
   }
 }
 
-export interface ContactDetailsViewModel {
-  address?: {
-    lines: string[]
-    type?: string
-    phone?: string
-    startDate: DateTime
-  }
-  otherAddresses: {
-    current: number
-    previous: number
-  }
-  phoneNumbers: {
-    mobile?: string
-    other?: string
-  }
-  emailAddresses: string[]
-  personalContacts: {
-    link: string
-    type: string
-    name: string
-  }[]
-  lastUpdated?: DateTime
-}
-
-export interface PersonalDetailsViewModel {
-  name: string
-  dateOfBirth?: DateTime
-  preferredName?: string
-  aliases: string[]
-  previousName?: string
-  preferredLanguage?: string
-  currentCircumstances: string[]
-  disabilities: string[]
-  religion?: string
-  sex?: string
-  genderIdentity?: string
-  selfDescribedGender?: string
-  sexualOrientation?: string
-}
-
-export interface OffenderPersonalViewModel extends OffenderViewModelBase {
+export interface OffenderPersonalViewModel extends OffenderViewModelBase, GetPersonalDetailsResult {
   page: OffenderPage.Personal
-  contactDetails: ContactDetailsViewModel
-  personalDetails: PersonalDetailsViewModel
 }
 
 export interface OffenderSentenceViewModel extends OffenderViewModelBase {

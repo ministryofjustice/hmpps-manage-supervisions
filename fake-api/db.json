@@ -28,7 +28,7 @@
         ],
         "addresses": [
           {
-            "from": "2015-07-16",
+            "from": "2018-08-01",
             "noFixedAbode": false,
             "addressNumber": "1",
             "streetName": "High Street",
@@ -49,6 +49,35 @@
             "latestAssessmentDate": "2021-06-11T12:00:00",
             "createdDatetime": "2021-06-11T13:00:00",
             "lastUpdatedDatetime": "2021-06-11T14:00:00"
+          },
+          {
+            "from": "2016-01-08",
+            "noFixedAbode": false,
+            "addressNumber": "24",
+            "buildingName": "The Mill",
+            "streetName": "Sherbourne Street",
+            "town": "Birmingham",
+            "county": "West Midlands",
+            "postcode": "B16 8TP",
+            "status": {
+              "code": "S",
+              "description": "Secondary"
+            },
+            "typeVerified": false,
+            "createdDatetime": "2018-07-09T13:58:58",
+            "lastUpdatedDatetime": "2018-08-01T02:02:07"
+          },
+          {
+            "from": "2016-01-08",
+            "to": "2018-08-01",
+            "noFixedAbode": true,
+            "status": {
+              "code": "P",
+              "description": "Previous"
+            },
+            "typeVerified": false,
+            "createdDatetime": "2018-07-09T13:58:58",
+            "lastUpdatedDatetime": "2018-08-01T02:02:07"
           }
         ],
         "emailAddresses": [

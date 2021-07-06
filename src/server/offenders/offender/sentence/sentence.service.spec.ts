@@ -5,7 +5,7 @@ import { CommunityApiService } from '../../../community-api'
 import { fakeConviction, fakeRequirement } from '../../../community-api/community-api.fake'
 import { fakeOkResponse } from '../../../common/rest/rest.fake'
 import { DateTime } from 'luxon'
-import { quantity } from '../../../util/math'
+import { quantity } from '../../../util'
 import { ConvictionDetails } from './sentence.types'
 
 describe('SentenceService', () => {
