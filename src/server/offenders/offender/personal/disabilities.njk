@@ -1,0 +1,84 @@
+{% extends "partials/layout.njk" %}
+{% set pageTitle = 'Disabilities and adjustments - ' + displayName %}
+
+{% from 'components/summary-card.njk' import appSummaryCard %}
+
+{% block content %}
+    <h1 class="govuk-heading-xl">Disabilities and adjustments</h1>
+
+    {% if disabilities.length > 0 %}
+        {% for disability in disabilities %}
+            {% set adjustmentDetails %}
+                {% if disability.adjustments.length === 0 %}
+                    None
+                {% endif %}
+
+                {% for adjustment in disability.adjustments %}
+                    {{ govukDetails({
+                        summaryText: adjustment.name,
+                        classes: 'govuk-!-margin-top-2 govuk-!-margin-bottom-0',
+                        attributes: {
+                            'data-qa': 'adjustment'
+                        },
+                        html: govukSummaryList({
+                            rows: [
+                                {
+                                    key: { text: "Adjustment" },
+                                    value: { text: adjustment.name }
+                                },
+                                {
+                                    key: { text: "Start date" },
+                                    value: { text: adjustment.startDate | shortDate }
+                                },
+                                {
+                                    key: { text: "End date" },
+                                    value: { text: adjustment.endDate | shortDate }
+                                } if adjustment.endDate,
+                                {
+                                    key: { text: "Notes" },
+                                    value: { html: adjustment.notes | nl2br }
+                                } if adjustment.notes
+                            ]
+                        })
+                    }) }}
+                {% endfor %}
+            {% endset %}
+
+            {% call appSummaryCard({
+                titleText: disability.name,
+                classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
+                attributes: {
+                    'data-qa': 'offender/disabilities/disability'
+                } }) -%}
+                {{ govukSummaryList({
+                    rows: [
+                        {
+                            key: { text: "Disability" },
+                            value: { text: disability.name }
+                        },
+                        {
+                            key: { text: "Start date" },
+                            value: { text: disability.startDate | shortDate }
+                        },
+                        {
+                            key: { text: "End date" },
+                            value: { text: disability.endDate | shortDate }
+                        } if disability.endDate,
+                        {
+                            key: { text: "Notes" },
+                            value: { html: disability.notes | nl2br }
+                        } if disability.notes,
+                        {
+                            key: { text: "Adjustments" },
+                            value: { html: adjustmentDetails }
+                        }
+                    ]
+                }) }}
+            {%- endcall %}
+        {% endfor %}
+    {% else %}
+        <p class='govuk-body'>
+            {{ displayName }} has no disabilities.
+        </p>
+    {% endif %}
+{% endblock %}

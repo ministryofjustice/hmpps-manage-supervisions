@@ -112,6 +112,14 @@
                 }
               }
             ]
+          },
+          {
+            "disabilityId": 2500081088,
+            "disabilityType": {
+              "code": "DY",
+              "description": "Dyslexia"
+            },
+            "startDate": "2021-07-02"
           }
         ],
         "genderIdentity": "Prefer to self-describe",

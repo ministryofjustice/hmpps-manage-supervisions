@@ -10,7 +10,7 @@ import {
 } from '../../../community-api'
 import { getDisplayName, isActiveDateRange, titleCase, sentenceCase } from '../../../util'
 import { DateTime } from 'luxon'
-import { AddressDetail, GetAddressDetailResult, GetPersonalDetailsResult } from './personal.types'
+import { AddressDetail, DisabilityDetail, GetAddressDetailResult, GetPersonalDetailsResult } from './personal.types'
 
 function getLanguageSummary(languages: OffenderLanguages) {
   if (!languages.primaryLanguage) {
@@ -85,6 +85,37 @@ export class PersonalService {
       ),
       previousAddresses: orderBy(previous, [x => x.startDate.toJSDate(), x => x.endDate?.toJSDate()], ['desc', 'desc']),
     }
+  }
+
+  getDisabilities(offender: OffenderDetail): DisabilityDetail[] {
+    if (!offender.offenderProfile.disabilities) {
+      return []
+    }
+
+    return orderBy(
+      offender.offenderProfile.disabilities.map(x => {
+        const startDate = DateTime.fromISO(x.startDate)
+        const endDate = x.endDate ? DateTime.fromISO(x.endDate) : null
+        return {
+          name: x.disabilityType.description,
+          active: isActiveDateRange({ startDate, endDate }),
+          startDate,
+          endDate,
+          notes: x.notes,
+          adjustments:
+            x.provisions
+              ?.map(provision => ({
+                startDate: DateTime.fromISO(provision.startDate),
+                endDate: provision.finishDate ? DateTime.fromISO(provision.finishDate) : null,
+                name: provision.provisionType.description,
+                notes: provision.notes,
+              }))
+              .filter(isActiveDateRange) || [],
+        }
+      }),
+      [x => x.startDate.toJSDate(), x => x.endDate?.toJSDate()],
+      ['desc', 'desc'],
+    )
   }
 
   async getPersonalDetails(offender: OffenderDetail): Promise<GetPersonalDetailsResult> {

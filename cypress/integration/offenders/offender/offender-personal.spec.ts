@@ -1,5 +1,6 @@
 import { ViewOffenderFixture } from './view-offender.fixture'
 import { ADDRESS, OffenderAddressesPage } from '../../../pages/offender-addresses.page'
+import { OffenderDisabilitiesPage } from '../../../pages/offender-disabilities.page'
 
 class Fixture extends ViewOffenderFixture {
   whenClickingViewAllAddresses(): this {
@@ -8,39 +9,86 @@ class Fixture extends ViewOffenderFixture {
     })
   }
 
-  shouldRenderAddressesPage(assert: (page: OffenderAddressesPage) => void): this {
-    const addresses = new OffenderAddressesPage()
-    assert(addresses)
+  whenClickingViewAllDisabilities() {
+    return this.shouldRenderOffenderTab('personal', page => {
+      page.tableValue('personal', 'Disabilities and adjustments').contains('View details and notes').click()
+    })
+  }
+
+  shouldRenderAddress(type: ADDRESS, expected: ExpectedAddress): this {
+    const page = new OffenderAddressesPage()
+    page.pageTitle.contains('Addresses')
+    page.addressTitle(type).contains(expected.name)
+    page.address(type, 'Status').contains(expected.status)
+    page.address(type, 'Address').contains(expected.address)
+    if (expected.phone) {
+      page.address(type, 'Address telephone').contains(expected.phone)
+    } else {
+      page.addressCell(type, 'Address telephone').should('not.exist')
+    }
+    if (expected.type) {
+      page.address(type, 'Type of address').contains(expected.type)
+    } else {
+      page.addressCell(type, 'Type of address').should('not.exist')
+    }
+    page.address(type, 'Start date').contains(expected.startDate)
+    if (expected.endDate) {
+      page.address(type, 'End date').contains(expected.endDate)
+    } else {
+      page.addressCell(type, 'End date').should('not.exist')
+    }
+    if (expected.notes) {
+      page.address(type, 'Notes').contains(expected.notes)
+    } else {
+      page.addressCell(type, 'Notes').should('not.exist')
+    }
+
     return this
   }
 
-  shouldRenderAddress(type: ADDRESS, expected: ExpectedAddress) {
-    return this.shouldRenderAddressesPage(page => {
-      page.addressTitle(type).contains(expected.name)
-      page.address(type, 'Status').contains(expected.status)
-      page.address(type, 'Address').contains(expected.address)
-      if (expected.phone) {
-        page.address(type, 'Address telephone').contains(expected.phone)
-      } else {
-        page.addressCell(type, 'Address telephone').should('not.exist')
-      }
-      if (expected.type) {
-        page.address(type, 'Type of address').contains(expected.type)
-      } else {
-        page.addressCell(type, 'Type of address').should('not.exist')
-      }
-      page.address(type, 'Start date').contains(expected.startDate)
+  shouldRenderDisability(expected: ExpectedDisability): this {
+    const page = new OffenderDisabilitiesPage()
+
+    page.pageTitle.contains('Disabilities and adjustments')
+    page.disability(expected.name, card => {
+      card.value('Disability').contains(expected.name)
+      card.value('Start date').contains(expected.startDate)
       if (expected.endDate) {
-        page.address(type, 'End date').contains(expected.endDate)
+        card.value('End date').contains(expected.endDate)
       } else {
-        page.addressCell(type, 'End date').should('not.exist')
+        card.cell('End date').should('not.exist')
       }
       if (expected.notes) {
-        page.address(type, 'Notes').contains(expected.notes)
+        card.value('Notes').contains(expected.notes)
       } else {
-        page.addressCell(type, 'Notes').should('not.exist')
+        card.cell('Notes').should('not.exist')
+      }
+
+      for (const adjustment of expected.adjustments) {
+        card.adjustment(adjustment.name, subject => {
+          subject.open()
+          subject.value('Adjustment').contains(adjustment.name)
+          subject.value('Start date').contains(adjustment.startDate)
+          if (adjustment.endDate) {
+            subject.value('End date').contains(adjustment.endDate)
+          } else {
+            subject.cell('End date').should('not.exist')
+          }
+
+          if (adjustment.notes) {
+            subject.value('Notes').contains(adjustment.notes)
+          } else {
+            subject.cell('Notes').should('not.exist')
+          }
+        })
+      }
+
+      if (expected.adjustments.length === 0) {
+        card.value('Adjustments').contains('None')
       }
     })
+
+    return this
   }
 }
 
@@ -53,6 +101,19 @@ interface ExpectedAddress {
   startDate: string
   endDate?: string
   notes?: string
+}
+
+interface ExpectedDisability {
+  name: string
+  startDate: string
+  endDate?: string
+  notes?: string
+  adjustments: {
+    name: string
+    startDate: string
+    endDate?: string
+    notes?: string
+  }[]
 }
 
 context('ViewOffenderPersonalDetails', () => {
@@ -113,9 +174,6 @@ context('ViewOffenderPersonalDetails', () => {
       .whenViewingOffender()
       .whenClickingSubNavTab('personal')
       .whenClickingViewAllAddresses()
-      .shouldRenderAddressesPage(page => {
-        page.header.contains('Addresses')
-      })
       .shouldRenderAddress('main', {
         name: 'Main address - Since 16 July 2015',
         status: 'Main address',
@@ -138,6 +196,31 @@ context('ViewOffenderPersonalDetails', () => {
         type: 'Tent (not verified)',
         startDate: '16 July 2001',
         endDate: '16 July 2015',
+      })
+  })
+
+  it('displays all disability details', () => {
+    fixture
+      .havingOffender()
+      .whenViewingOffender()
+      .whenClickingSubNavTab('personal')
+      .whenClickingViewAllDisabilities()
+      .shouldRenderDisability({
+        name: 'Learning Difficulties',
+        startDate: '1 February 2021',
+        adjustments: [{ name: 'Other', startDate: '10 May 2021', notes: 'Extra tuition' }],
+      })
+      .shouldRenderDisability({
+        name: 'Speech Impairment',
+        startDate: '1 March 2021',
+        notes: 'Talks like a pirate',
+        adjustments: [],
+      })
+      .shouldRenderDisability({
+        name: 'Dyslexia',
+        startDate: '1 April 2020',
+        endDate: '1 May 2020',
+        adjustments: [],
       })
   })
 })

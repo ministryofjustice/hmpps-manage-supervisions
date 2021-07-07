@@ -256,7 +256,17 @@ export class CommunityMockApi {
                   code: 'SI',
                   description: 'Speech Impairment',
                 },
-                startDate: '2021-02-01',
+                startDate: '2021-03-01',
+                notes: 'Talks like a pirate',
+              },
+              {
+                disabilityId: 2500080089,
+                disabilityType: {
+                  code: 'D',
+                  description: 'Dyslexia',
+                },
+                startDate: '2020-04-01',
+                endDate: '2020-05-01',
               },
             ],
           },
