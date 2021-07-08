@@ -8,10 +8,12 @@ import { SentenceService } from './offender/sentence/sentence.service'
 import { ScheduleService } from './offender/schedule/schedule.service'
 import { ActivityService } from './offender/activity/activity.service'
 import { RiskService } from './offender/risk/risk.service'
+import { PersonalController } from './offender/personal/personal.controller'
+import { PersonalService } from './offender/personal/personal.service'
 
 @Module({
   imports: [CommonModule, CommunityApiModule, AssessRisksAndNeedsApiModule],
-  controllers: [OffenderController],
-  providers: [OffenderService, SentenceService, ScheduleService, ActivityService, RiskService],
+  controllers: [OffenderController, PersonalController],
+  providers: [OffenderService, SentenceService, ScheduleService, ActivityService, RiskService, PersonalService],
 })
 export class OffendersModule {}

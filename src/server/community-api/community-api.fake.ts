@@ -22,6 +22,8 @@ import {
   Offence,
   Requirement,
   Registration,
+  PersonalCircumstance,
+  PersonalContact,
 } from './client'
 import { merge } from 'lodash'
 import * as faker from 'faker'
@@ -112,7 +114,7 @@ export const fakeOffenderAlias = fake<OffenderAlias>(() => ({
 
 export const fakeOffenderDetail = fake<OffenderDetail>((options, partial) => ({
   offenderId: faker.datatype.number(),
-  otherIds: { crn: 'some-crn' },
+  otherIds: { crn: 'some-crn', pncNumber: 'some-prn' },
   activeProbationManagedSentence: true,
   firstName: faker.name.firstName(),
   surname: faker.name.lastName(),
@@ -151,31 +153,47 @@ export const fakeOfficeLocation = fake<OfficeLocation>(() => ({
   description: faker.address.streetAddress(),
 }))
 
-export function fakePersonalCircumstances(partial: DeepPartial<PersonalCircumstances> = {}): PersonalCircumstances {
-  return merge(
-    {
-      personalCircumstances: [
-        {
-          startDate: fakeIsoDate(),
-          endDate: fakeIsoDate('future'),
-          evidenced: faker.datatype.boolean(),
-          notes: faker.lorem.lines(),
-          offenderId: faker.datatype.number(),
-          personalCircumstanceId: faker.datatype.number(),
-          personalCircumstanceSubType: {
-            code: faker.lorem.slug(3),
-            description: faker.lorem.slug(10),
-          },
-          personalCircumstanceType: {
-            code: 'B',
-            description: faker.lorem.slug(10),
-          },
-        },
-      ],
-    } as PersonalCircumstances,
-    partial,
-  )
-}
+export const fakePersonalCircumstance = fake<PersonalCircumstance>(() => ({
+  startDate: fakeIsoDate(),
+  endDate: fakeIsoDate('future'),
+  evidenced: faker.datatype.boolean(),
+  notes: faker.lorem.lines(),
+  offenderId: faker.datatype.number(),
+  personalCircumstanceId: faker.datatype.number(),
+  personalCircumstanceSubType: {
+    code: faker.lorem.slug(3),
+    description: faker.lorem.slug(10),
+  },
+  personalCircumstanceType: {
+    code: 'B',
+    description: faker.lorem.slug(10),
+  },
+}))
+
+export const fakePersonalCircumstances = fake<PersonalCircumstances>(() => ({
+  personalCircumstances: [fakePersonalCircumstance()],
+}))
+
+export const fakePersonalContact = fake<PersonalContact>(() => ({
+  personalContactId: faker.datatype.number(),
+  title: faker.name.title(),
+  firstName: faker.name.firstName(),
+  otherNames: faker.name.middleName(),
+  surname: faker.name.lastName(),
+  previousSurname: faker.name.lastName(),
+  relationship: 'Wife',
+  gender: 'Female',
+  relationshipType: {
+    code: 'NK',
+    description: 'Next of Kin',
+  },
+  startDate: fakeIsoDate(),
+  createdDatetime: faker.date.past().toISOString(),
+  lastUpdatedDatetime: faker.date.past().toISOString(),
+  emailAddress: faker.internet.email(),
+  mobileNumber: faker.phone.phoneNumber(),
+  notes: faker.lorem.sentence(),
+}))
 
 export const fakeStaffDetails = fake<StaffDetails>(() => ({
   username: faker.lorem.slug(10),

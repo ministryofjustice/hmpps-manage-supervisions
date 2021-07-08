@@ -13,10 +13,6 @@ export class OffenderPage extends PageBase {
     return cy.url().then(url => url.match(/\/offender\/.+\/(.+)/)[1])
   }
 
-  get arrangeAppointmentButton() {
-    return cy.get('[data-qa="offender/arrange-appointment-button"]')
-  }
-
   get registrations() {
     return cy.get('[data-qa="registration"]')
   }
@@ -55,6 +51,10 @@ export class OffenderPage extends PageBase {
 
   get schedule() {
     return {
+      get arrangeAppointmentButton() {
+        return cy.get('[data-qa="offender/arrange-appointment-button"]')
+      },
+
       tableCaption(table: TABLE) {
         return cy.get(`table[data-qa="offender/schedule/${table}"] > caption`)
       },
@@ -121,6 +121,14 @@ export class OffenderPage extends PageBase {
     return {
       tableValue(table: 'contact' | 'personal' | 'equality', title: string) {
         return cy.get(`dl[data-qa="offender/personal-details/${table}"] dt`).contains(title).siblings('dd')
+      },
+
+      get viewMainAddressDetails() {
+        return cy.get('[data-qa="offender/personal-details/address-details"]')
+      },
+
+      mainAddressDetails(title: string) {
+        return cy.get('[data-qa="offender/personal-details/address-details"] dl dt').contains(title).siblings('dd')
       },
     }
   }

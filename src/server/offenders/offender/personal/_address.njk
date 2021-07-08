@@ -1,0 +1,48 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from 'components/summary-card.njk' import appSummaryCard %}
+{% from '_join.njk' import join %}
+
+{% macro addressCard(address, options) %}
+
+{% call appSummaryCard({
+    titleText: address.name,
+    classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
+    attributes: {
+        'data-qa': 'offender/addresses/' + options.qa
+    } })
+-%}
+    {{ govukSummaryList({
+        rows: [
+            {
+                key: { text: "Status" },
+                value: { text: address.status }
+            },
+            {
+                key: { text: "Address" },
+                value: { text: join(address.lines) }
+            },
+            {
+                key: { text: "Address telephone" },
+                value: { text: address.phone }
+            } if address.phone,
+            {
+                key: { text: "Type of address" },
+                value: { text: address.type }
+            } if address.type,
+            {
+                key: { text: "Start date" },
+                value: { text: address.startDate | shortDate }
+            },
+            {
+                key: { text: "End date" },
+                value: { text: address.endDate | shortDate }
+            } if address.endDate,
+            {
+                key: { text: "Notes" },
+                value: { html: address.notes | nl2br }
+            } if address.notes
+        ]
+    }) }}
+{%- endcall %}
+
+{% endmacro %}

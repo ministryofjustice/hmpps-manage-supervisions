@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { CommunityApiService, isRar, Offence, Requirement, Sentence } from '../../../community-api'
 import { maxBy } from 'lodash'
 import { DateTime, Duration, DurationUnit } from 'luxon'
-import { quantity } from '../../../util/math'
+import { quantity } from '../../../util'
 import { ConvictionOffence, ConvictionDetails } from './sentence.types'
 
 @Injectable()

@@ -2,7 +2,6 @@
 
 {% from "govuk/components/accordion/macro.njk"        import govukAccordion %}
 {% from "govuk/components/back-link/macro.njk"        import govukBackLink %}
-{% from "govuk/components/breadcrumbs/macro.njk"      import govukBreadcrumbs %}
 {% from "govuk/components/button/macro.njk"           import govukButton %}
 {% from "govuk/components/character-count/macro.njk"  import govukCharacterCount %}
 {% from "govuk/components/checkboxes/macro.njk"       import govukCheckboxes %}
@@ -25,6 +24,7 @@
 {% from "govuk/components/tag/macro.njk"              import govukTag %}
 {% from "govuk/components/textarea/macro.njk"         import govukTextarea %}
 {% from "govuk/components/warning-text/macro.njk"     import govukWarningText %}
+{% from "govuk/components/breadcrumbs/macro.njk"      import govukBreadcrumbs %}
 
 {% block head %}
   <link href="/assets/client.css?{{ version }}" rel="stylesheet"/>
@@ -34,7 +34,9 @@
 
 {% endblock %}
 
-{% block pageTitle %}{{pageTitle | default(applicationName)}}{% endblock %}
+{% block pageTitle %}
+  {{ pageTitle | default(applicationName) }}
+{% endblock %}
 
 {% block header %}
   {% include "./header.njk" %}
@@ -42,6 +44,13 @@
 
 {% block beforeContent %}
   {% block pageNavigation %}{% endblock %}
+  {% if breadcrumbs and breadcrumbs.length > 0 %}
+    {{ govukBreadcrumbs({
+      collapseOnMobile: true,
+      items: breadcrumbs,
+      classes: "govuk-!-display-none-print"
+    }) }}
+  {% endif %}
 {% endblock %}
 
 {% block bodyStart %}

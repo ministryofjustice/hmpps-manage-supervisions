@@ -5,6 +5,10 @@ export function titleCase(sentence: string): string {
   return sentence?.trim()?.replace(/\w+/g, capitalize) ?? ''
 }
 
+export function sentenceCase(sentence: string): string {
+  return sentence?.trim()?.replace(/\w+/, capitalize) ?? ''
+}
+
 export function staffName(staff?: StaffHuman): string | null {
   if (!staff || staff.unallocated) {
     return null
