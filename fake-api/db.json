@@ -238,7 +238,32 @@
             "code": "N07",
             "description": "NPS London"
           },
-          "evidenced": true
+          "evidenced": true,
+          "notes": "Lives apart",
+          "createdDatetime": "2021-07-02T12:02:00",
+          "lastUpdatedDatetime": "2021-07-02T13:04:00"
+        },
+        {
+          "personalCircumstanceId": 2500147504,
+          "offenderId": 2500184815,
+          "personalCircumstanceType": {
+            "code": "H",
+            "description": "Relationship"
+          },
+          "personalCircumstanceSubType": {
+            "code": "H02",
+            "description": "Married / Civil partnership"
+          },
+          "startDate": "2005-04-01",
+          "endDate": "2021-07-02",
+          "probationArea": {
+            "code": "N07",
+            "description": "NPS London"
+          },
+          "evidenced": true,
+          "notes": "Previous marriage",
+          "createdDatetime": "2005-04-01T12:02:00",
+          "lastUpdatedDatetime": "2021-07-02T13:04:00"
         }
       ]
     }

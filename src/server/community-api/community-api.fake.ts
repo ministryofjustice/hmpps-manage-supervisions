@@ -168,6 +168,8 @@ export const fakePersonalCircumstance = fake<PersonalCircumstance>(() => ({
     code: 'B',
     description: faker.lorem.slug(10),
   },
+  createdDatetime: faker.date.past().toISOString(),
+  lastUpdatedDatetime: faker.date.recent().toISOString(),
 }))
 
 export const fakePersonalCircumstances = fake<PersonalCircumstances>(() => ({

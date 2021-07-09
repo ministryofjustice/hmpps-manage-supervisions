@@ -2,8 +2,14 @@ import { Controller, Get, Param, Render } from '@nestjs/common'
 import { Breadcrumb, BreadcrumbType, LinksService } from '../../../common/links'
 import { PersonalService } from './personal.service'
 import { OffenderService } from '../offender.service'
-import { PersonalAddressesViewModel, PersonalDisabilitiesViewModel } from './personal.types'
+import {
+  OffenderViewModel,
+  PersonalAddressesViewModel,
+  PersonalCircumstancesViewModel,
+  PersonalDisabilitiesViewModel,
+} from './personal.types'
 import { getDisplayName } from '../../../util'
+import { OffenderDetail } from '../../../community-api'
 
 @Controller('offender/:crn(\\w+)/personal')
 export class PersonalController {
@@ -22,15 +28,9 @@ export class PersonalController {
   })
   async getAddresses(@Param('crn') crn: string): Promise<PersonalAddressesViewModel> {
     const offender = await this.offender.getOffenderDetail(crn)
-
-    const displayName = getDisplayName(offender)
     return {
+      ...this.getViewModel(crn, offender, BreadcrumbType.PersonalAddresses),
       ...this.personal.getAddressDetail(offender),
-      displayName,
-      breadcrumbs: this.links.resolveAll(BreadcrumbType.PersonalAddresses, {
-        crn,
-        offenderName: displayName,
-      }),
     }
   }
 
@@ -43,14 +43,9 @@ export class PersonalController {
   })
   async getDisabilities(@Param('crn') crn: string): Promise<PersonalDisabilitiesViewModel> {
     const offender = await this.offender.getOffenderDetail(crn)
-    const displayName = getDisplayName(offender)
     return {
+      ...this.getViewModel(crn, offender, BreadcrumbType.PersonalDisabilities),
       disabilities: this.personal.getDisabilities(offender),
-      displayName,
-      breadcrumbs: this.links.resolveAll(BreadcrumbType.PersonalDisabilities, {
-        crn,
-        offenderName: displayName,
-      }),
     }
   }
 
@@ -61,7 +56,25 @@ export class PersonalController {
     parent: BreadcrumbType.PersonalDetails,
     title: 'Personal circumstances',
   })
-  async getPersonalCircumstances(): Promise<any> {
-    throw new Error('not implemented')
+  async getPersonalCircumstances(@Param('crn') crn: string): Promise<PersonalCircumstancesViewModel> {
+    const [offender, circumstances] = await Promise.all([
+      this.offender.getOffenderDetail(crn),
+      this.personal.getPersonalCircumstances(crn),
+    ])
+    return {
+      ...this.getViewModel(crn, offender, BreadcrumbType.PersonalCircumstances),
+      circumstances,
+    }
+  }
+
+  private getViewModel(crn: string, offender: OffenderDetail, breadcrumbType: BreadcrumbType): OffenderViewModel {
+    const displayName = getDisplayName(offender)
+    return {
+      displayName,
+      breadcrumbs: this.links.resolveAll(breadcrumbType, {
+        crn,
+        offenderName: displayName,
+      }),
+    }
   }
 }

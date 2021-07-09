@@ -1,6 +1,7 @@
 import { ViewOffenderFixture } from './view-offender.fixture'
 import { ADDRESS, OffenderAddressesPage } from '../../../pages/offender-addresses.page'
 import { OffenderDisabilitiesPage } from '../../../pages/offender-disabilities.page'
+import { OffenderPersonalCircumstancesPage } from '../../../pages/offender-personal-circumstances.page'
 
 class Fixture extends ViewOffenderFixture {
   whenClickingViewAllAddresses(): this {
@@ -12,6 +13,12 @@ class Fixture extends ViewOffenderFixture {
   whenClickingViewAllDisabilities() {
     return this.shouldRenderOffenderTab('personal', page => {
       page.tableValue('personal', 'Disabilities and adjustments').contains('View details and notes').click()
+    })
+  }
+
+  whenClickingViewAllPersonalCircumstances() {
+    return this.shouldRenderOffenderTab('personal', page => {
+      page.tableValue('personal', 'Current circumstances').contains('View details and previous circumstances').click()
     })
   }
 
@@ -87,7 +94,25 @@ class Fixture extends ViewOffenderFixture {
         card.value('Adjustments').contains('None')
       }
     })
+    return this
+  }
 
+  shouldRenderPersonalCircumstance(expected: ExpectedCircumstance): this {
+    const page = new OffenderPersonalCircumstancesPage()
+    page.pageTitle.contains('Personal circumstances')
+    page.circumstance(`${expected.type} ${expected.subType}`, card => {
+      card.value('Type').contains(expected.type)
+      card.value('Sub-type').contains(expected.subType)
+      card.value('Start date').contains(expected.startDate)
+      if (expected.endDate) {
+        card.value('End date').contains(expected.endDate)
+      } else {
+        card.cell('End date').should('not.exist')
+      }
+      card.value('Verified').contains(expected.verified ? 'Yes' : 'No')
+      card.value('Notes').contains(expected.notes || 'No Notes')
+      card.lastUpdated.contains(expected.lastUpdated)
+    })
     return this
   }
 }
@@ -114,6 +139,16 @@ interface ExpectedDisability {
     endDate?: string
     notes?: string
   }[]
+}
+
+interface ExpectedCircumstance {
+  type: string
+  subType: string
+  startDate: string
+  endDate?: string
+  verified: boolean
+  notes?: string
+  lastUpdated: string
 }
 
 context('ViewOffenderPersonalDetails', () => {
@@ -221,6 +256,30 @@ context('ViewOffenderPersonalDetails', () => {
         startDate: '1 April 2020',
         endDate: '1 May 2020',
         adjustments: [],
+      })
+  })
+
+  it('displays all personal circumstances', () => {
+    fixture
+      .havingOffender()
+      .whenViewingOffender()
+      .whenClickingSubNavTab('personal')
+      .whenClickingViewAllPersonalCircumstances()
+      .shouldRenderPersonalCircumstance({
+        type: 'Employment',
+        subType: 'Temporary/casual work (30 or more hours per week)',
+        startDate: '3 March 2021',
+        verified: false,
+        lastUpdated: '4 March 2021',
+      })
+      .shouldRenderPersonalCircumstance({
+        type: 'Relationship',
+        subType: 'Married / Civil partnership',
+        startDate: '1 April 2005',
+        endDate: '2 July 2021',
+        verified: true,
+        notes: 'Divorced',
+        lastUpdated: '2 July 2021',
       })
   })
 })

@@ -1,7 +1,13 @@
 import { Test } from '@nestjs/testing'
+import { match } from 'sinon'
 import { PersonalService } from './personal.service'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../../community-api/community-api.mock'
-import { CommunityApiService, PhoneNumberType, WellKnownAddressTypes } from '../../../community-api'
+import {
+  CommunityApiService,
+  PersonalCircumstance,
+  PhoneNumberType,
+  WellKnownAddressTypes,
+} from '../../../community-api'
 import {
   fakeIsoDate,
   fakeOffenderDetail,
@@ -11,6 +17,7 @@ import {
 import { fakeOkResponse } from '../../../common/rest/rest.fake'
 import { DateTime } from 'luxon'
 import { AddressDetail, GetPersonalDetailsResult } from './personal.types'
+import * as faker from 'faker'
 
 describe('PersonalService', () => {
   let subject: PersonalService
@@ -121,19 +128,17 @@ describe('PersonalService', () => {
     })
     community.offender.getAllOffenderPersonalContactsByCrnUsingGET.resolves(fakeOkResponse([personalContact]))
 
-    const currentCircumstance = fakePersonalCircumstance({
-      endDate: null,
-      personalCircumstanceType: {
-        description: 'Relationship',
+    havingPersonalCircumstances(
+      {
+        endDate: null,
+        personalCircumstanceType: {
+          description: 'Relationship',
+        },
+        personalCircumstanceSubType: {
+          description: 'Married / Civil partnership',
+        },
       },
-      personalCircumstanceSubType: {
-        description: 'Married / Civil partnership',
-      },
-    })
-    community.personalCircumstances.getOffenderPersonalCircumstancesByCrnUsingGET.resolves(
-      fakeOkResponse({
-        personalCircumstances: [currentCircumstance],
-      }),
+      { endDate: faker.date.past().toISOString() },
     )
 
     const observed = await subject.getPersonalDetails(offender)
@@ -231,4 +236,43 @@ describe('PersonalService', () => {
     const observed = subject.getDisabilities(offender)
     expect(observed).toEqual([])
   })
+
+  it('gets personal circumstances', async () => {
+    havingPersonalCircumstances({
+      startDate: '2021-07-08',
+      endDate: '2021-07-09',
+      evidenced: true,
+      notes: 'Some personal circumstance notes',
+      personalCircumstanceType: {
+        description: 'Relationship',
+      },
+      personalCircumstanceSubType: {
+        description: 'Married / Civil partnership',
+      },
+      createdDatetime: '2021-07-08T12:00:00',
+      lastUpdatedDatetime: '2021-07-08T13:00:00',
+    })
+
+    const observed = await subject.getPersonalCircumstances('some-crn')
+
+    expect(observed).toEqual([
+      {
+        name: 'Relationship: Married / Civil partnership',
+        type: 'Relationship',
+        subType: 'Married / Civil partnership',
+        startDate: DateTime.fromObject({ year: 2021, month: 7, day: 8 }),
+        endDate: DateTime.fromObject({ year: 2021, month: 7, day: 9 }),
+        verified: true,
+        notes: 'Some personal circumstance notes',
+        lastUpdated: DateTime.fromObject({ year: 2021, month: 7, day: 8, hour: 13 }),
+      },
+    ])
+  })
+
+  function havingPersonalCircumstances(...partials: DeepPartial<PersonalCircumstance>[]) {
+    const personalCircumstances = partials.map(fakePersonalCircumstance)
+    community.personalCircumstances.getOffenderPersonalCircumstancesByCrnUsingGET
+      .withArgs(match({ crn: 'some-crn' }))
+      .resolves(fakeOkResponse({ personalCircumstances }))
+  }
 })

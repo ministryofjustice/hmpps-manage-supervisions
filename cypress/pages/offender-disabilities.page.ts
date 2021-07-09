@@ -40,7 +40,7 @@ export class OffenderDisabilitiesPage extends PageBase {
     cy.get(`[data-qa="offender/disabilities/disability"] h2`)
       .contains(name)
       .parents('[data-qa="offender/disabilities/disability"]')
-      .find('> div > dl') // we have to be this specific to ignore the nested dl
+      .find('dl[data-qa="disability-summary"]')
       .within(() => callback(new DisabilityCard()))
   }
 }
