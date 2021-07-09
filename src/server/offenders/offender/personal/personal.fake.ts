@@ -4,6 +4,7 @@ import { DateTime } from 'luxon'
 import {
   AddressDetail,
   ContactDetailsViewModel,
+  DisabilityDetail,
   GetAddressDetailResult,
   PersonalDetailsViewModel,
 } from './personal.types'
@@ -75,3 +76,20 @@ export const fakePersonalDetailsViewModel = fake<PersonalDetailsViewModel>(() =>
   selfDescribedGender: 'Jedi',
   sexualOrientation: 'Bisexual',
 }))
+
+export const fakeDisabilityDetail = fake<DisabilityDetail>(({ active = faker.datatype.boolean() } = {}) => {
+  return {
+    name: faker.company.bs(),
+    active,
+    startDate: DateTime.fromJSDate(faker.date.past()),
+    endDate: active ? null : DateTime.fromJSDate(faker.date.recent()),
+    notes: faker.lorem.sentence(),
+    adjustments: [
+      {
+        name: faker.company.bs(),
+        startDate: DateTime.fromJSDate(faker.date.past()),
+        notes: faker.lorem.sentence(),
+      },
+    ],
+  }
+})

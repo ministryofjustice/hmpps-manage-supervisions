@@ -2,7 +2,7 @@ import { Controller, Get, Param, Render } from '@nestjs/common'
 import { Breadcrumb, BreadcrumbType, LinksService } from '../../../common/links'
 import { PersonalService } from './personal.service'
 import { OffenderService } from '../offender.service'
-import { PersonalAddressesViewModel } from './personal.types'
+import { PersonalAddressesViewModel, PersonalDisabilitiesViewModel } from './personal.types'
 import { getDisplayName } from '../../../util'
 
 @Controller('offender/:crn(\\w+)/personal')
@@ -35,14 +35,23 @@ export class PersonalController {
   }
 
   @Get('disabilities')
-  @Render('offenders/offender/personal/circumstances')
+  @Render('offenders/offender/personal/disabilities')
   @Breadcrumb({
     type: BreadcrumbType.PersonalDisabilities,
     parent: BreadcrumbType.PersonalDetails,
-    title: 'Disabilities',
+    title: 'Disabilities and adjustments',
   })
-  async getDisabilities(): Promise<any> {
-    throw new Error('not implemented')
+  async getDisabilities(@Param('crn') crn: string): Promise<PersonalDisabilitiesViewModel> {
+    const offender = await this.offender.getOffenderDetail(crn)
+    const displayName = getDisplayName(offender)
+    return {
+      disabilities: this.personal.getDisabilities(offender),
+      displayName,
+      breadcrumbs: this.links.resolveAll(BreadcrumbType.PersonalDisabilities, {
+        crn,
+        offenderName: displayName,
+      }),
+    }
   }
 
   @Get('circumstances')

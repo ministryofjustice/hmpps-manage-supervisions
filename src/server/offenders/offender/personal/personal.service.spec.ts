@@ -58,10 +58,24 @@ describe('PersonalService', () => {
     offenderProfile: {
       offenderLanguages: { primaryLanguage: 'English', requiresInterpreter: true },
       disabilities: [
-        { disabilityType: { description: 'Some disability' }, provisions: [] },
         {
+          startDate: '2021-02-01',
+          notes: 'Some notes',
+          disabilityType: { description: 'Some disability' },
+          provisions: [],
+        },
+        {
+          startDate: '2021-02-02',
+          notes: 'Some other notes',
           disabilityType: { description: 'Some other disability' },
-          provisions: [{ provisionType: { description: 'Some provision' } }],
+          provisions: [{ startDate: '2021-02-03', provisionType: { description: 'Some provision' } }],
+        },
+        {
+          startDate: '2020-02-03',
+          endDate: '2020-02-04',
+          notes: 'Some expired notes',
+          disabilityType: { description: 'Some expired disability' },
+          provisions: [],
         },
       ],
     },
@@ -174,5 +188,47 @@ describe('PersonalService', () => {
     )
     const observed = await subject.getPersonalDetails(offender)
     expect(observed.contactDetails.address).toBeFalsy()
+  })
+
+  it('gets disabilities', () => {
+    const observed = subject.getDisabilities(offender)
+    expect(observed).toEqual([
+      {
+        active: true,
+        adjustments: [
+          {
+            endDate: null,
+            name: 'Some provision',
+            startDate: DateTime.fromISO('2021-02-03'),
+          },
+        ],
+        endDate: null,
+        name: 'Some other disability',
+        notes: 'Some other notes',
+        startDate: DateTime.fromISO('2021-02-02'),
+      },
+      {
+        active: true,
+        adjustments: [],
+        endDate: null,
+        name: 'Some disability',
+        notes: 'Some notes',
+        startDate: DateTime.fromISO('2021-02-01'),
+      },
+      {
+        active: false,
+        adjustments: [],
+        startDate: DateTime.fromISO('2020-02-03'),
+        endDate: DateTime.fromISO('2020-02-04'),
+        notes: 'Some expired notes',
+        name: 'Some expired disability',
+      },
+    ])
+  })
+
+  it('gets empty disabilities', () => {
+    offender.offenderProfile.disabilities = null
+    const observed = subject.getDisabilities(offender)
+    expect(observed).toEqual([])
   })
 })

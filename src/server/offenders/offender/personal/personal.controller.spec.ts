@@ -5,14 +5,16 @@ import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { OffenderService } from '../offender.service'
 import { PersonalService } from './personal.service'
 import { fakeOffenderDetail } from '../../../community-api/community-api.fake'
-import { fakeGetAddressDetailResult } from './personal.fake'
-import { PersonalAddressesViewModel } from './personal.types'
+import { fakeDisabilityDetail, fakeGetAddressDetailResult } from './personal.fake'
+import { PersonalAddressesViewModel, PersonalDisabilitiesViewModel } from './personal.types'
 import { BreadcrumbType } from '../../../common/links'
+import { OffenderDetail } from '../../../community-api'
 
 describe('PersonalController', () => {
   let subject: PersonalController
   let offenderService: SinonStubbedInstance<OffenderService>
   let personalService: SinonStubbedInstance<PersonalService>
+  let offender: OffenderDetail
 
   beforeEach(async () => {
     offenderService = createStubInstance(OffenderService)
@@ -28,12 +30,12 @@ describe('PersonalController', () => {
     }).compile()
 
     subject = module.get(PersonalController)
+
+    offender = fakeOffenderDetail({ firstName: 'Liz', middleNames: ['Danger'], surname: 'Haggis' })
+    offenderService.getOffenderDetail.withArgs('some-crn').resolves(offender)
   })
 
   it('gets addresses', async () => {
-    const offender = fakeOffenderDetail({ firstName: 'Liz', middleNames: ['Danger'], surname: 'Haggis' })
-    offenderService.getOffenderDetail.withArgs('some-crn').resolves(offender)
-
     const details = fakeGetAddressDetailResult()
     personalService.getAddressDetail.withArgs(offender).returns(details)
 
@@ -47,5 +49,21 @@ describe('PersonalController', () => {
         offenderName: 'Liz Danger Haggis',
       }),
     } as PersonalAddressesViewModel)
+  })
+
+  it('gets disabilities', async () => {
+    const disabilities = [fakeDisabilityDetail()]
+    personalService.getDisabilities.withArgs(offender).returns(disabilities)
+
+    const observed = await subject.getDisabilities('some-crn')
+
+    expect(observed).toEqual({
+      disabilities,
+      displayName: 'Liz Danger Haggis',
+      breadcrumbs: fakeBreadcrumbs(BreadcrumbType.PersonalDisabilities, {
+        crn: 'some-crn',
+        offenderName: 'Liz Danger Haggis',
+      }),
+    } as PersonalDisabilitiesViewModel)
   })
 })

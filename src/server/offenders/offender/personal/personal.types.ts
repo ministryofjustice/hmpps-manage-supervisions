@@ -64,3 +64,22 @@ export interface GetAddressDetailResult {
 export interface PersonalAddressesViewModel extends GetAddressDetailResult, ViewModel {
   displayName: string
 }
+
+export interface DisabilityDetail {
+  name: string
+  active: boolean
+  startDate: DateTime
+  endDate?: DateTime
+  notes?: string
+  adjustments: {
+    name: string
+    startDate: DateTime
+    endDate?: DateTime
+    notes?: string
+  }[]
+}
+
+export interface PersonalDisabilitiesViewModel extends ViewModel {
+  displayName: string
+  disabilities: DisabilityDetail[]
+}
