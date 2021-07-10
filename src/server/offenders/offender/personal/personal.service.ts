@@ -2,13 +2,14 @@ import { Injectable } from '@nestjs/common'
 import { groupBy, maxBy, orderBy } from 'lodash'
 import {
   Address,
+  AddressSummary,
   CommunityApiService,
   OffenderDetail,
   OffenderLanguages,
   PhoneNumberType,
   WellKnownAddressTypes,
 } from '../../../community-api'
-import { getDisplayName, isActiveDateRange, titleCase, sentenceCase } from '../../../util'
+import { getDisplayName, isActiveDateRange, sentenceCase, titleCase } from '../../../util'
 import { DateTime } from 'luxon'
 import {
   AddressDetail,
@@ -16,7 +17,9 @@ import {
   GetAddressDetailResult,
   GetPersonalDetailsResult,
   PersonalCircumstanceDetail,
+  PersonalContactDetail,
 } from './personal.types'
+import { BreadcrumbType, LinksService } from '../../../common/links'
 
 function getLanguageSummary(languages: OffenderLanguages) {
   if (!languages.primaryLanguage) {
@@ -26,6 +29,16 @@ function getLanguageSummary(languages: OffenderLanguages) {
   return [languages.primaryLanguage, languages.requiresInterpreter ? '(interpreter required)' : null]
     .filter(x => x)
     .join(' ')
+}
+
+function getAddressLines(address: AddressSummary): string[] {
+  return [
+    [address.addressNumber, address.buildingName, address.streetName].filter(x => x).join(' '),
+    address.district,
+    address.town,
+    address.county,
+    address.postcode,
+  ].filter(x => x)
 }
 
 function getAddressViewModel(address: Address): AddressDetail {
@@ -47,16 +60,9 @@ function getAddressViewModel(address: Address): AddressDetail {
       isActiveDateRange({ startDate: address.from, endDate: address.to }) &&
       address.status.code !== WellKnownAddressTypes.Previous,
     main,
-    lines: (address.noFixedAbode
-      ? ['No fixed abode', address.type?.description]
-      : [
-          [address.addressNumber, address.buildingName, address.streetName].filter(x => x).join(' '),
-          address.district,
-          address.town,
-          address.county,
-          address.postcode,
-        ]
-    ).filter(x => x),
+    lines: address.noFixedAbode
+      ? ['No fixed abode', address.type?.description].filter(x => x)
+      : getAddressLines(address),
     phone: address.telephoneNumber,
     type: address.type && `${address.type.description} (${address.typeVerified ? 'verified' : 'not verified'})`,
     startDate,
@@ -69,7 +75,7 @@ function getAddressViewModel(address: Address): AddressDetail {
 
 @Injectable()
 export class PersonalService {
-  constructor(private readonly community: CommunityApiService) {}
+  constructor(private readonly community: CommunityApiService, private readonly links: LinksService) {}
 
   getAddressDetail(offender: OffenderDetail): GetAddressDetailResult {
     const { current = [], previous = [] } = groupBy(offender.contactDetails.addresses?.map(getAddressViewModel), x =>
@@ -145,13 +151,41 @@ export class PersonalService {
     )
   }
 
-  async getPersonalDetails(offender: OffenderDetail): Promise<GetPersonalDetailsResult> {
-    const crn = offender.otherIds.crn
-    const [{ data: personalContacts = [] }, personalCircumstances] = await Promise.all([
-      this.community.offender.getAllOffenderPersonalContactsByCrnUsingGET({ crn }),
-      this.getPersonalCircumstances(crn),
-    ])
+  async getPersonalContacts(crn: string): Promise<PersonalContactDetail[]> {
+    const { data: personalContacts = [] } = await this.community.offender.getAllOffenderPersonalContactsByCrnUsingGET({
+      crn,
+    })
 
+    return orderBy(
+      personalContacts.filter(isActiveDateRange).map(x => {
+        const displayName = getDisplayName(x)
+        return {
+          id: x.personalContactId,
+          description: [displayName, titleCase(x.relationship)].filter(x => x).join(' – '),
+          type: x.relationshipType?.description,
+          relationship: x.relationship,
+          displayName,
+          address: x.address && getAddressLines(x.address),
+          link: this.links.getUrl(BreadcrumbType.PersonalContact, {
+            crn,
+            id: x.personalContactId,
+          }),
+          emailAddress: x.emailAddress,
+          startDate: DateTime.fromISO(x.startDate),
+          endDate: x.endDate && DateTime.fromISO(x.endDate),
+          notes: x.notes,
+          phone: x.mobileNumber,
+        }
+      }),
+      [x => x.type, x => x.displayName],
+    )
+  }
+
+  getPersonalDetails(
+    offender: OffenderDetail,
+    personalContacts: PersonalContactDetail[],
+    personalCircumstances: PersonalCircumstanceDetail[],
+  ): GetPersonalDetailsResult {
     const addresses = this.getAddressDetail(offender)
 
     const { offenderLanguages, religion, sexualOrientation, genderIdentity, selfDescribedGender } =
@@ -168,11 +202,7 @@ export class PersonalService {
           other: offender.contactDetails.phoneNumbers?.find(x => x.type !== PhoneNumberType.Mobile)?.number,
         },
         emailAddresses: offender.contactDetails.emailAddresses?.filter(x => x).sort() || [],
-        personalContacts: personalContacts.filter(isActiveDateRange).map(x => ({
-          link: `/offender/${crn}/personal-contacts/${x.personalContactId}`,
-          type: x.relationshipType?.description,
-          name: [getDisplayName(x), titleCase(x.relationship)].filter(x => x).join(' - '),
-        })),
+        personalContacts,
         lastUpdated: addresses.mainAddress?.lastUpdated, // TODO determine logic for aggregating dates across addresses
       },
       personalDetails: {

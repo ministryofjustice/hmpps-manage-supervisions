@@ -2,6 +2,7 @@ import { ViewOffenderFixture } from './view-offender.fixture'
 import { ADDRESS, OffenderAddressesPage } from '../../../pages/offender-addresses.page'
 import { OffenderDisabilitiesPage } from '../../../pages/offender-disabilities.page'
 import { OffenderPersonalCircumstancesPage } from '../../../pages/offender-personal-circumstances.page'
+import { OffenderPersonalContactPage } from '../../../pages/offender-personal-contact.page'
 
 class Fixture extends ViewOffenderFixture {
   whenClickingViewAllAddresses(): this {
@@ -19,6 +20,12 @@ class Fixture extends ViewOffenderFixture {
   whenClickingViewAllPersonalCircumstances() {
     return this.shouldRenderOffenderTab('personal', page => {
       page.tableValue('personal', 'Current circumstances').contains('View details and previous circumstances').click()
+    })
+  }
+
+  whenClickingViewPersonalContact(name: string) {
+    return this.shouldRenderOffenderTab('personal', page => {
+      page.tableValue('contact', 'Personal contacts').contains(name).click()
     })
   }
 
@@ -115,6 +122,12 @@ class Fixture extends ViewOffenderFixture {
     })
     return this
   }
+
+  shouldDisplayPersonalContact(name: string, assert: (page: OffenderPersonalContactPage) => void) {
+    const page = new OffenderPersonalContactPage()
+    page.pageTitle.contains(name)
+    assert(page)
+  }
 }
 
 interface ExpectedAddress {
@@ -177,8 +190,8 @@ context('ViewOffenderPersonalDetails', () => {
         page.mainAddressDetails('Notes').contains('Sleeping on sofa')
 
         page.tableValue('contact', 'Other addresses').contains('1 other current address 1 previous address')
-        page.tableValue('contact', 'Personal contacts').contains('Next of Kin: Pippa Wade - Wife')
-        page.tableValue('contact', 'Personal contacts').contains('Family member: Jonathon Bacon - Father')
+        page.tableValue('contact', 'Personal contacts').contains('Next of Kin: Pippa Wade – Wife')
+        page.tableValue('contact', 'Personal contacts').contains('Family member: Jonathon Bacon – Father')
 
         page.tableValue('personal', 'Name').contains('Brian Cheese')
         page.tableValue('personal', 'Date of birth').contains('10 June 1980')
@@ -280,6 +293,22 @@ context('ViewOffenderPersonalDetails', () => {
         verified: true,
         notes: 'Divorced',
         lastUpdated: '2 July 2021',
+      })
+  })
+
+  it('displays personal contact', () => {
+    fixture
+      .havingOffender()
+      .whenViewingOffender()
+      .whenClickingSubNavTab('personal')
+      .whenClickingViewPersonalContact('Pippa Wade – Wife')
+      .shouldDisplayPersonalContact('Next of Kin Pippa Wade – Wife', page => {
+        page.value('Name').contains('Pippa Wade')
+        page.value('Relationship type').contains('Next of Kin')
+        page.value(/^\s*Relationship\s*$/).contains('Wife')
+        page.value('Address').contains('64 Ermin Street Wrenthorpe West Yorkshire WF2 8WT')
+        page.value('Phone number').contains('07700 900 141')
+        page.value('Notes').contains('Divorced')
       })
   })
 })

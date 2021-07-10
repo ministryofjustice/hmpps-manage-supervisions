@@ -1,0 +1,46 @@
+{% extends "partials/layout.njk" %}
+{% set pageTitle = 'Personal contact - ' + personalContact.description %}
+{% from '_join.njk' import join %}
+
+{% block content %}
+    <h1 class="govuk-heading-xl">
+        <span class="govuk-caption-xl">{{ personalContact.type }}</span>
+        {{ personalContact.description }}
+    </h1>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            {{ govukSummaryList({
+                attributes: {
+                    'data-qa': 'offender/personal-contact/contact'
+                },
+                rows: [
+                    {
+                        key: { text: "Name" },
+                        value: { text: personalContact.displayName }
+                    },
+                    {
+                        key: { text: "Relationship type" },
+                        value: { text: personalContact.type }
+                    },
+                    {
+                        key: { text: "Relationship" },
+                        value: { text: personalContact.relationship }
+                    } if personalContact.relationship,
+                    {
+                        key: { text: "Address" },
+                        value: { html: join(personalContact.address) }
+                    } if personalContact.address,
+                    {
+                        key: { text: "Phone number" },
+                        value: { text: personalContact.phone }
+                    } if personalContact.phone,
+                    {
+                        key: { text: "Notes" },
+                        value: { text: personalContact.notes if personalContact.notes else "No notes" }
+                    }
+                ]
+            }) }}
+        </div>
+    </div>
+{% endblock %}

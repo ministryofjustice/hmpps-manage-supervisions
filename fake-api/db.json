@@ -199,6 +199,16 @@
         "code": "NK",
         "description": "Next of Kin"
       },
+      "address": {
+        "addressNumber": "64",
+        "streetName": "Ermin Street",
+        "town": "Wrenthorpe",
+        "county": "West Yorkshire",
+        "postcode": "WF2 8WT",
+        "telephoneNumber": "07073735801"
+      },
+      "notes": "Divorced",
+      "mobileNumber": "07700 900 141",
       "createdDatetime": "2019-09-13T00:00:00",
       "lastUpdatedDatetime": "2019-09-13T00:00:00"
     },

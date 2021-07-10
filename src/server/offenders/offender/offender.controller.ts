@@ -61,17 +61,20 @@ export class OffenderController {
     title: options => options.offenderName,
   })
   async getOverview(@Param('crn') crn: string): Promise<OffenderOverviewViewModel> {
-    const [offender, conviction, appointmentSummary, risks, registrations] = await Promise.all([
-      this.offenderService.getOffenderDetail(crn),
-      this.sentenceService.getConvictionDetails(crn),
-      this.scheduleService.getAppointmentSummary(crn),
-      this.riskService.getRisks(crn),
-      this.riskService.getRiskRegistrations(crn),
-    ])
+    const [offender, conviction, appointmentSummary, risks, registrations, personalContacts, personalCircumstances] =
+      await Promise.all([
+        this.offenderService.getOffenderDetail(crn),
+        this.sentenceService.getConvictionDetails(crn),
+        this.scheduleService.getAppointmentSummary(crn),
+        this.riskService.getRisks(crn),
+        this.riskService.getRiskRegistrations(crn),
+        this.personalService.getPersonalContacts(crn),
+        this.personalService.getPersonalCircumstances(crn),
+      ])
     return {
       ...this.getBase(OffenderPage.Overview, BreadcrumbType.Case, offender),
       page: OffenderPage.Overview,
-      ...(await this.personalService.getPersonalDetails(offender)),
+      ...this.personalService.getPersonalDetails(offender, personalContacts, personalCircumstances),
       conviction,
       appointmentSummary,
       risks,
@@ -133,13 +136,15 @@ export class OffenderController {
     title: 'Personal details',
   })
   async getPersonal(@Param('crn') crn: string): Promise<OffenderPersonalViewModel> {
-    const [offender, registrations] = await Promise.all([
+    const [offender, registrations, personalContacts, personalCircumstances] = await Promise.all([
       this.offenderService.getOffenderDetail(crn),
       this.riskService.getRiskRegistrations(crn),
+      this.personalService.getPersonalContacts(crn),
+      this.personalService.getPersonalCircumstances(crn),
     ])
     return {
       ...this.getBase(OffenderPage.Personal, BreadcrumbType.PersonalDetails, offender),
-      ...(await this.personalService.getPersonalDetails(offender)),
+      ...this.personalService.getPersonalDetails(offender, personalContacts, personalCircumstances),
       page: OffenderPage.Personal,
       registrations,
     }
