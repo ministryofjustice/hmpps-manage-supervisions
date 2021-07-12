@@ -48,7 +48,7 @@ context('ViewOffenderOverview', () => {
 
   it('displays offender overview when no OASys risk data', () => {
     fixture
-      .havingOffender({ noArnRiskDataAvailable: true })
+      .havingOffender({ arnRiskDataAvailable: false })
       .whenViewingOffender()
       .shouldDisplayCommonHeader()
       .shouldRenderOffenderTab('overview', page => {

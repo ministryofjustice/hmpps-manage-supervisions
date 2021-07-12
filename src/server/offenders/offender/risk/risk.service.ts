@@ -43,6 +43,10 @@ export class RiskService {
     const registration = (await this.community.risks.getOffenderRegistrationsByCrnUsingGET({ crn, activeOnly: true }))
       .data
 
+    if (!registration.registrations) {
+      return []
+    }
+
     return registration.registrations
       .map(r => {
         return {
