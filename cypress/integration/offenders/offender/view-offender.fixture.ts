@@ -12,12 +12,14 @@ export class ViewOffenderFixture {
     cy.task('stubGetStaffDetails')
   }
 
-  havingOffender(
-    options: {
-      convictions?: Omit<StubGetConvictionsOptions, 'crn'>
-      appointments?: StubOffenderAppointmentOptions['partials']
-    } = {},
-  ): this {
+  havingOffender({
+    arnRiskDataAvailable = true,
+    ...options
+  }: {
+    convictions?: Omit<StubGetConvictionsOptions, 'crn'>
+    appointments?: StubOffenderAppointmentOptions['partials']
+    arnRiskDataAvailable?: boolean
+  } = {}): this {
     const crn = this.crn
     cy.task('stubOffenderDetails', { crn })
     cy.task('stubGetConvictions', { crn, ...options.convictions })
@@ -26,7 +28,9 @@ export class ViewOffenderFixture {
     cy.task('stubGetPersonalCircumstances', { crn })
     cy.task('stubGetPersonalContacts', { crn })
     cy.task('stubOffenderRegistrations', { crn })
-    cy.task('stubOffenderRisks', { crn })
+    if (arnRiskDataAvailable) {
+      cy.task('stubOffenderRisks', { crn })
+    }
     return this
   }
 

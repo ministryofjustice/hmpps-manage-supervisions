@@ -102,4 +102,12 @@ describe('RiskService', () => {
     expect(observed).toEqual(expected)
     expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn', activeOnly: true })
   })
+
+  it('returns an empty array if no risk registrations available for CRN', async () => {
+    const stub = community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({}))
+    const observed = await subject.getRiskRegistrations('some-crn')
+
+    expect(observed).toEqual([])
+    expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn', activeOnly: true })
+  })
 })

@@ -1,6 +1,6 @@
 export interface Risks {
-  overallLevel: Level
-  communityRisks: RoshRisk[]
+  overallLevel?: Level
+  communityRisks?: RoshRisk[]
 }
 
 export interface RoshRisk {

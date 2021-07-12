@@ -55,47 +55,53 @@
                         ]
                     }) }}
 
-                    <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
                 {% endif %}
             {% endif %}
 
-            <h2 class="govuk-heading-m">
-            Risks
-            </h2>
+            {% if risks.overallLevel %}
+                {% if conviction.sentence %}
+                    <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+                {% endif %}
+                <h2 class="govuk-heading-m">
+                Risks
+                </h2>
 
-            <p>
-            Risk of Serious Harm (ROSH)
-            <span class="govuk-tag {{ risks.overallLevel.class }} govuk-!-margin-left-2">{{ risks.overallLevel.text }}</span>
-            </p>
+                <p>
+                Risk of Serious Harm (ROSH)
+                <span class="govuk-tag {{ risks.overallLevel.class }} govuk-!-margin-left-2">{{ risks.overallLevel.text }}</span>
+                </p>
 
-            {% set riskTable %}
-            <table class="govuk-table">
-            <thead class="govuk-table__head">
-                <tr class="govuk-table__row">
-                <th class="govuk-table__header">Risk to</th>
-                <th class="govuk-table__header">In community</th>
-                </tr>
-            </thead>
-            <tbody class="govuk-table__body">
-                {% for risk in risks.communityRisks %}
-                <tr class="govuk-table__row">
-                <td class="govuk-table__cell">{{ risk.riskTo }}</td>
-                <td class="govuk-table__cell">
-                    <span class="govuk-tag {{ risk.level.class }}">{{ risk.level.text }}</span>
-                </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-            </table>
-            {% endset %}
-
-            {{ govukDetails({
-            summaryText: "View those at risk",
-            html: riskTable
-            }) }}
+                {% set riskTable %}
+                <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                    <th class="govuk-table__header">Risk to</th>
+                    <th class="govuk-table__header">In community</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    {% for risk in risks.communityRisks %}
+                    <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">{{ risk.riskTo }}</td>
+                    <td class="govuk-table__cell">
+                        <span class="govuk-tag {{ risk.level.class }}">{{ risk.level.text }}</span>
+                    </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                </table>
+                {% endset %}
+                
+                {{ govukDetails({
+                summaryText: "View those at risk",
+                html: riskTable
+                }) }}
+            {% endif %}
 
             {% if conviction and conviction.previousConvictions %}
-                <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+                {% if risks.overallLevel %}
+                    <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+                {% endif %}
                 {{ probationHistorySummary({
                     model: conviction,
                     attributes: {

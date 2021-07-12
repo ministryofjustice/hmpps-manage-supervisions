@@ -12,9 +12,16 @@ export class RiskService {
   ) {}
 
   async getRisks(crn: string): Promise<Risks> {
-    const response = await this.assessRisksAndNeeds.risk.getRoshRisksByCrn({
-      crn,
-    })
+    const response = await this.assessRisksAndNeeds.risk.getRoshRisksByCrn(
+      {
+        crn,
+      },
+      { validateStatus: (status: number) => (status >= 200 && status < 300) || status === 404 },
+    )
+
+    if (response.status === 404) {
+      return {}
+    }
 
     const communityRisks = invertRiskMap(response.data.summary.riskInCommunity)
 
@@ -35,6 +42,10 @@ export class RiskService {
   async getRiskRegistrations(crn: string): Promise<RegistrationFlag[]> {
     const registration = (await this.community.risks.getOffenderRegistrationsByCrnUsingGET({ crn, activeOnly: true }))
       .data
+
+    if (!registration.registrations) {
+      return []
+    }
 
     return registration.registrations
       .map(r => {

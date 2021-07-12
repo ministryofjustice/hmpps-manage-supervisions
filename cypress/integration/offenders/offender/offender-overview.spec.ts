@@ -45,4 +45,14 @@ context('ViewOffenderOverview', () => {
         page.appointmentAttendance.contains('1 Failure to comply')
       })
   })
+
+  it('displays offender overview when no OASys risk data', () => {
+    fixture
+      .havingOffender({ arnRiskDataAvailable: false })
+      .whenViewingOffender()
+      .shouldDisplayCommonHeader()
+      .shouldRenderOffenderTab('overview', page => {
+        page.roshRisksSection.should('not.exist')
+      })
+  })
 })

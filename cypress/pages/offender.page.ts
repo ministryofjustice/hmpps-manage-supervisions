@@ -46,6 +46,10 @@ export class OffenderPage extends PageBase {
       get appointmentAttendance() {
         return cy.get('[data-qa="offender/overview/appointment-attendance"]')
       },
+
+      get roshRisksSection() {
+        return cy.get('[data-qa="offender/overview/rosh-risks-section"]')
+      },
     }
   }
 
