@@ -10,7 +10,13 @@ import {
 } from '../../../community-api'
 import { getDisplayName, isActiveDateRange, titleCase, sentenceCase } from '../../../util'
 import { DateTime } from 'luxon'
-import { AddressDetail, DisabilityDetail, GetAddressDetailResult, GetPersonalDetailsResult } from './personal.types'
+import {
+  AddressDetail,
+  DisabilityDetail,
+  GetAddressDetailResult,
+  GetPersonalDetailsResult,
+  PersonalCircumstanceDetail,
+} from './personal.types'
 
 function getLanguageSummary(languages: OffenderLanguages) {
   if (!languages.primaryLanguage) {
@@ -118,16 +124,32 @@ export class PersonalService {
     )
   }
 
+  async getPersonalCircumstances(crn: string): Promise<PersonalCircumstanceDetail[]> {
+    const {
+      data: { personalCircumstances = [] },
+    } = await this.community.personalCircumstances.getOffenderPersonalCircumstancesByCrnUsingGET({ crn })
+
+    return orderBy(
+      personalCircumstances.map(x => ({
+        name: `${x.personalCircumstanceType.description}: ${x.personalCircumstanceSubType.description}`,
+        type: x.personalCircumstanceType.description,
+        subType: x.personalCircumstanceSubType.description,
+        startDate: DateTime.fromISO(x.startDate),
+        endDate: x.endDate && DateTime.fromISO(x.endDate),
+        verified: x.evidenced || false,
+        notes: x.notes,
+        lastUpdated: DateTime.fromISO(x.lastUpdatedDatetime),
+      })),
+      [x => x.startDate.toJSDate(), x => x.endDate?.toJSDate()],
+      ['desc', 'desc'],
+    )
+  }
+
   async getPersonalDetails(offender: OffenderDetail): Promise<GetPersonalDetailsResult> {
     const crn = offender.otherIds.crn
-    const [
-      { data: personalContacts },
-      {
-        data: { personalCircumstances },
-      },
-    ] = await Promise.all([
+    const [{ data: personalContacts = [] }, personalCircumstances] = await Promise.all([
       this.community.offender.getAllOffenderPersonalContactsByCrnUsingGET({ crn }),
-      this.community.personalCircumstances.getOffenderPersonalCircumstancesByCrnUsingGET({ crn }),
+      this.getPersonalCircumstances(crn),
     ])
 
     const addresses = this.getAddressDetail(offender)
@@ -164,10 +186,7 @@ export class PersonalService {
             .sort() || [],
         previousName: offender.previousSurname,
         preferredLanguage: getLanguageSummary(offenderLanguages),
-        currentCircumstances: personalCircumstances
-          .filter(isActiveDateRange)
-          .map(x => `${x.personalCircumstanceType.description}: ${x.personalCircumstanceSubType.description}`)
-          .sort(),
+        currentCircumstances: personalCircumstances.filter(isActiveDateRange).map(x => x.name),
         disabilities: offender.offenderProfile.disabilities
           ?.filter(isActiveDateRange)
           .map(x =>

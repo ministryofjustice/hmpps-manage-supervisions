@@ -1,6 +1,10 @@
 import { DateTime } from 'luxon'
 import { ViewModel } from '../../../common'
 
+export interface OffenderViewModel extends ViewModel {
+  displayName: string
+}
+
 export interface ContactDetailsViewModel {
   address?: AddressDetail
   otherAddresses: {
@@ -18,6 +22,17 @@ export interface ContactDetailsViewModel {
     name: string
   }[]
   lastUpdated?: DateTime
+}
+
+export interface PersonalCircumstanceDetail {
+  name: string
+  type: string
+  subType: string
+  startDate: DateTime
+  endDate?: DateTime
+  verified: boolean
+  notes?: string
+  lastUpdated: DateTime
 }
 
 export interface PersonalDetailsViewModel {
@@ -61,9 +76,7 @@ export interface GetAddressDetailResult {
   previousAddresses: AddressDetail[]
 }
 
-export interface PersonalAddressesViewModel extends GetAddressDetailResult, ViewModel {
-  displayName: string
-}
+export interface PersonalAddressesViewModel extends GetAddressDetailResult, OffenderViewModel {}
 
 export interface DisabilityDetail {
   name: string
@@ -79,7 +92,10 @@ export interface DisabilityDetail {
   }[]
 }
 
-export interface PersonalDisabilitiesViewModel extends ViewModel {
-  displayName: string
+export interface PersonalDisabilitiesViewModel extends OffenderViewModel {
   disabilities: DisabilityDetail[]
+}
+
+export interface PersonalCircumstancesViewModel extends OffenderViewModel {
+  circumstances: PersonalCircumstanceDetail[]
 }

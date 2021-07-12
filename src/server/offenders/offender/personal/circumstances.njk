@@ -1,0 +1,63 @@
+{% extends "partials/layout.njk" %}
+{% set pageTitle = 'Personal circumstances - ' + displayName %}
+
+{% from 'components/summary-card.njk' import appSummaryCard %}
+
+{% block content %}
+    <h1 class="govuk-heading-xl">Personal circumstances</h1>
+
+    {% if circumstances.length === 0 %}
+        <p class='govuk-body'>
+            {{ displayName }} has no personal circumstances.
+        </p>
+    {% endif %}
+
+    {% for circumstance in circumstances %}
+        {% set title %}
+            <span class="govuk-!-font-weight-regular govuk-!-font-size-19">{{ circumstance.type }}</span>
+            <br>
+            {{ circumstance.subType }}
+        {% endset %}
+        {% call appSummaryCard({
+            titleHtml: title,
+            classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
+            attributes: {
+                'data-qa': 'offender/personal-circumstances/circumstance'
+            } })
+        -%}
+            {{ govukSummaryList({
+                attributes: { 'data-qa': 'circumstance-summary' },
+                rows: [
+                    {
+                        key: { text: "Type" },
+                        value: { text: circumstance.type }
+                    },
+                    {
+                        key: { text: "Sub-type" },
+                        value: { text: circumstance.subType }
+                    },
+                    {
+                        key: { text: "Start date" },
+                        value: { text: circumstance.startDate | shortDate }
+                    },
+                    {
+                        key: { text: "End date" },
+                        value: { text: circumstance.endDate | shortDate }
+                    } if circumstance.endDate,
+                    {
+                        key: { text: "Verified" },
+                        value: { text: circumstance.verified | yesNo }
+                    },
+                    {
+                        key: { text: "Notes" },
+                        value: { text: (circumstance.notes | nl2br) if circumstance.notes else 'No Notes' }
+                    }
+                ]
+            }) }}
+            <p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s govuk-hint-s" data-qa='circumstance-last-updated'>
+                Last updated {{ circumstance.lastUpdated | shortDate }}
+            </p>
+        {%- endcall %}
+    {% endfor %}
+
+{% endblock %}
