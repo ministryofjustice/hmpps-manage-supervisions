@@ -71,6 +71,9 @@ env:
   - name: COMMUNITY_API_URL
     value: {{ .Values.env.COMMUNITY_API_URL | quote }}
 
+  - name: ASSESS_RISKS_AND_NEEDS_API_URL
+    value: {{ .Values.env.ASSESS_RISKS_AND_NEEDS_API_URL | quote }}
+
   - name: NODE_ENV
     value: production
 
