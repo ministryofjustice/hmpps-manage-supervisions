@@ -5,6 +5,7 @@ export enum BreadcrumbType {
   PersonalAddresses,
   PersonalDisabilities,
   PersonalCircumstances,
+  PersonalContact,
   CaseSentence,
   CaseActivityLog,
   CaseSchedule,
@@ -12,6 +13,8 @@ export enum BreadcrumbType {
 }
 
 export interface ResolveBreadcrumbOptions {
+  id?: string | number
+  entityName?: string
   crn?: string
   offenderName?: string
 }

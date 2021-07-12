@@ -5,7 +5,12 @@ import { OffenderService } from './offender.service'
 import { OffenderPage, OffenderViewModel } from './offender-view-model'
 import { RedirectResponse } from '../../common'
 import { fakeOffenderDetail, fakePaginated } from '../../community-api/community-api.fake'
-import { fakeContactDetailsViewModel, fakePersonalDetailsViewModel } from './personal/personal.fake'
+import {
+  fakeContactDetailsViewModel,
+  fakePersonalCircumstanceDetail,
+  fakePersonalContactDetail,
+  fakePersonalDetailsViewModel,
+} from './personal/personal.fake'
 import { SentenceService } from './sentence'
 import { ScheduleService } from './schedule'
 import { ActivityService } from './activity'
@@ -13,9 +18,10 @@ import { RiskService } from './risk'
 import { fakeConvictionDetails } from './sentence/sentence.fake'
 import { fakeActivityLogEntry } from './activity/activity.fake'
 import { fakeAppointmentSummary, fakeRecentAppointments } from './schedule/schedule.fake'
-import { fakeBreadcrumbs, MockLinksModule } from '../../common/links/links.mock'
+import { fakeBreadcrumbs, fakeBreadcrumbUrl, MockLinksModule } from '../../common/links/links.mock'
 import { PersonalService } from './personal'
-import { BreadcrumbType } from '../../common/links'
+import { BreadcrumbType, ResolveBreadcrumbOptions } from '../../common/links'
+import { fakeRegistrationFlag } from './risk/risk.fake'
 
 describe('OffenderController', () => {
   let subject: OffenderController
@@ -60,15 +66,26 @@ describe('OffenderController', () => {
   it('gets overview', async () => {
     const offender = havingOffender()
 
+    const personalContacts = [fakePersonalContactDetail()]
+    personalService.getPersonalContacts.withArgs('some-crn').resolves(personalContacts)
+
+    const circumstances = [fakePersonalCircumstanceDetail()]
+    personalService.getPersonalCircumstances.withArgs('some-crn').resolves(circumstances)
+
     const contactDetails = fakeContactDetailsViewModel()
     const personalDetails = fakePersonalDetailsViewModel()
-    personalService.getPersonalDetails.withArgs(offender).resolves({ contactDetails, personalDetails })
+    personalService.getPersonalDetails
+      .withArgs(offender, personalContacts, circumstances)
+      .returns({ contactDetails, personalDetails })
 
     const conviction = fakeConvictionDetails()
     sentenceService.getConvictionDetails.withArgs('some-crn').resolves(conviction)
 
     const appointmentSummary = fakeAppointmentSummary()
     scheduleService.getAppointmentSummary.withArgs('some-crn').resolves(appointmentSummary)
+
+    const registrations = [fakeRegistrationFlag()]
+    riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
 
     const observed = await subject.getOverview('some-crn')
     shouldReturnViewModel(observed, BreadcrumbType.Case, {
@@ -77,6 +94,7 @@ describe('OffenderController', () => {
       contactDetails,
       personalDetails,
       appointmentSummary,
+      registrations,
     })
   })
 
@@ -86,10 +104,14 @@ describe('OffenderController', () => {
     const appointments = fakeRecentAppointments()
     scheduleService.getRecentAppointments.withArgs('some-crn').resolves(appointments)
 
+    const registrations = [fakeRegistrationFlag()]
+    riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
+
     const observed = await subject.getSchedule('some-crn')
     shouldReturnViewModel(observed, BreadcrumbType.CaseSchedule, {
       page: OffenderPage.Schedule,
       appointments,
+      registrations,
     })
   })
 
@@ -100,6 +122,9 @@ describe('OffenderController', () => {
 
     activityService.getActivityLogPage.withArgs('some-crn', match({ appointmentsOnly: true })).resolves(contacts)
 
+    const registrations = [fakeRegistrationFlag()]
+    riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
+
     const observed = await subject.getActivity('some-crn')
     shouldReturnViewModel(observed, BreadcrumbType.CaseActivityLog, {
       page: OffenderPage.Activity,
@@ -108,16 +133,27 @@ describe('OffenderController', () => {
         page: contacts.number,
         size: contacts.size,
       },
+      registrations,
     })
   })
 
   it('gets personal', async () => {
     const offender = havingOffender()
 
+    const personalContacts = [fakePersonalContactDetail()]
+    personalService.getPersonalContacts.withArgs('some-crn').resolves(personalContacts)
+
+    const circumstances = [fakePersonalCircumstanceDetail()]
+    personalService.getPersonalCircumstances.withArgs('some-crn').resolves(circumstances)
+
     const contactDetails = fakeContactDetailsViewModel()
     const personalDetails = fakePersonalDetailsViewModel()
+    personalService.getPersonalDetails
+      .withArgs(offender, personalContacts, circumstances)
+      .returns({ contactDetails, personalDetails })
 
-    personalService.getPersonalDetails.withArgs(offender).resolves({ contactDetails, personalDetails })
+    const registrations = [fakeRegistrationFlag()]
+    riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
 
     const observed = await subject.getPersonal('some-crn')
 
@@ -125,6 +161,7 @@ describe('OffenderController', () => {
       page: OffenderPage.Personal,
       contactDetails,
       personalDetails,
+      registrations,
     })
   })
 
@@ -134,11 +171,15 @@ describe('OffenderController', () => {
     const conviction = fakeConvictionDetails()
     sentenceService.getConvictionDetails.withArgs('some-crn').resolves(conviction)
 
+    const registrations = [fakeRegistrationFlag()]
+    riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
+
     const observed = await subject.getSentence('some-crn')
 
     shouldReturnViewModel(observed, BreadcrumbType.CaseSentence, {
       page: OffenderPage.Sentence,
       conviction,
+      registrations,
     })
   })
 
@@ -159,6 +200,7 @@ describe('OffenderController', () => {
     breadcrumbType: BreadcrumbType,
     expected: Partial<OffenderViewModel>,
   ) {
+    const breadcrumbOptions: ResolveBreadcrumbOptions = { crn: 'some-crn', offenderName: 'Liz Danger Haggis' }
     expect(observed).toEqual({
       ids: {
         crn: 'SOME-CRN',
@@ -167,16 +209,16 @@ describe('OffenderController', () => {
       breadcrumbs: fakeBreadcrumbs(breadcrumbType, { crn: 'some-crn', offenderName: 'Liz Danger Haggis' }),
       displayName: 'Liz Danger Haggis (Bob)',
       links: {
-        activity: '/CaseActivityLog?crn=some-crn&offenderName=Liz%20Danger%20Haggis',
+        arrangeAppointment: fakeBreadcrumbUrl(BreadcrumbType.NewAppointment, breadcrumbOptions),
         addActivity: '/offender/some-crn/activity/new',
-        addressBook: '/PersonalAddresses?crn=some-crn&offenderName=Liz%20Danger%20Haggis',
-        arrangeAppointment: '/NewAppointment?crn=some-crn&offenderName=Liz%20Danger%20Haggis',
-        circumstances: '/PersonalCircumstances?crn=some-crn&offenderName=Liz%20Danger%20Haggis',
-        disabilities: '/PersonalDisabilities?crn=some-crn&offenderName=Liz%20Danger%20Haggis',
-        overview: '/Case?crn=some-crn&offenderName=Liz%20Danger%20Haggis',
-        personal: '/PersonalDetails?crn=some-crn&offenderName=Liz%20Danger%20Haggis',
-        schedule: '/CaseSchedule?crn=some-crn&offenderName=Liz%20Danger%20Haggis',
-        sentence: '/CaseSentence?crn=some-crn&offenderName=Liz%20Danger%20Haggis',
+        addressBook: fakeBreadcrumbUrl(BreadcrumbType.PersonalAddresses, breadcrumbOptions),
+        circumstances: fakeBreadcrumbUrl(BreadcrumbType.PersonalCircumstances, breadcrumbOptions),
+        disabilities: fakeBreadcrumbUrl(BreadcrumbType.PersonalDisabilities, breadcrumbOptions),
+        overview: fakeBreadcrumbUrl(BreadcrumbType.Case, breadcrumbOptions),
+        personal: fakeBreadcrumbUrl(BreadcrumbType.PersonalDetails, breadcrumbOptions),
+        schedule: fakeBreadcrumbUrl(BreadcrumbType.CaseSchedule, breadcrumbOptions),
+        sentence: fakeBreadcrumbUrl(BreadcrumbType.CaseSentence, breadcrumbOptions),
+        activity: fakeBreadcrumbUrl(BreadcrumbType.CaseActivityLog, breadcrumbOptions),
       },
       ...expected,
     } as OffenderViewModel)

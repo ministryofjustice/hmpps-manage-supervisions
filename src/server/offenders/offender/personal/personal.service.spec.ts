@@ -16,8 +16,11 @@ import {
 } from '../../../community-api/community-api.fake'
 import { fakeOkResponse } from '../../../common/rest/rest.fake'
 import { DateTime } from 'luxon'
-import { AddressDetail, GetPersonalDetailsResult } from './personal.types'
+import { AddressDetail, GetPersonalDetailsResult, PersonalContactDetail } from './personal.types'
 import * as faker from 'faker'
+import { fakePersonalCircumstanceDetail, fakePersonalContactDetail } from './personal.fake'
+import { fakeBreadcrumbUrl, MockLinksModule } from '../../../common/links/links.mock'
+import { BreadcrumbType } from '../../../common/links'
 
 describe('PersonalService', () => {
   let subject: PersonalService
@@ -105,7 +108,7 @@ describe('PersonalService', () => {
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [PersonalService],
-      imports: [MockCommunityApiModule.register()],
+      imports: [MockCommunityApiModule.register(), MockLinksModule],
     }).compile()
 
     subject = module.get(PersonalService)
@@ -119,29 +122,60 @@ describe('PersonalService', () => {
     expect(observed.previousAddresses).toHaveLength(2)
   })
 
-  it('gets offender personal details', async () => {
+  it('gets personal contacts', async () => {
     const personalContact = fakePersonalContact({
       personalContactId: 1000,
       firstName: 'Pippa',
       otherNames: null,
       surname: 'Wade',
-    })
-    community.offender.getAllOffenderPersonalContactsByCrnUsingGET.resolves(fakeOkResponse([personalContact]))
-
-    havingPersonalCircumstances(
-      {
-        endDate: null,
-        personalCircumstanceType: {
-          description: 'Relationship',
-        },
-        personalCircumstanceSubType: {
-          description: 'Married / Civil partnership',
-        },
+      notes: 'Some notes',
+      mobileNumber: '0123456789',
+      emailAddress: 'example@example.com',
+      startDate: '2019-10-05',
+      address: {
+        addressNumber: '53327',
+        buildingName: null,
+        streetName: 'Movies Conn Ridges',
+        town: 'Mafaldaville',
+        county: 'Avon',
+        postcode: 'ABC 123',
       },
-      { endDate: faker.date.past().toISOString() },
-    )
+    })
+    community.offender.getAllOffenderPersonalContactsByCrnUsingGET
+      .withArgs(match({ crn: 'some-crn' }))
+      .resolves(fakeOkResponse([personalContact]))
 
-    const observed = await subject.getPersonalDetails(offender)
+    const observed = await subject.getPersonalContacts('some-crn')
+    expect(observed).toEqual([
+      {
+        id: 1000,
+        type: 'Next of Kin',
+        description: 'Pippa Wade – Wife',
+        displayName: 'Pippa Wade',
+        relationship: 'Wife',
+        link: fakeBreadcrumbUrl(BreadcrumbType.PersonalContact, {
+          crn: 'some-crn',
+          id: 1000,
+        }),
+        notes: 'Some notes',
+        phone: '0123456789',
+        startDate: DateTime.fromObject({ year: 2019, month: 10, day: 5 }),
+        emailAddress: 'example@example.com',
+        address: ['53327 Movies Conn Ridges', 'Mafaldaville', 'Avon', 'ABC 123'],
+      } as PersonalContactDetail,
+    ])
+  })
+
+  it('gets offender personal details', () => {
+    const personalContacts = [fakePersonalContactDetail()]
+    const personalCircumstances = [
+      fakePersonalCircumstanceDetail(
+        { name: 'Relationship: Married / Civil partnership' },
+        { name: 'Some expired circumstance', endDate: DateTime.fromJSDate(faker.date.past()) },
+      ),
+    ]
+
+    const observed = subject.getPersonalDetails(offender, personalContacts, personalCircumstances)
     expect(observed).toEqual({
       contactDetails: {
         address: expectedMainAddress,
@@ -154,13 +188,7 @@ describe('PersonalService', () => {
           other: '9876543210',
         },
         emailAddresses: ['some.email@address.com', 'some.other.email@address.com'],
-        personalContacts: [
-          {
-            name: 'Pippa Wade - Wife',
-            type: 'Next of Kin',
-            link: '/offender/some-crn/personal-contacts/1000',
-          },
-        ],
+        personalContacts,
         lastUpdated: DateTime.fromISO('2021-01-02T12:00:00'),
       },
       personalDetails: {
@@ -191,7 +219,7 @@ describe('PersonalService', () => {
         personalCircumstances: [],
       }),
     )
-    const observed = await subject.getPersonalDetails(offender)
+    const observed = subject.getPersonalDetails(offender, [], [])
     expect(observed.contactDetails.address).toBeFalsy()
   })
 

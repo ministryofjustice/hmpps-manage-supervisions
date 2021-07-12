@@ -5,8 +5,8 @@ import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { OffenderService } from '../offender.service'
 import { PersonalService } from './personal.service'
 import { fakeOffenderDetail } from '../../../community-api/community-api.fake'
-import { fakeDisabilityDetail, fakeGetAddressDetailResult } from './personal.fake'
-import { PersonalAddressesViewModel, PersonalDisabilitiesViewModel } from './personal.types'
+import { fakeDisabilityDetail, fakeGetAddressDetailResult, fakePersonalContactDetail } from './personal.fake'
+import { PersonalAddressesViewModel, PersonalContactViewModel, PersonalDisabilitiesViewModel } from './personal.types'
 import { BreadcrumbType } from '../../../common/links'
 import { OffenderDetail } from '../../../community-api'
 
@@ -65,5 +65,24 @@ describe('PersonalController', () => {
         offenderName: 'Liz Danger Haggis',
       }),
     } as PersonalDisabilitiesViewModel)
+  })
+
+  it('gets personal contact', async () => {
+    const personalContact = fakePersonalContactDetail({ id: 100, description: 'Some personal contact' })
+    const otherPersonalContact = fakePersonalContactDetail({ id: 101 })
+    personalService.getPersonalContacts.withArgs('some-crn').resolves([otherPersonalContact, personalContact])
+
+    const observed = await subject.getPersonalContact('some-crn', 100)
+
+    expect(observed).toEqual({
+      personalContact,
+      displayName: 'Liz Danger Haggis',
+      breadcrumbs: fakeBreadcrumbs(BreadcrumbType.PersonalContact, {
+        id: 100,
+        crn: 'some-crn',
+        offenderName: 'Liz Danger Haggis',
+        entityName: 'Some personal contact',
+      }),
+    } as PersonalContactViewModel)
   })
 })

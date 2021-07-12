@@ -195,6 +195,15 @@ export const fakePersonalContact = fake<PersonalContact>(() => ({
   emailAddress: faker.internet.email(),
   mobileNumber: faker.phone.phoneNumber(),
   notes: faker.lorem.sentence(),
+  address: {
+    addressNumber: faker.datatype.number().toString(),
+    streetName: faker.address.streetName(),
+    buildingName: faker.commerce.department(),
+    town: faker.address.city(),
+    county: faker.address.county(),
+    postcode: faker.address.zipCode(),
+    telephoneNumber: faker.phone.phoneNumber(),
+  },
 }))
 
 export const fakeStaffDetails = fake<StaffDetails>(() => ({

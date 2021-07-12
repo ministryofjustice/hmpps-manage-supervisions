@@ -58,7 +58,7 @@
                 {% for personalContact in contactDetails.personalContacts %}
                     <p>
                         {{ personalContact.type }}:<br>
-                        <a href="{{ personalContact.link }}">{{ personalContact.name }}</a>
+                        <a href="{{ personalContact.link }}">{{ personalContact.description }}</a>
                     </p>
                 {% endfor %}
             {% endset %}

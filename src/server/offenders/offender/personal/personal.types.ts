@@ -5,6 +5,21 @@ export interface OffenderViewModel extends ViewModel {
   displayName: string
 }
 
+export interface PersonalContactDetail {
+  id: number
+  description: string
+  type: string
+  startDate?: DateTime
+  endDate?: DateTime
+  relationship?: string
+  displayName: string
+  address?: string[]
+  phone?: string
+  emailAddress?: string
+  notes?: string
+  link: string
+}
+
 export interface ContactDetailsViewModel {
   address?: AddressDetail
   otherAddresses: {
@@ -16,11 +31,7 @@ export interface ContactDetailsViewModel {
     other?: string
   }
   emailAddresses: string[]
-  personalContacts: {
-    link: string
-    type: string
-    name: string
-  }[]
+  personalContacts: PersonalContactDetail[]
   lastUpdated?: DateTime
 }
 
@@ -98,4 +109,8 @@ export interface PersonalDisabilitiesViewModel extends OffenderViewModel {
 
 export interface PersonalCircumstancesViewModel extends OffenderViewModel {
   circumstances: PersonalCircumstanceDetail[]
+}
+
+export interface PersonalContactViewModel extends OffenderViewModel {
+  personalContact: PersonalContactDetail
 }

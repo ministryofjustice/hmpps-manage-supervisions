@@ -1,11 +1,15 @@
 import { ILinksService, LinksService } from './links.service'
 import { BreadcrumbType, ResolveBreadcrumbOptions } from './types'
 import { BreadcrumbValue } from '../types'
-import { stringify } from 'qs'
 import { Module } from '@nestjs/common'
 
 export function fakeBreadcrumbUrl(type: BreadcrumbType, options: ResolveBreadcrumbOptions) {
-  return `/${BreadcrumbType[type]}${stringify(options, { addQueryPrefix: true })}`
+  const queryString = Object.entries(options)
+    .map(([k, v]) => `${k}=${v}`)
+    .sort()
+    .join('&')
+
+  return `/${BreadcrumbType[type]}?${queryString}`
 }
 
 export function fakeBreadcrumbs(type: BreadcrumbType, options: ResolveBreadcrumbOptions): BreadcrumbValue[] {

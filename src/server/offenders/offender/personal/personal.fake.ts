@@ -6,6 +6,8 @@ import {
   ContactDetailsViewModel,
   DisabilityDetail,
   GetAddressDetailResult,
+  PersonalCircumstanceDetail,
+  PersonalContactDetail,
   PersonalDetailsViewModel,
 } from './personal.types'
 
@@ -36,6 +38,20 @@ export const fakeGetAddressDetailResult = fake<GetAddressDetailResult>(() => ({
   previousAddresses: [fakeAddressDetail({ main: false, active: false })],
 }))
 
+export const fakePersonalContactDetail = fake<PersonalContactDetail>(() => ({
+  id: faker.datatype.number(),
+  description: `${faker.name.findName()} - Father`,
+  type: 'Family Member',
+  link: faker.internet.url(),
+  startDate: DateTime.fromJSDate(faker.date.past()),
+  phone: faker.phone.phoneNumber(),
+  notes: faker.lorem.sentence(),
+  emailAddress: faker.internet.email(),
+  address: [faker.address.streetAddress(), faker.address.city(), faker.address.zipCode()],
+  displayName: faker.name.findName(),
+  relationship: 'Father',
+}))
+
 export const fakeContactDetailsViewModel = fake<ContactDetailsViewModel>(() => ({
   address: fakeAddressDetail({ main: true, active: true }),
   phoneNumbers: {
@@ -48,13 +64,7 @@ export const fakeContactDetailsViewModel = fake<ContactDetailsViewModel>(() => (
     previous: faker.datatype.number({ min: 1, max: 10 }),
     link: faker.internet.url(),
   },
-  personalContacts: [
-    {
-      name: `${faker.name.findName()} - Father`,
-      type: 'Family Member',
-      link: faker.internet.url(),
-    },
-  ],
+  personalContacts: [fakePersonalContactDetail()],
   lastUpdated: DateTime.fromJSDate(faker.date.past()),
 }))
 
@@ -93,3 +103,14 @@ export const fakeDisabilityDetail = fake<DisabilityDetail>(({ active = faker.dat
     ],
   }
 })
+
+export const fakePersonalCircumstanceDetail = fake<PersonalCircumstanceDetail>(() => ({
+  name: faker.company.bs(),
+  startDate: DateTime.fromJSDate(faker.date.past()),
+  endDate: DateTime.fromJSDate(faker.date.future()),
+  verified: faker.datatype.boolean(),
+  notes: faker.lorem.lines(),
+  subType: faker.lorem.slug(10),
+  type: faker.lorem.slug(10),
+  lastUpdated: DateTime.fromJSDate(faker.date.past()),
+}))

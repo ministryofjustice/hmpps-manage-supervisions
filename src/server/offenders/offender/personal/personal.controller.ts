@@ -1,11 +1,12 @@
-import { Controller, Get, Param, Render } from '@nestjs/common'
-import { Breadcrumb, BreadcrumbType, LinksService } from '../../../common/links'
+import { Controller, Get, NotFoundException, Param, ParseIntPipe, Render } from '@nestjs/common'
+import { Breadcrumb, BreadcrumbType, LinksService, ResolveBreadcrumbOptions } from '../../../common/links'
 import { PersonalService } from './personal.service'
 import { OffenderService } from '../offender.service'
 import {
   OffenderViewModel,
   PersonalAddressesViewModel,
   PersonalCircumstancesViewModel,
+  PersonalContactViewModel,
   PersonalDisabilitiesViewModel,
 } from './personal.types'
 import { getDisplayName } from '../../../util'
@@ -67,13 +68,49 @@ export class PersonalController {
     }
   }
 
-  private getViewModel(crn: string, offender: OffenderDetail, breadcrumbType: BreadcrumbType): OffenderViewModel {
+  @Get('personal-contacts/:id(\\d+)')
+  @Render('offenders/offender/personal/personal-contact')
+  @Breadcrumb({
+    type: BreadcrumbType.PersonalContact,
+    parent: BreadcrumbType.PersonalDetails,
+    title: x => `Personal contact: ${x.entityName}`,
+  })
+  async getPersonalContact(
+    @Param('crn') crn: string,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<PersonalContactViewModel> {
+    const [offender, personalContacts] = await Promise.all([
+      this.offender.getOffenderDetail(crn),
+      this.personal.getPersonalContacts(crn),
+    ])
+
+    const personalContact = personalContacts.find(x => x.id === id)
+    if (!personalContact) {
+      throw new NotFoundException(`Personal contact with id ${id} does not exist`)
+    }
+
+    return {
+      ...this.getViewModel(crn, offender, BreadcrumbType.PersonalContact, {
+        id,
+        entityName: personalContact.description,
+      }),
+      personalContact,
+    }
+  }
+
+  private getViewModel(
+    crn: string,
+    offender: OffenderDetail,
+    breadcrumbType: BreadcrumbType,
+    partial: Partial<ResolveBreadcrumbOptions> = {},
+  ): OffenderViewModel {
     const displayName = getDisplayName(offender)
     return {
       displayName,
       breadcrumbs: this.links.resolveAll(breadcrumbType, {
         crn,
         offenderName: displayName,
+        ...partial,
       }),
     }
   }
