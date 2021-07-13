@@ -22,3 +22,4 @@ env:
   TOKEN_VERIFICATION_ENABLED: true
   COMMUNITY_API_URL: https://community-api-secure.test.delius.probation.hmpps.dsd.io
   ASSESS_RISKS_AND_NEEDS_API_URL: https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk
+  DELIUS_BASE_URL: https://ndelius.test.probation.service.justice.gov.uk

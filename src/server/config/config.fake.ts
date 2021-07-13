@@ -56,6 +56,9 @@ export function fakeConfig(partial: DeepPartial<Config> = {}): Config {
         expiryMinutes: faker.datatype.number({ min: 60, max: 120 }),
         secret: faker.internet.password(),
       },
+      delius: {
+        baseUrl: new URL(faker.internet.url()),
+      },
       apis: {
         hmppsAuth: {
           ...fakeApiConfig(),

@@ -95,6 +95,9 @@ export class PersonalController {
         entityName: personalContact.description,
       }),
       personalContact,
+      ids: {
+        crn: offender.otherIds.crn,
+      },
     }
   }
 

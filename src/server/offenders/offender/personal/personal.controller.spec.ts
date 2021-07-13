@@ -83,6 +83,9 @@ describe('PersonalController', () => {
         offenderName: 'Liz Danger Haggis',
         entityName: 'Some personal contact',
       }),
+      ids: {
+        crn: 'some-crn',
+      },
     } as PersonalContactViewModel)
   })
 })

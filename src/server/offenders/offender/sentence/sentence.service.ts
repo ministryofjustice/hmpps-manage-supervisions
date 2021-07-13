@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { CommunityApiService, isRar, Offence, Requirement, Sentence } from '../../../community-api'
+import { CommunityApiService, Conviction, isRar, Offence, Requirement, Sentence } from '../../../community-api'
 import { maxBy } from 'lodash'
 import { DateTime, Duration, DurationUnit } from 'luxon'
 import { quantity } from '../../../util'
@@ -14,15 +14,7 @@ export class SentenceService {
   async getConvictionDetails(crn: string): Promise<ConvictionDetails | null> {
     const { data: convictions } = await this.community.offender.getConvictionsForOffenderByCrnUsingGET({ crn })
 
-    // TODO we are assuming only a single active conviction per offender at this time
-    // TODO so in the case where we have multiple then just take the latest
-    const conviction = maxBy(
-      convictions.filter(x => x.active),
-      x => x.convictionDate,
-    )
-    if (!conviction) {
-      return null
-    }
+    const conviction = this.getLatestConviction(convictions)
 
     const {
       data: { requirements },
@@ -82,6 +74,27 @@ export class SentenceService {
             }
           : null,
     }
+  }
+
+  async getConvictionId(crn: string): Promise<Number> {
+    const { data: convictions } = await this.community.offender.getConvictionsForOffenderByCrnUsingGET({ crn })
+
+    const conviction = this.getLatestConviction(convictions)
+
+    return conviction?.convictionId
+  }
+
+  private getLatestConviction(convictions: Conviction[]): Conviction {
+    // TODO we are assuming only a single active conviction per offender at this time
+    // TODO so in the case where we have multiple then just take the latest
+    const conviction = maxBy(
+      convictions.filter(x => x.active),
+      x => x.convictionDate,
+    )
+    if (!conviction) {
+      return null
+    }
+    return conviction
   }
 
   private getRarMeta(requirement: Requirement): { length: number; progress: number } | null {

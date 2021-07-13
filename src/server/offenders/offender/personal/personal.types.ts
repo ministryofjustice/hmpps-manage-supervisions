@@ -113,4 +113,7 @@ export interface PersonalCircumstancesViewModel extends OffenderViewModel {
 
 export interface PersonalContactViewModel extends OffenderViewModel {
   personalContact: PersonalContactDetail
+  ids: {
+    crn: string
+  }
 }
