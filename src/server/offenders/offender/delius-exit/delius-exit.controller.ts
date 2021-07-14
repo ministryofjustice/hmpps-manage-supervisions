@@ -14,7 +14,7 @@ export class DeliusExitController {
   ) {}
 
   @Get('/')
-  @Render('offenders/offender/to-delius/to-delius')
+  @Render('offenders/offender/delius-exit/delius-exit')
   async getDeliusExit(@Param('crn') crn: string): Promise<DeliusExitViewModel> {
     const [offender, convictionId] = await Promise.all([
       this.offender.getOffenderDetail(crn),

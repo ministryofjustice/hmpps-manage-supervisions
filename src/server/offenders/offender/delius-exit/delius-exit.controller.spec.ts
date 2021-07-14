@@ -40,7 +40,7 @@ describe('DeliusExitController', () => {
     config = module.get(ConfigService).get('delius')
   })
 
-  it('gets addresses', async () => {
+  it('displays an exit link to delius', async () => {
     const observed = await subject.getDeliusExit('some-crn')
 
     expect(observed).toEqual({

@@ -8,4 +8,8 @@ export class OffenderPersonalContactPage extends PageBase {
   value(title: string | RegExp) {
     return this.cell(title).siblings('dd')
   }
+
+  get changeContactDetailsLink() {
+    return cy.get('a').contains('Change contact details')
+  }
 }

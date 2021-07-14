@@ -3,6 +3,7 @@ import { ADDRESS, OffenderAddressesPage } from '../../../pages/offender-addresse
 import { OffenderDisabilitiesPage } from '../../../pages/offender-disabilities.page'
 import { OffenderPersonalCircumstancesPage } from '../../../pages/offender-personal-circumstances.page'
 import { OffenderPersonalContactPage } from '../../../pages/offender-personal-contact.page'
+import { DeliusExitPage } from '../../../pages/delius-exit.page'
 
 class Fixture extends ViewOffenderFixture {
   whenClickingViewAllAddresses(): this {
@@ -26,6 +27,12 @@ class Fixture extends ViewOffenderFixture {
   whenClickingViewPersonalContact(name: string) {
     return this.shouldRenderOffenderTab('personal', page => {
       page.tableValue('contact', 'Personal contacts').contains(name).click()
+    })
+  }
+
+  whenClickingChangeContactDetails(title: string) {
+    return this.shouldDisplayPersonalContact(title, page => {
+      page.changeContactDetailsLink.click()
     })
   }
 
@@ -127,6 +134,14 @@ class Fixture extends ViewOffenderFixture {
     const page = new OffenderPersonalContactPage()
     page.pageTitle.contains(name)
     assert(page)
+    return this
+  }
+
+  shouldDisplayDeliusExitPage(name: string, assert: (page: DeliusExitPage) => void) {
+    const page = new DeliusExitPage()
+    page.pageTitle.contains(name)
+    assert(page)
+    return this
   }
 }
 
@@ -309,6 +324,15 @@ context('ViewOffenderPersonalDetails', () => {
         page.value('Address').contains('64 Ermin Street Wrenthorpe West Yorkshire WF2 8WT')
         page.value('Phone number').contains('07700 900 141')
         page.value('Notes').contains('Divorced')
+      })
+      .whenClickingChangeContactDetails('Pippa Wade – Wife')
+      .shouldDisplayDeliusExitPage('Use National Delius to make these changes', page => {
+        page.deliusExitButton
+          .should('have.attr', 'href')
+          .and(
+            'include',
+            `http://localhost:8082/NDelius-war/delius/JSP/deeplink.jsp?component=ContactList&offenderId=2500011641&eventId=1`,
+          )
       })
   })
 })

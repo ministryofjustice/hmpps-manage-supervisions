@@ -16,6 +16,10 @@ export class SentenceService {
 
     const conviction = this.getLatestConviction(convictions)
 
+    if (!conviction) {
+      return null
+    }
+
     const {
       data: { requirements },
     } = await this.community.requirement.getRequirementsByConvictionIdUsingGET({
@@ -79,9 +83,7 @@ export class SentenceService {
   async getConvictionId(crn: string): Promise<Number> {
     const { data: convictions } = await this.community.offender.getConvictionsForOffenderByCrnUsingGET({ crn })
 
-    const conviction = this.getLatestConviction(convictions)
-
-    return conviction?.convictionId
+    return this.getLatestConviction(convictions)?.convictionId
   }
 
   private getLatestConviction(convictions: Conviction[]): Conviction {
@@ -91,9 +93,7 @@ export class SentenceService {
       convictions.filter(x => x.active),
       x => x.convictionDate,
     )
-    if (!conviction) {
-      return null
-    }
+
     return conviction
   }
 
