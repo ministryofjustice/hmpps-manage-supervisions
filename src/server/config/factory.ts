@@ -129,6 +129,9 @@ export function configFactory(): Config {
       secret: string('SESSION_SECRET', developmentOnly('app-insecure-default-session')),
       expiryMinutes: int('WEB_SESSION_TIMEOUT_IN_MINUTES', fallback(120)),
     },
+    delius: {
+      baseUrl: Object.freeze(new URL(string('DELIUS_BASE_URL', developmentOnly('http://localhost:8082/delius')))),
+    },
     apis: {
       hmppsAuth: {
         enabled: true,

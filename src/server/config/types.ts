@@ -70,6 +70,10 @@ export interface DependentApisConfig {
   assessRisksAndNeeds: ApiConfig
 }
 
+export interface DeliusConfig {
+  baseUrl: URL
+}
+
 export enum WellKnownAppointmentType {
   OfficeVisit = 'office-visit',
   HomeVisit = 'home-visit',
@@ -111,4 +115,5 @@ export interface Config {
   session: SessionConfig
   apis: DependentApisConfig
   contacts: WellKnownContactTypeConfig
+  delius: DeliusConfig
 }

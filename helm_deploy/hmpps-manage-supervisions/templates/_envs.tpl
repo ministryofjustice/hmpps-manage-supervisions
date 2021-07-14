@@ -74,6 +74,9 @@ env:
   - name: ASSESS_RISKS_AND_NEEDS_API_URL
     value: {{ .Values.env.ASSESS_RISKS_AND_NEEDS_API_URL | quote }}
 
+  - name: DELIUS_BASE_URL
+    value: {{ .Values.env.DELIUS_BASE_URL | quote }}
+
   - name: NODE_ENV
     value: production
 
