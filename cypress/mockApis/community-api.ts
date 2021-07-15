@@ -557,7 +557,7 @@ export class CommunityMockApi {
               startDate: '2021-01-03',
               active: true,
               requirementTypeSubCategory: {
-                code: 'RARREQ',
+                code: 'SOME_CODE',
                 description: 'Rehabilitation Activity Requirement (RAR)',
               },
               requirementTypeMainCategory: {
