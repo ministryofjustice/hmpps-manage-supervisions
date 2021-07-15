@@ -30,11 +30,7 @@ import * as faker from 'faker'
 import { DateTime } from 'luxon'
 import { fake } from '../util/util.fake'
 import { Paginated } from './types'
-import {
-  RAR_REQUIREMENT_SUB_TYPE_CATEGORY_CODE,
-  RAR_REQUIREMENT_TYPE_MAIN_CATEGORY_CODE,
-  WellKnownAddressTypes,
-} from './well-known'
+import { RAR_REQUIREMENT_TYPE_MAIN_CATEGORY_CODE, WellKnownAddressTypes } from './well-known'
 
 export function fakeIsoDate(type: 'past' | 'recent' | 'soon' | 'future' = 'past'): string {
   return faker.date[type]().toISOString().substr(0, 10)
@@ -391,7 +387,7 @@ export const fakeRequirement = fake<Requirement>(() => ({
   expectedEndDate: fakeIsoDate('future'),
   requirementNotes: faker.lorem.sentence(),
   requirementTypeMainCategory: { code: RAR_REQUIREMENT_TYPE_MAIN_CATEGORY_CODE, description: 'RAR category' },
-  requirementTypeSubCategory: { code: RAR_REQUIREMENT_SUB_TYPE_CATEGORY_CODE, description: 'RAR sub category' },
+  requirementTypeSubCategory: { code: faker.random.alphaNumeric(5), description: faker.commerce.productMaterial() },
 }))
 
 export const fakeRegistration = fake<Registration>((partial: DeepPartial<Registration> = {}) => {
