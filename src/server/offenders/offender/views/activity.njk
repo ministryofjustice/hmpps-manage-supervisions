@@ -60,14 +60,14 @@
                         {% if contact.notes %}
                             {% if contact.notes.length > 300 %}
                                 <p class="govuk-body" data-qa='notes'>
-                                    {{ contact.notes | truncate(250) }}
+                                    {{ contact.notes | truncate(250) | nl2br }}
                                 </p>
                                 <p class="govuk-body govuk-!-margin-bottom-0" data-qa='view-link'>
                                     <a href="{{ contact.links.view }}">View full details</a>
                                 </p>
                             {% else %}
                                 <p class="govuk-body govuk-!-margin-bottom-0" data-qa='notes'>
-                                    {{ contact.notes }}
+                                    {{ contact.notes | nl2br }}
                                 </p>
                             {% endif %}
                         {% elif not contact.links.recordMissingAttendance %}

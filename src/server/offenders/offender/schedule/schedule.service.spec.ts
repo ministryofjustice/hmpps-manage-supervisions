@@ -4,7 +4,7 @@ import { AppointmentDetail, CommunityApiService } from '../../../community-api'
 import { orderBy, sortBy } from 'lodash'
 import { fakeAppointmentDetail } from '../../../community-api/community-api.fake'
 import { fakeOkResponse } from '../../../common/rest/rest.fake'
-import { AppointmentSummary, RecentAppointments } from './schedule.types'
+import { AppointmentListViewModel, AppointmentSummary, RecentAppointments } from './schedule.types'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../../community-api/community-api.mock'
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { ContactMappingService } from '../../../common'
@@ -43,20 +43,24 @@ describe('ScheduleService', () => {
     for (const apt of appointments) {
       contactMapping.getTypeMeta.withArgs(apt).returns({
         type: null,
-        value: { appointment: true },
+        value: { appointment: true, name: 'Some appointment' },
         name: 'some-appointment-type',
       })
     }
 
-    const expected = appointments.map(x => ({
-      ...x,
-      name: 'some-appointment-type',
-      link: '/offender/some-crn/appointment/12345',
-    }))
+    const expected = appointments.map(
+      x =>
+        ({
+          start: DateTime.fromISO(x.appointmentStart),
+          end: DateTime.fromISO(x.appointmentEnd),
+          name: 'some-appointment-type',
+          link: '/offender/some-crn/appointment/12345',
+        } as AppointmentListViewModel),
+    )
     const stub = community.appointment.getOffenderAppointmentsByCrnUsingGET.resolves(fakeOkResponse(appointments))
     const observed = await subject.getRecentAppointments('some-crn')
     expect(observed).toEqual({
-      future: sortBy(expected.slice(0, futureAppointments), 'appointmentStart', 'appointmentEnd'),
+      future: sortBy(expected.slice(0, futureAppointments), [x => x.start.toJSDate(), x => x.end.toJSDate()]),
       recent: expected.slice(futureAppointments, MAX_RECENT_APPOINTMENTS + futureAppointments),
       past: expected.slice(MAX_RECENT_APPOINTMENTS + futureAppointments),
     } as RecentAppointments)
@@ -74,7 +78,7 @@ describe('ScheduleService', () => {
     for (const apt of appointments) {
       contactMapping.getTypeMeta.withArgs(apt).returns({
         type: null,
-        value: { appointment: true },
+        value: { appointment: true, name: 'Some appointment' },
         name: 'some-appointment-type',
       })
     }

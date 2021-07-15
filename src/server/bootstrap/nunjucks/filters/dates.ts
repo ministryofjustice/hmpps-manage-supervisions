@@ -1,6 +1,6 @@
 import { NunjucksFilter } from './types'
 import { DateTime } from 'luxon'
-import { safeGetDateTime } from '../../../util'
+import { RawDate, safeGetDateTime } from '../../../util'
 
 export class ToIsoDate implements NunjucksFilter {
   filter(date: DateTime): string {
@@ -9,21 +9,45 @@ export class ToIsoDate implements NunjucksFilter {
 }
 
 export class DateFormat implements NunjucksFilter {
-  filter(value: string | DateTime, format: string): string {
+  filter(value: RawDate, format: string): string {
     return safeGetDateTime(value).toFormat(format)
   }
 }
 
 export class Time implements NunjucksFilter {
-  filter(value: string | DateTime): string {
-    const datetime = value instanceof DateTime ? value : DateTime.fromISO(value)
+  filter(value: RawDate): string {
+    return Time.apply(value)
+  }
+
+  static apply(value: RawDate): string {
+    const datetime = safeGetDateTime(value)
+    if (!datetime) {
+      throw new Error(`cannot parse time from ${value}`)
+    }
     const hourMinuteFormat = datetime.minute === 0 ? 'ha' : 'h:mma'
     return datetime.toFormat(hourMinuteFormat).toLowerCase()
   }
 }
 
+export class TimeRange implements NunjucksFilter {
+  filter(from: RawDate, to?: RawDate): string {
+    return TimeRange.apply(from, to)
+  }
+
+  static apply(from: RawDate, to?: RawDate): string {
+    return [Time.apply(from), to && Time.apply(to)]
+      .filter(x => x)
+      .join(' to ')
+      .toLowerCase()
+  }
+}
+
 export class LongDate implements NunjucksFilter {
-  filter(value: string | DateTime): string {
+  filter(value: RawDate): string {
+    return LongDate.apply(value)
+  }
+
+  static apply(value: RawDate): string {
     const date = safeGetDateTime(value)
     const format = date.year === DateTime.now().year ? 'cccc d MMMM' : 'cccc d MMMM yyyy'
     return date.toFormat(format)
@@ -31,13 +55,13 @@ export class LongDate implements NunjucksFilter {
 }
 
 export class ShortDate implements NunjucksFilter {
-  filter(value: string | DateTime): string {
+  filter(value: RawDate): string {
     return safeGetDateTime(value).toFormat('d MMMM yyyy')
   }
 }
 
 export class Dob implements NunjucksFilter {
-  filter(value: string | DateTime): string {
+  filter(value: RawDate): string {
     const date = safeGetDateTime(value)
     const age = DateTime.now().diff(date, 'years')
     return `${date.toFormat('d MMMM yyyy')} (${Math.floor(age.years)} years old)`

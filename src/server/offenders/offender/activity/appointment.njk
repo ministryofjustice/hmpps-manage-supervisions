@@ -1,0 +1,83 @@
+{% extends "partials/layout.njk" %}
+{% set pageTitle = appointment.name + ' – ' + displayName %}
+
+{% block content %}
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-2">
+        <span class="govuk-caption-l">{{ appointment.category }}</span>
+        {{ appointment.name }}
+    </h1>
+
+    <div class="govuk-!-margin-bottom-6">
+        {% for tag in appointment.tags %}
+            {{ govukTag({
+                text: tag.name,
+                classes: "govuk-tag--" + tag.colour,
+                attributes: { 'data-qa': 'tag' }
+            }) }}
+        {% endfor %}
+    </div>
+
+    <h3 class="govuk-heading-l govuk-!-font-size-27">Appointment details</h3>
+
+    {{ govukSummaryList({
+        classes: 'govuk-!-margin-bottom-9',
+        attributes: {
+            'data-qa': 'offender/activity/appointment'
+        },
+        rows: [
+            {
+                key: { text: "Type of appointment" },
+                value: { text: appointment.typeName }
+            },
+            {
+                key: { text: "Date" },
+                value: { text: appointment.start | shortDate }
+            },
+            {
+                key: { text: "Time" },
+                value: { text: appointment.start | timeRange(appointment.end) }
+            },
+            {
+                key: { text: "Appointment notes" },
+                value: { html: (appointment.notes | nl2br) if appointment.notes else 'No notes' }
+            },
+            {
+                key: { text: "Sensitive" },
+                value: { text: appointment.sensitive | yesNo }
+            },
+            {
+                key: { text: "RAR activity" },
+                value: { text: appointment.requirement.isRar | yesNo }
+            },
+            {
+                key: { text: "Counts towards RAR" },
+                value: { text: appointment.rarActivity | yesNo }
+            } if appointment.requirement
+        ]
+    }) }}
+
+    {% if appointment.outcome %}
+        <h3 class="govuk-heading-l govuk-!-font-size-27">Outcome details</h3>
+
+        {{ govukSummaryList({
+            attributes: {
+                'data-qa': 'offender/activity/outcome'
+            },
+            rows: [
+                {
+                    key: { text: "Attended" },
+                    value: { text: appointment.outcome.attended | yesNo }
+                },
+                {
+                    key: { text: "Complied" },
+                    value: { text: appointment.outcome.complied | yesNo }
+                },
+                {
+                    key: { text: "Description" },
+                    value: { text: appointment.outcome.description }
+                }
+            ]
+        }) }}
+    {% endif %}
+
+{% endblock %}

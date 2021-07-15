@@ -12,8 +12,8 @@
         { text: 'Appointment', attributes: { 'data-qa': 'appointment' } }
     ] %}
     {% set columns = [
-        { type: 'long-date', path: 'appointmentStart', attributes: { 'data-qa': 'date' } },
-        { type: 'time-range', from: 'appointmentStart', to: 'appointmentEnd', attributes: { 'data-qa': 'time' } },
+        { type: 'long-date', path: 'start', attributes: { 'data-qa': 'date' } },
+        { type: 'time-range', from: 'start', to: 'end', attributes: { 'data-qa': 'time' } },
         { type: 'link', path: 'name', href: 'link', attributes: { 'data-qa': 'appointment' }
     }] %}
 

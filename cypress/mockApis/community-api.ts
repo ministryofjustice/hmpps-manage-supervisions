@@ -1,6 +1,10 @@
 import { WireMockClient } from './wiremock-client'
 import { merge } from 'lodash'
 
+export interface StubOffenderOptions {
+  crn: string
+}
+
 export interface CreateAppointmentArgs {
   crn: string
   convictionId: number
@@ -32,6 +36,18 @@ export interface StubContactSummaryOptions {
   crn: string
   partials: any[]
   query: any
+}
+
+export interface StubGetAppointmentOptions {
+  appointmentId: number
+  crn: string
+  start: string
+  end: string
+  outcome?: {
+    complied: boolean
+    attended: boolean
+    description: string
+  }
 }
 
 export interface StubGetRequirementsOptions {
@@ -130,7 +146,103 @@ export class CommunityMockApi {
     })
   }
 
-  async stubOffenderDetails({ crn }: CreateAppointmentArgs) {
+  async stubOffenderSummary({ crn }: StubOffenderOptions) {
+    return this.client.stub({
+      request: {
+        method: 'GET',
+        urlPath: `/community/secure/offenders/crn/${crn}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          offenderId: 2500011641,
+          title: 'Mr',
+          firstName: 'Brian',
+          surname: 'Cheese',
+          preferredName: 'Bob',
+          dateOfBirth: '1980-06-10',
+          previousSurname: 'Smith',
+          gender: 'Male',
+          otherIds: { crn, pncNumber: '2012/123400000F' },
+          contactDetails: {
+            phoneNumbers: [
+              {
+                type: 'MOBILE',
+                number: '07734 111992',
+              },
+              {
+                type: 'TELEPHONE',
+                number: '01234 111222',
+              },
+            ],
+            emailAddresses: ['example@example.com', 'example2@example2.com'],
+          },
+          offenderProfile: {
+            offenderLanguages: {
+              primaryLanguage: 'Bengali',
+              requiresInterpreter: true,
+            },
+            remandStatus: 'Bail - Unconditional',
+            previousConviction: {},
+            religion: 'Christian',
+            genderIdentity: 'Prefer to self-describe',
+            selfDescribedGender: 'Jedi',
+            sexualOrientation: 'Bisexual',
+            disabilities: [
+              {
+                disabilityId: 2500079588,
+                disabilityType: {
+                  code: 'LD',
+                  description: 'Learning Difficulties',
+                },
+                startDate: '2021-02-01',
+                provisions: [
+                  {
+                    provisionId: 2500075159,
+                    startDate: '2021-05-10',
+                    provisionType: {
+                      code: '99',
+                      description: 'Other',
+                    },
+                    notes: 'Extra tuition',
+                  },
+                ],
+              },
+              {
+                disabilityId: 2500080089,
+                disabilityType: {
+                  code: 'SI',
+                  description: 'Speech Impairment',
+                },
+                startDate: '2021-03-01',
+                notes: 'Talks like a pirate',
+              },
+              {
+                disabilityId: 2500080089,
+                disabilityType: {
+                  code: 'D',
+                  description: 'Dyslexia',
+                },
+                startDate: '2020-04-01',
+                endDate: '2020-05-01',
+              },
+            ],
+          },
+          softDeleted: false,
+          currentDisposal: '1',
+          partitionArea: 'National Data',
+          currentRestriction: false,
+          currentExclusion: false,
+          activeProbationManagedSentence: true,
+        },
+      },
+    })
+  }
+
+  async stubOffenderDetails({ crn }: StubOffenderOptions) {
     return this.client.stub({
       request: {
         method: 'GET',
@@ -781,6 +893,71 @@ export class CommunityMockApi {
               },
             },
           ],
+        },
+      },
+    })
+  }
+
+  async stubGetAppointment({ crn, appointmentId, start, end, outcome }: StubGetAppointmentOptions) {
+    return this.client.stub({
+      request: {
+        method: 'GET',
+        urlPath: `/community/secure/offenders/crn/${crn}/appointments/${appointmentId}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          appointmentId,
+          appointmentStart: start,
+          appointmentEnd: end,
+          notes: 'Some office visit appointment',
+          officeLocation: {
+            code: '58c9c12a-8121-497d-b0ff-f576d3d7adc7',
+            buildingName: 'Odie',
+            buildingNumber: '430',
+            streetName: 'Larkin Mountain',
+            townCity: 'Shieldsland',
+            county: 'Buckinghamshire',
+            postcode: '34887',
+            description: '80664 Casper Plains',
+          },
+          outcome: outcome && {
+            code: '27524882-18fd-4a0e-b971-99a8f1b831e7',
+            attended: outcome.attended || false,
+            complied: outcome.complied || false,
+            description: outcome.description || 'e-enable out-of-the-box networks',
+            hoursCredited: 38436,
+          },
+          sensitive: true,
+          type: {
+            contactType: 'APAT',
+            description: 'Some office visit',
+            orderTypes: ['CJA', 'CJA'],
+            requiresLocation: 'NOT_REQUIRED',
+          },
+          provider: {
+            code: '21f0232b-1676-420a-92ec-9ebbd11e3f49',
+            description: 'morph granular infomediaries',
+          },
+          team: {
+            code: '96602333-b9a2-42d4-8d3e-0764ed2a6042',
+            description: 'repurpose next-generation solutions',
+          },
+          staff: {
+            code: '067232a5-96f4-436b-aa61-beb68cc0bc44',
+            forenames: 'Some',
+            surname: 'Staff',
+            unallocated: false,
+          },
+          rarActivity: true,
+          requirement: {
+            requirementId: 10000,
+            isRar: true,
+            isActive: true,
+          },
         },
       },
     })

@@ -32,7 +32,7 @@ export class ContactMappingService {
     if (!meta) {
       return {
         type: null,
-        value: { appointment },
+        value: { appointment, name: type.description },
         name: appointment ? appointmentName(type.description) : type.description,
       }
     }

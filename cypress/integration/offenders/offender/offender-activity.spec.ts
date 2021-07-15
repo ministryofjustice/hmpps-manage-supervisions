@@ -1,11 +1,23 @@
 import { ViewOffenderFixture } from './view-offender.fixture'
 import * as faker from 'faker'
-import { StubContactSummaryOptions } from '../../../mockApis/community-api'
+import { StubContactSummaryOptions, StubGetAppointmentOptions } from '../../../mockApis/community-api'
+import { OffenderActivityAppointmentPage } from '../../../pages'
 
 class Fixture extends ViewOffenderFixture {
   havingOffenderContacts(...partials: StubContactSummaryOptions['partials']): this {
     cy.task('stubContactSummary', { crn: this.crn, partials })
     return this
+  }
+
+  havingOffenderAppointment(partial: Omit<StubGetAppointmentOptions, 'crn'>): this {
+    cy.task('stubGetAppointment', { crn: this.crn, ...partial })
+    return this
+  }
+
+  whenClickingAppointmentEntry(id: number) {
+    return this.shouldRenderOffenderTab('activity', page => {
+      page.entry(id).title.find('a').click()
+    })
   }
 
   shouldRenderActivity({
@@ -28,10 +40,9 @@ class Fixture extends ViewOffenderFixture {
     havingLongNotes?: boolean
   }) {
     return this.shouldRenderOffenderTab('activity', page => {
-      const link = `/offender/${this.crn}/appointment/${id}`
       const entry = page.entry(id)
       entry.title.contains(date).contains(time)
-      entry.title.children(`a[href="${link}"]`).contains(name)
+      entry.title.find('a').contains(name)
 
       entry.tags.should('have.length', tags.length)
       for (const { colour, text } of tags) {
@@ -40,7 +51,7 @@ class Fixture extends ViewOffenderFixture {
 
       if (havingLongNotes) {
         entry.notes.contains(notes.substr(0, 200)) // just assert first 200 chars as it can cut off in the last word
-        entry.longNotesLink.contains('View full details').should('have.attr', 'href').and('include', link)
+        entry.longNotesLink.contains('View full details').should('have.attr', 'href')
       } else {
         entry.notes.contains(notes)
       }
@@ -52,6 +63,12 @@ class Fixture extends ViewOffenderFixture {
           .contains('Record attendance')
       }
     })
+  }
+
+  shouldRenderAppointmentPage(title: string, assert: (page: OffenderActivityAppointmentPage) => void) {
+    const page = new OffenderActivityAppointmentPage()
+    page.pageTitle.contains(title)
+    assert(page)
   }
 }
 
@@ -188,6 +205,73 @@ context('ViewOffenderActivity', () => {
         name: 'Not a well known appointment with Mark Berridge',
         notes: 'Some unknown appointment',
         havingAttendanceMissing: true,
+      })
+  })
+
+  it('displays appointment detail without outcome', () => {
+    fixture
+      .havingOffender()
+      .havingOffenderContacts({
+        type: { code: 'CHVS' },
+        contactStart: '2020-09-04T12:00:00+01:00',
+        contactEnd: '2020-09-04T13:00:00+01:00',
+        notes: 'Some home visit appointment',
+        outcome: { complied: true, attended: true },
+      })
+
+      .havingOffenderAppointment({
+        appointmentId: 1,
+        start: '2020-09-04T12:00:00+01:00',
+        end: '2020-09-04T13:00:00+01:00',
+      })
+
+      .whenViewingOffender()
+      .whenClickingSubNavTab('activity')
+      .whenClickingAppointmentEntry(1)
+
+      .shouldRenderAppointmentPage('Previous appointment Office visit with Some Staff', page => {
+        page.detail('Type of appointment').contains('Office visit')
+        page.detail('Date').contains('4 September 2020')
+        page.detail('Time').contains('12pm to 1pm')
+        page.detail('Appointment notes').contains('Some office visit appointment')
+        page.detail('Sensitive').contains('Yes')
+        page.detail('RAR activity').contains('Yes')
+        page.detail('Counts towards RAR').contains('Yes')
+
+        page.outcomeTable.should('not.exist')
+      })
+  })
+
+  it('displays appointment detail with outcome', () => {
+    fixture
+      .havingOffender()
+      .havingOffenderContacts({
+        type: { code: 'CHVS' },
+        contactStart: '2020-09-04T12:00:00+01:00',
+        contactEnd: '2020-09-04T13:00:00+01:00',
+        notes: 'Some home visit appointment',
+        outcome: { complied: true, attended: true },
+      })
+
+      .havingOffenderAppointment({
+        appointmentId: 1,
+        start: '2020-09-04T12:00:00+01:00',
+        end: '2020-09-04T13:00:00+01:00',
+        outcome: {
+          attended: true,
+          complied: true,
+          description: 'Some outcome description',
+        },
+      })
+
+      .whenViewingOffender()
+      .whenClickingSubNavTab('activity')
+      .whenClickingAppointmentEntry(1)
+
+      .shouldRenderAppointmentPage('Previous appointment Office visit with Some Staff', page => {
+        page.outcome('Attended').contains('Yes')
+        page.outcome('Complied').contains('Yes')
+        page.outcome('Description').contains('Some outcome description')
       })
   })
 })

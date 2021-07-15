@@ -1,15 +1,22 @@
 import { Injectable } from '@nestjs/common'
 import {
+  AppointmentDetail,
   AppointmentOutcome,
   CommunityApiService,
   ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
   ContactSummary,
   Paginated,
 } from '../../../community-api'
-import { ActivityLogEntry, ActivityLogEntryBase, ActivityLogEntryTag } from './activity.types'
-import { ContactMappingService, isAppointment } from '../../../common'
+import {
+  ActivityLogEntry,
+  ActivityLogEntryBase,
+  ActivityLogEntryTag,
+  AppointmentActivityLogEntry,
+} from './activity.types'
+import { ContactMappingService, GetMetaResult, isAppointment } from '../../../common'
 import { DateTime } from 'luxon'
 import { WellKnownContactTypeCategory } from '../../../config'
+import { BreadcrumbType, LinksService } from '../../../common/links'
 
 export type GetContactsOptions = Omit<ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest, 'crn'>
 
@@ -24,7 +31,7 @@ function getOutcomeFlags(outcome?: AppointmentOutcome): ActivityLogEntryTag[] {
   }
 }
 
-function getAppointmentFlags(contact: ContactSummary): ActivityLogEntryTag[] {
+function getAppointmentFlags(contact: ContactSummary | AppointmentDetail): ActivityLogEntryTag[] {
   const tags = []
   if (contact.sensitive) {
     tags.push({ name: 'sensitive', colour: 'grey' })
@@ -39,7 +46,11 @@ function getAppointmentFlags(contact: ContactSummary): ActivityLogEntryTag[] {
 
 @Injectable()
 export class ActivityService {
-  constructor(private readonly community: CommunityApiService, private readonly contacts: ContactMappingService) {}
+  constructor(
+    private readonly community: CommunityApiService,
+    private readonly contacts: ContactMappingService,
+    private readonly links: LinksService,
+  ) {}
 
   async getActivityLogPage(crn: string, options: GetContactsOptions = {}): Promise<Paginated<ActivityLogEntry>> {
     const { data } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET({
@@ -58,42 +69,43 @@ export class ActivityService {
     }
   }
 
-  private getActivityLogEntry(crn: string, contact: ContactSummary): ActivityLogEntry {
-    const start = DateTime.fromISO(contact.contactStart)
-    const base = {
-      id: contact.contactId,
-      start,
-      notes: contact.notes,
-    } as ActivityLogEntryBase
+  async getAppointment(crn: string, appointmentId: number): Promise<AppointmentActivityLogEntry> {
+    const { data: appointment } = await this.community.appointment.getOffenderAppointmentByCrnUsingGET({
+      crn,
+      appointmentId,
+    })
 
+    const meta = this.contacts.getTypeMeta(appointment)
+    if (!isAppointment(meta)) {
+      throw new Error(`cannot determine that appointment with id '${appointmentId}' is a valid appointment`)
+    }
+
+    return this.getAppointmentActivityLogEntry(crn, appointment, meta)
+  }
+
+  private getActivityLogEntry(crn: string, contact: ContactSummary): ActivityLogEntry {
     const meta = this.contacts.getTypeMeta(contact)
 
     if (isAppointment(meta)) {
       // is either a well-known or 'other' appointment
-      const outcomeFlags = [...getAppointmentFlags(contact), ...getOutcomeFlags(contact.outcome)]
-      const missingOutcome = outcomeFlags.length === 0 && start <= DateTime.now()
-      return {
-        ...base,
-        type: WellKnownContactTypeCategory.Appointment,
-        name: meta.name,
-        end: DateTime.fromISO(contact.contactEnd),
-        tags: [...outcomeFlags],
-        links: {
-          view: `/offender/${crn}/appointment/${contact.contactId}`,
-          addNotes: `/offender/${crn}/appointment/${contact.contactId}/add-notes`,
-          recordMissingAttendance: missingOutcome
-            ? `/offender/${crn}/appointment/${contact.contactId}/record-outcome`
-            : null,
-        },
-      }
+      return this.getAppointmentActivityLogEntry(crn, contact, meta)
     }
+
+    const base = {
+      id: contact.contactId,
+      start: DateTime.fromISO(contact.contactStart),
+      notes: contact.notes,
+      sensitive: contact.sensitive || false,
+    } as Pick<ActivityLogEntryBase, 'id' | 'start' | 'notes' | 'sensitive'>
 
     if (meta.type === WellKnownContactTypeCategory.Communication) {
       // is a well known communication
       return {
         ...base,
         type: meta.type,
+        category: 'Other communication',
         name: meta.name,
+        typeName: meta.value.name,
         tags: [],
         links: {
           view: `/offender/${crn}/communication/${contact.contactId}`,
@@ -106,9 +118,65 @@ export class ActivityService {
     return {
       ...base,
       type: null,
+      category: 'Unclassified contact',
       name: meta.name,
+      typeName: meta.value.name,
       tags: [],
       links: null,
+    }
+  }
+
+  private getAppointmentActivityLogEntry(
+    crn: string,
+    contact: AppointmentDetail | ContactSummary,
+    meta: GetMetaResult,
+  ): AppointmentActivityLogEntry {
+    function isAppointment(value: any): value is AppointmentDetail {
+      return 'appointmentStart' in value
+    }
+
+    const {
+      id,
+      start: startIso,
+      end: endIso,
+      requirement = null,
+    } = isAppointment(contact)
+      ? {
+          id: contact.appointmentId,
+          start: contact.appointmentStart,
+          end: contact.appointmentEnd,
+          requirement: contact.requirement,
+        }
+      : { id: contact.contactId, start: contact.contactStart, end: contact.contactEnd, requirement: null }
+
+    const start = DateTime.fromISO(startIso)
+    const outcomeFlags = [...getAppointmentFlags(contact), ...getOutcomeFlags(contact.outcome)]
+    const missingOutcome = outcomeFlags.length === 0 && start <= DateTime.now()
+    return {
+      id,
+      start,
+      notes: contact.notes,
+      sensitive: contact.sensitive || false,
+      type: WellKnownContactTypeCategory.Appointment,
+      category: `${start > DateTime.now() ? 'Future' : 'Previous'} appointment`,
+      name: meta.name,
+      typeName: meta.value.name,
+      end: endIso && DateTime.fromISO(endIso),
+      tags: [...outcomeFlags],
+      links: {
+        view: this.links.getUrl(BreadcrumbType.Appointment, { id, crn }),
+        addNotes: `/offender/${crn}/appointment/${id}/add-notes`,
+        recordMissingAttendance: missingOutcome ? `/offender/${crn}/appointment/${id}/record-outcome` : null,
+      },
+      rarActivity: contact.rarActivity || false,
+      requirement,
+      outcome: contact.outcome
+        ? {
+            complied: contact.outcome.complied,
+            attended: contact.outcome.attended,
+            description: contact.outcome.description,
+          }
+        : null,
     }
   }
 }
