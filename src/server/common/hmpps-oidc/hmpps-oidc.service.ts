@@ -19,7 +19,11 @@ export class HmppsOidcService {
     this.config = config.get('apis.hmppsAuth')
   }
 
-  public async getDeliusUserToken({ username = '%ANONYMOUS%' }: User): Promise<string> {
+  public async getDeliusUserToken({ username }: User): Promise<string> {
+    if (!username) {
+      throw new Error("Not getting client token on user's behalf - no username present on user object")
+    }
+
     const credentials = this.config.systemClientCredentials
 
     return await this.cache.getOrSet(`oidc:client_credentials:${credentials.id}:delius:${username}`, async () => {

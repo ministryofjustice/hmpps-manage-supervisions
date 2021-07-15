@@ -61,4 +61,9 @@ describe('HmppsOidcService', () => {
     const result = await subject.getDeliusUserToken(user)
     expect(result).toBe(accessToken)
   })
+
+  it('no username results in error', async () => {
+    const noUsername = fakeUser({ username: null })
+    await expect(subject.getDeliusUserToken(noUsername)).rejects.toThrow(Error)
+  })
 })
