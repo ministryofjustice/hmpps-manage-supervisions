@@ -4,7 +4,7 @@ import { OffenderController } from './offender.controller'
 import { OffenderService } from './offender.service'
 import { OffenderPage, OffenderViewModel } from './offender-view-model'
 import { RedirectResponse } from '../../common'
-import { fakeOffenderDetail, fakePaginated } from '../../community-api/community-api.fake'
+import { fakeOffenderDetail, fakeOffenderDetailSummary, fakePaginated } from '../../community-api/community-api.fake'
 import {
   fakeContactDetailsViewModel,
   fakePersonalCircumstanceDetail,
@@ -99,7 +99,7 @@ describe('OffenderController', () => {
   })
 
   it('gets schedule', async () => {
-    havingOffender()
+    havingOffenderSummary()
 
     const appointments = fakeRecentAppointments()
     scheduleService.getRecentAppointments.withArgs('some-crn').resolves(appointments)
@@ -116,7 +116,7 @@ describe('OffenderController', () => {
   })
 
   it('gets activity', async () => {
-    havingOffender()
+    havingOffenderSummary()
 
     const contacts = fakePaginated([fakeActivityLogEntry(), fakeActivityLogEntry()])
 
@@ -166,7 +166,7 @@ describe('OffenderController', () => {
   })
 
   it('gets sentence', async () => {
-    havingOffender()
+    havingOffenderSummary()
 
     const conviction = fakeConvictionDetails()
     sentenceService.getConvictionDetails.withArgs('some-crn').resolves(conviction)
@@ -192,6 +192,18 @@ describe('OffenderController', () => {
       preferredName: 'Bob',
     })
     offenderService.getOffenderDetail.withArgs('some-crn').resolves(offender)
+    return offender
+  }
+
+  function havingOffenderSummary() {
+    const offender = fakeOffenderDetailSummary({
+      otherIds: { crn: 'some-crn', pncNumber: 'some-prn' },
+      firstName: 'Liz',
+      middleNames: ['Danger'],
+      surname: 'Haggis',
+      preferredName: 'Bob',
+    })
+    offenderService.getOffenderSummary.withArgs('some-crn').resolves(offender)
     return offender
   }
 

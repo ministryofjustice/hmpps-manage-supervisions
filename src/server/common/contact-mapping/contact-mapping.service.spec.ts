@@ -85,7 +85,7 @@ describe('ContactMappingService', () => {
     expect(observed).toEqual({
       name: 'Not well known with John Doe',
       type: null,
-      value: { appointment: true },
+      value: { appointment: true, name: 'Not well known' },
     } as UnknownMetaResult)
   })
 })

@@ -1,6 +1,7 @@
 import { NunjucksFilter } from './types'
 import { get, pick } from 'lodash'
 import { DateTime } from 'luxon'
+import { LongDate, TimeRange } from './dates'
 
 export interface TableColumn {
   /**
@@ -94,15 +95,12 @@ export class ToTableRows implements NunjucksFilter {
       case ColumnType.Link:
         return { html: `<a href="${get(row, col.href)}">${get(row, col.path)}</a>` }
       case ColumnType.LongDate:
-        return { text: this.getDateTime(row, col.path).toFormat('cccc d MMMM yyyy') }
+        return { text: LongDate.apply(this.getDateTime(row, col.path)) }
       case ColumnType.TimeRange: {
         const from = this.getDateTime(row, col.from)
         const to = this.getDateTime(row, col.to)
         return {
-          text: [from, to]
-            .map(x => x.toFormat(x.minute === 0 ? 'ha' : 'h:mma'))
-            .join(' to ')
-            .toLowerCase(),
+          text: TimeRange.apply(from, to),
         }
       }
     }

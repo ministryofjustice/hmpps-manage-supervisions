@@ -23,7 +23,8 @@ export class ScheduleService {
             ? agg.recent
             : agg.past
         const view: AppointmentListViewModel = {
-          ...apt,
+          start: DateTime.fromISO(apt.appointmentStart),
+          end: apt.appointmentEnd && DateTime.fromISO(apt.appointmentEnd),
           name: this.contacts.getTypeMeta(apt).name,
           link: `/offender/${crn}/appointment/${apt.appointmentId}`,
         }
@@ -33,12 +34,7 @@ export class ScheduleService {
       { future: [], recent: [], past: [] },
     )
 
-    result.future = sortBy(
-      result.future,
-      x => x.appointmentStart,
-      x => x.appointmentEnd,
-    )
-
+    result.future = sortBy(result.future, [x => x.start.toJSDate(), x => x.end?.toJSDate()])
     return result
   }
 

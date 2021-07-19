@@ -1,15 +1,19 @@
 import { Test } from '@nestjs/testing'
 import { ActivityService } from './activity.service'
 import { DateTime } from 'luxon'
+import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
 import * as faker from 'faker'
 import { CommunityApiService, ContactSummary, Paginated } from '../../../community-api'
 import { WellKnownContactTypeCategory } from '../../../config'
-import { fakeContactSummary, fakePaginated } from '../../../community-api/community-api.fake'
+import { fakeAppointmentDetail, fakeContactSummary, fakePaginated } from '../../../community-api/community-api.fake'
 import { fakeOkResponse } from '../../../common/rest/rest.fake'
-import { ActivityLogEntry, ActivityLogEntryTag } from './activity.types'
+import { ActivityLogEntry, ActivityLogEntryTag, AppointmentActivityLogEntry } from './activity.types'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../../community-api/community-api.mock'
-import { createStubInstance, SinonStubbedInstance } from 'sinon'
-import { ContactMappingService } from '../../../common'
+
+import { AppointmentMetaResult, ContactMappingService } from '../../../common'
+import { fakeBreadcrumbUrl, MockLinksModule } from '../../../common/links/links.mock'
+import { BreadcrumbType } from '../../../common/links'
+import { merge } from 'lodash'
 
 describe('ActivityService', () => {
   let subject: ActivityService
@@ -21,11 +25,69 @@ describe('ActivityService', () => {
 
     const module = await Test.createTestingModule({
       providers: [ActivityService, { provide: ContactMappingService, useValue: contactMapping }],
-      imports: [MockCommunityApiModule.register()],
+      imports: [MockCommunityApiModule.register(), MockLinksModule],
     }).compile()
 
     subject = module.get(ActivityService)
     community = module.get(CommunityApiService)
+  })
+
+  it('gets appointment', async () => {
+    const appointment = fakeAppointmentDetail({
+      appointmentId: 91747,
+      appointmentStart: '2020-07-13T12:00:00',
+      appointmentEnd: '2020-07-13T13:00:00',
+      notes: 'Some appointment notes',
+      sensitive: false,
+      outcome: { complied: false, attended: true, description: 'Some outcome' },
+      rarActivity: false,
+      requirement: {
+        requirementId: 84512,
+        isActive: true,
+        isRar: true,
+      },
+    })
+    community.appointment.getOffenderAppointmentByCrnUsingGET
+      .withArgs(match({ crn: 'some-crn', appointmentId: 123 }))
+      .resolves(fakeOkResponse(appointment))
+
+    contactMapping.getTypeMeta.withArgs(appointment).returns({
+      name: 'Some appointment with some staff member',
+      type: WellKnownContactTypeCategory.Appointment,
+      value: { name: 'Some appointment' },
+    } as AppointmentMetaResult)
+
+    const observed = await subject.getAppointment('some-crn', 123)
+
+    expect(observed).toEqual({
+      id: 91747,
+      category: 'Previous appointment',
+      start: DateTime.fromObject({ year: 2020, month: 7, day: 13, hour: 12 }),
+      end: DateTime.fromObject({ year: 2020, month: 7, day: 13, hour: 13 }),
+      name: 'Some appointment with some staff member',
+      notes: 'Some appointment notes',
+      sensitive: false,
+      tags: [
+        {
+          colour: 'red',
+          name: 'failed to comply',
+        },
+      ],
+      type: 'appointment',
+      typeName: 'Some appointment',
+      links: {
+        addNotes: '/offender/some-crn/appointment/91747/add-notes',
+        recordMissingAttendance: null,
+        view: fakeBreadcrumbUrl(BreadcrumbType.Appointment, { crn: 'some-crn', id: 91747 }),
+      },
+      requirement: {
+        requirementId: 84512,
+        isActive: true,
+        isRar: true,
+      },
+      outcome: { complied: false, attended: true, description: 'Some outcome' },
+      rarActivity: false,
+    } as AppointmentActivityLogEntry)
   })
 
   it('gets activity log page', async () => {
@@ -38,18 +100,27 @@ describe('ActivityService', () => {
       type: WellKnownContactTypeCategory | null,
       meta: any = {},
     ) {
-      const contact = fakeContactSummary({
-        contactId: contacts.length + 1,
-        contactStart: start.toISO(),
-        contactEnd: end.toISO(),
-        sensitive: false,
-        ...partial,
-      })
+      const contact = fakeContactSummary(
+        merge(
+          {
+            contactId: contacts.length + 1,
+            contactStart: start.toISO(),
+            contactEnd: end.toISO(),
+            sensitive: false,
+            outcome: {
+              complied: true,
+              attended: true,
+              description: 'Some outcome',
+            },
+          },
+          partial,
+        ),
+      )
       contacts.push(contact)
       contactMapping.getTypeMeta.withArgs(contact).returns({
         name: `some ${contact.notes}`,
         type,
-        value: meta,
+        value: { ...meta, name: 'Some type' },
       })
     }
 
@@ -58,7 +129,6 @@ describe('ActivityService', () => {
         notes: 'well known, complied RAR appointment',
         outcome: { complied: true, attended: true },
         rarActivity: true,
-        sensitive: false,
       },
       WellKnownContactTypeCategory.Appointment,
     )
@@ -70,16 +140,15 @@ describe('ActivityService', () => {
       },
       WellKnownContactTypeCategory.Appointment,
     )
-    havingContact({ notes: 'other appointment, not recorded', outcome: null, sensitive: false }, null, {
+    havingContact({ notes: 'other appointment, not recorded', outcome: null }, null, {
       appointment: true,
     })
-    havingContact({ notes: 'well known communication', sensitive: false }, WellKnownContactTypeCategory.Communication)
-    havingContact({ notes: 'unknown', sensitive: false }, null, { appointment: false })
+    havingContact({ notes: 'well known communication' }, WellKnownContactTypeCategory.Communication)
+    havingContact({ notes: 'unknown' }, null, { appointment: false })
     havingContact(
       {
         notes: 'well known, unacceptable absence appointment',
         outcome: { complied: false, attended: false },
-        sensitive: false,
       },
       WellKnownContactTypeCategory.Appointment,
     )
@@ -87,7 +156,6 @@ describe('ActivityService', () => {
       {
         notes: 'well known, acceptable absence appointment',
         outcome: { complied: true, attended: false },
-        sensitive: false,
       },
       WellKnownContactTypeCategory.Appointment,
     )
@@ -102,7 +170,17 @@ describe('ActivityService', () => {
       id: number,
       notes: string,
       tags: ActivityLogEntryTag[],
-      recorded = true,
+      {
+        rarActivity = false,
+        recorded = true,
+        sensitive = false,
+        outcome = { complied: true, attended: true },
+      }: {
+        rarActivity?: boolean
+        recorded?: boolean
+        sensitive?: boolean
+        outcome?: { complied: boolean; attended: boolean }
+      } = {},
     ): ActivityLogEntry {
       return {
         id,
@@ -113,10 +191,21 @@ describe('ActivityService', () => {
         notes,
         tags,
         links: {
-          view: `/offender/some-crn/appointment/${id}`,
+          view: fakeBreadcrumbUrl(BreadcrumbType.Appointment, { id, crn: 'some-crn' }),
           addNotes: `/offender/some-crn/appointment/${id}/add-notes`,
           recordMissingAttendance: recorded ? null : `/offender/some-crn/appointment/${id}/record-outcome`,
         },
+        category: 'Previous appointment',
+        sensitive,
+        typeName: 'Some type',
+        requirement: null,
+        outcome: outcome
+          ? {
+              ...outcome,
+              description: 'Some outcome',
+            }
+          : null,
+        rarActivity,
       }
     }
 
@@ -128,19 +217,32 @@ describe('ActivityService', () => {
       size: 7,
       totalElements: 7,
       content: [
-        expectedAppointment(1, 'well known, complied RAR appointment', [
-          { colour: 'purple', name: 'rar' },
-          { colour: 'green', name: 'complied' },
-        ]),
-        expectedAppointment(2, 'well known, not complied sensitive appointment', [
-          { colour: 'grey', name: 'sensitive' },
-          { colour: 'red', name: 'failed to comply' },
-        ]),
-        expectedAppointment(3, 'other appointment, not recorded', [], false),
+        expectedAppointment(
+          1,
+          'well known, complied RAR appointment',
+          [
+            { colour: 'purple', name: 'rar' },
+            { colour: 'green', name: 'complied' },
+          ],
+          { rarActivity: true, outcome: { complied: true, attended: true } },
+        ),
+        expectedAppointment(
+          2,
+          'well known, not complied sensitive appointment',
+          [
+            { colour: 'grey', name: 'sensitive' },
+            { colour: 'red', name: 'failed to comply' },
+          ],
+          { sensitive: true, outcome: { complied: false, attended: true } },
+        ),
+        expectedAppointment(3, 'other appointment, not recorded', [], { recorded: false, outcome: null }),
         {
           id: 4,
           type: WellKnownContactTypeCategory.Communication,
           name: 'some well known communication',
+          category: 'Other communication',
+          sensitive: false,
+          typeName: 'Some type',
           start,
           notes: 'well known communication',
           tags: [],
@@ -153,17 +255,26 @@ describe('ActivityService', () => {
           id: 5,
           type: null,
           name: 'some unknown',
+          category: 'Unclassified contact',
+          sensitive: false,
+          typeName: 'Some type',
           start,
           notes: 'unknown',
           tags: [],
           links: null,
         },
-        expectedAppointment(6, 'well known, unacceptable absence appointment', [
-          { colour: 'red', name: 'unacceptable absence' },
-        ]),
-        expectedAppointment(7, 'well known, acceptable absence appointment', [
-          { colour: 'green', name: 'acceptable absence' },
-        ]),
+        expectedAppointment(
+          6,
+          'well known, unacceptable absence appointment',
+          [{ colour: 'red', name: 'unacceptable absence' }],
+          { outcome: { complied: false, attended: false } },
+        ),
+        expectedAppointment(
+          7,
+          'well known, acceptable absence appointment',
+          [{ colour: 'green', name: 'acceptable absence' }],
+          { outcome: { complied: true, attended: false } },
+        ),
       ],
     } as Paginated<ActivityLogEntry>)
 

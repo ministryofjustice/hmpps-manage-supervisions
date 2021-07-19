@@ -10,7 +10,7 @@ import {
   PersonalDisabilitiesViewModel,
 } from './personal.types'
 import { getDisplayName } from '../../../util'
-import { OffenderDetail } from '../../../community-api'
+import { OffenderDetailSummary } from '../../../community-api'
 
 @Controller('offender/:crn(\\w+)/personal')
 export class PersonalController {
@@ -59,7 +59,7 @@ export class PersonalController {
   })
   async getPersonalCircumstances(@Param('crn') crn: string): Promise<PersonalCircumstancesViewModel> {
     const [offender, circumstances] = await Promise.all([
-      this.offender.getOffenderDetail(crn),
+      this.offender.getOffenderSummary(crn),
       this.personal.getPersonalCircumstances(crn),
     ])
     return {
@@ -80,7 +80,7 @@ export class PersonalController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<PersonalContactViewModel> {
     const [offender, personalContacts] = await Promise.all([
-      this.offender.getOffenderDetail(crn),
+      this.offender.getOffenderSummary(crn),
       this.personal.getPersonalContacts(crn),
     ])
 
@@ -103,7 +103,7 @@ export class PersonalController {
 
   private getViewModel(
     crn: string,
-    offender: OffenderDetail,
+    offender: OffenderDetailSummary,
     breadcrumbType: BreadcrumbType,
     partial: Partial<ResolveBreadcrumbOptions> = {},
   ): OffenderViewModel {

@@ -24,6 +24,7 @@ import {
   Registration,
   PersonalCircumstance,
   PersonalContact,
+  OffenderDetailSummary,
 } from './client'
 import { merge } from 'lodash'
 import * as faker from 'faker'
@@ -138,6 +139,33 @@ export const fakeOffenderDetail = fake<OffenderDetail>((options, partial) => ({
   offenderManagers: [{ team: { code: faker.datatype.uuid() } }],
 }))
 
+export const fakeOffenderDetailSummary = fake<OffenderDetailSummary>((options, partial) => ({
+  offenderId: faker.datatype.number(),
+  otherIds: { crn: 'some-crn', pncNumber: 'some-prn' },
+  activeProbationManagedSentence: true,
+  firstName: faker.name.firstName(),
+  surname: faker.name.lastName(),
+  preferredName: faker.name.findName(),
+  previousSurname: faker.name.lastName(),
+  gender: faker.random.arrayElement(['Male', 'Female']),
+  dateOfBirth: fakeIsoDate(),
+  contactDetails: {
+    phoneNumbers: partial?.contactDetails?.phoneNumbers?.map(fakePhoneNumber) || [fakePhoneNumber()],
+    emailAddresses: partial?.contactDetails?.emailAddresses || [faker.internet.email()],
+  },
+  offenderProfile: {
+    offenderLanguages: {
+      primaryLanguage: faker.address.country(),
+      requiresInterpreter: true,
+    },
+    disabilities: partial?.offenderProfile?.disabilities?.map(fakeDisability) || [fakeDisability()],
+    genderIdentity: 'Prefer to self-describe',
+    selfDescribedGender: 'Jedi',
+    sexualOrientation: 'Bisexual',
+    religion: 'Christian',
+  },
+}))
+
 export const fakeOfficeLocation = fake<OfficeLocation>(() => ({
   code: faker.datatype.uuid(),
   buildingName: faker.name.firstName(),
@@ -247,6 +275,12 @@ export const fakeAppointmentDetail = fake<AppointmentDetail, FakeAppointmentDeta
     provider: fakeKeyValue(),
     team: fakeKeyValue(),
     staff: fakeStaffHuman(),
+    rarActivity: faker.datatype.boolean(),
+    requirement: {
+      isRar: faker.datatype.boolean(),
+      requirementId: faker.datatype.number(),
+      isActive: faker.datatype.boolean(),
+    },
   }
 })
 

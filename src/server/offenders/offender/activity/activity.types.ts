@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon'
 import { WellKnownContactTypeCategory } from '../../../config'
+import { ViewModel } from '../../../common'
+import { AppointmentRequirementDetail } from '../../../community-api'
 
 export interface ActivityLogEntryLinks {
   view: string
@@ -16,15 +18,25 @@ export interface ActivityLogEntryBase<Links extends ActivityLogEntryLinks = Acti
   id: number
   start: DateTime
   name: string
+  category: string
+  typeName: string
   notes?: string
   tags: ActivityLogEntryTag[]
   links: Links
+  sensitive: boolean
 }
 
 export interface AppointmentActivityLogEntry
   extends ActivityLogEntryBase<ActivityLogEntryLinks & { recordMissingAttendance: string | null }> {
   type: WellKnownContactTypeCategory.Appointment
-  end: DateTime
+  end?: DateTime
+  rarActivity: boolean
+  requirement?: AppointmentRequirementDetail
+  outcome?: {
+    complied: boolean
+    attended: boolean
+    description: string
+  }
 }
 
 export interface CommunicationActivityLogEntry extends ActivityLogEntryBase {
@@ -36,3 +48,8 @@ export interface UnknownActivityLogEntry extends ActivityLogEntryBase<null> {
 }
 
 export type ActivityLogEntry = AppointmentActivityLogEntry | CommunicationActivityLogEntry | UnknownActivityLogEntry
+
+export interface AppointmentViewModel extends ViewModel {
+  displayName: string
+  appointment: AppointmentActivityLogEntry
+}

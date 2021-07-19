@@ -21,6 +21,7 @@ export class ViewOffenderFixture {
     arnRiskDataAvailable?: boolean
   } = {}): this {
     const crn = this.crn
+    cy.task('stubOffenderSummary', { crn })
     cy.task('stubOffenderDetails', { crn })
     cy.task('stubGetConvictions', { crn, ...options.convictions })
     cy.task('stubGetRequirements', { crn })

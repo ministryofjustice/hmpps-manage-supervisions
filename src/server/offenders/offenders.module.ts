@@ -11,10 +11,11 @@ import { RiskService } from './offender/risk/risk.service'
 import { PersonalController } from './offender/personal/personal.controller'
 import { PersonalService } from './offender/personal/personal.service'
 import { DeliusExitController } from './offender/delius-exit/delius-exit.controller'
+import { ActivityController } from './offender/activity/activity.controller'
 
 @Module({
   imports: [CommonModule, CommunityApiModule, AssessRisksAndNeedsApiModule],
-  controllers: [OffenderController, PersonalController, DeliusExitController],
+  controllers: [OffenderController, PersonalController, DeliusExitController, ActivityController],
   providers: [OffenderService, SentenceService, ScheduleService, ActivityService, RiskService, PersonalService],
 })
 export class OffendersModule {}

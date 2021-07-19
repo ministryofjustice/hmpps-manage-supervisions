@@ -10,6 +10,7 @@ export enum BreadcrumbType {
   CaseActivityLog,
   CaseSchedule,
   NewAppointment,
+  Appointment,
 }
 
 export interface ResolveBreadcrumbOptions {

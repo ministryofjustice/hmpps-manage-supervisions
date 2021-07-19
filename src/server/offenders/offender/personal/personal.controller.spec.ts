@@ -4,17 +4,17 @@ import { fakeBreadcrumbs, MockLinksModule } from '../../../common/links/links.mo
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { OffenderService } from '../offender.service'
 import { PersonalService } from './personal.service'
-import { fakeOffenderDetail } from '../../../community-api/community-api.fake'
+import { fakeOffenderDetail, fakeOffenderDetailSummary } from '../../../community-api/community-api.fake'
 import { fakeDisabilityDetail, fakeGetAddressDetailResult, fakePersonalContactDetail } from './personal.fake'
 import { PersonalAddressesViewModel, PersonalContactViewModel, PersonalDisabilitiesViewModel } from './personal.types'
 import { BreadcrumbType } from '../../../common/links'
-import { OffenderDetail } from '../../../community-api'
+import { OffenderDetail, OffenderDetailSummary } from '../../../community-api'
 
 describe('PersonalController', () => {
   let subject: PersonalController
   let offenderService: SinonStubbedInstance<OffenderService>
   let personalService: SinonStubbedInstance<PersonalService>
-  let offender: OffenderDetail
+  let offender: OffenderDetail | OffenderDetailSummary
 
   beforeEach(async () => {
     offenderService = createStubInstance(OffenderService)
@@ -30,12 +30,21 @@ describe('PersonalController', () => {
     }).compile()
 
     subject = module.get(PersonalController)
-
-    offender = fakeOffenderDetail({ firstName: 'Liz', middleNames: ['Danger'], surname: 'Haggis' })
-    offenderService.getOffenderDetail.withArgs('some-crn').resolves(offender)
   })
 
+  function havingOffender() {
+    offender = fakeOffenderDetail({ firstName: 'Liz', middleNames: ['Danger'], surname: 'Haggis' })
+    offenderService.getOffenderDetail.withArgs('some-crn').resolves(offender)
+  }
+
+  function havingOffenderSummary() {
+    offender = fakeOffenderDetailSummary({ firstName: 'Liz', middleNames: ['Danger'], surname: 'Haggis' })
+    offenderService.getOffenderSummary.withArgs('some-crn').resolves(offender)
+  }
+
   it('gets addresses', async () => {
+    havingOffender()
+
     const details = fakeGetAddressDetailResult()
     personalService.getAddressDetail.withArgs(offender).returns(details)
 
@@ -52,6 +61,8 @@ describe('PersonalController', () => {
   })
 
   it('gets disabilities', async () => {
+    havingOffender()
+
     const disabilities = [fakeDisabilityDetail()]
     personalService.getDisabilities.withArgs(offender).returns(disabilities)
 
@@ -68,6 +79,8 @@ describe('PersonalController', () => {
   })
 
   it('gets personal contact', async () => {
+    havingOffenderSummary()
+
     const personalContact = fakePersonalContactDetail({ id: 100, description: 'Some personal contact' })
     const otherPersonalContact = fakePersonalContactDetail({ id: 101 })
     personalService.getPersonalContacts.withArgs('some-crn').resolves([otherPersonalContact, personalContact])

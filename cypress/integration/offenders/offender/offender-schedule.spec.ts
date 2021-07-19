@@ -1,7 +1,5 @@
 import { ViewOffenderFixture } from './view-offender.fixture'
-import { getDateRange } from '../../../util/getDateRange'
 import { TABLE } from '../../../pages/offender.page'
-import { DateTime } from 'luxon'
 
 class Fixture extends ViewOffenderFixture {
   shouldRenderAppointmentTableFurniture(table: TABLE, caption: string): this {
@@ -16,7 +14,7 @@ class Fixture extends ViewOffenderFixture {
 
   shouldRenderAppointmentTableRow(table: TABLE, row: number, date: string, time: string, name: string): this {
     return this.shouldRenderOffenderTab('schedule', page => {
-      page.tableData(table, row, 'date').contains(DateTime.fromISO(date).toFormat('cccc d MMMM yyyy'))
+      page.tableData(table, row, 'date').contains(date)
       page.tableData(table, row, 'time').contains(time)
       page.tableData(table, row, 'appointment').contains(name)
     })
@@ -36,18 +34,18 @@ context('ViewOffenderSchedule', () => {
   beforeEach(() => fixture.reset())
 
   it('displays populated offender schedule', () => {
-    const future = getDateRange('future', { hour: 13, minute: 30 }, { minutes: 30 })
-    const recent = getDateRange('past', { hour: 10, minute: 0 }, { hour: 1 })
     fixture
       .havingOffender({
         appointments: [
           {
-            ...future,
+            start: '2200-01-02T13:30:00',
+            end: '2200-01-02T14:00:00',
             type: { code: 'F123', name: 'Future appointment' },
             staff: { forenames: 'Future First', surname: 'Future Last' },
           },
           {
-            ...recent,
+            start: '2020-02-03T10:00:00',
+            end: '2020-02-03T11:00:00',
             type: { code: 'P123', name: 'Recent appointment' },
             staff: { forenames: 'Recent First', surname: 'Recent Last' },
           },
@@ -61,7 +59,7 @@ context('ViewOffenderSchedule', () => {
       .shouldRenderAppointmentTableRow(
         'future',
         0,
-        future.start,
+        'Thursday 2 January 2200',
         '1:30pm to 2pm',
         'Future appointment with Future First Future Last',
       )
@@ -70,7 +68,7 @@ context('ViewOffenderSchedule', () => {
       .shouldRenderAppointmentTableRow(
         'recent',
         0,
-        recent.start,
+        'Monday 3 February 2020',
         '10am to 11am',
         'Recent appointment with Recent First Recent Last',
       )

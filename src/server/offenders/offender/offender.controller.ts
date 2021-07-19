@@ -10,13 +10,13 @@ import {
   OffenderViewModelBase,
 } from './offender-view-model'
 import { RedirectResponse } from '../../common'
-import { OffenderDetail } from '../../community-api'
+import { OffenderDetailSummary } from '../../community-api'
 import { OffenderService } from './offender.service'
 import { getDisplayName } from '../../util'
 import { SentenceService } from './sentence'
 import { ScheduleService } from './schedule'
 import { ActivityService } from './activity'
-import { RiskService } from './risk/risk.service'
+import { RiskService } from './risk'
 import { PersonalService } from './personal'
 import { Breadcrumb, BreadcrumbType, LinksService, ResolveBreadcrumbOptions } from '../../common/links'
 
@@ -91,7 +91,7 @@ export class OffenderController {
   })
   async getSchedule(@Param('crn') crn: string): Promise<OffenderScheduleViewModel> {
     const [offender, appointments, registrations] = await Promise.all([
-      this.offenderService.getOffenderDetail(crn),
+      this.offenderService.getOffenderSummary(crn),
       this.scheduleService.getRecentAppointments(crn),
       this.riskService.getRiskRegistrations(crn),
     ])
@@ -112,7 +112,7 @@ export class OffenderController {
   })
   async getActivity(@Param('crn') crn: string): Promise<OffenderActivityViewModel> {
     const [offender, contacts, registrations] = await Promise.all([
-      this.offenderService.getOffenderDetail(crn),
+      this.offenderService.getOffenderSummary(crn),
       this.activityService.getActivityLogPage(crn, { appointmentsOnly: true }), // TODO just getting appointment contacts for now
       this.riskService.getRiskRegistrations(crn),
     ])
@@ -159,7 +159,7 @@ export class OffenderController {
   })
   async getSentence(@Param('crn') crn: string): Promise<OffenderSentenceViewModel> {
     const [offender, conviction, registrations] = await Promise.all([
-      this.offenderService.getOffenderDetail(crn),
+      this.offenderService.getOffenderSummary(crn),
       this.sentenceService.getConvictionDetails(crn),
       this.riskService.getRiskRegistrations(crn),
     ])
@@ -171,7 +171,11 @@ export class OffenderController {
     }
   }
 
-  private getBase(page: OffenderPage, breadcrumb: BreadcrumbType, offender: OffenderDetail): OffenderViewModelBase {
+  private getBase(
+    page: OffenderPage,
+    breadcrumb: BreadcrumbType,
+    offender: OffenderDetailSummary,
+  ): OffenderViewModelBase {
     const crn = offender.otherIds.crn
     const breadcrumbOptions: ResolveBreadcrumbOptions = { crn, offenderName: getDisplayName(offender) }
     return {
