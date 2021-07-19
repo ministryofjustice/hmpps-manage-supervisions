@@ -13,7 +13,7 @@ const pluginConfig: Cypress.PluginConfig = (on, config) => {
     reset: () => client.reset(),
 
     stubLogin: () =>
-      Promise.all([auth.stubToken(), auth.stubRedirect(), auth.stubLogout(), auth.stubOpenIdConfiguration()]),
+      Promise.all([auth.stubToken(), auth.stubAuthorizeCodeFlow(), auth.stubLogout(), auth.stubOpenIdConfiguration()]),
     stubAuthUser: () => Promise.all([auth.stubUser(), auth.stubUserRoles()]),
   }
 

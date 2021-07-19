@@ -2,7 +2,6 @@
 
 declare namespace Cypress {
   interface Chainable {
-    login(): Chainable<Element>
     home(): Chainable<Element>
     arrangeAppointment(crn: string): Chainable<Element>
     viewOffender(crn: string): Chainable<Element>

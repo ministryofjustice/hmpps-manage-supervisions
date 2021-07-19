@@ -35,7 +35,6 @@ export class ViewOffenderFixture {
   }
 
   whenViewingOffender(): this {
-    cy.login()
     cy.viewOffender(this.crn)
     return this
   }

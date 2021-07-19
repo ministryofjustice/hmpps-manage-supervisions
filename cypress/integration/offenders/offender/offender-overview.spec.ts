@@ -6,11 +6,6 @@ context('ViewOffenderOverview', () => {
 
   beforeEach(() => fixture.reset())
 
-  it('requires authentication', () => {
-    cy.viewOffender('somecrn')
-    cy.task('getLoginAttempts').should('have.length', 1)
-  })
-
   it('displays offender overview', () => {
     const past = getDateRange('past', { hour: 10, minute: 0 }, { hour: 1 })
     fixture

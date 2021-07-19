@@ -37,11 +37,6 @@ context('CreateAppointment', () => {
     cy.task('stubAuthUser')
   })
 
-  it('Unauthenticated user directed to login', () => {
-    cy.arrangeAppointment('somecrn')
-    cy.task('getLoginAttempts').should('have.length', 1)
-  })
-
   it('can book an office visit appointment', () => {
     const test = testCase({
       crn: 'ABC123',
@@ -282,7 +277,6 @@ context('CreateAppointment', () => {
   }
 
   function havingLoggedInAndBeginBookingAppointmentFlow({ crn }: AppointmentBookingTestCase) {
-    cy.login()
     cy.arrangeAppointment(crn)
   }
 
