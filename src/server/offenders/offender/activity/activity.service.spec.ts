@@ -1,9 +1,14 @@
 import { Test } from '@nestjs/testing'
 import { ActivityService } from './activity.service'
-import { DateTime } from 'luxon'
+import { DateTime, Settings } from 'luxon'
 import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
 import * as faker from 'faker'
-import { CommunityApiService, ContactSummary, Paginated } from '../../../community-api'
+import {
+  CommunityApiService,
+  ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
+  ContactSummary,
+  Paginated,
+} from '../../../community-api'
 import { WellKnownContactTypeCategory } from '../../../config'
 import { fakeAppointmentDetail, fakeContactSummary, fakePaginated } from '../../../community-api/community-api.fake'
 import { fakeOkResponse } from '../../../common/rest/rest.fake'
@@ -19,8 +24,11 @@ describe('ActivityService', () => {
   let subject: ActivityService
   let community: MockCommunityApiService
   let contactMapping: SinonStubbedInstance<ContactMappingService>
+  const now = DateTime.now()
 
   beforeEach(async () => {
+    Settings.now = () => now.valueOf()
+
     contactMapping = createStubInstance(ContactMappingService)
 
     const module = await Test.createTestingModule({
@@ -278,6 +286,10 @@ describe('ActivityService', () => {
       ],
     } as Paginated<ActivityLogEntry>)
 
-    expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn', appointmentsOnly: true })
+    expect(stub.getCall(0).firstArg).toEqual({
+      crn: 'some-crn',
+      appointmentsOnly: true,
+      to: now.toUTC().toISO(),
+    } as ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest)
   })
 })
