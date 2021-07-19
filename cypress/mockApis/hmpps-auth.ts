@@ -26,37 +26,30 @@ export class HmppsAuthMockApi {
     await this.client.stubPing('auth')
   }
 
-  async getLoginUrl() {
-    const requests = await this.client.getRequests('/auth/oauth/authorize')
-    const state = requests.find(x => x)?.request.queryParams.state?.values?.find(x => x)
-    if (!state) {
-      throw new Error('no /auth/oauth/authorize request found')
-    }
-    return `/login/callback?code=codexxxx&state=${state}`
-  }
-
-  async getLoginAttempts() {
-    return await this.client.getRequests('/auth/oauth/authorize')
-  }
-
-  async getLogoutAttempts() {
-    return await this.client.getRequests('/auth/logout')
-  }
-
-  async stubRedirect() {
+  async stubAuthorizeCodeFlow() {
     return this.client.stub({
       request: {
         method: 'GET',
-        // TODO extract query params
-        urlPattern: '/auth/oauth/authorize\\?response_type=code&redirect_uri=.+?&state=.+?&client_id=clientid',
+        urlPath: '/auth/oauth/authorize',
+        queryParameters: {
+          response_type: { equalTo: 'code' },
+          client_id: { equalTo: 'clientid' },
+          redirect_uri: { matches: '.+' },
+          state: { matches: '.+' },
+        },
       },
       response: {
         status: 200,
         headers: {
           'Content-Type': 'text/html',
-          Location: this.baseUrl + '/login/callback?code=codexxxx&state=stateyyyy',
         },
-        body: '<html><body>Login page<h1>Sign in</h1></body></html>',
+        body: `<html>
+                 <body>
+                   <h1>HMPPS Auth Login</h1>
+                   <a href="{{ request.query.redirect_uri }}&code=codexxxx&state={{ request.query.state }}">Login</a>
+                 </body>
+               </html>`,
+        transformers: ['response-template'],
       },
     })
   }
@@ -72,7 +65,7 @@ export class HmppsAuthMockApi {
         headers: {
           'Content-Type': 'text/html',
         },
-        body: '<html><body>Logout page<h1>Logged out</h1></body></html>',
+        body: '<html><body><h1>HMPPS Auth Logout</h1></body></html>',
       },
     })
   }
@@ -87,7 +80,6 @@ export class HmppsAuthMockApi {
         status: 200,
         headers: {
           'Content-Type': 'application/json;charset=UTF-8',
-          Location: this.baseUrl + '/login/callback?code=codexxxx&state=stateyyyy',
         },
         jsonBody: {
           access_token: createToken(),

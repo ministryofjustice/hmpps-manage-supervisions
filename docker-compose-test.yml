@@ -18,6 +18,8 @@ services:
     restart: always
     ports:
       - "9091:8080"
+    command:
+      - -global-response-templating
 
 networks:
   hmpps_int:

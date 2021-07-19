@@ -1,7 +1,8 @@
-import { HomePage } from '../pages'
+import { HmppsAuthPage, HomePage } from '../pages'
 
 context('Home', () => {
   const homePage = new HomePage()
+  const authPage = new HmppsAuthPage()
 
   beforeEach(() => {
     cy.task('reset')
@@ -10,20 +11,13 @@ context('Home', () => {
     cy.task('stubGetStaffDetails')
   })
 
-  it('Unauthenticated user directed to login', () => {
-    cy.home()
-    cy.task('getLoginAttempts').should('have.length', 1)
-  })
-
   it('User can log out', () => {
-    cy.login()
     cy.home()
     homePage.logoutButton.click()
-    cy.task('getLogoutAttempts').should('have.length', 1)
+    authPage.shouldHaveRedirectedToLogoutPage()
   })
 
   it('Page furniture rendered', () => {
-    cy.login()
     cy.home()
     homePage.pageTitle.contains('This site is under construction...')
     homePage.headerUserName.should('contain.text', 'J. Smith')

@@ -12,7 +12,7 @@ executors:
           TZ: "Europe/London"
       - image: circleci/redis:buster
       - image: rodolpheche/wiremock
-        command: ['/docker-entrypoint.sh', '--port', '9091']
+        command: ['/docker-entrypoint.sh', '--port', '9091', '--global-response-templating']
 
 commands:
   install-build-deps:
