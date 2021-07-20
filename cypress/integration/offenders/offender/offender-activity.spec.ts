@@ -5,6 +5,8 @@ import { OffenderActivityAppointmentPage } from '../../../pages'
 
 class Fixture extends ViewOffenderFixture {
   havingOffenderContacts(...partials: StubContactSummaryOptions['partials']): this {
+    cy.task('stubGetAppointmentTypes')
+    cy.task('stubGetContactTypes')
     cy.task('stubContactSummary', { crn: this.crn, partials })
     return this
   }
@@ -14,7 +16,7 @@ class Fixture extends ViewOffenderFixture {
     return this
   }
 
-  whenClickingAppointmentEntry(id: number) {
+  whenClickingActivityEntry(id: number) {
     return this.shouldRenderOffenderTab('activity', page => {
       page.entry(id).title.find('a').click()
     })
@@ -146,6 +148,43 @@ context('ViewOffenderActivity', () => {
           notes: 'Some unknown appointment',
           outcome: null,
         },
+        {
+          type: { code: 'CTOA', description: 'Phone Contact from Offender', appointment: false },
+          contactStart: '2020-09-04T11:00:00+01:00',
+          contactEnd: '2020-09-04T00:00:00+01:00',
+          notes: 'Phone call from Brian to double check when his next appointment was.',
+          outcome: null,
+        },
+        {
+          type: { code: 'CMOB', description: 'eMail/Text to Offender', appointment: false },
+          contactStart: '2020-09-04T13:00:00+01:00',
+          contactEnd: '2020-09-04T00:00:00+01:00',
+          notes:
+            'Hi Brian - it was good to speak today. To confirm, your next probation appointment is by telephone on 7th April 2021 at 10:00.',
+          outcome: null,
+        },
+        {
+          type: {
+            code: 'NOT_WELL_KNOWN_COMMUNICATION',
+            description: 'Not a well known communication',
+            appointment: false,
+          },
+          contactStart: '2020-09-04T14:00:00+01:00',
+          contactEnd: '2020-09-04T00:00:00+01:00',
+          notes: 'Some unknown communication',
+          outcome: null,
+        },
+        {
+          type: {
+            code: 'SYSTEM_GENERATED_UNKNOWN',
+            description: 'System generated unknown contact',
+            appointment: false,
+          },
+          contactStart: '2020-09-04T14:00:00+01:00',
+          contactEnd: '2020-09-04T00:00:00+01:00',
+          notes: 'Unknown system generated contact',
+          outcome: null,
+        },
       )
 
       .whenViewingOffender()
@@ -206,6 +245,39 @@ context('ViewOffenderActivity', () => {
         notes: 'Some unknown appointment',
         havingAttendanceMissing: true,
       })
+
+      .shouldRenderActivity({
+        id: 6,
+        date: 'Friday 4 September 2020',
+        time: '11am',
+        name: 'Phone call from Offender',
+        notes: 'Phone call from Brian to double check when his next appointment was.',
+      })
+
+      .shouldRenderActivity({
+        id: 7,
+        date: 'Friday 4 September 2020',
+        time: '1pm',
+        name: 'Email/Text to Offender',
+        notes:
+          'Hi Brian - it was good to speak today. To confirm, your next probation appointment is by telephone on 7th April 2021 at 10:00.',
+      })
+
+      .shouldRenderActivity({
+        id: 8,
+        date: 'Friday 4 September 2020',
+        time: '2pm',
+        name: 'Not a well known communication',
+        notes: 'Some unknown communication',
+      })
+
+      .shouldRenderActivity({
+        id: 9,
+        date: 'Friday 4 September 2020',
+        time: '2pm',
+        name: 'System generated unknown contact',
+        notes: 'Unknown system generated contact',
+      })
   })
 
   it('displays appointment detail without outcome', () => {
@@ -227,7 +299,7 @@ context('ViewOffenderActivity', () => {
 
       .whenViewingOffender()
       .whenClickingSubNavTab('activity')
-      .whenClickingAppointmentEntry(1)
+      .whenClickingActivityEntry(1)
 
       .shouldRenderAppointmentPage('Previous appointment Office visit with Some Staff', page => {
         page.detail('Type of appointment').contains('Office visit')
@@ -266,12 +338,46 @@ context('ViewOffenderActivity', () => {
 
       .whenViewingOffender()
       .whenClickingSubNavTab('activity')
-      .whenClickingAppointmentEntry(1)
+      .whenClickingActivityEntry(1)
 
       .shouldRenderAppointmentPage('Previous appointment Office visit with Some Staff', page => {
         page.outcome('Attended').contains('Yes')
         page.outcome('Complied').contains('Yes')
         page.outcome('Description').contains('Some outcome description')
+      })
+  })
+
+  it('displays communication', () => {
+    fixture
+      .havingOffender()
+      .havingOffenderContacts({
+        type: { code: 'CMOB' },
+        contactStart: '2020-09-04T12:00:00+01:00',
+        contactEnd: '2020-09-04T00:00:00+01:00',
+        notes: 'Some text message',
+        outcome: null,
+      })
+
+      .havingOffenderAppointment({
+        appointmentId: 1,
+        start: '2020-09-04T12:00:00+01:00',
+        end: '2020-09-04T13:00:00+01:00',
+      })
+
+      .whenViewingOffender()
+      .whenClickingSubNavTab('activity')
+      .whenClickingActivityEntry(1)
+
+      .shouldRenderAppointmentPage('Previous appointment Office visit with Some Staff', page => {
+        page.detail('Type of appointment').contains('Office visit')
+        page.detail('Date').contains('4 September 2020')
+        page.detail('Time').contains('12pm to 1pm')
+        page.detail('Appointment notes').contains('Some office visit appointment')
+        page.detail('Sensitive').contains('Yes')
+        page.detail('RAR activity').contains('Yes')
+        page.detail('Counts towards RAR').contains('Yes')
+
+        page.outcomeTable.should('not.exist')
       })
   })
 })

@@ -1,14 +1,14 @@
 import { Test } from '@nestjs/testing'
 import { MAX_RECENT_APPOINTMENTS, ScheduleService } from './schedule.service'
-import { AppointmentDetail, CommunityApiService } from '../../../community-api'
+import { AppointmentDetail, CommunityApiService, ContactMappingService } from '../../../community-api'
 import { orderBy, sortBy } from 'lodash'
 import { fakeAppointmentDetail } from '../../../community-api/community-api.fake'
 import { fakeOkResponse } from '../../../common/rest/rest.fake'
 import { AppointmentListViewModel, AppointmentSummary, RecentAppointments } from './schedule.types'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../../community-api/community-api.mock'
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
-import { ContactMappingService } from '../../../common'
 import { DateTime } from 'luxon'
+import { ContactTypeCategory } from '../../../config'
 
 describe('ScheduleService', () => {
   let subject: ScheduleService
@@ -41,9 +41,9 @@ describe('ScheduleService', () => {
     )
 
     for (const apt of appointments) {
-      contactMapping.getTypeMeta.withArgs(apt).returns({
-        type: null,
-        value: { appointment: true, name: 'Some appointment' },
+      contactMapping.getTypeMeta.withArgs(apt).resolves({
+        type: ContactTypeCategory.Appointment,
+        value: { name: 'Some appointment', codes: { nonRar: 'SOME_CODE' } },
         name: 'some-appointment-type',
       })
     }
@@ -76,9 +76,9 @@ describe('ScheduleService', () => {
     ]
 
     for (const apt of appointments) {
-      contactMapping.getTypeMeta.withArgs(apt).returns({
-        type: null,
-        value: { appointment: true, name: 'Some appointment' },
+      contactMapping.getTypeMeta.withArgs(apt).resolves({
+        type: ContactTypeCategory.Appointment,
+        value: { name: 'Some appointment', codes: { nonRar: 'SOME_CODE' } },
         name: 'some-appointment-type',
       })
     }

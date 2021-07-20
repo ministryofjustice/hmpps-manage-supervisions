@@ -24,7 +24,7 @@
                     </span>
                         <br>
                         <a href="{{ contact.links.view }}">
-                            {{ contact.name }}
+                            {{ contact.type | capitalize + ' – ' + contact.name }}
                         </a>
                     </h3>
 

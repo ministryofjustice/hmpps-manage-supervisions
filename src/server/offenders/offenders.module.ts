@@ -13,6 +13,7 @@ import { PersonalService } from './offender/personal'
 import { DeliusExitController } from './offender/delius-exit/delius-exit.controller'
 import { ActivityController } from './offender/activity/activity.controller'
 import { RequirementService } from './offender/sentence/requirement.service'
+import { ContactTypesService } from '../community-api/contact-types'
 
 @Module({
   imports: [CommonModule, CommunityApiModule, AssessRisksAndNeedsApiModule],
@@ -25,6 +26,7 @@ import { RequirementService } from './offender/sentence/requirement.service'
     RiskService,
     PersonalService,
     RequirementService,
+    ContactTypesService,
   ],
 })
 export class OffendersModule {}

@@ -268,6 +268,7 @@ context('CreateAppointment', () => {
   function havingOffender({ crn, convictionId }: AppointmentBookingTestCase) {
     cy.task('stubGetStaffDetails')
     cy.task('stubGetAppointmentTypes')
+    cy.task('stubGetContactTypes')
     cy.task('stubGetLocations')
     cy.task('stubCreateAppointment', { crn, convictionId })
     cy.task('stubOffenderDetails', { crn })

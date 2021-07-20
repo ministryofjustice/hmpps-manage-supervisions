@@ -4051,7 +4051,148 @@
         "surname": "Berridge",
         "unallocated": false
       }
-    }
+    },
+    {
+      "contactId": 2503942686,
+      "contactStart": "2021-07-21T16:38:00+01:00",
+      "contactEnd": "2021-07-21T00:00:00+01:00",
+      "type": {
+          "code": "CLOB",
+          "description": "Letter/Fax to Offender",
+          "appointment": false
+      },
+      "provider": {
+          "code": "CRS",
+          "description": "Commissioned Rehab Services"
+      },
+      "team": {
+          "code": "CRSUAT",
+          "description": "Unallocated"
+      },
+      "staff": {
+          "code": "CRSA076",
+          "forenames": "Ed",
+          "surname": "Brindley",
+          "unallocated": false
+      },
+      "sensitive": false,
+      "rarActivity": false
+  },
+  {
+      "contactId": 2503942666,
+      "contactStart": "2021-07-21T16:28:00+01:00",
+      "contactEnd": "2021-07-21T00:00:00+01:00",
+      "type": {
+          "code": "CTOA",
+          "description": "Phone Contact from Offender",
+          "appointment": false
+      },
+      "provider": {
+          "code": "CRS",
+          "description": "Commissioned Rehab Services"
+      },
+      "team": {
+          "code": "CRSUAT",
+          "description": "Unallocated"
+      },
+      "staff": {
+          "code": "CRSA076",
+          "forenames": "Ed",
+          "surname": "Brindley",
+          "unallocated": false
+      },
+      "sensitive": false,
+      "rarActivity": false
+  },
+  {
+      "contactId": 2503942665,
+      "contactStart": "2021-07-21T15:56:00+01:00",
+      "contactEnd": "2021-07-21T00:00:00+01:00",
+      "type": {
+          "code": "CMOB",
+          "description": "eMail/Text to Offender",
+          "appointment": false
+      },
+      "provider": {
+          "code": "CRS",
+          "description": "Commissioned Rehab Services"
+      },
+      "team": {
+          "code": "CRSUAT",
+          "description": "Unallocated"
+      },
+      "staff": {
+          "code": "CRSA076",
+          "forenames": "Ed",
+          "surname": "Brindley",
+          "unallocated": false
+      },
+      "sensitive": false,
+
+      "rarActivity": false
+  },
+  {
+      "contactId": 2503942660,
+      "contactStart": "2021-07-21T15:55:00+01:00",
+      "contactEnd": "2021-07-21T00:00:00+01:00",
+      "type": {
+          "code": "CTOB",
+          "description": "Phone Contact to Offender",
+          "appointment": false
+      },
+      "provider": {
+          "code": "CRS",
+          "description": "Commissioned Rehab Services"
+      },
+      "team": {
+          "code": "CRSUAT",
+          "description": "Unallocated"
+      },
+      "staff": {
+          "code": "CRSA076",
+          "forenames": "Ed",
+          "surname": "Brindley",
+          "unallocated": false
+      },
+      "sensitive": false,
+      "rarActivity": false
+  },
+  {
+      "contactId": 2503870250,
+      "contactStart": "2021-06-17T14:45:51+01:00",
+      "contactEnd": "2021-06-17T00:00:00+01:00",
+      "type": {
+          "code": "CLBR",
+          "description": "Breach Action - Breach Letter Sent",
+          "appointment": false
+      },
+      "officeLocation": {
+          "code": "LDN_MTH",
+          "description": "117 STOCKWELL ROAD",
+          "buildingName": "Moat House",
+          "buildingNumber": "117",
+          "streetName": "Stockwell Road",
+          "townCity": "London",
+          "county": "Lambeth",
+          "postcode": "SW9 9TN"
+      },
+      "provider": {
+          "code": "N07",
+          "description": "NPS London"
+      },
+      "team": {
+          "code": "N07UAT",
+          "description": "Unallocated Team(N07)"
+      },
+      "staff": {
+          "code": "N07A003",
+          "forenames": "Unallocate",
+          "surname": "Unallocate",
+          "unallocated": false
+      },
+      "sensitive": false,
+      "rarActivity": false
+  }
   ],
   "registrations": [
     {
@@ -4173,6 +4314,218 @@
           ]
         }
       }
+    }
+  ],
+  "contact-types": [
+    {
+      "code": "C040",
+      "description": "Breach Action - Withdraw Warning Letter",
+      "appointment": false
+    },
+    {
+      "code": "C063",
+      "description": "Contact with Electronic Monitoring Provider",
+      "appointment": false
+    },
+    {
+      "code": "C068",
+      "description": "Restriction Notification",
+      "appointment": false
+    },
+    {
+      "code": "C129",
+      "description": "Use of Video Link / Teleconference",
+      "appointment": false
+    },
+    {
+      "code": "AWLI",
+      "description": "Breach Action - First Warning Letter Sent",
+      "appointment": false
+    },
+    {
+      "code": "CLBR",
+      "description": "Breach Action - Breach Letter Sent",
+      "appointment": false
+    },
+    {
+      "code": "CTXT",
+      "description": "Text Message to Send",
+      "appointment": false
+    },
+    {
+      "code": "CLOA",
+      "description": "Letter/Fax from Offender",
+      "appointment": false
+    },
+    {
+      "code": "CLOB",
+      "description": "Letter/Fax to Offender",
+      "appointment": false
+    },
+    {
+      "code": "CI3A",
+      "description": "Information - from 3rd Party",
+      "appointment": false
+    },
+    {
+      "code": "CI3B",
+      "description": "Information - to 3rd Party",
+      "appointment": false
+    },
+    {
+      "code": "CIEA",
+      "description": "Information - from External Agency",
+      "appointment": false
+    },
+    {
+      "code": "CIEB",
+      "description": "Information - to External Agency",
+      "appointment": false
+    },
+    {
+      "code": "CIOA",
+      "description": "Information - from Offender",
+      "appointment": false
+    },
+    {
+      "code": "CIOB",
+      "description": "Information - to Offender",
+      "appointment": false
+    },
+    {
+      "code": "CIZZ",
+      "description": "Information - Other",
+      "appointment": false
+    },
+    {
+      "code": "CL3A",
+      "description": "Letter/Fax from Other",
+      "appointment": false
+    },
+    {
+      "code": "C016",
+      "description": "CPS Received",
+      "appointment": false
+    },
+    {
+      "code": "C294",
+      "description": "Information from Court Team",
+      "appointment": false
+    },
+    {
+      "code": "C325",
+      "description": "Information / Documents Requested",
+      "appointment": false
+    },
+    {
+      "code": "C326",
+      "description": "Internal Communications",
+      "appointment": false
+    },
+    {
+      "code": "C333",
+      "description": "Interpreter Requested/ Confirmed",
+      "appointment": false
+    },
+    {
+      "code": "C366",
+      "description": "Breach Action - Confirmation Warning Letter Sent",
+      "appointment": false
+    },
+    {
+      "code": "CL3B",
+      "description": "Letter/Fax to Other",
+      "appointment": false
+    },
+    {
+      "code": "CMRQ",
+      "description": "CPS Package Request",
+      "appointment": false
+    },
+    {
+      "code": "CT3A",
+      "description": "Phone Contact from Other",
+      "appointment": false
+    },
+    {
+      "code": "CT3B",
+      "description": "Phone Contact to Other",
+      "appointment": false
+    },
+    {
+      "code": "CTOA",
+      "description": "Phone Contact from Offender",
+      "appointment": false
+    },
+    {
+      "code": "CTOB",
+      "description": "Phone Contact to Offender",
+      "appointment": false
+    },
+    {
+      "code": "CAYL",
+      "description": "YOT - Letter",
+      "appointment": false
+    },
+    {
+      "code": "CM3A",
+      "description": "eMail/Text from Other",
+      "appointment": false
+    },
+    {
+      "code": "CMOA",
+      "description": "eMail/Text from Offender",
+      "appointment": false
+    },
+    {
+      "code": "CMOB",
+      "description": "eMail/Text to Offender",
+      "appointment": false
+    },
+    {
+      "code": "CBRC",
+      "description": "Breach Action - Breach Confirmation Sent",
+      "appointment": false
+    },
+    {
+      "code": "CLBW",
+      "description": "Withdrawal of Warning",
+      "appointment": false
+    },
+    {
+      "code": "CRFI",
+      "description": "Request For Information",
+      "appointment": false
+    },
+    {
+      "code": "AWLS",
+      "description": "Breach Action - Enforcement Letter Requested",
+      "appointment": false
+    },
+    {
+      "code": "AWL2",
+      "description": "Breach Action - Second Warning Letter Sent",
+      "appointment": false
+    },
+    {
+      "code": "AWLF",
+      "description": "Breach Action - Final Warning Letter Sent",
+      "appointment": false
+    },
+    {
+      "code": "CDHC",
+      "description": "HDC - Correspondence / Communication",
+      "appointment": false
+    },
+    {
+      "code": "CM3B",
+      "description": "eMail/Text to Other",
+      "appointment": false
+    },
+    {
+      "code": "SPG002",
+      "description": "Accepted - Additional Information Requested",
+      "appointment": false
     }
   ]
 }

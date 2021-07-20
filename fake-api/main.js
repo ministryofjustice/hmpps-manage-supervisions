@@ -46,6 +46,7 @@ app.use(
     '/secure/offenders/crn/:crn/personalCircumstances': '/personal-circumstances-by-crn/:crn',
     '/secure/offenders/crn/:crn/personalContacts': '/personal-contacts',
     '/secure/offenders/crn/:crn/registrations?activeOnly=true': '/registrations/:crn',
+    '/secure/contact-types?categories=LT': '/contact-types',
     '/arn/risks/crn/:crn': '/rosh/:crn',
     ...paginated,
   }),

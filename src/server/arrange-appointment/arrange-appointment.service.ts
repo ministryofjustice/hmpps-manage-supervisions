@@ -16,7 +16,7 @@ import {
 import {
   Config,
   WellKnownAppointmentType,
-  WellKnownContactTypeCategory,
+  ContactTypeCategory,
   WellKnownContactTypeConfig,
   isRar,
   WellKnownRequirementTypeConfig,
@@ -95,7 +95,7 @@ export class ArrangeAppointmentService {
     return await this.cache.getOrSet('community:available-appointment-types', async () => {
       const { data } = await this.community.appointment.getAllAppointmentTypesUsingGET()
 
-      const config = this.config.get<WellKnownContactTypeConfig>('contacts')[WellKnownContactTypeCategory.Appointment]
+      const config = this.config.get<WellKnownContactTypeConfig>('contacts')[ContactTypeCategory.Appointment]
       const featured: FeaturedAppointmentType[] = Object.entries(config)
         .map(([type, meta]) => {
           const appointmentTypes = Object.values(meta.codes)
