@@ -18,7 +18,10 @@ import { DateTime } from 'luxon'
 import { WellKnownContactTypeCategory } from '../../../config'
 import { BreadcrumbType, LinksService } from '../../../common/links'
 
-export type GetContactsOptions = Omit<ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest, 'crn'>
+export type GetContactsOptions = Omit<
+  ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
+  'crn' | 'from' | 'to'
+>
 
 function getOutcomeFlags(outcome?: AppointmentOutcome): ActivityLogEntryTag[] {
   switch (outcome?.complied) {
@@ -55,6 +58,7 @@ export class ActivityService {
   async getActivityLogPage(crn: string, options: GetContactsOptions = {}): Promise<Paginated<ActivityLogEntry>> {
     const { data } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET({
       crn,
+      to: DateTime.now().toUTC().toISO(), // this endpoint does not accept offset date times.
       ...options,
     })
 
