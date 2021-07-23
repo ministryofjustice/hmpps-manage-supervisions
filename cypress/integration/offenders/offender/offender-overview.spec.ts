@@ -22,13 +22,13 @@ context('ViewOffenderOverview', () => {
       .shouldDisplayCommonHeader()
       .shouldRenderOffenderTab('overview', page => {
         page.mainOffence.contains(
-          'Cheats at gambling or enables or assists person to cheat (Gambling Act 2005) - 07539',
+          'Cheats at gambling or enables or assists person to cheat (Gambling Act 2005) (1 count)',
         )
-        page.additionalOffences.contains('Assault on Police Officer - 10400')
+        page.additionalOffences.contains('Assault on Police Officer (1 count)')
 
-        page.sentence.contains('ORA Community Order')
+        page.sentence.contains('12 month Community Order')
         page.progress('Sentence').contains('12 months elapsed (of 12 months)')
-        page.progress('RAR').contains('5 days completed (of 20 days)')
+        page.progress('RAR').contains('20 days RAR (5 days completed)')
 
         page.previousOrders.contains('Previous orders (1) Last ended on 1 December 2020')
 

@@ -1,4 +1,4 @@
-import { titleCase } from './person'
+import { titleCase } from './text'
 
 describe('Convert to title case', () => {
   it('null string', () => {

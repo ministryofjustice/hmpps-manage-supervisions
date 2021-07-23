@@ -8,13 +8,19 @@ import {
   CommunityApiService,
   Conviction,
   EMPLOYMENT_TYPE_CODE,
-  isRar,
   OffenderDetail,
   OfficeLocation,
   PersonalCircumstance,
   Requirement,
 } from '../community-api'
-import { Config, WellKnownAppointmentType, WellKnownContactTypeCategory, WellKnownContactTypeConfig } from '../config'
+import {
+  Config,
+  WellKnownAppointmentType,
+  WellKnownContactTypeCategory,
+  WellKnownContactTypeConfig,
+  isRar,
+  WellKnownRequirementTypeConfig,
+} from '../config'
 import { AvailableAppointmentTypes, FeaturedAppointmentType } from './dto/AppointmentWizardViewModel'
 import { ConfigService } from '@nestjs/config'
 import { isActiveDateRange } from '../util'
@@ -143,7 +149,8 @@ export class ArrangeAppointmentService {
       activeOnly: true,
     })
 
-    const rarRequirement = data.requirements.find(isRar)
+    const config = this.config.get<WellKnownRequirementTypeConfig>('requirements')
+    const rarRequirement = data.requirements.find(r => isRar(config, r))
 
     // RAR requirements will only be found on ORA Community Order and ORA Suspended Sentence Order sentences
     if (!rarRequirement) {

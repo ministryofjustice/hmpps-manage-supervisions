@@ -505,6 +505,19 @@ export class CommunityMockApi {
             code: 'SP',
             description: 'ORA Community Order',
           },
+          additionalSentences: [
+            {
+              additionalSentenceId: 2500021606,
+              type: { code: 'FINE', description: 'Fine' },
+              amount: 500,
+              notes: '£500 fine',
+            },
+            {
+              additionalSentenceId: 2500021607,
+              type: { code: 'DISQ', description: 'Disqualified from Driving' },
+              length: 6,
+            },
+          ],
         },
         latestCourtAppearanceOutcome: {
           code: '329',

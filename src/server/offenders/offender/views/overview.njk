@@ -6,17 +6,17 @@
     <div class="govuk-grid-row">
         <div class='govuk-grid-column-two-thirds'>
             {% if conviction %}
-                {% if conviction.mainOffence %}
+                {% if conviction.offence %}
                     <h2 class="govuk-heading-m">
                         Offences
                     </h2>
                     <p class='govuk-body' data-qa='offender/overview/main-offence'>
-                        {{ conviction.mainOffence.description }}
+                        {{ conviction.offence.description }}
                     </p>
 
-                    {% for offence in conviction.additionalOffences %}
+                    {% for offence in conviction.offence.additionalOffences %}
                         <p class='govuk-body' data-qa='offender/overview/additional-offence'>
-                            {{ offence.description }}
+                            {{ offence }}
                         </p>
                     {% endfor %}
 
@@ -49,9 +49,9 @@
                             },
                             {
                                 key: { text: "RAR" },
-                                value: { text: conviction.requirement.progress + ' completed (of ' + conviction.requirement.length + ')' },
+                                value: { text: conviction.rar },
                                 classes: 'qa-rar'
-                            } if conviction.requirement
+                            } if conviction.rar
                         ]
                     }) }}
 

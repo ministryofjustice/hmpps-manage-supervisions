@@ -1,6 +1,19 @@
 import { DateObject, DateTime } from 'luxon'
 import { TIME_FORMAT } from '../validators'
 
+export interface PotentiallyExpectedDateTime {
+  value: DateTime
+  expected: boolean
+}
+
+export function getPotentiallyExpectedDateTime(date: string, expectedDate: string): PotentiallyExpectedDateTime | null {
+  return date
+    ? { value: DateTime.fromISO(date), expected: false }
+    : expectedDate
+    ? { value: DateTime.fromISO(expectedDate), expected: true }
+    : null
+}
+
 export type RawDate = DateTime | Date | string | DateObject
 
 export function getDateTime(dateOrIso: RawDate, time?: string): DateTime {

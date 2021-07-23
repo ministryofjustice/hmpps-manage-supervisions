@@ -1,6 +1,6 @@
 import { NunjucksFilter } from './types'
 import { DateTime } from 'luxon'
-import { RawDate, safeGetDateTime } from '../../../util'
+import { PotentiallyExpectedDateTime, RawDate, safeGetDateTime } from '../../../util'
 
 export class ToIsoDate implements NunjucksFilter {
   filter(date: DateTime): string {
@@ -65,5 +65,12 @@ export class Dob implements NunjucksFilter {
     const date = safeGetDateTime(value)
     const age = DateTime.now().diff(date, 'years')
     return `${date.toFormat('d MMMM yyyy')} (${Math.floor(age.years)} years old)`
+  }
+}
+
+export class ExpectedDate implements NunjucksFilter {
+  filter({ value, expected }: PotentiallyExpectedDateTime): string {
+    const date = safeGetDateTime(value).toFormat('d MMMM yyyy')
+    return expected ? `${date} (expected)` : date
   }
 }

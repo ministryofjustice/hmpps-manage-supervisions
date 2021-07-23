@@ -4,7 +4,29 @@
             {{ item }}
         </p>
     {% endfor %}
-    {% if options and options.link and options.linkText %}
+    {% if options.link and options.linkText %}
+        <p class='govuk-!-margin-top-4'>
+            <a href='{{ options.link }}'>{{ options.linkText }}</a>
+        </p>
+    {% endif %}
+{% endmacro %}
+
+{% macro joinList(items, options) %}
+    {% if options.ordered %}
+        <ol class='govuk-list govuk-list--number'>
+            {% for item in items %}
+                <li>{{ item }}</li>
+            {% endfor %}
+        </ol>
+    {% else %}
+        <ul class='govuk-list'>
+            {% for item in items %}
+                <li>{{ item }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if options.link and options.linkText %}
         <p class='govuk-!-margin-top-4'>
             <a href='{{ options.link }}'>{{ options.linkText }}</a>
         </p>
