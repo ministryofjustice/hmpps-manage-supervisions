@@ -10,7 +10,8 @@ import {
   OffenderViewModelBase,
 } from './offender-view-model'
 import { RedirectResponse } from '../../common'
-import { OffenderDetailSummary, ContactTypesService } from '../../community-api'
+import { OffenderDetailSummary } from '../../community-api/client'
+import { ContactTypesService } from '../../community-api'
 import { OffenderService } from './offender.service'
 import { getDisplayName } from '../../util'
 import { SentenceService } from './sentence'

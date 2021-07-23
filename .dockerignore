@@ -2,7 +2,6 @@ dist/
 kubectl_deploy/
 helm_deploy/
 node_modules/
-fake-api/
 README.md
 LICENSE
 .*

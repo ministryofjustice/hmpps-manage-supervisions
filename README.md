@@ -1,18 +1,25 @@
 # HMPPS Manage Supervisions
 
-## Running
+## Running+
+
 The easiest way to run `HMPPS Manage Supervisions` is to use docker compose to create the service and all dependencies. 
 
 ```bash
-docker-compose pull
-docker-compose up
+docker compose pull
+docker compose up
+npm install && npm run seed
 ```
 
-This will run with a fake Community API & allow non-Delius user authentication.
+This will run with a fake dependent APIs (via wiremock) & allow non-Delius user authentication.
+Navigate to `http://localhost:3000` and login with:
+
+* username: `AUTH_ADM`
+* password: `password123456`
+
 If you'd like to run with Delius user based authentication & against the real Community API then run.
 
 ```bash
-docker-compose -f docker-compose.yml -f docker-compose.community-api.yml up
+docker compose -f docker-compose.yml -f docker-compose.community-api.yml up
 ```
 
 > Warning: this requires access to the private [Oracle DB image](https://github.com/ministryofjustice/hmpps-delius-api/blob/main/doc/development.md#oracle-database)
@@ -22,20 +29,21 @@ docker-compose -f docker-compose.yml -f docker-compose.community-api.yml up
 `HMPPS Manage Supervisions` requires: 
 * redis - session store and token caching
 * [hmpps-auth](https://github.com/ministryofjustice/hmpps-auth) - for authentication
-* [community-api](https://github.com/ministryofjustice/community-api) - for data access
+* [community-api](https://github.com/ministryofjustice/community-api) - for Delius data access
 
 ## Development
 
-To start the main services excluding `HMPPS Manage Supervisions`: 
+To start the main services excluding `HMPPS Manage Supervisions` & seed the wiremock instance:
 
 ```bash
-docker-compose up redis hmpps-auth fake-api
+docker compose up redis hmpps-auth wiremock
+npm run seed
 ```
 
 Or with real Community API:
 
 ```bash
-docker-compose -f docker-compose.yml -f docker-compose.community-api.yml up redis hmpps-auth community-api
+docker compose -f docker-compose.yml -f docker-compose.community-api.yml up redis hmpps-auth community-api
 ```
 
 Install dependencies using `npm install`, ensuring you are using >= `Node v14.x` & `npm v7.x`.
@@ -57,14 +65,14 @@ You can update the community-api definition locally.
 
 ```bash
 curl https://raw.githubusercontent.com/ministryofjustice/community-api/main/docker-compose.yml --output docker-compose.community-api-main.yml
-docker-compose -f docker-compose.community-api-main.yml pull
-docker-compose -f docker-compose.community-api-main.yml up -d
+docker compose -f docker-compose.community-api-main.yml pull
+docker compose -f docker-compose.community-api-main.yml up -d
 
 # when ready
 curl http://localhost:8080/v2/api-docs?group=Community%20API --output src/server/community-api/client/community-api.json
 
 # clean up
-docker-compose -f docker-compose.community-api-main.yml down
+docker compose -f docker-compose.community-api-main.yml down
 rm -f docker-compose.community-api-main.yml
 ```
 
@@ -85,7 +93,7 @@ npm run test
 For local running, start redis and a wiremock instance:
 
 ```bash
-docker-compose -f docker-compose-test.yml up
+docker compose up wiremock redis
 ```
 
 Then run the server in test mode:

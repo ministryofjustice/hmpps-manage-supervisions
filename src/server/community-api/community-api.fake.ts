@@ -9,7 +9,6 @@ import {
   OffenderDetail,
   OfficeLocation,
   PhoneNumberType,
-  PersonalCircumstances,
   StaffDetails,
   StaffHuman,
   ContactSummary,
@@ -25,6 +24,7 @@ import {
   PersonalCircumstance,
   PersonalContact,
   OffenderDetailSummary,
+  AdditionalSentence,
 } from './client'
 import { merge } from 'lodash'
 import * as faker from 'faker'
@@ -32,6 +32,11 @@ import { DateTime } from 'luxon'
 import { fake } from '../util/util.fake'
 import { Paginated } from './types'
 import { WellKnownAddressTypes } from './well-known'
+
+export function fakeCrn() {
+  const n = faker.datatype.number({ min: 1, max: 999999 }).toString()
+  return faker.random.alpha().toUpperCase() + n.padStart(n.length - 6, '0')
+}
 
 export function fakeIsoDate(type: 'past' | 'recent' | 'soon' | 'future' = 'past'): string {
   return faker.date[type]().toISOString().substr(0, 10)
@@ -53,30 +58,40 @@ export const fakeAppointmentCreateResponse = fake<AppointmentCreateResponse>(() 
   type: faker.datatype.uuid(),
 }))
 
-export const fakeAddress = fake<Address>(() => ({
-  from: fakeIsoDate(),
-  notes: faker.company.bs(),
-  addressNumber: faker.datatype.number().toString(),
-  streetName: faker.address.streetName(),
-  buildingName: faker.commerce.department(),
-  town: faker.address.city(),
-  county: faker.address.county(),
-  postcode: faker.address.zipCode(),
-  status: {
-    code: WellKnownAddressTypes.Main,
-    description: 'Main',
-  },
-  noFixedAbode: false,
-  telephoneNumber: faker.phone.phoneNumber(),
-  latestAssessmentDate: faker.date.past().toISOString(),
-  type: {
-    code: faker.random.alphaNumeric(3),
-    description: faker.company.bs(),
-  },
-  typeVerified: true,
-  lastUpdatedDatetime: faker.date.past().toISOString(),
-  createdDatetime: faker.date.past().toISOString(),
-}))
+export const fakeAddress = fake<Address>((options, partial = {}) => {
+  const code = partial.status?.code || WellKnownAddressTypes.Main
+  const [description] = Object.entries(WellKnownAddressTypes).find(([, v]) => v === code)
+
+  const base = {
+    from: fakeIsoDate(),
+    notes: faker.company.bs(),
+    status: { code, description },
+    lastUpdatedDatetime: faker.date.past().toISOString(),
+    createdDatetime: faker.date.past().toISOString(),
+  }
+
+  if (partial.noFixedAbode) {
+    return { ...base, noFixedAbode: true }
+  }
+
+  return {
+    ...base,
+    addressNumber: faker.datatype.number().toString(),
+    streetName: faker.address.streetName(),
+    buildingName: faker.commerce.department(),
+    town: faker.address.city(),
+    county: faker.address.county(),
+    postcode: faker.address.zipCode(),
+    noFixedAbode: false,
+    telephoneNumber: faker.phone.phoneNumber(),
+    latestAssessmentDate: faker.date.past().toISOString(),
+    type: {
+      code: 'A02',
+      description: 'Approved premises',
+    },
+    typeVerified: true,
+  }
+})
 
 export const fakePhoneNumber = fake<PhoneNumber>(() => ({
   type: PhoneNumberType.Mobile,
@@ -109,9 +124,9 @@ export const fakeOffenderAlias = fake<OffenderAlias>(() => ({
   surname: faker.name.lastName(),
 }))
 
-export const fakeOffenderDetail = fake<OffenderDetail>((options, partial) => ({
+export const fakeOffenderDetail = fake<OffenderDetail>((options, partial = {}) => ({
   offenderId: faker.datatype.number(),
-  otherIds: { crn: 'some-crn', pncNumber: 'some-prn' },
+  otherIds: { crn: fakeCrn(), pncNumber: 'some-prn' },
   activeProbationManagedSentence: true,
   firstName: faker.name.firstName(),
   surname: faker.name.lastName(),
@@ -120,28 +135,31 @@ export const fakeOffenderDetail = fake<OffenderDetail>((options, partial) => ({
   gender: faker.random.arrayElement(['Male', 'Female']),
   dateOfBirth: fakeIsoDate(),
   contactDetails: {
-    addresses: partial?.contactDetails?.addresses?.map(fakeAddress) || [fakeAddress()],
-    phoneNumbers: partial?.contactDetails?.phoneNumbers?.map(fakePhoneNumber) || [fakePhoneNumber()],
-    emailAddresses: partial?.contactDetails?.emailAddresses || [faker.internet.email()],
+    addresses: partial.contactDetails?.addresses?.map(fakeAddress) || [fakeAddress()],
+    phoneNumbers: partial.contactDetails?.phoneNumbers?.map(fakePhoneNumber) || [
+      fakePhoneNumber({ type: PhoneNumberType.Mobile }),
+      fakePhoneNumber({ type: PhoneNumberType.Telephone }),
+    ],
+    emailAddresses: partial.contactDetails?.emailAddresses || [faker.internet.email()],
   },
   offenderProfile: {
     offenderLanguages: {
       primaryLanguage: faker.address.country(),
       requiresInterpreter: true,
     },
-    disabilities: partial?.offenderProfile?.disabilities?.map(fakeDisability) || [fakeDisability()],
+    disabilities: partial.offenderProfile?.disabilities?.map(fakeDisability) || [fakeDisability()],
     genderIdentity: 'Prefer to self-describe',
     selfDescribedGender: 'Jedi',
     sexualOrientation: 'Bisexual',
     religion: 'Christian',
   },
-  offenderAliases: partial?.offenderAliases || [fakeOffenderAlias()],
+  offenderAliases: partial.offenderAliases?.map(p => fakeOffenderAlias(p)) || [fakeOffenderAlias()],
   offenderManagers: [{ team: { code: faker.datatype.uuid() } }],
 }))
 
 export const fakeOffenderDetailSummary = fake<OffenderDetailSummary>((options, partial) => ({
   offenderId: faker.datatype.number(),
-  otherIds: { crn: 'some-crn', pncNumber: 'some-prn' },
+  otherIds: { crn: fakeCrn(), pncNumber: 'some-prn' },
   activeProbationManagedSentence: true,
   firstName: faker.name.firstName(),
   surname: faker.name.lastName(),
@@ -179,25 +197,20 @@ export const fakeOfficeLocation = fake<OfficeLocation>(() => ({
 
 export const fakePersonalCircumstance = fake<PersonalCircumstance>(() => ({
   startDate: fakeIsoDate(),
-  endDate: fakeIsoDate('future'),
   evidenced: faker.datatype.boolean(),
   notes: faker.lorem.lines(),
   offenderId: faker.datatype.number(),
   personalCircumstanceId: faker.datatype.number(),
   personalCircumstanceSubType: {
-    code: faker.lorem.slug(3),
-    description: faker.lorem.slug(10),
+    code: faker.random.alphaNumeric(3).toUpperCase(),
+    description: faker.company.bs(),
   },
   personalCircumstanceType: {
-    code: 'B',
-    description: faker.lorem.slug(10),
+    code: faker.random.alphaNumeric(3).toUpperCase(),
+    description: faker.company.bs(),
   },
   createdDatetime: faker.date.past().toISOString(),
   lastUpdatedDatetime: faker.date.recent().toISOString(),
-}))
-
-export const fakePersonalCircumstances = fake<PersonalCircumstances>(() => ({
-  personalCircumstances: [fakePersonalCircumstance()],
 }))
 
 export const fakePersonalContact = fake<PersonalContact>(() => ({
@@ -207,11 +220,21 @@ export const fakePersonalContact = fake<PersonalContact>(() => ({
   otherNames: faker.name.middleName(),
   surname: faker.name.lastName(),
   previousSurname: faker.name.lastName(),
-  relationship: 'Wife',
-  gender: 'Female',
+  relationship: faker.random.arrayElement([
+    'Wife',
+    'Husband',
+    'Mother',
+    'Father',
+    'Daughter',
+    'Son',
+    'Auntie',
+    'Uncle',
+    'Cousin',
+  ]),
+  gender: faker.random.arrayElement(['Female', 'Male']),
   relationshipType: {
     code: 'NK',
-    description: 'Next of Kin',
+    description: faker.random.arrayElement(['Next of Kin', 'Family Member']),
   },
   startDate: fakeIsoDate(),
   createdDatetime: faker.date.past().toISOString(),
@@ -344,6 +367,19 @@ export const fakeOffence = fake<Offence>(() => ({
   lastUpdatedDatetime: faker.date.past().toISOString(),
 }))
 
+export const fakeAdditionalSentence = fake<AdditionalSentence>((options, partial = {}) => {
+  return {
+    additionalSentenceId: faker.datatype.number(),
+    type: {
+      code: faker.random.alphaNumeric(3).toUpperCase(),
+      description: faker.random.arrayElement(['Disqualified from Driving', 'Fine']),
+    },
+    notes: faker.lorem.sentence(),
+    length: partial.amount ? null : faker.datatype.number({ min: 1, max: 4 }) * 6,
+    amount: partial.length ? null : faker.datatype.number({ min: 100, max: 1000 }),
+  }
+})
+
 export const fakeConviction = fake<Conviction>((options, partial = {}) => ({
   convictionId: faker.datatype.number(),
   index: faker.datatype.number().toString(),
@@ -365,6 +401,7 @@ export const fakeConviction = fake<Conviction>((options, partial = {}) => ({
       code: faker.random.alphaNumeric(2),
       description: faker.commerce.productMaterial(),
     },
+    additionalSentences: [],
   },
   latestCourtAppearanceOutcome: {
     code: faker.random.alphaNumeric(3),
@@ -404,7 +441,7 @@ export const fakeConviction = fake<Conviction>((options, partial = {}) => ({
       code: faker.random.alphaNumeric(2),
       description: faker.commerce.productMaterial(),
     },
-    crn: faker.random.alphaNumeric(7),
+    crn: fakeCrn(),
   },
 }))
 

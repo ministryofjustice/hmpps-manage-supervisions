@@ -6,7 +6,7 @@ import { RedirectResponse } from '../common'
 import { AppointmentBuilderDto } from './dto/AppointmentBuilderDto'
 import { plainToClass } from 'class-transformer'
 import { DEFAULT_GROUP } from '../util/mapping'
-import { AppointmentTypeRequiresLocation } from '../community-api'
+import { AppointmentTypeRequiresLocation } from '../community-api/client'
 
 export function getStepUrl({ crn }: AppointmentWizardSession, step: AppointmentWizardStep) {
   return `/arrange-appointment/${crn}/${step}`

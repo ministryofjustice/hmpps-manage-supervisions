@@ -1,6 +1,7 @@
 import { Test } from '@nestjs/testing'
 import { MAX_RECENT_APPOINTMENTS, ScheduleService } from './schedule.service'
-import { AppointmentDetail, CommunityApiService, ContactMappingService } from '../../../community-api'
+import { AppointmentDetail } from '../../../community-api/client'
+import { CommunityApiService, ContactMappingService } from '../../../community-api'
 import { orderBy, sortBy } from 'lodash'
 import { fakeAppointmentDetail } from '../../../community-api/community-api.fake'
 import { fakeOkResponse } from '../../../common/rest/rest.fake'

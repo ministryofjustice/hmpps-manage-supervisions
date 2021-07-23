@@ -18,7 +18,7 @@ import { Controller, Get, Param, Post, Redirect, Render, Session } from '@nestjs
 import { AuthenticatedUser, DynamicRedirect, RedirectResponse } from '../common'
 import { BodyClass } from '../common/meta/body-class.decorator'
 import { DEFAULT_GROUP } from '../util/mapping'
-import { AppointmentTypeRequiresLocation, OffenderDetail, OffenderManager } from '../community-api'
+import { AppointmentTypeRequiresLocation, OffenderDetail, OffenderManager } from '../community-api/client'
 import { DateTime } from 'luxon'
 import { ConfigService } from '@nestjs/config'
 import { Config, DebugFlags, ServerConfig } from '../config'

@@ -50,7 +50,7 @@
                     },
                     {
                         key: { text: "Notes" },
-                        value: { text: (circumstance.notes | nl2br) if circumstance.notes else 'No Notes' }
+                        value: { html: (circumstance.notes | nl2br) if circumstance.notes else 'No Notes' }
                     }
                 ]
             }) }}

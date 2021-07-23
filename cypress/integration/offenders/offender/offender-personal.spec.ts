@@ -4,6 +4,8 @@ import { OffenderDisabilitiesPage } from '../../../pages/offender-disabilities.p
 import { OffenderPersonalCircumstancesPage } from '../../../pages/offender-personal-circumstances.page'
 import { OffenderPersonalContactPage } from '../../../pages/offender-personal-contact.page'
 import { DeliusExitPage } from '../../../pages/delius-exit.page'
+import { ACTIVE_CONVICTION_ID } from '../../../plugins/convictions'
+import { OFFENDER_ID } from '../../../plugins/offender'
 
 class Fixture extends ViewOffenderFixture {
   whenClickingViewAllAddresses(): this {
@@ -182,11 +184,10 @@ interface ExpectedCircumstance {
 context('ViewOffenderPersonalDetails', () => {
   const fixture = new Fixture()
 
-  beforeEach(() => fixture.reset())
+  before(() => cy.seed())
 
   it('displays personal details', () => {
     fixture
-      .havingOffender()
       .whenViewingOffender()
       .whenClickingSubNavTab('personal')
       .shouldDisplayCommonHeader()
@@ -208,11 +209,11 @@ context('ViewOffenderPersonalDetails', () => {
         page.tableValue('contact', 'Personal contacts').contains('Next of Kin: Pippa Wade – Wife')
         page.tableValue('contact', 'Personal contacts').contains('Family member: Jonathon Bacon – Father')
 
-        page.tableValue('personal', 'Name').contains('Brian Cheese')
+        page.tableValue('personal', 'Name').contains('Liz Danger Haggis')
         page.tableValue('personal', 'Date of birth').contains('10 June 1980')
         page.tableValue('personal', 'Preferred name/Known as').contains('Bob')
         page.tableValue('personal', 'Aliases').contains('Dylan Meyer Romario Montgomery')
-        page.tableValue('personal', 'Previous name').contains('Smith')
+        page.tableValue('personal', 'Previous name').contains('Scotland')
         page.tableValue('personal', 'Preferred language').contains('Bengali (interpreter required)')
         page
           .tableValue('personal', 'Current circumstances')
@@ -220,11 +221,11 @@ context('ViewOffenderPersonalDetails', () => {
         page
           .tableValue('personal', 'Disabilities and adjustments')
           .contains('Learning Difficulties: Other Speech Impairment: None')
-        page.tableValue('personal', 'CRN').contains('ABC123')
+        page.tableValue('personal', 'CRN').contains(fixture.crn)
         page.tableValue('personal', 'PNC').contains('2012/123400000F')
 
         page.tableValue('equality', 'Religion or belief').contains('Christian')
-        page.tableValue('equality', 'Sex').contains('Male')
+        page.tableValue('equality', 'Sex').contains('Female')
         page.tableValue('equality', 'Gender identity').contains('Prefer to self-describe')
         page.tableValue('equality', 'Self-described gender').contains('Jedi')
         page.tableValue('equality', 'Sexual orientation').contains('Bisexual')
@@ -233,7 +234,6 @@ context('ViewOffenderPersonalDetails', () => {
 
   it('displays all address details', () => {
     fixture
-      .havingOffender()
       .whenViewingOffender()
       .whenClickingSubNavTab('personal')
       .whenClickingViewAllAddresses()
@@ -264,7 +264,6 @@ context('ViewOffenderPersonalDetails', () => {
 
   it('displays all disability details', () => {
     fixture
-      .havingOffender()
       .whenViewingOffender()
       .whenClickingSubNavTab('personal')
       .whenClickingViewAllDisabilities()
@@ -289,7 +288,6 @@ context('ViewOffenderPersonalDetails', () => {
 
   it('displays all personal circumstances', () => {
     fixture
-      .havingOffender()
       .whenViewingOffender()
       .whenClickingSubNavTab('personal')
       .whenClickingViewAllPersonalCircumstances()
@@ -313,7 +311,6 @@ context('ViewOffenderPersonalDetails', () => {
 
   it('displays personal contact', () => {
     fixture
-      .havingOffender()
       .whenViewingOffender()
       .whenClickingSubNavTab('personal')
       .whenClickingViewPersonalContact('Pippa Wade – Wife')
@@ -331,7 +328,7 @@ context('ViewOffenderPersonalDetails', () => {
           .should('have.attr', 'href')
           .and(
             'include',
-            `http://localhost:8082/NDelius-war/delius/JSP/deeplink.jsp?component=ContactList&offenderId=2500011641&eventId=1`,
+            `http://localhost:8082/NDelius-war/delius/JSP/deeplink.jsp?component=ContactList&offenderId=${OFFENDER_ID}&eventId=${ACTIVE_CONVICTION_ID}`,
           )
       })
   })

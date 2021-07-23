@@ -10,7 +10,7 @@ import {
   PersonalDisabilitiesViewModel,
 } from './personal.types'
 import { getDisplayName } from '../../../util'
-import { OffenderDetailSummary } from '../../../community-api'
+import { OffenderDetailSummary } from '../../../community-api/client'
 
 @Controller('offender/:crn(\\w+)/personal')
 export class PersonalController {

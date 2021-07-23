@@ -161,12 +161,12 @@ export function configFactory(): Config {
       },
       community: {
         enabled: true,
-        url: string('COMMUNITY_API_URL', developmentOnly('http://localhost:8082')),
+        url: string('COMMUNITY_API_URL', developmentOnly('http://localhost:9091/community-api')),
         timeout: int('COMMUNITY_API_TIMEOUT', fallback(30000)),
       },
       assessRisksAndNeeds: {
         enabled: true,
-        url: string('ASSESS_RISKS_AND_NEEDS_API_URL', developmentOnly('http://localhost:8082/arn')),
+        url: string('ASSESS_RISKS_AND_NEEDS_API_URL', developmentOnly('http://localhost:9091/assess-risks-and-needs')),
         timeout: int('ASSESS_RISKS_AND_NEEDS_API_TIMEOUT', fallback(30000)),
       },
     },

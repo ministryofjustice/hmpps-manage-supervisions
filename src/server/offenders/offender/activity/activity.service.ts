@@ -2,13 +2,15 @@ import { Injectable } from '@nestjs/common'
 import {
   AppointmentDetail,
   AppointmentOutcome,
-  CommunityApiService,
   ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
-  ContactMappingService,
   ContactSummary,
+} from '../../../community-api/client'
+import {
+  CommunityApiService,
+  Paginated,
   GetMetaResult,
   isAppointment,
-  Paginated,
+  ContactMappingService,
 } from '../../../community-api'
 import {
   ActivityLogEntry,

@@ -65,7 +65,7 @@ export interface AdditionalSentence {
   name: string
   length?: number
   value?: number
-  notes: string
+  notes?: string
 }
 
 export interface ConvictionDetails {

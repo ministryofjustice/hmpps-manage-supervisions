@@ -24,15 +24,17 @@ services:
       - SERVER_PORT=8080
       - SPRING_PROFILES_ACTIVE=dev,auth-seed
 
-  fake-api:
-    build: ./fake-api
+  wiremock:
+    image: rodolpheche/wiremock
     networks:
       - hmpps
-    container_name: fake-api
+    container_name: wiremock
+    restart: always
     ports:
-      - "8082:8082"
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8082/health/ping" ]
+      - "9091:8080"
+    command:
+      - -global-response-templating
+      - -verbose
 
   app:
     build: .
@@ -41,7 +43,7 @@ services:
     container_name: hmpps-manage-supervisions
     depends_on:
       - redis
-      - fake-api
+      - wiremock
     ports:
       - "3000:3000"
     environment:
@@ -49,7 +51,7 @@ services:
       REDIS_HOST: redis
       HMPPS_AUTH_EXTERNAL_URL: http://localhost:9090/auth
       HMPPS_AUTH_URL: http://hmpps-auth:8080/auth
-      COMMUNITY_API_URL: http://fake-api:8082
+      COMMUNITY_API_URL: http://wiremock:8080
       # These will need to match new creds in the seed auth service auth
       API_CLIENT_ID: interventions
       API_CLIENT_SECRET: clientsecret

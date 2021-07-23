@@ -1,23 +1,25 @@
 import { ViewOffenderFixture } from './view-offender.fixture'
-import { getDateRange } from '../../../util/getDateRange'
 
 context('ViewOffenderOverview', () => {
   const fixture = new ViewOffenderFixture()
 
-  beforeEach(() => fixture.reset())
-
   it('displays offender overview', () => {
-    const past = getDateRange('past', { hour: 10, minute: 0 }, { hour: 1 })
+    const past = { appointmentStart: '2020-05-25T12:00:00+01:00', appointmentEnd: '2020-05-25T13:00:00+01:00' }
+    cy.seed({
+      appointments: [
+        {
+          appointmentStart: '2100-05-25T12:00:00+01:00',
+          appointmentEnd: '2100-05-25T13:00:00+01:00',
+          type: { contactType: 'CHVS' },
+          staff: { unallocated: false, forenames: 'Laura', surname: 'Smith' },
+        },
+        { ...past, outcome: { complied: true, attended: true } },
+        { ...past, outcome: { complied: false, attended: true } },
+        { ...past, outcome: { complied: true, attended: false } },
+      ],
+    })
+
     fixture
-      .havingOffender({
-        convictions: { previous: true },
-        appointments: [
-          { start: '2100-05-25T12:00:00+01:00', end: '2100-05-25T13:00:00+01:00' },
-          { ...past, outcome: { complied: true, attended: true } },
-          { ...past, outcome: { complied: false, attended: true } },
-          { ...past, outcome: { complied: true, attended: false } },
-        ],
-      })
       .whenViewingOffender()
       .shouldDisplayCommonHeader()
       .shouldRenderOffenderTab('overview', page => {
@@ -28,13 +30,11 @@ context('ViewOffenderOverview', () => {
 
         page.sentence.contains('12 month Community Order')
         page.progress('Sentence').contains('12 months elapsed (of 12 months)')
-        page.progress('RAR').contains('20 days RAR (5 days completed)')
+        page.progress('RAR').contains('44 days RAR, 29 completed (2 requirements)')
 
         page.previousOrders.contains('Previous orders (1) Last ended on 1 December 2020')
 
-        page.nextAppointment.contains(
-          `The next appointment is Tuesday 25 May 2100 at 12pm Office visit with Some Staff`,
-        )
+        page.nextAppointment.contains('The next appointment is Tuesday 25 May 2100 at 12pm Home visit with Laura Smith')
         page.appointmentAttendance.contains('1 Complied')
         page.appointmentAttendance.contains('1 Acceptable absence')
         page.appointmentAttendance.contains('1 Failure to comply')
@@ -42,8 +42,8 @@ context('ViewOffenderOverview', () => {
   })
 
   it('displays offender overview when no OASys risk data', () => {
+    cy.seed({ risks: null })
     fixture
-      .havingOffender({ arnRiskDataAvailable: false })
       .whenViewingOffender()
       .shouldDisplayCommonHeader()
       .shouldRenderOffenderTab('overview', page => {

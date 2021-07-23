@@ -4,7 +4,7 @@ import * as faker from 'faker'
 import { ContactTypeCategory } from '../../../config'
 import { DateTime } from 'luxon'
 import { ActivityLogEntry } from './activity.types'
-import { AppointmentRequirementDetail } from '../../../community-api'
+import { AppointmentRequirementDetail } from '../../../community-api/client'
 
 export const fakeActivityLogEntry = fake<ActivityLogEntry, FakeAppointmentDetailOptions>(
   ({ when = 'past' }, { type = faker.random.arrayElement(Object.values(ContactTypeCategory)) }) => {

@@ -10,7 +10,7 @@ import { plainToClass } from 'class-transformer'
 import { DEFAULT_GROUP } from '../../util/mapping'
 import { pick } from 'lodash'
 import { IS_AFTER, IS_DATE_INPUT, IS_FUTURE_DATE, IS_FUTURE_TIME, IS_TIME } from '../../validators'
-import { AppointmentTypeRequiresLocation } from '../../community-api'
+import { AppointmentTypeRequiresLocation } from '../../community-api/client'
 import { WellKnownAppointmentType } from '../../config'
 
 type Assertion = (subject: AppointmentBuilderDto) => void

@@ -1,4 +1,4 @@
-import { StaffHuman } from '../community-api'
+import { StaffHuman } from '../community-api/client'
 import { titleCase } from './text'
 
 export function staffName(staff?: StaffHuman): string | null {

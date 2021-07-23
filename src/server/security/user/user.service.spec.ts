@@ -4,7 +4,7 @@ import { MockRestModule } from '../../common/rest/rest.mock'
 import { fakeUser, fakeUserProfile } from './user.fake'
 import { classToPlain } from 'class-transformer'
 import MockAdapter from 'axios-mock-adapter'
-import { StaffDetails } from '../../community-api'
+import { StaffDetails } from '../../community-api/client'
 import { fakeStaffDetails } from '../../community-api/community-api.fake'
 import { AuthenticationMethod } from '../../common'
 

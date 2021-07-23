@@ -5,7 +5,7 @@ import { AppointmentWizardStep } from './AppointmentWizardViewModel'
 import { DateInput, IsAfter, IsDateInput, IsFutureTime, ValidationGroup, IsFutureDate, IsTime } from '../../validators'
 import { getDateTime } from '../../util'
 import { ExposeDefault, ToBoolean } from '../../util/mapping'
-import { AppointmentTypeRequiresLocation } from '../../community-api'
+import { AppointmentTypeRequiresLocation } from '../../community-api/client'
 import { WellKnownAppointmentType } from '../../config'
 
 export const MESSAGES = {

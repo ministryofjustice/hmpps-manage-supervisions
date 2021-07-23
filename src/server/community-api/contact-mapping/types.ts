@@ -1,4 +1,4 @@
-import { AppointmentType, ContactType, StaffHuman } from '../../community-api'
+import { AppointmentType, ContactType, StaffHuman } from '../client'
 import { WellKnownAppointmentTypeMeta, WellKnownCommunicationTypeMeta, ContactTypeCategory } from '../../config'
 
 export interface GetMetaOptions {

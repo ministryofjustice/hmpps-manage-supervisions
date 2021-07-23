@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { ContactTypeCategory } from '../../../config'
 import { ViewModel } from '../../../common'
-import { AppointmentRequirementDetail } from '../../../community-api'
+import { AppointmentRequirementDetail } from '../../../community-api/client'
 
 export interface ActivityLogEntryLinks {
   view: string

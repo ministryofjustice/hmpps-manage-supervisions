@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { CommunityApiService, OffenderDetail, OffenderDetailSummary } from '../../community-api'
+import { OffenderDetail, OffenderDetailSummary } from '../../community-api/client'
+import { CommunityApiService } from '../../community-api'
 
 @Injectable()
 export class OffenderService {
