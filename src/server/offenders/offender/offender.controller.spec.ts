@@ -15,7 +15,7 @@ import { SentenceService } from './sentence'
 import { ScheduleService } from './schedule'
 import { ActivityService } from './activity'
 import { RiskService } from './risk'
-import { fakeConvictionDetails } from './sentence/sentence.fake'
+import { fakeConvictionDetails, fakeConvictionRequirement } from './sentence/sentence.fake'
 import { fakeActivityLogEntry } from './activity/activity.fake'
 import { fakeAppointmentSummary, fakeRecentAppointments } from './schedule/schedule.fake'
 import { fakeBreadcrumbs, fakeBreadcrumbUrl, MockLinksModule } from '../../common/links/links.mock'
@@ -78,7 +78,9 @@ describe('OffenderController', () => {
       .withArgs(offender, personalContacts, circumstances)
       .returns({ contactDetails, personalDetails })
 
-    const conviction = fakeConvictionDetails()
+    const conviction = fakeConvictionDetails({
+      requirements: [fakeConvictionRequirement({ isRar: true, name: 'Some RAR requirement' })],
+    })
     sentenceService.getConvictionDetails.withArgs('some-crn').resolves(conviction)
 
     const appointmentSummary = fakeAppointmentSummary()
@@ -90,7 +92,7 @@ describe('OffenderController', () => {
     const observed = await subject.getOverview('some-crn')
     shouldReturnViewModel(observed, BreadcrumbType.Case, {
       page: OffenderPage.Overview,
-      conviction,
+      conviction: { ...conviction, rar: 'Some RAR requirement' },
       contactDetails,
       personalDetails,
       appointmentSummary,

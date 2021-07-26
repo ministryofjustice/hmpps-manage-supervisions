@@ -1,4 +1,5 @@
 import { PageBase } from './page'
+import { SummaryList } from './components/summary-list'
 
 export type TABS = 'overview' | 'schedule' | 'activity' | 'personal' | 'sentence'
 export type TABLE = 'future' | 'recent'
@@ -139,32 +140,24 @@ export class OffenderPage extends PageBase {
 
   get sentence() {
     return {
-      mainOffence(title: string) {
-        return cy.get(`dl[data-qa="offender/sentence/main-offence"] dt`).contains(title).siblings('dd')
-      },
-
-      get noOffences() {
-        return cy.get(`[data-qa="offender/sentence/no-offences"]`)
-      },
-
-      additionalOffence(id: string, title: string) {
-        return cy.get(`dl[data-qa="offender/sentence/additional-offence/${id}"] dt`).contains(title).siblings('dd')
-      },
-
       get noDetails() {
-        return cy.get(`[data-qa="offender/sentence/no-details"]`)
+        return cy.get(`[data-qa="offender/sentence/no-sentence"]`)
       },
 
-      details(title: string) {
-        return cy.get(`dl[data-qa="offender/sentence/details"] dt`).contains(title).siblings('dd')
+      offence(callback: (card: SummaryList) => void) {
+        SummaryList.selectFromCard('Offence', callback)
       },
 
-      requirements(title: string) {
-        return cy.get(`dl[data-qa="offender/sentence/requirements"] dt`).contains(title).siblings('dd')
+      conviction(callback: (card: SummaryList) => void) {
+        SummaryList.selectFromCard('Conviction', callback)
       },
 
-      get previous() {
-        return cy.get('[data-qa="offender/sentence/probation-history"] [data-qa="previous-orders"]')
+      sentence(callback: (card: SummaryList) => void) {
+        SummaryList.selectFromCard('Sentence', callback)
+      },
+
+      probationHistory(callback: (card: SummaryList) => void) {
+        SummaryList.selectFromCard('Probation history', callback)
       },
     }
   }

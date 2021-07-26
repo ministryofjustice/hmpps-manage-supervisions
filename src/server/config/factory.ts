@@ -8,6 +8,7 @@ import {
   WellKnownCommunicationTypeMeta,
 } from './types'
 import { ApplicationVersion } from '../util'
+import { requirements } from './requirements'
 
 interface EnvironmentFallback<T> {
   value: T
@@ -168,5 +169,6 @@ export function configFactory(): Config {
       appointment,
       communication,
     },
+    requirements,
   }
 }

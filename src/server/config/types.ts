@@ -109,11 +109,24 @@ export interface WellKnownContactTypeConfig {
   [WellKnownContactTypeCategory.Communication]: { [Type in WellKnownCommunicationType]: WellKnownCommunicationTypeMeta }
 }
 
+export type WellKnownRequirementTypeConfig = {
+  [Code in string]: { pattern: string; subTypePatterns?: { [Code in string]: string }; isRar?: boolean }
+}
+
+export enum WellKnownRequirementTypePattern {
+  SubCategory = '{sub-category}',
+  Length = '{length}',
+  Unit = '{unit}',
+  LengthAndUnit = '{length} {unit}',
+  Progress = '{progress}',
+}
+
 export interface Config {
   server: ServerConfig
   redis: RedisConfig
   session: SessionConfig
   apis: DependentApisConfig
   contacts: WellKnownContactTypeConfig
+  requirements: WellKnownRequirementTypeConfig
   delius: DeliusConfig
 }

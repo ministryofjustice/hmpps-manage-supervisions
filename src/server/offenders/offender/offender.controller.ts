@@ -75,7 +75,7 @@ export class OffenderController {
       ...this.getBase(OffenderPage.Overview, BreadcrumbType.Case, offender),
       page: OffenderPage.Overview,
       ...this.personalService.getPersonalDetails(offender, personalContacts, personalCircumstances),
-      conviction,
+      conviction: conviction && { ...conviction, rar: conviction.requirements.find(x => x.isRar)?.name },
       appointmentSummary,
       risks,
       registrations,

@@ -1,3 +1,5 @@
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
 {% macro probationHistorySummary(params) %}
     {% if params.model.previousConvictions %}
         <div{% for attribute, value in params.attributes %} {{attribute}}="{{value}}"{% endfor %}>
@@ -12,4 +14,35 @@
             </p>
         </div>
     {% endif %}
+{% endmacro %}
+
+{% macro requirementSummary(requirement) %}
+    {{ govukSummaryList({
+        rows: [
+            {
+                key: { text: "Length" },
+                value: { text: requirement.length }
+            },
+            {
+                key: { text: "Progress" },
+                value: { text: requirement.progress }
+            } if requirement.progress,
+            {
+                key: { text: "Start date" },
+                value: { text: requirement.startDate | expectedDate }
+            } if requirement.startDate,
+            {
+                key: { text: "Termination date" },
+                value: { text: requirement.endDate | expectedDate }
+            } if requirement.endDate,
+            {
+                key: { text: "Termination reason" },
+                value: { text: requirement.terminationReason }
+            } if requirement.terminationReason,
+            {
+                key: { text: "Notes" },
+                value: { text: requirement.notes | nl2br if requirement.notes else 'No notes' }
+            }
+        ]
+    }) }}
 {% endmacro %}

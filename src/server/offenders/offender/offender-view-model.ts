@@ -36,7 +36,7 @@ export interface OffenderViewModelBase extends ViewModel {
 
 export interface OffenderOverviewViewModel extends OffenderViewModelBase, GetPersonalDetailsResult {
   page: OffenderPage.Overview
-  conviction?: ConvictionDetails
+  conviction?: ConvictionDetails & { rar?: string }
   appointmentSummary: AppointmentSummary
   risks: Risks
 }

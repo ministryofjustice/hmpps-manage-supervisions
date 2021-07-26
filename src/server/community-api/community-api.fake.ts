@@ -31,7 +31,7 @@ import * as faker from 'faker'
 import { DateTime } from 'luxon'
 import { fake } from '../util/util.fake'
 import { Paginated } from './types'
-import { RAR_REQUIREMENT_TYPE_MAIN_CATEGORY_CODE, WellKnownAddressTypes } from './well-known'
+import { WellKnownAddressTypes } from './well-known'
 
 export function fakeIsoDate(type: 'past' | 'recent' | 'soon' | 'future' = 'past'): string {
   return faker.date[type]().toISOString().substr(0, 10)
@@ -344,17 +344,14 @@ export const fakeOffence = fake<Offence>(() => ({
   lastUpdatedDatetime: faker.date.past().toISOString(),
 }))
 
-export const fakeConviction = fake<Conviction, { additionalOffences?: number }>(({ additionalOffences = 0 }) => ({
+export const fakeConviction = fake<Conviction>((options, partial = {}) => ({
   convictionId: faker.datatype.number(),
   index: faker.datatype.number().toString(),
   active: true,
   inBreach: faker.datatype.boolean(),
   convictionDate: fakeIsoDate(),
   referralDate: fakeIsoDate(),
-  offences: [
-    fakeOffence({ mainOffence: true }),
-    ...[...Array(additionalOffences)].map(() => fakeOffence({ mainOffence: false })),
-  ],
+  offences: partial.offences || [fakeOffence({ mainOffence: true })],
   sentence: {
     sentenceId: faker.datatype.number(),
     description: faker.commerce.productDescription(),
@@ -420,7 +417,7 @@ export const fakeRequirement = fake<Requirement>(() => ({
   expectedStartDate: fakeIsoDate(),
   expectedEndDate: fakeIsoDate('future'),
   requirementNotes: faker.lorem.sentence(),
-  requirementTypeMainCategory: { code: RAR_REQUIREMENT_TYPE_MAIN_CATEGORY_CODE, description: 'RAR category' },
+  requirementTypeMainCategory: { code: 'F', description: 'RAR category' },
   requirementTypeSubCategory: { code: faker.random.alphaNumeric(5), description: faker.commerce.productMaterial() },
 }))
 
