@@ -18,6 +18,8 @@ We will introduce an HMPPS Auth role that prevents practitioners that we haven�
 
 All our participants will only be shown cases that are assigned to them. While it’s possible to engineer the URL to access the records of cases, the service currently throws an error if the user attempts to arrange an appointment with that user. This functionally replicates the protections afforded by Delius’s RBAC model.
 
+Wherever supported, we will pass the identity of the logged-in user to Community API endpoints so that NDelius can perform its permission checks correctly.
+
 ## Consequences
 
 We consider the risk of a pilot participant engineering the URL to access a case in our service that they wouldn’t be permitted to access in Delius (if such a thing exists) is low enough that we are comfortable with that risk during the pilot phase.
