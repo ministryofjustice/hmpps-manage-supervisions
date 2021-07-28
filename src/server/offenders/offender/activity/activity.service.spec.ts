@@ -4,18 +4,18 @@ import { DateTime, Settings } from 'luxon'
 import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
 import * as faker from 'faker'
 import {
+  AppointmentMetaResult,
   CommunityApiService,
   ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
+  ContactMappingService,
   ContactSummary,
   Paginated,
 } from '../../../community-api'
-import { WellKnownContactTypeCategory } from '../../../config'
+import { ContactTypeCategory } from '../../../config'
 import { fakeAppointmentDetail, fakeContactSummary, fakePaginated } from '../../../community-api/community-api.fake'
 import { fakeOkResponse } from '../../../common/rest/rest.fake'
 import { ActivityLogEntry, ActivityLogEntryTag, AppointmentActivityLogEntry } from './activity.types'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../../community-api/community-api.mock'
-
-import { AppointmentMetaResult, ContactMappingService } from '../../../common'
 import { fakeBreadcrumbUrl, MockLinksModule } from '../../../common/links/links.mock'
 import { BreadcrumbType } from '../../../common/links'
 import { merge } from 'lodash'
@@ -59,11 +59,13 @@ describe('ActivityService', () => {
       .withArgs(match({ crn: 'some-crn', appointmentId: 123 }))
       .resolves(fakeOkResponse(appointment))
 
-    contactMapping.getTypeMeta.withArgs(appointment).returns({
-      name: 'Some appointment with some staff member',
-      type: WellKnownContactTypeCategory.Appointment,
-      value: { name: 'Some appointment' },
-    } as AppointmentMetaResult)
+    contactMapping.getTypeMeta.withArgs(appointment).returns(
+      Promise.resolve({
+        name: 'Some appointment with some staff member',
+        type: ContactTypeCategory.Appointment,
+        value: { name: 'Some appointment' },
+      } as AppointmentMetaResult),
+    )
 
     const observed = await subject.getAppointment('some-crn', 123)
 
@@ -105,7 +107,7 @@ describe('ActivityService', () => {
 
     function havingContact(
       partial: DeepPartial<ContactSummary> & { notes: string },
-      type: WellKnownContactTypeCategory | null,
+      type: ContactTypeCategory | null,
       meta: any = {},
     ) {
       const contact = fakeContactSummary(
@@ -125,11 +127,13 @@ describe('ActivityService', () => {
         ),
       )
       contacts.push(contact)
-      contactMapping.getTypeMeta.withArgs(contact).returns({
-        name: `some ${contact.notes}`,
-        type,
-        value: { ...meta, name: 'Some type' },
-      })
+      contactMapping.getTypeMeta.withArgs(contact).returns(
+        Promise.resolve({
+          name: `some ${contact.notes}`,
+          type,
+          value: { ...meta, name: 'Some type' },
+        }),
+      )
     }
 
     havingContact(
@@ -138,7 +142,7 @@ describe('ActivityService', () => {
         outcome: { complied: true, attended: true },
         rarActivity: true,
       },
-      WellKnownContactTypeCategory.Appointment,
+      ContactTypeCategory.Appointment,
     )
     havingContact(
       {
@@ -146,26 +150,26 @@ describe('ActivityService', () => {
         outcome: { complied: false, attended: true },
         sensitive: true,
       },
-      WellKnownContactTypeCategory.Appointment,
+      ContactTypeCategory.Appointment,
     )
     havingContact({ notes: 'other appointment, not recorded', outcome: null }, null, {
       appointment: true,
     })
-    havingContact({ notes: 'well known communication' }, WellKnownContactTypeCategory.Communication)
+    havingContact({ notes: 'well known communication' }, ContactTypeCategory.Communication)
     havingContact({ notes: 'unknown' }, null, { appointment: false })
     havingContact(
       {
         notes: 'well known, unacceptable absence appointment',
         outcome: { complied: false, attended: false },
       },
-      WellKnownContactTypeCategory.Appointment,
+      ContactTypeCategory.Appointment,
     )
     havingContact(
       {
         notes: 'well known, acceptable absence appointment',
         outcome: { complied: true, attended: false },
       },
-      WellKnownContactTypeCategory.Appointment,
+      ContactTypeCategory.Appointment,
     )
 
     const stub = community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET.resolves(
@@ -192,7 +196,7 @@ describe('ActivityService', () => {
     ): ActivityLogEntry {
       return {
         id,
-        type: WellKnownContactTypeCategory.Appointment,
+        type: ContactTypeCategory.Appointment,
         name: `some ${notes}`,
         start,
         end,
@@ -246,7 +250,7 @@ describe('ActivityService', () => {
         expectedAppointment(3, 'other appointment, not recorded', [], { recorded: false, outcome: null }),
         {
           id: 4,
-          type: WellKnownContactTypeCategory.Communication,
+          type: ContactTypeCategory.Communication,
           name: 'some well known communication',
           category: 'Other communication',
           sensitive: false,
@@ -261,7 +265,7 @@ describe('ActivityService', () => {
         },
         {
           id: 5,
-          type: null,
+          type: ContactTypeCategory.Other,
           name: 'some unknown',
           category: 'Unclassified contact',
           sensitive: false,

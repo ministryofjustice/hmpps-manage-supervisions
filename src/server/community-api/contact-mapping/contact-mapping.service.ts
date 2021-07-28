@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { Config, WellKnownContactTypeCategory, WellKnownContactTypeConfig } from '../../config'
+import { Config, ContactTypeCategory, WellKnownContactTypeConfig } from '../../config'
 import { staffName } from '../../util'
 import { AppointmentType } from '../../community-api'
 import { GetMetaOptions, GetMetaResult } from './types'
+import { ContactTypesService } from '../contact-types'
 
 function isAppointmentType(value: any): value is AppointmentType {
   return 'contactType' in value
@@ -11,18 +12,23 @@ function isAppointmentType(value: any): value is AppointmentType {
 
 @Injectable()
 export class ContactMappingService {
-  constructor(private readonly config: ConfigService<Config>) {}
+  constructor(
+    private readonly config: ConfigService<Config>,
+    private readonly contactTypesService: ContactTypesService,
+  ) {}
 
-  getTypeMeta({ type, staff }: GetMetaOptions): GetMetaResult {
+  async getTypeMeta({ type, staff }: GetMetaOptions): Promise<GetMetaResult> {
     const { code, appointment } = isAppointmentType(type)
       ? { code: type.contactType.trim().toUpperCase(), appointment: true }
       : { code: type.code.trim().toUpperCase(), appointment: type.appointment || false }
 
-    const category = appointment ? WellKnownContactTypeCategory.Appointment : WellKnownContactTypeCategory.Communication
+    const category = appointment ? ContactTypeCategory.Appointment : ContactTypeCategory.Communication
     const config = this.config.get<WellKnownContactTypeConfig>('contacts')[category]
     const meta = Object.values(config).find(x =>
       'code' in x ? x.code === code : Object.values(x.codes).includes(code),
     )
+
+    const communication = await this.contactTypesService.isCommunicationContactType(code)
 
     function appointmentName(typeName: string) {
       const staffFullName = staffName(staff)
@@ -31,8 +37,8 @@ export class ContactMappingService {
 
     if (!meta) {
       return {
-        type: null,
-        value: { appointment, name: type.description },
+        type: communication ? ContactTypeCategory.Communication : ContactTypeCategory.Other,
+        value: { appointment, communication, name: type.description },
         name: appointment ? appointmentName(type.description) : type.description,
       }
     }

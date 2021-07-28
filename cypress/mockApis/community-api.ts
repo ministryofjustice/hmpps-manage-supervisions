@@ -125,6 +125,66 @@ export class CommunityMockApi {
     })
   }
 
+  async stubGetContactTypes() {
+    return this.client.stub({
+      request: {
+        method: 'GET',
+        urlPath: '/community/secure/contact-types',
+        queryParameters: {
+          categories: { equalTo: 'LT' },
+        },
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: [
+          {
+            code: 'CT3A',
+            description: 'Phone Contact from Other',
+            appointment: false,
+          },
+          {
+            code: 'CT3B',
+            description: 'Phone Contact to Other',
+            appointment: false,
+          },
+          {
+            code: 'CTOA',
+            description: 'Phone Contact from Offender',
+            appointment: false,
+          },
+          {
+            code: 'CTOB',
+            description: 'Phone Contact to Offender',
+            appointment: false,
+          },
+          {
+            code: 'CM3A',
+            description: 'eMail/Text from Other',
+            appointment: false,
+          },
+          {
+            code: 'CMOA',
+            description: 'eMail/Text from Offender',
+            appointment: false,
+          },
+          {
+            code: 'CMOB',
+            description: 'eMail/Text to Offender',
+            appointment: false,
+          },
+          {
+            code: 'NOT_WELL_KNOWN_COMMUNICATION',
+            description: 'A not well know communication type',
+            appointment: false,
+          },
+        ],
+      },
+    })
+  }
+
   async stubCreateAppointment({ crn, convictionId }: CreateAppointmentArgs) {
     return this.client.stub({
       request: {

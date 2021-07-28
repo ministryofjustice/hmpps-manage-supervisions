@@ -4,7 +4,12 @@ import { OffenderController } from './offender.controller'
 import { OffenderService } from './offender.service'
 import { OffenderPage, OffenderViewModel } from './offender-view-model'
 import { RedirectResponse } from '../../common'
-import { fakeOffenderDetail, fakeOffenderDetailSummary, fakePaginated } from '../../community-api/community-api.fake'
+import {
+  fakeAppointmentType,
+  fakeOffenderDetail,
+  fakeOffenderDetailSummary,
+  fakePaginated,
+} from '../../community-api/community-api.fake'
 import {
   fakeContactDetailsViewModel,
   fakePersonalCircumstanceDetail,
@@ -22,6 +27,10 @@ import { fakeBreadcrumbs, fakeBreadcrumbUrl, MockLinksModule } from '../../commo
 import { PersonalService } from './personal'
 import { BreadcrumbType, ResolveBreadcrumbOptions } from '../../common/links'
 import { fakeRegistrationFlag } from './risk/risk.fake'
+import { ConfigService } from '@nestjs/config'
+import { FakeConfigModule } from '../../config/config.fake'
+import { WellKnownContactTypeConfig } from '../../config'
+import { ContactTypesService } from '../../community-api'
 
 describe('OffenderController', () => {
   let subject: OffenderController
@@ -31,6 +40,8 @@ describe('OffenderController', () => {
   let sentenceService: SinonStubbedInstance<SentenceService>
   let riskService: SinonStubbedInstance<RiskService>
   let personalService: SinonStubbedInstance<PersonalService>
+  let config: WellKnownContactTypeConfig
+  let contactTypesService: SinonStubbedInstance<ContactTypesService>
 
   beforeEach(async () => {
     offenderService = createStubInstance(OffenderService)
@@ -39,10 +50,11 @@ describe('OffenderController', () => {
     sentenceService = createStubInstance(SentenceService)
     riskService = createStubInstance(RiskService)
     personalService = createStubInstance(PersonalService)
+    contactTypesService = createStubInstance(ContactTypesService)
 
     const module = await Test.createTestingModule({
       controllers: [OffenderController],
-      imports: [MockLinksModule],
+      imports: [MockLinksModule, FakeConfigModule.register()],
       providers: [
         { provide: OffenderService, useValue: offenderService },
         { provide: SentenceService, useValue: sentenceService },
@@ -50,9 +62,11 @@ describe('OffenderController', () => {
         { provide: ActivityService, useValue: activityService },
         { provide: RiskService, useValue: riskService },
         { provide: PersonalService, useValue: personalService },
+        { provide: ConfigService, useValue: config },
+        { provide: ContactTypesService, useValue: contactTypesService },
       ],
     }).compile()
-
+    config = module.get(ConfigService).get<WellKnownContactTypeConfig>('contacts')
     subject = module.get(OffenderController)
   })
 
@@ -120,9 +134,17 @@ describe('OffenderController', () => {
   it('gets activity', async () => {
     havingOffenderSummary()
 
+    const appointmentContactTypes = [fakeAppointmentType().contactType, fakeAppointmentType().contactType]
+    const communicationContactTypes = [fakeAppointmentType().contactType, fakeAppointmentType().contactType]
+
+    contactTypesService.getAppointmentContactTypes.resolves(appointmentContactTypes)
+    contactTypesService.getCommunicationContactTypes.resolves(communicationContactTypes)
+
     const contacts = fakePaginated([fakeActivityLogEntry(), fakeActivityLogEntry()])
 
-    activityService.getActivityLogPage.withArgs('some-crn', match({ appointmentsOnly: true })).resolves(contacts)
+    activityService.getActivityLogPage
+      .withArgs('some-crn', match({ contactTypes: [...appointmentContactTypes, ...communicationContactTypes] }))
+      .resolves(contacts)
 
     const registrations = [fakeRegistrationFlag()]
     riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)

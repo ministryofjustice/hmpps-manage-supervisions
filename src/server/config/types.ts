@@ -89,9 +89,14 @@ export interface WellKnownAppointmentTypeMeta {
 }
 
 export enum WellKnownCommunicationType {
-  Email = 'email',
-  PhoneCall = 'phone-call',
-  TextMessage = 'text-message',
+  EmailTextToOffender = 'email-text-to-offender',
+  EmailTextFromOffender = 'email-text-from-offender',
+  EmailTextToOther = 'email-text-to-other',
+  EmailTextFromOther = 'email-text-from-other',
+  PhoneCallToOffender = 'phone-call-to-offender',
+  PhoneCallFromOffender = 'phone-call-from-offender',
+  PhoneCallToOther = 'phone-call-to-other',
+  PhoneCallFromOther = 'phone-call-from-other',
 }
 
 export interface WellKnownCommunicationTypeMeta {
@@ -99,14 +104,15 @@ export interface WellKnownCommunicationTypeMeta {
   code: string
 }
 
-export enum WellKnownContactTypeCategory {
+export enum ContactTypeCategory {
   Appointment = 'appointment',
   Communication = 'communication',
+  Other = 'other',
 }
 
 export interface WellKnownContactTypeConfig {
-  [WellKnownContactTypeCategory.Appointment]: { [Type in WellKnownAppointmentType]: WellKnownAppointmentTypeMeta }
-  [WellKnownContactTypeCategory.Communication]: { [Type in WellKnownCommunicationType]: WellKnownCommunicationTypeMeta }
+  [ContactTypeCategory.Appointment]: { [Type in WellKnownAppointmentType]: WellKnownAppointmentTypeMeta }
+  [ContactTypeCategory.Communication]: { [Type in WellKnownCommunicationType]: WellKnownCommunicationTypeMeta }
 }
 
 export type WellKnownRequirementTypeConfig = {

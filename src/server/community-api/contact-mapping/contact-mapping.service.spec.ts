@@ -6,86 +6,93 @@ import {
   WellKnownAppointmentTypeMeta,
   WellKnownCommunicationType,
   WellKnownCommunicationTypeMeta,
-  WellKnownContactTypeCategory,
+  ContactTypeCategory,
   WellKnownContactTypeConfig,
 } from '../../config'
 import { ConfigService } from '@nestjs/config'
 import { fakeAppointmentType, fakeContactType, fakeStaffHuman } from '../../community-api/community-api.fake'
 import { AppointmentMetaResult, CommunicationMetaResult, UnknownMetaResult } from './types'
+import { ContactTypesService } from '../contact-types'
+import { createStubInstance, SinonStubbedInstance } from 'sinon'
 
 describe('ContactMappingService', () => {
   let subject: ContactMappingService
   let officeVisit: WellKnownAppointmentTypeMeta
-  let phoneCall: WellKnownCommunicationTypeMeta
+  let emailText: WellKnownCommunicationTypeMeta
+  let mockContactTypesService: SinonStubbedInstance<ContactTypesService>
 
   beforeEach(async () => {
+    mockContactTypesService = createStubInstance(ContactTypesService)
+
     const module = await Test.createTestingModule({
       imports: [FakeConfigModule.register()],
-      providers: [ContactMappingService],
+      providers: [ContactMappingService, { provide: ContactTypesService, useValue: mockContactTypesService }],
     }).compile()
 
     subject = module.get(ContactMappingService)
     const config = module.get(ConfigService).get<WellKnownContactTypeConfig>('contacts')
-    officeVisit = config[WellKnownContactTypeCategory.Appointment][WellKnownAppointmentType.OfficeVisit]
-    phoneCall = config[WellKnownContactTypeCategory.Communication][WellKnownCommunicationType.PhoneCall]
+    officeVisit = config[ContactTypeCategory.Appointment][WellKnownAppointmentType.OfficeVisit]
+    emailText = config[ContactTypeCategory.Communication][WellKnownCommunicationType.EmailTextFromOffender]
+
+    mockContactTypesService.isCommunicationContactType.resolves(false)
   })
 
-  it('gets well known appointment type meta', () => {
-    const observed = subject.getTypeMeta({
+  it('gets well known appointment type meta', async () => {
+    const observed = await subject.getTypeMeta({
       staff: fakeStaffHuman({ forenames: 'jOhN', surname: 'DOE', unallocated: false }),
       type: fakeAppointmentType({ contactType: officeVisit.codes.nonRar }),
     })
     expect(observed).toEqual({
-      type: WellKnownContactTypeCategory.Appointment,
+      type: ContactTypeCategory.Appointment,
       name: 'Office visit with John Doe',
       value: officeVisit,
     } as AppointmentMetaResult)
   })
 
-  it('gets well known appointment type meta without staff', () => {
-    const observed = subject.getTypeMeta({
+  it('gets well known appointment type meta without staff', async () => {
+    const observed = await subject.getTypeMeta({
       type: fakeAppointmentType({ contactType: officeVisit.codes.nonRar }),
     })
     expect(observed).toEqual({
-      type: WellKnownContactTypeCategory.Appointment,
+      type: ContactTypeCategory.Appointment,
       name: 'Office visit',
       value: officeVisit,
     } as AppointmentMetaResult)
   })
 
-  it('gets well known appointment type meta with unallocated staff', () => {
-    const observed = subject.getTypeMeta({
+  it('gets well known appointment type meta with unallocated staff', async () => {
+    const observed = await subject.getTypeMeta({
       staff: fakeStaffHuman({ unallocated: true }),
       type: fakeAppointmentType({ contactType: officeVisit.codes.nonRar }),
     })
     expect(observed).toEqual({
-      type: WellKnownContactTypeCategory.Appointment,
+      type: ContactTypeCategory.Appointment,
       name: 'Office visit',
       value: officeVisit,
     } as AppointmentMetaResult)
   })
 
-  it('gets well known communication type meta', () => {
-    const observed = subject.getTypeMeta({
+  it('gets well known communication type meta', async () => {
+    const observed = await subject.getTypeMeta({
       staff: fakeStaffHuman({ forenames: 'jOhN', surname: 'DOE', unallocated: false }),
-      type: fakeContactType({ code: phoneCall.code, appointment: false }),
+      type: fakeContactType({ code: emailText.code, appointment: false }),
     })
     expect(observed).toEqual({
-      type: WellKnownContactTypeCategory.Communication,
-      name: 'Phone call',
-      value: phoneCall,
+      type: ContactTypeCategory.Communication,
+      name: 'Email/Text from Offender',
+      value: emailText,
     } as CommunicationMetaResult)
   })
 
-  it('gets non-well known appointment type meta', () => {
-    const observed = subject.getTypeMeta({
+  it('gets non-well known appointment type meta', async () => {
+    const observed = await subject.getTypeMeta({
       staff: fakeStaffHuman({ forenames: 'jOhN', surname: 'DOE', unallocated: false }),
       type: fakeAppointmentType({ contactType: 'NOT_WELL_KNOWN', description: 'Not well known' }),
     })
     expect(observed).toEqual({
       name: 'Not well known with John Doe',
-      type: null,
-      value: { appointment: true, name: 'Not well known' },
+      type: ContactTypeCategory.Other,
+      value: { appointment: true, communication: false, name: 'Not well known' },
     } as UnknownMetaResult)
   })
 })

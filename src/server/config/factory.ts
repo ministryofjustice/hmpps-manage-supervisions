@@ -59,9 +59,14 @@ export const CONTACT_DEFAULTS: WellKnownContactTypeConfig = {
     [WellKnownAppointmentType.PhoneCall]: { name: 'Phone call', codes: { nonRar: 'COPT' } },
   },
   communication: {
-    [WellKnownCommunicationType.Email]: { name: 'Email', code: 'TODO_EMAIL' },
-    [WellKnownCommunicationType.PhoneCall]: { name: 'Phone call', code: 'TODO_PHONE' },
-    [WellKnownCommunicationType.TextMessage]: { name: 'Text message', code: 'TODO_TEXT' },
+    [WellKnownCommunicationType.EmailTextToOffender]: { name: 'Email/Text to Offender', code: 'CMOB' },
+    [WellKnownCommunicationType.EmailTextFromOffender]: { name: 'Email/Text from Offender', code: 'CMOA' },
+    [WellKnownCommunicationType.EmailTextToOther]: { name: 'Email/Text to Other', code: 'CM3B' },
+    [WellKnownCommunicationType.EmailTextFromOther]: { name: 'Email/Text from Other', code: 'CM3A' },
+    [WellKnownCommunicationType.PhoneCallToOffender]: { name: 'Phone call to Offender', code: 'CTOB' },
+    [WellKnownCommunicationType.PhoneCallFromOffender]: { name: 'Phone call from Offender', code: 'CTOA' },
+    [WellKnownCommunicationType.PhoneCallToOther]: { name: 'Phone call to Other', code: 'CT3B' },
+    [WellKnownCommunicationType.PhoneCallFromOther]: { name: 'Phone call from Other', code: 'CT3A' },
   },
 }
 

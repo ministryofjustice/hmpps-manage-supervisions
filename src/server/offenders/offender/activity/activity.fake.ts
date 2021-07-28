@@ -1,13 +1,13 @@
 import { fake } from '../../../util/util.fake'
 import { FakeAppointmentDetailOptions } from '../../../community-api/community-api.fake'
 import * as faker from 'faker'
-import { WellKnownContactTypeCategory } from '../../../config'
+import { ContactTypeCategory } from '../../../config'
 import { DateTime } from 'luxon'
 import { ActivityLogEntry } from './activity.types'
 import { AppointmentRequirementDetail } from '../../../community-api'
 
 export const fakeActivityLogEntry = fake<ActivityLogEntry, FakeAppointmentDetailOptions>(
-  ({ when = 'past' }, { type = faker.random.arrayElement(Object.values(WellKnownContactTypeCategory)) }) => {
+  ({ when = 'past' }, { type = faker.random.arrayElement(Object.values(ContactTypeCategory)) }) => {
     const base = {
       id: faker.datatype.number(),
       start: DateTime.fromJSDate(faker.date[when]()),
@@ -25,7 +25,7 @@ export const fakeActivityLogEntry = fake<ActivityLogEntry, FakeAppointmentDetail
     }
 
     switch (type) {
-      case WellKnownContactTypeCategory.Appointment:
+      case ContactTypeCategory.Appointment:
         return {
           ...base,
           type,
@@ -37,7 +37,7 @@ export const fakeActivityLogEntry = fake<ActivityLogEntry, FakeAppointmentDetail
             isActive: true,
           } as AppointmentRequirementDetail,
         }
-      case WellKnownContactTypeCategory.Communication:
+      case ContactTypeCategory.Communication:
         return { ...base, type }
     }
   },

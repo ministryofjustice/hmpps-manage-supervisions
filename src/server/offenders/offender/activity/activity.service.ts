@@ -4,7 +4,10 @@ import {
   AppointmentOutcome,
   CommunityApiService,
   ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
+  ContactMappingService,
   ContactSummary,
+  GetMetaResult,
+  isAppointment,
   Paginated,
 } from '../../../community-api'
 import {
@@ -13,9 +16,8 @@ import {
   ActivityLogEntryTag,
   AppointmentActivityLogEntry,
 } from './activity.types'
-import { ContactMappingService, GetMetaResult, isAppointment } from '../../../common'
 import { DateTime } from 'luxon'
-import { WellKnownContactTypeCategory } from '../../../config'
+import { ContactTypeCategory } from '../../../config'
 import { BreadcrumbType, LinksService } from '../../../common/links'
 
 export type GetContactsOptions = Omit<
@@ -69,7 +71,7 @@ export class ActivityService {
       number: data.number,
       size: data.size,
       totalElements: data.totalElements,
-      content: data.content.map(contact => this.getActivityLogEntry(crn, contact)),
+      content: await Promise.all(data.content.map(contact => this.getActivityLogEntry(crn, contact))),
     }
   }
 
@@ -79,7 +81,7 @@ export class ActivityService {
       appointmentId,
     })
 
-    const meta = this.contacts.getTypeMeta(appointment)
+    const meta = await this.contacts.getTypeMeta(appointment)
     if (!isAppointment(meta)) {
       throw new Error(`cannot determine that appointment with id '${appointmentId}' is a valid appointment`)
     }
@@ -87,8 +89,8 @@ export class ActivityService {
     return this.getAppointmentActivityLogEntry(crn, appointment, meta)
   }
 
-  private getActivityLogEntry(crn: string, contact: ContactSummary): ActivityLogEntry {
-    const meta = this.contacts.getTypeMeta(contact)
+  private async getActivityLogEntry(crn: string, contact: ContactSummary): Promise<ActivityLogEntry> {
+    const meta = await this.contacts.getTypeMeta(contact)
 
     if (isAppointment(meta)) {
       // is either a well-known or 'other' appointment
@@ -102,8 +104,8 @@ export class ActivityService {
       sensitive: contact.sensitive || false,
     } as Pick<ActivityLogEntryBase, 'id' | 'start' | 'notes' | 'sensitive'>
 
-    if (meta.type === WellKnownContactTypeCategory.Communication) {
-      // is a well known communication
+    if (meta.type === ContactTypeCategory.Communication) {
+      // is a communication type (either known, or in the CAPI Communication category)
       return {
         ...base,
         type: meta.type,
@@ -121,7 +123,7 @@ export class ActivityService {
     // is unknown contact
     return {
       ...base,
-      type: null,
+      type: ContactTypeCategory.Other,
       category: 'Unclassified contact',
       name: meta.name,
       typeName: meta.value.name,
@@ -161,7 +163,7 @@ export class ActivityService {
       start,
       notes: contact.notes,
       sensitive: contact.sensitive || false,
-      type: WellKnownContactTypeCategory.Appointment,
+      type: ContactTypeCategory.Appointment,
       category: `${start > DateTime.now() ? 'Future' : 'Previous'} appointment`,
       name: meta.name,
       typeName: meta.value.name,

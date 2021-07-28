@@ -15,7 +15,7 @@ import {
   fakePersonalCircumstances,
 } from '../community-api/community-api.fake'
 import { fakeOkResponse } from '../common/rest/rest.fake'
-import { WellKnownAppointmentType, WellKnownContactTypeCategory, WellKnownContactTypeConfig } from '../config'
+import { WellKnownAppointmentType, ContactTypeCategory, WellKnownContactTypeConfig } from '../config'
 import { AvailableAppointmentTypes } from './dto/AppointmentWizardViewModel'
 import { FakeConfigModule } from '../config/config.fake'
 import { ConfigService } from '@nestjs/config'
@@ -102,7 +102,7 @@ describe('ArrangeAppointmentService', () => {
         {
           type: WellKnownAppointmentType.OfficeVisit,
           description: 'Office visit',
-          meta: config[WellKnownContactTypeCategory.Appointment][WellKnownAppointmentType.OfficeVisit],
+          meta: config[ContactTypeCategory.Appointment][WellKnownAppointmentType.OfficeVisit],
           appointmentTypes: [featured],
         },
       ],

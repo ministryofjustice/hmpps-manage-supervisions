@@ -10,7 +10,7 @@ import {
   OffenderViewModelBase,
 } from './offender-view-model'
 import { RedirectResponse } from '../../common'
-import { OffenderDetailSummary } from '../../community-api'
+import { OffenderDetailSummary, ContactTypesService } from '../../community-api'
 import { OffenderService } from './offender.service'
 import { getDisplayName } from '../../util'
 import { SentenceService } from './sentence'
@@ -45,6 +45,7 @@ export class OffenderController {
     private readonly riskService: RiskService,
     private readonly personalService: PersonalService,
     private readonly linksService: LinksService,
+    private readonly contactTypesService: ContactTypesService,
   ) {}
 
   @Get()
@@ -111,9 +112,14 @@ export class OffenderController {
     title: 'Activity log',
   })
   async getActivity(@Param('crn') crn: string): Promise<OffenderActivityViewModel> {
+    const [appointmentTypes, communicationTypes] = await Promise.all([
+      this.contactTypesService.getAppointmentContactTypes(),
+      this.contactTypesService.getCommunicationContactTypes(),
+    ])
+
     const [offender, contacts, registrations] = await Promise.all([
       this.offenderService.getOffenderSummary(crn),
-      this.activityService.getActivityLogPage(crn, { appointmentsOnly: true }), // TODO just getting appointment contacts for now
+      this.activityService.getActivityLogPage(crn, { contactTypes: [...appointmentTypes, ...communicationTypes] }),
       this.riskService.getRiskRegistrations(crn),
     ])
     return {
