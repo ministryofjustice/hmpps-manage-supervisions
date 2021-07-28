@@ -1,10 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { CommunityApiService, Conviction, Offence, Sentence } from '../../../community-api'
+import { Conviction, Offence, Sentence } from '../../../community-api/client'
 import { maxBy } from 'lodash'
 import { DateTime, DurationUnit } from 'luxon'
 import { quantity, titleCase } from '../../../util'
 import { ConvictionDetails } from './sentence.types'
 import { RequirementService } from './requirement.service'
+import { CommunityApiService } from '../../../community-api'
 
 function getOffenceName(offence: Offence): string {
   return `${offence.detail.subCategoryDescription} (${quantity(offence.offenceCount || 1, 'count')})`

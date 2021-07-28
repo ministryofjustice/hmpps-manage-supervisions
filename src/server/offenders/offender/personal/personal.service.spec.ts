@@ -2,12 +2,7 @@ import { Test } from '@nestjs/testing'
 import { match } from 'sinon'
 import { PersonalService } from './personal.service'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../../community-api/community-api.mock'
-import {
-  CommunityApiService,
-  PersonalCircumstance,
-  PhoneNumberType,
-  WellKnownAddressTypes,
-} from '../../../community-api'
+import { PersonalCircumstance, PhoneNumberType } from '../../../community-api/client'
 import {
   fakeIsoDate,
   fakeOffenderDetail,
@@ -21,6 +16,7 @@ import * as faker from 'faker'
 import { fakePersonalCircumstanceDetail, fakePersonalContactDetail } from './personal.fake'
 import { fakeBreadcrumbUrl, MockLinksModule } from '../../../common/links/links.mock'
 import { BreadcrumbType } from '../../../common/links'
+import { CommunityApiService, WellKnownAddressTypes } from '../../../community-api'
 
 describe('PersonalService', () => {
   let subject: PersonalService
@@ -128,6 +124,8 @@ describe('PersonalService', () => {
       firstName: 'Pippa',
       otherNames: null,
       surname: 'Wade',
+      relationship: 'Wife',
+      relationshipType: { description: 'Next of Kin' },
       notes: 'Some notes',
       mobileNumber: '0123456789',
       emailAddress: 'example@example.com',

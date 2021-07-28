@@ -5,14 +5,12 @@ import {
   AppointmentCreateRequest,
   AppointmentCreateResponse,
   AppointmentType,
-  CommunityApiService,
   Conviction,
-  EMPLOYMENT_TYPE_CODE,
   OffenderDetail,
   OfficeLocation,
   PersonalCircumstance,
   Requirement,
-} from '../community-api'
+} from '../community-api/client'
 import {
   Config,
   WellKnownAppointmentType,
@@ -24,6 +22,7 @@ import {
 import { AvailableAppointmentTypes, FeaturedAppointmentType } from './dto/AppointmentWizardViewModel'
 import { ConfigService } from '@nestjs/config'
 import { isActiveDateRange } from '../util'
+import { CommunityApiService, EMPLOYMENT_TYPE_CODE } from '../community-api'
 
 @Injectable()
 export class ArrangeAppointmentService {
@@ -149,6 +148,7 @@ export class ArrangeAppointmentService {
       activeOnly: true,
     })
 
+    // TODO determine best RAR requirement where there are multiple
     const config = this.config.get<WellKnownRequirementTypeConfig>('requirements')
     const rarRequirement = data.requirements.find(r => isRar(config, r))
 

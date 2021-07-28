@@ -1,40 +1,47 @@
-import { WireMockClient } from '../mockApis/wiremock-client'
-import { HmppsAuthMockApi } from '../mockApis/hmpps-auth'
-import { TokenVerificationMockApi } from '../mockApis/token-verification'
-import { CommunityMockApi } from '../mockApis/community-api'
-import PluginConfigOptions = Cypress.PluginConfigOptions
-import { AssessRisksAndNeedsMockApi } from '../mockApis/assess-risks-and-needs-api'
+import { WiremockClient, wiremocker } from './wiremock'
+import {
+  reset,
+  OffenderSeedOptions,
+  offenderSeed,
+  ContactSeedOptions,
+  contactsSeed,
+  ReferenceDataSeedOptions,
+  referenceDataSeed,
+} from './seeds'
+import { hmppsAuthStub, StubHmppsAuthOptions } from './hmpps-auth'
+import { CRN } from './offender'
+import { ACTIVE_CONVICTION_ID } from './convictions'
 
-const pluginConfig: Cypress.PluginConfig = (on, config) => {
-  const client = new WireMockClient()
-  const auth = new HmppsAuthMockApi(client, config)
+export type SeedOptions = ReferenceDataSeedOptions & OffenderSeedOptions & ContactSeedOptions & StubHmppsAuthOptions
 
-  const tasks: Cypress.Tasks = {
-    reset: () => client.reset(),
+const pluginConfig: Cypress.PluginConfig = on => {
+  on('task', {
+    async resetSeed() {
+      return wiremocker([reset], { silent: true })
+    },
 
-    stubLogin: () =>
-      Promise.all([auth.stubToken(), auth.stubAuthorizeCodeFlow(), auth.stubLogout(), auth.stubOpenIdConfiguration()]),
-    stubAuthUser: () => Promise.all([auth.stubUser(), auth.stubUserRoles()]),
-  }
+    async seed(options: SeedOptions = {}) {
+      await wiremocker(
+        [reset, hmppsAuthStub(options), referenceDataSeed(options), offenderSeed(options), contactsSeed(options)],
+        { silent: true },
+      )
+      return null
+    },
 
-  function mergeTasks<T>(Api: { new (client: WireMockClient, config?: PluginConfigOptions): T }) {
-    const api = new Api(client, config)
-    for (const key of Object.getOwnPropertyNames(Api.prototype).filter(x => x != 'constructor')) {
-      if (key in tasks) {
-        const existing = tasks[key]
-        tasks[key] = (options?: any) => Promise.all([existing(options), api[key](options)])
-      } else {
-        tasks[key] = (options?: any) => api[key](options)
-      }
-    }
-  }
-
-  mergeTasks(HmppsAuthMockApi)
-  mergeTasks(TokenVerificationMockApi)
-  mergeTasks(CommunityMockApi)
-  mergeTasks(AssessRisksAndNeedsMockApi)
-
-  on('task', tasks)
+    async getCreatedAppointments({
+      crn = CRN,
+      convictionId = ACTIVE_CONVICTION_ID,
+    }: {
+      crn?: string
+      convictionId?: number
+    } = {}) {
+      const client = new WiremockClient()
+      const requests = await client.community.getRequests(
+        `/secure/offenders/crn/${crn}/sentence/${convictionId}/appointments`,
+      )
+      return requests.map(x => JSON.parse(x.request.body))
+    },
+  })
 }
 
 export default pluginConfig

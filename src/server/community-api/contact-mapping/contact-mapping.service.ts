@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Config, ContactTypeCategory, WellKnownContactTypeConfig } from '../../config'
 import { staffName } from '../../util'
-import { AppointmentType } from '../../community-api'
+import { AppointmentType } from '../../community-api/client'
 import { GetMetaOptions, GetMetaResult } from './types'
 import { ContactTypesService } from '../contact-types'
 

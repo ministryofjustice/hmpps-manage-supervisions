@@ -1,5 +1,5 @@
 import { WellKnownRequirementTypeConfig, WellKnownRequirementTypePattern } from './types'
-import { Requirement } from '../community-api'
+import { Requirement } from '../community-api/client'
 import { quantity, safeCapitalize } from '../util'
 
 export function isRar(config: WellKnownRequirementTypeConfig, requirement: Requirement): boolean {

@@ -4,7 +4,7 @@ import * as faker from 'faker'
 import { AppointmentWizardSession } from './dto/AppointmentWizardSession'
 import { RedirectResponse } from '../common'
 import { HttpStatus } from '@nestjs/common'
-import { AppointmentTypeRequiresLocation } from '../community-api'
+import { AppointmentTypeRequiresLocation } from '../community-api/client'
 
 describe('AppointmentWizardService', () => {
   const subject = new AppointmentWizardService()

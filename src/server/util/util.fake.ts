@@ -1,12 +1,29 @@
 import { merge } from 'lodash'
 import { ClassConstructor, ClassTransformOptions, plainToClass } from 'class-transformer'
 
-export type FakeFn<Faked, Options = any> = (partial?: DeepPartial<Faked>, options?: Options) => Faked
+export type FakeFn<Faked, Options = any> = (
+  partialOrPartials?: DeepPartial<Faked> | DeepPartial<Faked>[],
+  options?: Options,
+) => Faked
+
+function mergePartials<Faked>(partials: DeepPartial<Faked>[]): DeepPartial<Faked> | null {
+  switch (partials.length) {
+    case 0:
+      return null
+    case 1:
+      return partials[0]
+    default:
+      return merge(partials[0], ...partials.slice(1))
+  }
+}
 
 export function fake<Faked, Options = any>(
   factory: (options?: Options, partial?: DeepPartial<Faked>) => Faked,
 ): FakeFn<Faked, Options> {
-  return (partial, options) => merge(factory(options || ({} as any), partial || {}), partial)
+  return (partialOrPartials, options) => {
+    const partial = Array.isArray(partialOrPartials) ? mergePartials(partialOrPartials) : partialOrPartials
+    return merge(factory(options || ({} as any), partial || {}), partial)
+  }
 }
 
 export function fakeClass<Faked, Options = ClassTransformOptions>(

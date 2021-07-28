@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Expose, plainToClass } from 'class-transformer'
-import { StaffApi, StaffDetails } from '../../community-api'
+import { StaffApi, StaffDetails } from '../../community-api/client'
 import { AuthenticationMethod, RestService } from '../../common'
 
 export class UserProfile {

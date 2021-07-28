@@ -4,13 +4,10 @@ import { DateTime, Settings } from 'luxon'
 import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
 import * as faker from 'faker'
 import {
-  AppointmentMetaResult,
-  CommunityApiService,
   ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
-  ContactMappingService,
   ContactSummary,
-  Paginated,
-} from '../../../community-api'
+} from '../../../community-api/client'
+import { CommunityApiService, Paginated, ContactMappingService, AppointmentMetaResult } from '../../../community-api'
 import { ContactTypeCategory } from '../../../config'
 import { fakeAppointmentDetail, fakeContactSummary, fakePaginated } from '../../../community-api/community-api.fake'
 import { fakeOkResponse } from '../../../common/rest/rest.fake'

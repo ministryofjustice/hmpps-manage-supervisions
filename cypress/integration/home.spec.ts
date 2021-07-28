@@ -4,11 +4,8 @@ context('Home', () => {
   const homePage = new HomePage()
   const authPage = new HmppsAuthPage()
 
-  beforeEach(() => {
-    cy.task('reset')
-    cy.task('stubLogin')
-    cy.task('stubAuthUser')
-    cy.task('stubGetStaffDetails')
+  before(() => {
+    cy.seed()
   })
 
   it('User can log out', () => {

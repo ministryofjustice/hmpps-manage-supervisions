@@ -8,7 +8,7 @@ import { fakeOffenderDetail, fakeOffenderDetailSummary } from '../../../communit
 import { fakeDisabilityDetail, fakeGetAddressDetailResult, fakePersonalContactDetail } from './personal.fake'
 import { PersonalAddressesViewModel, PersonalContactViewModel, PersonalDisabilitiesViewModel } from './personal.types'
 import { BreadcrumbType } from '../../../common/links'
-import { OffenderDetail, OffenderDetailSummary } from '../../../community-api'
+import { OffenderDetail, OffenderDetailSummary } from '../../../community-api/client'
 
 describe('PersonalController', () => {
   let subject: PersonalController
@@ -33,12 +33,22 @@ describe('PersonalController', () => {
   })
 
   function havingOffender() {
-    offender = fakeOffenderDetail({ firstName: 'Liz', middleNames: ['Danger'], surname: 'Haggis' })
+    offender = fakeOffenderDetail({
+      firstName: 'Liz',
+      middleNames: ['Danger'],
+      surname: 'Haggis',
+      otherIds: { crn: 'some-crn' },
+    })
     offenderService.getOffenderDetail.withArgs('some-crn').resolves(offender)
   }
 
   function havingOffenderSummary() {
-    offender = fakeOffenderDetailSummary({ firstName: 'Liz', middleNames: ['Danger'], surname: 'Haggis' })
+    offender = fakeOffenderDetailSummary({
+      firstName: 'Liz',
+      middleNames: ['Danger'],
+      surname: 'Haggis',
+      otherIds: { crn: 'some-crn' },
+    })
     offenderService.getOffenderSummary.withArgs('some-crn').resolves(offender)
   }
 

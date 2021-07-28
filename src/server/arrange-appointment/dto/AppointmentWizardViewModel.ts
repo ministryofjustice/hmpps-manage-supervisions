@@ -1,6 +1,6 @@
 import { ViewModel } from '../../common'
 import { AppointmentBuilderDto } from './AppointmentBuilderDto'
-import { AppointmentType, OfficeLocation } from '../../community-api'
+import { AppointmentType, OfficeLocation } from '../../community-api/client'
 import { WellKnownAppointmentType, WellKnownAppointmentTypeMeta } from '../../config'
 import { ValidationError } from 'class-validator'
 

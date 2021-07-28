@@ -41,7 +41,7 @@
             } if requirement.terminationReason,
             {
                 key: { text: "Notes" },
-                value: { text: requirement.notes | nl2br if requirement.notes else 'No notes' }
+                value: { html: requirement.notes | nl2br if requirement.notes else 'No notes' }
             }
         ]
     }) }}

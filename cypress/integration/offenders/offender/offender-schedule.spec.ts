@@ -31,67 +31,57 @@ class Fixture extends ViewOffenderFixture {
 context('ViewOffenderSchedule', () => {
   const fixture = new Fixture()
 
-  beforeEach(() => fixture.reset())
+  describe('populated schedule', () => {
+    before(() => cy.seed())
 
-  it('displays populated offender schedule', () => {
-    fixture
-      .havingOffender({
-        appointments: [
-          {
-            start: '2200-01-02T13:30:00',
-            end: '2200-01-02T14:00:00',
-            type: { code: 'F123', name: 'Future appointment' },
-            staff: { forenames: 'Future First', surname: 'Future Last' },
-          },
-          {
-            start: '2020-02-03T10:00:00',
-            end: '2020-02-03T11:00:00',
-            type: { code: 'P123', name: 'Recent appointment' },
-            staff: { forenames: 'Recent First', surname: 'Recent Last' },
-          },
-        ],
-      })
-      .whenViewingOffender()
-      .whenClickingSubNavTab('schedule')
-      .shouldDisplayCommonHeader()
+    it('displays populated offender schedule', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('schedule')
+        .shouldDisplayCommonHeader()
 
-      .shouldRenderAppointmentTableFurniture('future', 'Future appointments')
-      .shouldRenderAppointmentTableRow(
-        'future',
-        0,
-        'Thursday 2 January 2200',
-        '1:30pm to 2pm',
-        'Future appointment with Future First Future Last',
-      )
+        .shouldRenderAppointmentTableFurniture('future', 'Future appointments')
+        .shouldRenderAppointmentTableRow(
+          'future',
+          0,
+          'Thursday 2 January 2200',
+          '1:30pm to 2pm',
+          'Home visit with Catherine Ellis',
+        )
 
-      .shouldRenderAppointmentTableFurniture('recent', 'Recent appointments')
-      .shouldRenderAppointmentTableRow(
-        'recent',
-        0,
-        'Monday 3 February 2020',
-        '10am to 11am',
-        'Recent appointment with Recent First Recent Last',
-      )
+        .shouldRenderAppointmentTableFurniture('recent', 'Recent appointments')
+        .shouldRenderAppointmentTableRow(
+          'recent',
+          0,
+          'Monday 3 February 2020',
+          '10am to 11am',
+          'Some recent appointment',
+        )
+    })
   })
 
-  it('displays empty offender schedule', () => {
-    fixture
-      .havingOffender()
-      .whenViewingOffender()
-      .whenClickingSubNavTab('schedule')
-      .shouldDisplayCommonHeader()
-      .shouldDisplayEmptyWarning('future', 'Future appointments', 'There are no future appointments scheduled.')
-      .shouldDisplayEmptyWarning('recent', 'Recent appointments', 'There have been no recent appointments.')
-  })
+  describe('empty schedule', () => {
+    before(() => {
+      cy.seed({ appointments: [] })
+    })
 
-  it('can arrange an appointment from offender schedule', () => {
-    fixture
-      .havingOffender()
-      .whenViewingOffender()
-      .whenClickingSubNavTab('schedule')
-      .shouldRenderOffenderTab('schedule', page => {
-        page.arrangeAppointmentButton.contains('Arrange an appointment').click()
-        cy.url().should('include', '/arrange-appointment/ABC123')
-      })
+    it('displays empty offender schedule', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('schedule')
+        .shouldDisplayCommonHeader()
+        .shouldDisplayEmptyWarning('future', 'Future appointments', 'There are no future appointments scheduled.')
+        .shouldDisplayEmptyWarning('recent', 'Recent appointments', 'There have been no recent appointments.')
+    })
+
+    it('can arrange an appointment from offender schedule', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('schedule')
+        .shouldRenderOffenderTab('schedule', page => {
+          page.arrangeAppointmentButton.contains('Arrange an appointment').click()
+          cy.url().should('include', `/arrange-appointment/${fixture.crn}`)
+        })
+    })
   })
 })

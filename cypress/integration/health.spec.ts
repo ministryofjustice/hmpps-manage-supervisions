@@ -1,7 +1,6 @@
 context('Healthcheck', () => {
-  beforeEach(() => {
-    cy.task('reset')
-    cy.task('stubPing')
+  before(() => {
+    cy.resetSeed()
   })
 
   it('Health check api reports as healthy', () => {

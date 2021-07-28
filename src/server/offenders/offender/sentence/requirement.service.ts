@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { CommunityApiService, Requirement } from '../../../community-api'
+import { Requirement } from '../../../community-api/client'
 import { Duration, DurationObjectUnits } from 'luxon'
 import {
   ConvictionRequirement,
@@ -11,6 +11,7 @@ import { getPotentiallyExpectedDateTime, quantity } from '../../../util'
 import { groupBy, trimEnd } from 'lodash'
 import { ConfigService } from '@nestjs/config'
 import { Config, getWellKnownRequirementName, isRar, WellKnownRequirementTypeConfig } from '../../../config'
+import { CommunityApiService } from '../../../community-api'
 
 @Injectable()
 export class RequirementService {

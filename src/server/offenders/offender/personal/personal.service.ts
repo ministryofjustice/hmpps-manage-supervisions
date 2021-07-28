@@ -3,12 +3,10 @@ import { groupBy, maxBy, orderBy } from 'lodash'
 import {
   Address,
   AddressSummary,
-  CommunityApiService,
   OffenderDetail,
   OffenderLanguages,
   PhoneNumberType,
-  WellKnownAddressTypes,
-} from '../../../community-api'
+} from '../../../community-api/client'
 import { getDisplayName, isActiveDateRange, sentenceCase, titleCase } from '../../../util'
 import { DateTime } from 'luxon'
 import {
@@ -20,6 +18,7 @@ import {
   PersonalContactDetail,
 } from './personal.types'
 import { BreadcrumbType, LinksService } from '../../../common/links'
+import { CommunityApiService, WellKnownAddressTypes } from '../../../community-api'
 
 function getLanguageSummary(languages: OffenderLanguages) {
   if (!languages.primaryLanguage) {

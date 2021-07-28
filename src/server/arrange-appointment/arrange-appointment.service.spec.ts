@@ -6,13 +6,13 @@ import * as faker from 'faker'
 import { MockCacheModule, MockCacheService } from '../common/cache/cache.mock'
 import { Test } from '@nestjs/testing'
 import { MockCommunityApiModule, MockCommunityApiService } from '../community-api/community-api.mock'
-import { CommunityApiService } from '../community-api'
+import { CommunityApiService, EMPLOYMENT_TYPE_CODE } from '../community-api'
 import {
   fakeAppointmentCreateResponse,
   fakeAppointmentType,
   fakeOffenderDetail,
   fakeOfficeLocation,
-  fakePersonalCircumstances,
+  fakePersonalCircumstance,
 } from '../community-api/community-api.fake'
 import { fakeOkResponse } from '../common/rest/rest.fake'
 import { WellKnownAppointmentType, ContactTypeCategory, WellKnownContactTypeConfig } from '../config'
@@ -135,12 +135,17 @@ describe('ArrangeAppointmentService', () => {
   })
 
   it('gets offender employment', async () => {
-    const personalCircumstances = fakePersonalCircumstances()
+    const personalCircumstances = [
+      fakePersonalCircumstance({
+        personalCircumstanceType: { code: EMPLOYMENT_TYPE_CODE },
+        personalCircumstanceSubType: { description: 'Some offender employment' },
+      }),
+    ]
     const stub = community.personalCircumstances.getOffenderPersonalCircumstancesByCrnUsingGET.resolves(
-      fakeOkResponse(personalCircumstances),
+      fakeOkResponse({ personalCircumstances }),
     )
     const observed = await subject.getCurrentEmploymentCircumstances('some-crn')
-    expect(observed).toBe(personalCircumstances.personalCircumstances[0].personalCircumstanceSubType.description)
+    expect(observed).toBe('Some offender employment')
     expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn' })
   })
 })
