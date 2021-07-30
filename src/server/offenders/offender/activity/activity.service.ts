@@ -15,7 +15,6 @@ import {
 import {
   ActivityLogEntry,
   ActivityLogEntryBase,
-  ActivityLogEntryLinks,
   ActivityLogEntryTag,
   AppointmentActivityLogEntry,
   CommunicationActivityLogEntry,
