@@ -1,6 +1,6 @@
 import { Controller, Get, Param, ParseIntPipe, Render } from '@nestjs/common'
 import { ActivityService } from './activity.service'
-import { AppointmentViewModel } from './activity.types'
+import { AppointmentViewModel, CommunicationViewModel } from './activity.types'
 import { OffenderService } from '../offender.service'
 import { getDisplayName } from '../../../util'
 import { Breadcrumb, BreadcrumbType, LinksService } from '../../../common/links'
@@ -37,6 +37,34 @@ export class ActivityController {
         id,
         offenderName: displayName,
         entityName: appointment.name,
+      }),
+    }
+  }
+
+  @Get('communication/:id(\\d+)')
+  @Render('offenders/offender/activity/communication')
+  @Breadcrumb({
+    type: BreadcrumbType.OtherCommunication,
+    parent: BreadcrumbType.CaseActivityLog,
+    title: options => options.entityName,
+  })
+  async getCommunication(
+    @Param('crn') crn: string,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<CommunicationViewModel> {
+    const [offender, contact] = await Promise.all([
+      this.offender.getOffenderSummary(crn),
+      this.activity.getCommunicationContact(crn, id),
+    ])
+    const displayName = getDisplayName(offender)
+    return {
+      displayName,
+      contact,
+      breadcrumbs: this.links.resolveAll(BreadcrumbType.OtherCommunication, {
+        crn,
+        id,
+        offenderName: displayName,
+        entityName: contact.name,
       }),
     }
   }

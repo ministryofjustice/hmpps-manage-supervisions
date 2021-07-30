@@ -1,0 +1,39 @@
+{% extends "partials/layout.njk" %}
+{% set pageTitle =  displayName %}
+
+{% block content %}
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-2">
+        <span class="govuk-caption-l">{{ displayName }}</span>
+        {{ displayName }}
+    </h1>
+
+    <div class="govuk-!-margin-bottom-6">
+        {% for tag in appointment.tags %}
+            {{ govukTag({
+                text: tag.name,
+                classes: "govuk-tag--" + tag.colour,
+                attributes: { 'data-qa': 'tag' }
+            }) }}
+        {% endfor %}
+    </div>
+
+    <h3 class="govuk-heading-l govuk-!-font-size-27">Other Communication details</h3>
+
+    {{ govukSummaryList({
+        classes: 'govuk-!-margin-bottom-9',
+        attributes: {
+            'data-qa': 'offender/activity/other.communication'
+        },
+        rows: [
+            {
+                key: { text: "Type of appointment" },
+                value: { text: displayName }
+            },
+            {
+                key: { text: "Date" },
+                value: { text: displayName }
+            }
+        ]
+    }) }}
+
+{% endblock %}

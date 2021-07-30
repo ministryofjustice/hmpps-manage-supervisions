@@ -1,6 +1,7 @@
-import { ContactSummary, PageOfContactSummary } from '../../src/server/community-api/client'
+import { AppointmentDetail, ContactSummary, PageOfContactSummary } from '../../src/server/community-api/client'
 import { SeedFn } from './wiremock'
-import { fakeContactSummary } from '../../src/server/community-api/community-api.fake'
+import { fakeAppointmentDetail, fakeContactSummary } from '../../src/server/community-api/community-api.fake'
+import { APPOINTMENTS } from './appointments'
 
 export const LONG_CONTACT_NOTES = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed vestibulum risus, sed pretium nulla. Proin euismod nisl leo, eu porta purus tristique id. Morbi vel imperdiet magna. In eget ipsum a sem ullamcorper rhoncus sit amet eu metus. Donec dapibus ut leo vel finibus. Quisque quis lobortis risus. Sed massa erat, bibendum vitae ex malesuada, aliquet tristique risus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Praesent ac tempus est, eu pretium ipsum.
 Quisque eget nisl vel enim interdum ultrices. Etiam at orci sodales, dignissim leo ac, iaculis odio. Sed a arcu suscipit, aliquet velit in, ultricies lectus. Suspendisse potenti. Nulla sagittis rhoncus facilisis. Quisque laoreet molestie malesuada. Cras ac varius diam. Maecenas lacinia volutpat magna. Maecenas hendrerit enim nec magna aliquet, tempor interdum magna tempor.
@@ -106,16 +107,21 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
 export function contacts(crn: string, partials: DeepPartial<ContactSummary>[] = CONTACTS): SeedFn {
   return async context => {
     const contacts = partials.map(p => fakeContactSummary(p))
-    await context.client.community.get(`/secure/offenders/crn/${crn}/contact-summary`).returns({
-      content: contacts,
-      number: 0,
-      size: contacts.length || 10,
-      numberOfElements: contacts.length,
-      totalPages: contacts.length === 0 ? 0 : 1,
-      totalElements: contacts.length,
-      first: true,
-      last: false,
-      empty: contacts.length === 0,
-    } as PageOfContactSummary)
+    await Promise.all([
+      context.client.community.get(`/secure/offenders/crn/${crn}/contact-summary`).returns({
+        content: contacts,
+        number: 0,
+        size: contacts.length || 10,
+        numberOfElements: contacts.length,
+        totalPages: contacts.length === 0 ? 0 : 1,
+        totalElements: contacts.length,
+        first: true,
+        last: false,
+        empty: contacts.length === 0,
+      } as PageOfContactSummary),
+      ...contacts.map(c =>
+        context.client.community.get(`/secure/offenders/crn/${crn}/contacts/${c.contactId}`).returns(c),
+      ),
+    ])
   }
 }
