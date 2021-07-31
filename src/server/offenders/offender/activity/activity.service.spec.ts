@@ -256,8 +256,8 @@ describe('ActivityService', () => {
           notes: 'well known communication',
           tags: [],
           links: {
-            view: `/offender/some-crn/communication/4`,
-            addNotes: `/offender/some-crn/communication/4/add-notes`,
+            view: `/offender/some-crn/activity/communication/4`,
+            addNotes: `/offender/some-crn/activity/communication/4/add-notes`,
           },
         },
         {
