@@ -1,14 +1,14 @@
 {% extends "partials/layout.njk" %}
-{% set pageTitle =  displayName %}
+{% set pageTitle =  contact.name + ' – ' +  displayName %}
 
 {% block content %}
     <h1 class="govuk-heading-l govuk-!-margin-bottom-2">
-        <span class="govuk-caption-l">{{ displayName }}</span>
-        {{ displayName }}
+        <span class="govuk-caption-l">{{ contact.category }}</span>
+        {{ contact.name }}
     </h1>
 
     <div class="govuk-!-margin-bottom-6">
-        {% for tag in appointment.tags %}
+        {% for tag in contact.tags %}
             {{ govukTag({
                 text: tag.name,
                 classes: "govuk-tag--" + tag.colour,
@@ -17,21 +17,23 @@
         {% endfor %}
     </div>
 
-    <h3 class="govuk-heading-l govuk-!-font-size-27">Other Communication details</h3>
-
     {{ govukSummaryList({
         classes: 'govuk-!-margin-bottom-9',
         attributes: {
-            'data-qa': 'offender/activity/other.communication'
+            'data-qa': 'offender/activity/communication'
         },
         rows: [
             {
-                key: { text: "Type of appointment" },
-                value: { text: displayName }
+                key: { text: "Date" },
+                value: { text: contact.start | shortDate }
             },
             {
-                key: { text: "Date" },
-                value: { text: displayName }
+                key: { text: "Time" },
+                value: { text: contact.start | timeRange(contact.end) }
+            },
+            {
+                key: { text: "Details" },
+                value: { html: (contact.notes | nl2br) if contact.notes else 'No notes' }
             }
         ]
     }) }}
