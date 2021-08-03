@@ -16,6 +16,12 @@ We believe that at present, fine-grained access controls in NDelius only apply t
 
 We will introduce an HMPPS Auth role that prevents practitioners that we haven’t invited from accessing our service. The role will be created and assigned to users in Delius RBAC, and then mapped to an HMPPS Auth role.
 
+Steps:
+
+1. Create a new RBAC in Delius
+2. Map that RBAC to a ROLE on HMPPS Auth
+3. Add that RBAC to pilot users
+
 All our participants will only be shown cases that are assigned to them. While it’s possible to engineer the URL to access the records of cases, the service currently throws an error if the user attempts to arrange an appointment with that user. This functionally replicates the protections afforded by Delius’s RBAC model.
 
 Wherever supported, we will pass the identity of the logged-in user to Community API endpoints so that NDelius can perform its permission checks correctly.
