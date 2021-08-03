@@ -67,6 +67,8 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     contactEnd: '2020-09-04T00:00:00+01:00',
     notes: 'Phone call from Brian to double check when his next appointment was.',
     outcome: null,
+    lastUpdatedDateTime: '2020-09-04T11:20:23+01:00',
+    lastUpdatedByUser: { forenames: `Andy`, surname: `Smith` },
   },
   {
     contactId: 7,
@@ -76,6 +78,8 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     notes:
       'Hi Brian - it was good to speak today. To confirm, your next probation appointment is by telephone on 7th April 2021 at 10:00.',
     outcome: null,
+    lastUpdatedDateTime: '2020-09-04T14:20:23+01:00',
+    lastUpdatedByUser: { forenames: `John`, surname: `Smith` },
   },
   {
     contactId: 8,
@@ -88,6 +92,8 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     contactEnd: '2020-09-04T00:00:00+01:00',
     notes: 'Some unknown communication',
     outcome: null,
+    lastUpdatedDateTime: '2020-09-04T15:20:23+01:00',
+    lastUpdatedByUser: { forenames: `John`, surname: `Rover` },
   },
   {
     contactId: 9,
@@ -100,6 +106,8 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     contactEnd: '2020-09-04T00:00:00+01:00',
     notes: 'Unknown system generated contact',
     outcome: null,
+    lastUpdatedDateTime: '2020-09-04T14:20:23+01:00',
+    lastUpdatedByUser: { forenames: `Michael`, surname: `Smith` },
   },
 ]
 

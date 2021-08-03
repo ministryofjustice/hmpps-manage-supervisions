@@ -98,8 +98,8 @@ export class ActivityService {
       contactId,
     })
     const meta = await this.contacts.getTypeMeta(contact)
-    const base = this.getActivityLogEntryBase(contact)
-    return this.getCommunicationActivityLogEntry(crn, contact, meta, base)
+    const base = ActivityService.getActivityLogEntryBase(contact)
+    return ActivityService.getCommunicationActivityLogEntry(crn, contact, meta, base)
   }
   private async getActivityLogEntry(crn: string, contact: ContactSummary): Promise<ActivityLogEntry> {
     const meta = await this.contacts.getTypeMeta(contact)
@@ -109,11 +109,11 @@ export class ActivityService {
       return this.getAppointmentActivityLogEntry(crn, contact, meta)
     }
 
-    const base = this.getActivityLogEntryBase(contact)
+    const base = ActivityService.getActivityLogEntryBase(contact)
 
     if (meta.type === ContactTypeCategory.Communication) {
       // is a communication type (either known, or in the CAPI Communication category)
-      return this.getCommunicationActivityLogEntry(crn, contact, meta, base)
+      return ActivityService.getCommunicationActivityLogEntry(crn, contact, meta, base)
     }
 
     // is unknown contact
@@ -181,7 +181,7 @@ export class ActivityService {
         : null,
     }
   }
-  private getCommunicationActivityLogEntry(
+  private static getCommunicationActivityLogEntry(
     crn: string,
     contact: ContactSummary,
     meta: GetMetaResult,
@@ -198,9 +198,13 @@ export class ActivityService {
         view: `/offender/${crn}/activity/communication/${contact.contactId}`,
         addNotes: `/offender/${crn}/activity/communication/${contact.contactId}/add-notes`,
       },
+      lastUpdatedDateTime: contact.lastUpdatedDateTime ? DateTime.fromISO(contact.lastUpdatedDateTime) : null,
+      lastUpdatedBy: contact.lastUpdatedByUser
+        ? `${contact.lastUpdatedByUser.forenames} ${contact.lastUpdatedByUser.surname}`
+        : null,
     }
   }
-  private getActivityLogEntryBase(
+  private static getActivityLogEntryBase(
     contact: ContactSummary,
   ): Pick<ActivityLogEntryBase, 'id' | 'start' | 'notes' | 'sensitive'> {
     return {

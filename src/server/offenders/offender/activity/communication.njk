@@ -29,7 +29,7 @@
             },
             {
                 key: { text: "Time" },
-                value: { text: contact.start | timeRange(contact.end) }
+                value: { text: contact.start | time(contact.start) }
             },
             {
                 key: { text: "Details" },
@@ -37,5 +37,11 @@
             }
         ]
     }) }}
-
+    {% if contact.lastUpdatedDateTime and contact.lastUpdatedBy %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <p class="govuk-body-s govuk-hint-s">Last updated by {{ contact.lastUpdatedBy }} on {{ contact.lastUpdatedDateTime | longDate }} at {{ contact.lastUpdatedDateTime | time(contact.lastUpdatedDateTime) }}</p>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}
