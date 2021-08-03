@@ -107,7 +107,7 @@ context('ViewOffenderActivity', () => {
           date: 'Friday 4 September 2020',
           time: '12pm to 1pm',
           name: 'Home visit with Catherine Ellis',
-          notes: 'Some home visit appointment',
+          notes: 'Some home visit appointment With a new line!',
           tags: [{ colour: 'green', text: 'complied' }],
         })
 

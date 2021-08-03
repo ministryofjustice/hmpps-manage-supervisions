@@ -13,7 +13,7 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     type: { code: 'CHVS', description: 'Home Visit to Case (NS)', appointment: true },
     contactStart: '2020-09-04T12:00:00+01:00',
     contactEnd: '2020-09-04T13:00:00+01:00',
-    notes: 'Some home visit appointment',
+    notes: 'Some home visit appointment\n\nWith a new line!',
     staff: { forenames: 'Catherine', surname: 'Ellis', unallocated: false },
     outcome: { complied: true, attended: true },
     sensitive: false,
