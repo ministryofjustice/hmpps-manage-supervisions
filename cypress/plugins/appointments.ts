@@ -7,7 +7,7 @@ export const APPOINTMENTS: DeepPartial<AppointmentDetail>[] = [
     appointmentId: 1,
     appointmentStart: '2200-01-02T13:30:00',
     appointmentEnd: '2200-01-02T14:00:00',
-    notes: 'Some home visit appointment',
+    notes: 'Some home visit appointment\n\nWith a new line!',
     outcome: null,
     sensitive: true,
     type: { contactType: 'CHVS', description: 'Home Visit to Case (NS)' },
