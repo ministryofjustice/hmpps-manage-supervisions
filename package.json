@@ -108,7 +108,7 @@
     "jquery-ui": "^1.12.1",
     "lint-staged": "^11.0.0",
     "listr": "^0.14.3",
-    "mini-css-extract-plugin": "^1.6.0",
+    "mini-css-extract-plugin": "^2.2.0",
     "mocha-junit-reporter": "^2.0.0",
     "nock": "^13.0.11",
     "prettier": "^2.3.0",
