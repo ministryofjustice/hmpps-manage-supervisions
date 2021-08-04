@@ -41,8 +41,8 @@ export interface AppointmentActivityLogEntry
 
 export interface CommunicationActivityLogEntry extends ActivityLogEntryBase {
   type: ContactTypeCategory.Communication
-  lastUpdatedDateTime?: DateTime
-  lastUpdatedBy?: string
+  lastUpdatedDateTime: DateTime
+  lastUpdatedBy: string
 }
 
 export interface UnknownActivityLogEntry extends ActivityLogEntryBase<null> {

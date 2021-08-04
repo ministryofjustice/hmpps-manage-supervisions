@@ -198,10 +198,8 @@ export class ActivityService {
         view: `/offender/${crn}/activity/communication/${contact.contactId}`,
         addNotes: `/offender/${crn}/activity/communication/${contact.contactId}/add-notes`,
       },
-      lastUpdatedDateTime: contact.lastUpdatedDateTime ? DateTime.fromISO(contact.lastUpdatedDateTime) : null,
-      lastUpdatedBy: contact.lastUpdatedByUser
-        ? `${contact.lastUpdatedByUser.forenames} ${contact.lastUpdatedByUser.surname}`
-        : null,
+      lastUpdatedDateTime: DateTime.fromISO(contact.lastUpdatedDateTime),
+      lastUpdatedBy: `${contact.lastUpdatedByUser.forenames} ${contact.lastUpdatedByUser.surname}`,
     }
   }
   private static getActivityLogEntryBase(

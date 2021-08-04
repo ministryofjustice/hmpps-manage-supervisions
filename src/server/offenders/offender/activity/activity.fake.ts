@@ -38,7 +38,12 @@ export const fakeActivityLogEntry = fake<ActivityLogEntry, FakeAppointmentDetail
           } as AppointmentRequirementDetail,
         }
       case ContactTypeCategory.Communication:
-        return { ...base, type }
+        return {
+          ...base,
+          type,
+          lastUpdatedDateTime: DateTime.fromJSDate(faker.date[when]()),
+          lastUpdatedBy: faker.datatype.string(),
+        }
     }
   },
 )

@@ -1,6 +1,7 @@
 import { ViewOffenderFixture } from './view-offender.fixture'
 import { OffenderActivityAppointmentPage } from '../../../pages'
 import { LONG_CONTACT_NOTES } from '../../../plugins/contacts'
+import { OffenderActivityCommunicationPage } from '../../../pages/offender-activity-communication.page'
 
 class Fixture extends ViewOffenderFixture {
   whenClickingActivityEntry(id: number) {
@@ -56,6 +57,11 @@ class Fixture extends ViewOffenderFixture {
 
   shouldRenderAppointmentPage(title: string, assert: (page: OffenderActivityAppointmentPage) => void) {
     const page = new OffenderActivityAppointmentPage()
+    page.pageTitle.contains(title)
+    assert(page)
+  }
+  shouldRenderCommunicationPage(title: string, assert: (page: OffenderActivityCommunicationPage) => void) {
+    const page = new OffenderActivityCommunicationPage()
     page.pageTitle.contains(title)
     assert(page)
   }
@@ -219,6 +225,19 @@ context('ViewOffenderActivity', () => {
           page.outcome('Attended').contains('Yes')
           page.outcome('Complied').contains('Yes')
           page.outcome('Description').contains('Some outcome description')
+        })
+    })
+    it('displays communication detail ', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('activity')
+        .whenClickingActivityEntry(6)
+
+        .shouldRenderCommunicationPage('Phone call from Offender', page => {
+          page.detail('Date').contains('4 September 2020')
+          page.detail('Time').contains('11am')
+          page.detail('Details').contains('Phone call from Brian to double check when his next appointment was.')
+          page.getLastUpdated().contains('Last updated by Andy Smith on Friday 4 September 2020 at 11:20am')
         })
     })
   })

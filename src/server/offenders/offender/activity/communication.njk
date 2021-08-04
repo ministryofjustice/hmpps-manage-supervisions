@@ -37,11 +37,11 @@
             }
         ]
     }) }}
-    {% if contact.lastUpdatedDateTime and contact.lastUpdatedBy %}
+
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <p class="govuk-body-s govuk-hint-s">Last updated by {{ contact.lastUpdatedBy }} on {{ contact.lastUpdatedDateTime | longDate }} at {{ contact.lastUpdatedDateTime | time(contact.lastUpdatedDateTime) }}</p>
+            <p class="govuk-body-s govuk-hint-s" data-qa='contact-last-updated'>Last updated by {{ contact.lastUpdatedBy }} on {{ contact.lastUpdatedDateTime | longDate }} at {{ contact.lastUpdatedDateTime | time(contact.lastUpdatedDateTime) }}</p>
         </div>
     </div>
-    {% endif %}
+
 {% endblock %}
