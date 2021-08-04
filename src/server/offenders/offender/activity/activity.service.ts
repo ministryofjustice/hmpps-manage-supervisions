@@ -13,6 +13,7 @@ import {
   ContactMappingService,
 } from '../../../community-api'
 import {
+  ActivityFilter,
   ActivityLogEntry,
   ActivityLogEntryBase,
   ActivityLogEntryTag,
@@ -20,12 +21,13 @@ import {
   CommunicationActivityLogEntry,
 } from './activity.types'
 import { DateTime } from 'luxon'
-import { ContactTypeCategory } from '../../../config'
+import { ContactTypeCategory, WellKnownContactTypeConfig } from '../../../config'
 import { BreadcrumbType, LinksService } from '../../../common/links'
+import { ConfigService } from '@nestjs/config'
 
 export type GetContactsOptions = Omit<
   ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
-  'crn' | 'from' | 'to'
+  'crn' | 'to'
 >
 
 function getOutcomeFlags(outcome?: AppointmentOutcome): ActivityLogEntryTag[] {
@@ -58,6 +60,7 @@ export class ActivityService {
     private readonly community: CommunityApiService,
     private readonly contacts: ContactMappingService,
     private readonly links: LinksService,
+    private readonly config: ConfigService,
   ) {}
 
   async getActivityLogPage(crn: string, options: GetContactsOptions = {}): Promise<Paginated<ActivityLogEntry>> {
@@ -74,7 +77,7 @@ export class ActivityService {
       number: data.number,
       size: data.size,
       totalElements: data.totalElements,
-      content: await Promise.all(data.content.map(contact => this.getActivityLogEntry(crn, contact))),
+      content: await Promise.all((data.content || []).map(contact => this.getActivityLogEntry(crn, contact))),
     }
   }
 
@@ -210,6 +213,30 @@ export class ActivityService {
       start: DateTime.fromISO(contact.contactStart),
       notes: contact.notes,
       sensitive: contact.sensitive || false,
+    }
+  }
+
+  constructContactFilter(filter: ActivityFilter, convictionId: number): GetContactsOptions {
+    const from = DateTime.now().minus({ years: 1 }).toUTC().toISO()
+
+    const defaultFilters: GetContactsOptions = { convictionId, from }
+
+    const defaultAppointmentFilters = { ...defaultFilters, appointmentsOnly: true, nationalStandard: true }
+
+    switch (filter) {
+      case ActivityFilter.Appointments:
+        return defaultAppointmentFilters
+      case ActivityFilter.CompliedAppointments:
+        return { ...defaultAppointmentFilters, complied: true }
+      case ActivityFilter.AcceptableAbsenceAppointments:
+        return { ...defaultAppointmentFilters, complied: true, attended: false }
+      case ActivityFilter.FailedToComplyAppointments:
+        return { ...defaultAppointmentFilters, complied: false, attended: false }
+      case ActivityFilter.WarningLetters:
+        const contactTypes = Object.values(
+          this.config.get<WellKnownContactTypeConfig>('contacts')[ContactTypeCategory.WarningLetter],
+        )
+        return { ...defaultFilters, contactTypes }
     }
   }
 }

@@ -59,3 +59,11 @@ export interface CommunicationViewModel extends ViewModel {
   displayName: string
   contact: CommunicationActivityLogEntry
 }
+
+export enum ActivityFilter {
+  Appointments = 'appointments',
+  CompliedAppointments = 'complied-appointments',
+  FailedToComplyAppointments = 'failed-to-comply-appointments',
+  WarningLetters = 'warning-letters',
+  AcceptableAbsenceAppointments = 'acceptable-absence-appointments',
+}

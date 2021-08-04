@@ -104,15 +104,28 @@ export interface WellKnownCommunicationTypeMeta {
   code: string
 }
 
+export enum WellKnownWarningLetterType {
+  First = 'first',
+  Second = 'second',
+  Final = 'final',
+  Withdrawn = 'withdrawn',
+  BreachLetterSent = 'breach-letter-sent',
+  BreachConfirmationSent = 'breach-confirmation-sent',
+  GenericLetterToOffender = 'generic-letter-to-offender',
+  EnforcementLetterRequested = 'enforcement-letter-requested',
+}
+
 export enum ContactTypeCategory {
   Appointment = 'appointment',
   Communication = 'communication',
+  WarningLetter = 'warningLetter',
   Other = 'other',
 }
 
 export interface WellKnownContactTypeConfig {
   [ContactTypeCategory.Appointment]: { [Type in WellKnownAppointmentType]: WellKnownAppointmentTypeMeta }
   [ContactTypeCategory.Communication]: { [Type in WellKnownCommunicationType]: WellKnownCommunicationTypeMeta }
+  [ContactTypeCategory.WarningLetter]: { [Type in WellKnownWarningLetterType]: string }
 }
 
 export type WellKnownRequirementTypeConfig = {

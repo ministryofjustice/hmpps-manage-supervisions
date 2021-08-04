@@ -16,7 +16,7 @@ import { OffenderService } from './offender.service'
 import { getDisplayName } from '../../util'
 import { SentenceService } from './sentence'
 import { ScheduleService } from './schedule'
-import { ActivityService } from './activity'
+import { ActivityFilter, ActivityService, GetContactsOptions } from './activity'
 import { RiskService } from './risk'
 import { PersonalService } from './personal'
 import { Breadcrumb, BreadcrumbType, LinksService, ResolveBreadcrumbOptions } from '../../common/links'
@@ -118,9 +118,23 @@ export class OffenderController {
       this.contactTypesService.getCommunicationContactTypes(),
     ])
 
+    return this.activityPageCommon(crn, { contactTypes: [...appointmentTypes, ...communicationTypes] })
+  }
+
+  @Get(`${OffenderPage.Activity}/conviction/:convictionId/:filter`)
+  @Render('offenders/offender/views/activity')
+  async getActivityFiltered(
+    @Param('crn') crn: string,
+    @Param('convictionId') convictionId: number,
+    @Param('filter') filter: ActivityFilter,
+  ): Promise<OffenderActivityViewModel> {
+    return this.activityPageCommon(crn, this.activityService.constructContactFilter(filter, convictionId))
+  }
+
+  async activityPageCommon(crn: string, options?: GetContactsOptions): Promise<OffenderActivityViewModel> {
     const [offender, contacts, registrations] = await Promise.all([
       this.offenderService.getOffenderSummary(crn),
-      this.activityService.getActivityLogPage(crn, { contactTypes: [...appointmentTypes, ...communicationTypes] }),
+      this.activityService.getActivityLogPage(crn, options),
       this.riskService.getRiskRegistrations(crn),
     ])
     return {

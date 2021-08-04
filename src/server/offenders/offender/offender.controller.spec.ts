@@ -18,7 +18,7 @@ import {
 } from './personal/personal.fake'
 import { SentenceService } from './sentence'
 import { ScheduleService } from './schedule'
-import { ActivityService } from './activity'
+import { ActivityFilter, ActivityService } from './activity'
 import { RiskService } from './risk'
 import { fakeConvictionDetails, fakeConvictionRequirement } from './sentence/sentence.fake'
 import { fakeActivityLogEntry } from './activity/activity.fake'
@@ -150,6 +150,32 @@ describe('OffenderController', () => {
     riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
 
     const observed = await subject.getActivity('some-crn')
+    shouldReturnViewModel(observed, BreadcrumbType.CaseActivityLog, {
+      page: OffenderPage.Activity,
+      contacts: contacts.content,
+      pagination: {
+        page: contacts.number,
+        size: contacts.size,
+      },
+      registrations,
+    })
+  })
+
+  it('gets filtered activity list', async () => {
+    havingOffenderSummary()
+
+    const contacts = fakePaginated([fakeActivityLogEntry(), fakeActivityLogEntry()])
+
+    const registrations = [fakeRegistrationFlag()]
+    riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
+
+    const filter = { convictionId: 1234 }
+
+    activityService.constructContactFilter.withArgs(ActivityFilter.CompliedAppointments, 1234).returns(filter)
+
+    activityService.getActivityLogPage.withArgs('some-crn', filter).resolves(contacts)
+
+    const observed = await subject.getActivityFiltered('some-crn', 1234, ActivityFilter.CompliedAppointments)
     shouldReturnViewModel(observed, BreadcrumbType.CaseActivityLog, {
       page: OffenderPage.Activity,
       contacts: contacts.content,
