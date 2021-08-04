@@ -3,7 +3,7 @@ import { FakeAppointmentDetailOptions } from '../../../community-api/community-a
 import * as faker from 'faker'
 import { ContactTypeCategory } from '../../../config'
 import { DateTime } from 'luxon'
-import { ActivityLogEntry } from './activity.types'
+import { ActivityLogEntry, CommunicationActivityLogEntry } from './activity.types'
 import { AppointmentRequirementDetail } from '../../../community-api/client'
 
 export const fakeActivityLogEntry = fake<ActivityLogEntry, FakeAppointmentDetailOptions>(
@@ -47,3 +47,20 @@ export const fakeActivityLogEntry = fake<ActivityLogEntry, FakeAppointmentDetail
     }
   },
 )
+export const fakeCommunicationActivityLogEntry = fake<CommunicationActivityLogEntry>(() => ({
+  id: faker.datatype.number(),
+  start: DateTime.fromJSDate(faker.datatype.datetime()),
+  notes: faker.company.bs(),
+  name: faker.company.bs(),
+  tags: [],
+  links: {
+    view: faker.internet.url(),
+    addNotes: faker.internet.url(),
+  },
+  category: faker.company.bs(),
+  typeName: faker.company.bs(),
+  sensitive: faker.datatype.boolean(),
+  type: ContactTypeCategory.Communication,
+  lastUpdatedDateTime: DateTime.fromJSDate(faker.datatype.datetime()),
+  lastUpdatedBy: faker.datatype.string(),
+}))
