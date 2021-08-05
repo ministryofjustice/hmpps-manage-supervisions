@@ -329,6 +329,8 @@ export const fakeContactSummary = fake<ContactSummary, { when?: 'past' | 'recent
       provider: fakeKeyValue(),
       team: fakeKeyValue(),
       staff: fakeStaffHuman(),
+      lastUpdatedDateTime: date.toISO(),
+      lastUpdatedByUser: { forenames: faker.datatype.string(), surname: faker.datatype.string() },
     }
   },
 )

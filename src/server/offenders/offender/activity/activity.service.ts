@@ -17,6 +17,7 @@ import {
   ActivityLogEntryBase,
   ActivityLogEntryTag,
   AppointmentActivityLogEntry,
+  CommunicationActivityLogEntry,
 } from './activity.types'
 import { DateTime } from 'luxon'
 import { ContactTypeCategory } from '../../../config'
@@ -91,6 +92,15 @@ export class ActivityService {
     return this.getAppointmentActivityLogEntry(crn, appointment, meta)
   }
 
+  async getCommunicationContact(crn: string, contactId: number): Promise<CommunicationActivityLogEntry> {
+    const { data: contact } = await this.community.contactAndAttendance.getOffenderContactSummaryByCrnUsingGET({
+      crn,
+      contactId,
+    })
+    const meta = await this.contacts.getTypeMeta(contact)
+    const base = ActivityService.getActivityLogEntryBase(contact)
+    return ActivityService.getCommunicationActivityLogEntry(crn, contact, meta, base)
+  }
   private async getActivityLogEntry(crn: string, contact: ContactSummary): Promise<ActivityLogEntry> {
     const meta = await this.contacts.getTypeMeta(contact)
 
@@ -99,27 +109,11 @@ export class ActivityService {
       return this.getAppointmentActivityLogEntry(crn, contact, meta)
     }
 
-    const base = {
-      id: contact.contactId,
-      start: DateTime.fromISO(contact.contactStart),
-      notes: contact.notes,
-      sensitive: contact.sensitive || false,
-    } as Pick<ActivityLogEntryBase, 'id' | 'start' | 'notes' | 'sensitive'>
+    const base = ActivityService.getActivityLogEntryBase(contact)
 
     if (meta.type === ContactTypeCategory.Communication) {
       // is a communication type (either known, or in the CAPI Communication category)
-      return {
-        ...base,
-        type: meta.type,
-        category: 'Other communication',
-        name: meta.name,
-        typeName: meta.value.name,
-        tags: [],
-        links: {
-          view: `/offender/${crn}/communication/${contact.contactId}`,
-          addNotes: `/offender/${crn}/communication/${contact.contactId}/add-notes`,
-        },
-      }
+      return ActivityService.getCommunicationActivityLogEntry(crn, contact, meta, base)
     }
 
     // is unknown contact
@@ -185,6 +179,37 @@ export class ActivityService {
             description: contact.outcome.description,
           }
         : null,
+    }
+  }
+  private static getCommunicationActivityLogEntry(
+    crn: string,
+    contact: ContactSummary,
+    meta: GetMetaResult,
+    base: Pick<ActivityLogEntryBase, 'id' | 'start' | 'notes' | 'sensitive'>,
+  ): CommunicationActivityLogEntry {
+    return {
+      ...base,
+      type: ContactTypeCategory.Communication,
+      category: 'Other communication',
+      name: meta.name,
+      typeName: meta.value.name,
+      tags: [],
+      links: {
+        view: `/offender/${crn}/activity/communication/${contact.contactId}`,
+        addNotes: `/offender/${crn}/activity/communication/${contact.contactId}/add-notes`,
+      },
+      lastUpdatedDateTime: DateTime.fromISO(contact.lastUpdatedDateTime),
+      lastUpdatedBy: `${contact.lastUpdatedByUser.forenames} ${contact.lastUpdatedByUser.surname}`,
+    }
+  }
+  private static getActivityLogEntryBase(
+    contact: ContactSummary,
+  ): Pick<ActivityLogEntryBase, 'id' | 'start' | 'notes' | 'sensitive'> {
+    return {
+      id: contact.contactId,
+      start: DateTime.fromISO(contact.contactStart),
+      notes: contact.notes,
+      sensitive: contact.sensitive || false,
     }
   }
 }

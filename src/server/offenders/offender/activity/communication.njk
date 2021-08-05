@@ -1,0 +1,47 @@
+{% extends "partials/layout.njk" %}
+{% set pageTitle =  contact.name + ' – ' +  displayName %}
+
+{% block content %}
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-2">
+        <span class="govuk-caption-l">{{ contact.category }}</span>
+        {{ contact.name }}
+    </h1>
+
+    <div class="govuk-!-margin-bottom-6">
+        {% for tag in contact.tags %}
+            {{ govukTag({
+                text: tag.name,
+                classes: "govuk-tag--" + tag.colour,
+                attributes: { 'data-qa': 'tag' }
+            }) }}
+        {% endfor %}
+    </div>
+
+    {{ govukSummaryList({
+        classes: 'govuk-!-margin-bottom-9',
+        attributes: {
+            'data-qa': 'offender/activity/communication'
+        },
+        rows: [
+            {
+                key: { text: "Date" },
+                value: { text: contact.start | shortDate }
+            },
+            {
+                key: { text: "Time" },
+                value: { text: contact.start | time(contact.start) }
+            },
+            {
+                key: { text: "Details" },
+                value: { html: (contact.notes | nl2br) if contact.notes else 'No notes' }
+            }
+        ]
+    }) }}
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <p class="govuk-body-s govuk-hint-s" data-qa='contact-last-updated'>Last updated by {{ contact.lastUpdatedBy }} on {{ contact.lastUpdatedDateTime | longDate }} at {{ contact.lastUpdatedDateTime | time(contact.lastUpdatedDateTime) }}</p>
+        </div>
+    </div>
+
+{% endblock %}

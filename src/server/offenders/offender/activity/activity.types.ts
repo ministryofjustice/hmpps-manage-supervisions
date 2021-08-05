@@ -41,6 +41,8 @@ export interface AppointmentActivityLogEntry
 
 export interface CommunicationActivityLogEntry extends ActivityLogEntryBase {
   type: ContactTypeCategory.Communication
+  lastUpdatedDateTime: DateTime
+  lastUpdatedBy: string
 }
 
 export interface UnknownActivityLogEntry extends ActivityLogEntryBase<null> {
@@ -52,4 +54,8 @@ export type ActivityLogEntry = AppointmentActivityLogEntry | CommunicationActivi
 export interface AppointmentViewModel extends ViewModel {
   displayName: string
   appointment: AppointmentActivityLogEntry
+}
+export interface CommunicationViewModel extends ViewModel {
+  displayName: string
+  contact: CommunicationActivityLogEntry
 }

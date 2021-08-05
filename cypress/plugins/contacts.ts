@@ -67,6 +67,8 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     contactEnd: '2020-09-04T00:00:00+01:00',
     notes: 'Phone call from Brian to double check when his next appointment was.',
     outcome: null,
+    lastUpdatedDateTime: '2020-09-04T11:20:23+01:00',
+    lastUpdatedByUser: { forenames: `Andy`, surname: `Smith` },
   },
   {
     contactId: 7,
@@ -76,6 +78,8 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     notes:
       'Hi Brian - it was good to speak today. To confirm, your next probation appointment is by telephone on 7th April 2021 at 10:00.',
     outcome: null,
+    lastUpdatedDateTime: '2020-09-04T14:20:23+01:00',
+    lastUpdatedByUser: { forenames: `John`, surname: `Smith` },
   },
   {
     contactId: 8,
@@ -88,6 +92,8 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     contactEnd: '2020-09-04T00:00:00+01:00',
     notes: 'Some unknown communication',
     outcome: null,
+    lastUpdatedDateTime: '2020-09-04T15:20:23+01:00',
+    lastUpdatedByUser: { forenames: `John`, surname: `Rover` },
   },
   {
     contactId: 9,
@@ -100,22 +106,29 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     contactEnd: '2020-09-04T00:00:00+01:00',
     notes: 'Unknown system generated contact',
     outcome: null,
+    lastUpdatedDateTime: '2020-09-04T14:20:23+01:00',
+    lastUpdatedByUser: { forenames: `Michael`, surname: `Smith` },
   },
 ]
 
 export function contacts(crn: string, partials: DeepPartial<ContactSummary>[] = CONTACTS): SeedFn {
   return async context => {
     const contacts = partials.map(p => fakeContactSummary(p))
-    await context.client.community.get(`/secure/offenders/crn/${crn}/contact-summary`).returns({
-      content: contacts,
-      number: 0,
-      size: contacts.length || 10,
-      numberOfElements: contacts.length,
-      totalPages: contacts.length === 0 ? 0 : 1,
-      totalElements: contacts.length,
-      first: true,
-      last: false,
-      empty: contacts.length === 0,
-    } as PageOfContactSummary)
+    await Promise.all([
+      context.client.community.get(`/secure/offenders/crn/${crn}/contact-summary`).returns({
+        content: contacts,
+        number: 0,
+        size: contacts.length || 10,
+        numberOfElements: contacts.length,
+        totalPages: contacts.length === 0 ? 0 : 1,
+        totalElements: contacts.length,
+        first: true,
+        last: false,
+        empty: contacts.length === 0,
+      } as PageOfContactSummary),
+      ...contacts.map(c =>
+        context.client.community.get(`/secure/offenders/crn/${crn}/contacts/${c.contactId}`).returns(c),
+      ),
+    ])
   }
 }

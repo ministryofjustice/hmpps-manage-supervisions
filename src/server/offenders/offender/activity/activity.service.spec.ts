@@ -7,11 +7,22 @@ import {
   ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
   ContactSummary,
 } from '../../../community-api/client'
-import { CommunityApiService, Paginated, ContactMappingService, AppointmentMetaResult } from '../../../community-api'
+import {
+  CommunityApiService,
+  Paginated,
+  ContactMappingService,
+  AppointmentMetaResult,
+  CommunicationMetaResult,
+} from '../../../community-api'
 import { ContactTypeCategory } from '../../../config'
 import { fakeAppointmentDetail, fakeContactSummary, fakePaginated } from '../../../community-api/community-api.fake'
 import { fakeOkResponse } from '../../../common/rest/rest.fake'
-import { ActivityLogEntry, ActivityLogEntryTag, AppointmentActivityLogEntry } from './activity.types'
+import {
+  ActivityLogEntry,
+  ActivityLogEntryTag,
+  AppointmentActivityLogEntry,
+  CommunicationActivityLogEntry,
+} from './activity.types'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../../community-api/community-api.mock'
 import { fakeBreadcrumbUrl, MockLinksModule } from '../../../common/links/links.mock'
 import { BreadcrumbType } from '../../../common/links'
@@ -101,10 +112,19 @@ describe('ActivityService', () => {
     const start = DateTime.fromJSDate(faker.date.past()).set({ hour: 12, minute: 0, second: 0, millisecond: 0 })
     const end = start.plus({ hour: 1 })
     const contacts: ContactSummary[] = []
+    const lastUpdatedDateTime = DateTime.fromJSDate(faker.date.past()).set({
+      hour: 12,
+      minute: 0,
+      second: 0,
+      millisecond: 0,
+    })
+    const lastUpdatedBy = { forenames: faker.datatype.string(), surname: faker.datatype.string() }
 
     function havingContact(
       partial: DeepPartial<ContactSummary> & { notes: string },
       type: ContactTypeCategory | null,
+      lastUpdatedDateTime: DateTime | null,
+      lastUpdatedByUser: { forenames: string; surname: string } | null,
       meta: any = {},
     ) {
       const contact = fakeContactSummary(
@@ -119,6 +139,10 @@ describe('ActivityService', () => {
               attended: true,
               description: 'Some outcome',
             },
+          },
+          {
+            lastUpdatedDateTime: lastUpdatedDateTime,
+            lastUpdatedByUser: lastUpdatedByUser,
           },
           partial,
         ),
@@ -140,6 +164,8 @@ describe('ActivityService', () => {
         rarActivity: true,
       },
       ContactTypeCategory.Appointment,
+      null,
+      null,
     )
     havingContact(
       {
@@ -148,18 +174,27 @@ describe('ActivityService', () => {
         sensitive: true,
       },
       ContactTypeCategory.Appointment,
+      null,
+      null,
     )
-    havingContact({ notes: 'other appointment, not recorded', outcome: null }, null, {
+    havingContact({ notes: 'other appointment, not recorded', outcome: null }, null, null, null, {
       appointment: true,
     })
-    havingContact({ notes: 'well known communication' }, ContactTypeCategory.Communication)
-    havingContact({ notes: 'unknown' }, null, { appointment: false })
+    havingContact(
+      { notes: 'well known communication' },
+      ContactTypeCategory.Communication,
+      lastUpdatedDateTime,
+      lastUpdatedBy,
+    )
+    havingContact({ notes: 'unknown' }, null, null, null, { appointment: false })
     havingContact(
       {
         notes: 'well known, unacceptable absence appointment',
         outcome: { complied: false, attended: false },
       },
       ContactTypeCategory.Appointment,
+      null,
+      null,
     )
     havingContact(
       {
@@ -167,6 +202,8 @@ describe('ActivityService', () => {
         outcome: { complied: true, attended: false },
       },
       ContactTypeCategory.Appointment,
+      null,
+      null,
     )
 
     const stub = community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET.resolves(
@@ -254,10 +291,12 @@ describe('ActivityService', () => {
           typeName: 'Some type',
           start,
           notes: 'well known communication',
+          lastUpdatedBy: `${lastUpdatedBy.forenames} ${lastUpdatedBy.surname}`,
+          lastUpdatedDateTime,
           tags: [],
           links: {
-            view: `/offender/some-crn/communication/4`,
-            addNotes: `/offender/some-crn/communication/4/add-notes`,
+            view: `/offender/some-crn/activity/communication/4`,
+            addNotes: `/offender/some-crn/activity/communication/4/add-notes`,
           },
         },
         {
@@ -292,5 +331,47 @@ describe('ActivityService', () => {
       appointmentsOnly: true,
       to: now.toUTC().toISO(),
     } as ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest)
+  })
+
+  it('gets a communication contact', async () => {
+    const contact = fakeContactSummary({
+      contactId: 111,
+      notes: 'Some contact notes',
+      contactStart: '2020-07-13T12:00:00',
+      lastUpdatedDateTime: '2020-07-13T12:00:00',
+      sensitive: false,
+      lastUpdatedByUser: { forenames: 'Alan', surname: 'Jones' },
+    })
+    community.contactAndAttendance.getOffenderContactSummaryByCrnUsingGET
+      .withArgs(match({ crn: 'some-crn', contactId: 111 }))
+      .resolves(fakeOkResponse(contact))
+
+    contactMapping.getTypeMeta.withArgs(contact).returns(
+      Promise.resolve({
+        name: 'Some communication with some offender',
+        type: ContactTypeCategory.Communication,
+        value: { name: 'Some contact' },
+      } as CommunicationMetaResult),
+    )
+
+    const observed = await subject.getCommunicationContact('some-crn', 111)
+
+    expect(observed).toEqual({
+      id: 111,
+      category: 'Other communication',
+      start: DateTime.fromObject({ year: 2020, month: 7, day: 13, hour: 12 }),
+      name: 'Some communication with some offender',
+      notes: 'Some contact notes',
+      type: 'communication',
+      lastUpdatedDateTime: DateTime.fromObject({ year: 2020, month: 7, day: 13, hour: 12 }),
+      lastUpdatedBy: `Alan Jones`,
+      sensitive: false,
+      typeName: 'Some contact',
+      tags: [],
+      links: {
+        addNotes: '/offender/some-crn/activity/communication/111/add-notes',
+        view: '/offender/some-crn/activity/communication/111',
+      },
+    } as CommunicationActivityLogEntry)
   })
 })
