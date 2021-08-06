@@ -26,6 +26,7 @@ We will log at least the following events in our service, in all environments:
 
 * Incoming HTTP requests (though some information will only be available to Cloud Platform)
 * API calls we make to other services such as Community API
+* Any unexpected exceptions
 
 These events will be written to:
 
