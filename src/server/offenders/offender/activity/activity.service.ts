@@ -27,7 +27,7 @@ import { ConfigService } from '@nestjs/config'
 
 export type GetContactsOptions = Omit<
   ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
-  'crn' | 'to'
+  'crn' | 'contactDateTo'
 >
 
 function getOutcomeFlags(outcome?: AppointmentOutcome): ActivityLogEntryTag[] {
@@ -66,7 +66,7 @@ export class ActivityService {
   async getActivityLogPage(crn: string, options: GetContactsOptions = {}): Promise<Paginated<ActivityLogEntry>> {
     const { data } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET({
       crn,
-      to: DateTime.now().toUTC().toISO(), // this endpoint does not accept offset date times.
+      contactDateTo: DateTime.now().toUTC().toISO(), // this endpoint does not accept offset date times.
       ...options,
     })
 
@@ -217,9 +217,9 @@ export class ActivityService {
   }
 
   constructContactFilter(filter: ActivityFilter, convictionId: number): GetContactsOptions {
-    const from = DateTime.now().minus({ years: 1 }).toUTC().toISO()
+    const contactDateFrom = DateTime.now().minus({ years: 1 }).toUTC().toISO()
 
-    const defaultFilters: GetContactsOptions = { convictionId, from }
+    const defaultFilters: GetContactsOptions = { convictionId, contactDateFrom }
 
     const defaultAppointmentFilters = { ...defaultFilters, appointmentsOnly: true, nationalStandard: true }
 

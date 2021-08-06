@@ -331,7 +331,7 @@ describe('ActivityService', () => {
     expect(stub.getCall(0).firstArg).toEqual({
       crn: 'some-crn',
       appointmentsOnly: true,
-      to: now.toUTC().toISO(),
+      contactDateTo: now.toUTC().toISO(),
     } as ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest)
   })
 
@@ -381,7 +381,7 @@ describe('ActivityService', () => {
     const basicAppointmentFilters = {
       convictionId: 1,
       appointmentsOnly: true,
-      from: now.minus({ years: 1 }).toUTC().toISO(),
+      contactDateFrom: now.minus({ years: 1 }).toUTC().toISO(),
       nationalStandard: true,
     }
 
@@ -409,7 +409,7 @@ describe('ActivityService', () => {
       const observed = subject.constructContactFilter(ActivityFilter.WarningLetters, 1)
       expect(observed).toEqual({
         convictionId: 1,
-        from: now.minus({ years: 1 }).toUTC().toISO(),
+        contactDateFrom: now.minus({ years: 1 }).toUTC().toISO(),
         contactTypes: ['AWLI', 'AWL2', 'AWLF', 'AWLS', 'C040', 'CLBR', 'CBRC', 'CLOB'],
       } as GetContactsOptions)
     })
