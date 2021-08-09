@@ -158,6 +158,30 @@ describe('OffenderController', () => {
         size: contacts.size,
       },
       registrations,
+      filters: {
+        'acceptable-absence-appointments': {
+          description: 'Acceptable abscences',
+          name: 'Acceptable absences',
+        },
+        appointments: {
+          description: 'Appointments',
+          name: 'Appointments',
+        },
+        'complied-appointments': {
+          description: 'Complied appointments',
+          name: 'Complied',
+        },
+        'failed-to-comply-appointments': {
+          description: 'Failures to comply within 12 months',
+          name: 'Failures to comply',
+        },
+        'warning-letters': {
+          description: 'Warning letters',
+          name: 'Warning letters',
+        },
+      },
+      title: null,
+      currentFilter: undefined,
     })
   })
 
@@ -171,11 +195,15 @@ describe('OffenderController', () => {
 
     const filter = { convictionId: 1234 }
 
-    activityService.constructContactFilter.withArgs(ActivityFilter.CompliedAppointments, 1234).returns(filter)
+    sentenceService.getConvictionId.withArgs('some-crn').resolves(1234)
+
+    activityService.constructContactFilter
+      .withArgs(ActivityFilter.CompliedAppointments, { convictionId: 1234 })
+      .returns(filter)
 
     activityService.getActivityLogPage.withArgs('some-crn', filter).resolves(contacts)
 
-    const observed = await subject.getActivityFiltered('some-crn', 1234, ActivityFilter.CompliedAppointments)
+    const observed = await subject.getActivityFiltered('some-crn', ActivityFilter.CompliedAppointments)
     shouldReturnViewModel(observed, BreadcrumbType.CaseActivityLog, {
       page: OffenderPage.Activity,
       contacts: contacts.content,
@@ -184,6 +212,30 @@ describe('OffenderController', () => {
         size: contacts.size,
       },
       registrations,
+      filters: {
+        'acceptable-absence-appointments': {
+          description: 'Acceptable abscences',
+          name: 'Acceptable absences',
+        },
+        appointments: {
+          description: 'Appointments',
+          name: 'Appointments',
+        },
+        'complied-appointments': {
+          description: 'Complied appointments',
+          name: 'Complied',
+        },
+        'failed-to-comply-appointments': {
+          description: 'Failures to comply within 12 months',
+          name: 'Failures to comply',
+        },
+        'warning-letters': {
+          description: 'Warning letters',
+          name: 'Warning letters',
+        },
+      },
+      title: 'Complied appointments',
+      currentFilter: ActivityFilter.CompliedAppointments,
     })
   })
 

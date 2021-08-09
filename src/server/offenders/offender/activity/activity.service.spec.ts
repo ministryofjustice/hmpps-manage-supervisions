@@ -376,7 +376,7 @@ describe('ActivityService', () => {
       },
     } as CommunicationActivityLogEntry)
   })
-  
+
   describe('activity page filter', () => {
     const basicAppointmentFilters = {
       convictionId: 1,
@@ -386,27 +386,27 @@ describe('ActivityService', () => {
     }
 
     it('creates appointment filter', () => {
-      const observed = subject.constructContactFilter(ActivityFilter.Appointments, 1)
+      const observed = subject.constructContactFilter(ActivityFilter.Appointments, { convictionId: 1 })
       expect(observed).toEqual(basicAppointmentFilters as GetContactsOptions)
     })
 
     it('creates complied appointment filter', () => {
-      const observed = subject.constructContactFilter(ActivityFilter.CompliedAppointments, 1)
+      const observed = subject.constructContactFilter(ActivityFilter.CompliedAppointments, { convictionId: 1 })
       expect(observed).toEqual({ ...basicAppointmentFilters, complied: true } as GetContactsOptions)
     })
 
     it('creates acceptable absence appointment filter', () => {
-      const observed = subject.constructContactFilter(ActivityFilter.AcceptableAbsenceAppointments, 1)
+      const observed = subject.constructContactFilter(ActivityFilter.AcceptableAbsenceAppointments, { convictionId: 1 })
       expect(observed).toEqual({ ...basicAppointmentFilters, attended: false, complied: true } as GetContactsOptions)
     })
 
     it('creates FTC appointment filter', () => {
-      const observed = subject.constructContactFilter(ActivityFilter.FailedToComplyAppointments, 1)
+      const observed = subject.constructContactFilter(ActivityFilter.FailedToComplyAppointments, { convictionId: 1 })
       expect(observed).toEqual({ ...basicAppointmentFilters, attended: false, complied: false } as GetContactsOptions)
     })
 
     it('creates warning letter filter', () => {
-      const observed = subject.constructContactFilter(ActivityFilter.WarningLetters, 1)
+      const observed = subject.constructContactFilter(ActivityFilter.WarningLetters, { convictionId: 1 })
       expect(observed).toEqual({
         convictionId: 1,
         contactDateFrom: now.minus({ years: 1 }).toUTC().toISO(),

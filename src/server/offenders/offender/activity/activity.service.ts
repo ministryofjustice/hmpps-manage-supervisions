@@ -216,10 +216,10 @@ export class ActivityService {
     }
   }
 
-  constructContactFilter(filter: ActivityFilter, convictionId: number): GetContactsOptions {
-    const contactDateFrom = DateTime.now().minus({ years: 1 }).toUTC().toISO()
+  constructContactFilter(filter: ActivityFilter, options: GetContactsOptions): GetContactsOptions {
+    const contactDateFrom = DateTime.now().minus({ years: 1 }).toUTC().toISO() // TODO this needs to be more sophisticated and take into consideration the date of the last breach
 
-    const defaultFilters: GetContactsOptions = { convictionId, contactDateFrom }
+    const defaultFilters: GetContactsOptions = { ...options, contactDateFrom }
 
     const defaultAppointmentFilters = { ...defaultFilters, appointmentsOnly: true, nationalStandard: true }
 

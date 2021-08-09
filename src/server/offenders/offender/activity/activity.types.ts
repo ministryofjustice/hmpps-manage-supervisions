@@ -64,6 +64,22 @@ export enum ActivityFilter {
   Appointments = 'appointments',
   CompliedAppointments = 'complied-appointments',
   FailedToComplyAppointments = 'failed-to-comply-appointments',
-  WarningLetters = 'warning-letters',
   AcceptableAbsenceAppointments = 'acceptable-absence-appointments',
+  WarningLetters = 'warning-letters',
+}
+
+export const FilterLinks: { [key: string]: ActivityFilterMeta } = {
+  [ActivityFilter.Appointments]: { name: 'Appointments', description: 'Appointments' },
+  [ActivityFilter.CompliedAppointments]: { name: 'Complied', description: 'Complied appointments' },
+  [ActivityFilter.FailedToComplyAppointments]: {
+    name: 'Failures to comply',
+    description: 'Failures to comply within 12 months',
+  },
+  [ActivityFilter.AcceptableAbsenceAppointments]: { name: 'Acceptable absences', description: 'Acceptable abscences' },
+  [ActivityFilter.WarningLetters]: { name: 'Warning letters', description: 'Warning letters' },
+}
+
+export interface ActivityFilterMeta {
+  name: string
+  description: string
 }

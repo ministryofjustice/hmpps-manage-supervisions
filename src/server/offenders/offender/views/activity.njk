@@ -2,12 +2,37 @@
 {% set pageName = 'Activity log' %}
 
 {% block page %}
-    <a href='{{ links.addActivity }}' class='govuk-button govuk-!-margin-bottom-8' data-qa='offender/add-activity-button'>
-        Add to log
-    </a>
-
     <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-third">
+            <div class="app-card">
+                {{ govukButton({
+                    text: 'Add to log',
+                    href: links.addActivity,
+                    attributes: {
+                        'data-qa': 'offender/add-activity-button'
+                    }
+                }) }}
+
+                <h3 class="govuk-heading-m">Filter activity log</h3>
+
+                <ul class="govuk-list govuk-!-margin-bottom-0">
+                <li><a {% if not currentFilter %}class="govuk-!-font-weight-bold" aria-current="page"{% endif %} href="{{links.activity}}">All activity</a></li>
+
+                {% for key, value in filters %}
+                    <li><a {% if currentFilter == key %}class="govuk-!-font-weight-bold" aria-current="page"{% endif %} href="{{links.activity}}/{{ key }}">{{ value.name }}</a></li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+
         <div class='govuk-grid-column-two-thirds'>
+            {% if title %}
+            <h2 class="govuk-heading-m">
+                {{ title }}
+            </h2>
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+            {% endif %}
+
             {% set hr = joiner('<hr class="govuk-section-break govuk-section-break--m">') %}
 
             {% for contact in contacts %}

@@ -75,7 +75,7 @@ export class SentenceService {
     }
   }
 
-  async getConvictionId(crn: string): Promise<Number> {
+  async getConvictionId(crn: string): Promise<number> {
     const { data: convictions } = await this.community.offender.getConvictionsForOffenderByCrnUsingGET({ crn })
 
     return SentenceService.getLatestConviction(convictions)?.convictionId
