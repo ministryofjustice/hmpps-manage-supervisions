@@ -17,7 +17,7 @@ this purpose.
 NDelius keeps an audit log of read and write access through its UI, but not for its API. API
 clients are responsible for audit logging of accesses.
 
-Logging of HTTP requests is handled upstream by Cloud Platform, and logging of user authentication
+Logging of HTTP requests is [handled upstream by Cloud Platform], and logging of user authentication
 is handled by HMPPS Auth.
 
 ## Decision
@@ -32,15 +32,14 @@ We will include the current authenticated user ID in all log entries.
 
 These events will be written to:
 
-* Application `stdout` and `stderr`, which are aggregated by Cloud Platform into their Elasticsearch/Kibana system
+* Application `stdout` and `stderr`, which are [aggregated by Cloud Platform into their Elasticsearch/Kibana system](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/logging-an-app/log-collection-and-storage.html#application-log-collection-and-storage)
 * Azure Application Insights, for legacy monitoring purposes
 
 ## Consequences
 
 The upcoming MLAP system requires unmodified logs; AppInsights exports cannot be relied upon. When
-we need to get our data into that systen, we are confident that the original, unmodified log messages
-can be extracted from Kibana, thus avoiding any need for us to store logs separately for that future
-purpose.
+we need to get our data into that systen, we are confident that the sufficiently detailed logs
+[can be extracted from Kibana](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/logging-an-app/access-logs.html#accessing-application-log-data), thus avoiding any need for us to store logs separately for that future purpose.
 
 Logs are retained for [30 days](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/logging-an-app/log-collection-and-storage.html#application-log-collection-and-storage) in Kibana. We must check if this is long enough for:
 
