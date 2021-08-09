@@ -28,13 +28,13 @@ is handled by HMPPS Auth.
 
 ## Decision
 
-We will log at least the following events in our service, in all environments:
+We will log at least the following events in our service, in all environments, using [NestJS's logging capability](https://javascript.plainenglish.io/how-to-use-nestjs-logger-2a9cb107bce9):
 
 * Incoming HTTP requests (though some information will only be available to Cloud Platform)
-* API calls we make to other services such as Community API
+* API calls we make to other services such as Community API (perhaps using [Axios request interceptors](https://itnext.io/advanced-nestjs-techniques-part-2-logging-outgoing-http-requests-3c75d47c5768))
 * Any unexpected exceptions
 
-We will include the current authenticated user ID in all log entries.
+We will include the current authenticated user ID in all log entries, in a suitable form to be [parsed by FluentBit](https://docs.fluentbit.io/manual/v/1.7/concepts/data-pipeline/parser).
 
 These events will be written to:
 
