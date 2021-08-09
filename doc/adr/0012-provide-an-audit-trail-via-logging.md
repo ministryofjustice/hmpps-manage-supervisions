@@ -34,7 +34,7 @@ We will log at least the following events in our service, in all environments, u
 * API calls we make to other services such as Community API (perhaps using [Axios request interceptors](https://itnext.io/advanced-nestjs-techniques-part-2-logging-outgoing-http-requests-3c75d47c5768))
 * Any unexpected exceptions
 
-We will include the current authenticated user ID in all log entries, in a suitable form to be [parsed by FluentBit](https://docs.fluentbit.io/manual/v/1.7/concepts/data-pipeline/parser).
+We will include the [UUID](https://github.com/ministryofjustice/hmpps-auth/blob/9296135ad842e6ec01945d679666ffd46c98654a/src/main/kotlin/uk/gov/justice/digital/hmpps/oauth2server/model/UserDetail.kt) of the current authenticated user in all log entries, in a suitable form to be [parsed by FluentBit](https://docs.fluentbit.io/manual/v/1.7/concepts/data-pipeline/parser).
 
 These events will be written to:
 
