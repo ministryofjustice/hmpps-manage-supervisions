@@ -14,6 +14,12 @@ service user data.
 Keeping an audit trail of who has accessed and updated data is sufficient "supervision" for
 this purpose.
 
+For Authority to Operate, the following [logging requirements](https://dsdmoj.atlassian.net/wiki/spaces/NDSS/pages/3053519229/Logging+Audit) must be met:
+
+* Which users have accessed information
+* Who completed transactions
+* Who added/removed data
+
 NDelius keeps an audit log of read and write access through its UI, but not for its API. API
 clients are responsible for audit logging of accesses.
 
