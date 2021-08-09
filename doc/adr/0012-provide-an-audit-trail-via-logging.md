@@ -23,7 +23,7 @@ For Authority to Operate, the following [logging requirements](https://dsdmoj.at
 NDelius keeps an audit log of read and write access through its UI, but not for its API. API
 clients are responsible for audit logging of accesses.
 
-Logging of HTTP requests is [handled upstream by Cloud Platform], and logging of user authentication
+Logging of HTTP requests is handled upstream by Cloud Platform, and logging of user authentication
 is handled by HMPPS Auth.
 
 ## Decision
