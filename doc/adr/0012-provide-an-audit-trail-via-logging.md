@@ -28,6 +28,8 @@ We will log at least the following events in our service, in all environments:
 * API calls we make to other services such as Community API
 * Any unexpected exceptions
 
+We will include the current authenticated user ID in all log entries.
+
 These events will be written to:
 
 * Application `stdout` and `stderr`, which are aggregated by Cloud Platform into their Elasticsearch/Kibana system
