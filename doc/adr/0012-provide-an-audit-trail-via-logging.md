@@ -42,6 +42,7 @@ we need to get our data into that systen, we are confident that the original, un
 can be extracted from Kibana, thus avoiding any need for us to store logs separately for that future
 purpose.
 
-Logs are retained for X in Kibana... need to know how long and if this is enough time for audit.
+Logs are retained for [30 days](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/logging-an-app/log-collection-and-storage.html#application-log-collection-and-storage) in Kibana. We must check if this is long enough for:
 
-TBC
+* MLAP ingestion at a later date - will they want all historical data?
+* Auditing of requests - is a longer retention period required in case of a breach?
