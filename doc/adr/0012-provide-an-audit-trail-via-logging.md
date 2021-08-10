@@ -8,6 +8,9 @@ Accepted
 
 ## Context
 
+MoJ monitors use of its services [by logging](https://security-guidance.service.justice.gov.uk/logging-and-monitoring).
+Detailed logs for internal services are normally [retained for 13 months](https://security-guidance.service.justice.gov.uk/logging-and-monitoring/#log-retention).
+
 To comply with security requirements, our service must not provide "unsupervised" access to
 service user data.
 
@@ -41,13 +44,12 @@ These events will be written to:
 * Application `stdout` and `stderr`, which are [aggregated by Cloud Platform into their Elasticsearch/Kibana system](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/logging-an-app/log-collection-and-storage.html#application-log-collection-and-storage)
 * Azure Application Insights, for legacy monitoring purposes
 
+We will also write all log data to an S3 bucket for long-term retention. We will, if possible, configure this to happen at the infrastructure level, so that `stdout` and `stderr` are automatically stored there, rather than dealing with it separately in our code. This bucket will be set to expire data after 13 months.
 ## Consequences
 
-The upcoming MLAP system requires unmodified logs; AppInsights exports cannot be relied upon. When
-we need to get our data into that systen, we are confident that the sufficiently detailed logs
-[can be extracted from Kibana](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/logging-an-app/access-logs.html#accessing-application-log-data), thus avoiding any need for us to store logs separately for that future purpose.
+The upcoming MLAP system requires unmodified logs to ingest; AppInsights exports cannot be relied upon. When
+we need to get our data into that system, we will be able to use the raw logs stored in S3.
 
-Logs are retained for [30 days](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/logging-an-app/log-collection-and-storage.html#application-log-collection-and-storage) in Kibana. We must check if this is long enough for:
-
-* MLAP ingestion at a later date - will they want all historical data?
-* Auditing of requests - is a longer retention period required in case of a breach?
+Logs are only retained for [30 days](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/logging-an-app/log-collection-and-storage.html#application-log-collection-and-storage) in Kibana. This is insufficient for audit purposes,
+so the S3 bucket will be the "channel of record" for our auditable logs. Both Kibana and AppInsights will only be used for
+debugging and short-term monitoring of the service.
