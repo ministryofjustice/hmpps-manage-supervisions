@@ -66,7 +66,7 @@ export class ActivityService {
   async getActivityLogPage(crn: string, options: GetContactsOptions = {}): Promise<Paginated<ActivityLogEntry>> {
     const { data } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET({
       crn,
-      contactDateTo: DateTime.now().toUTC().toISO(), // this endpoint does not accept offset date times.
+      contactDateTo: DateTime.now().toUTC().toISODate(), // this endpoint does not accept offset date times.
       ...options,
     })
 
@@ -217,7 +217,7 @@ export class ActivityService {
   }
 
   constructContactFilter(filter: ActivityFilter, options: GetContactsOptions): GetContactsOptions {
-    const contactDateFrom = DateTime.now().minus({ years: 1 }).toUTC().toISO() // TODO this needs to be more sophisticated and take into consideration the date of the last breach
+    const contactDateFrom = DateTime.now().minus({ years: 1 }).toUTC().toISODate() // TODO this needs to be more sophisticated and take into consideration the date of the last breach
 
     const defaultFilters: GetContactsOptions = { ...options, contactDateFrom }
 
@@ -227,11 +227,11 @@ export class ActivityService {
       case ActivityFilter.Appointments:
         return defaultAppointmentFilters
       case ActivityFilter.CompliedAppointments:
-        return { ...defaultAppointmentFilters, complied: true }
+        return { ...defaultAppointmentFilters, complied: true, attended: true }
       case ActivityFilter.AcceptableAbsenceAppointments:
         return { ...defaultAppointmentFilters, complied: true, attended: false }
       case ActivityFilter.FailedToComplyAppointments:
-        return { ...defaultAppointmentFilters, complied: false, attended: false }
+        return { ...defaultAppointmentFilters, complied: false }
       case ActivityFilter.WarningLetters:
         const contactTypes = Object.values(
           this.config.get<WellKnownContactTypeConfig>('contacts')[ContactTypeCategory.WarningLetter],

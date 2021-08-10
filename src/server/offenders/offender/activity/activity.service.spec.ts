@@ -331,7 +331,7 @@ describe('ActivityService', () => {
     expect(stub.getCall(0).firstArg).toEqual({
       crn: 'some-crn',
       appointmentsOnly: true,
-      contactDateTo: now.toUTC().toISO(),
+      contactDateTo: now.toUTC().toISODate(),
     } as ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest)
   })
 
@@ -381,7 +381,7 @@ describe('ActivityService', () => {
     const basicAppointmentFilters = {
       convictionId: 1,
       appointmentsOnly: true,
-      contactDateFrom: now.minus({ years: 1 }).toUTC().toISO(),
+      contactDateFrom: now.minus({ years: 1 }).toUTC().toISODate(),
       nationalStandard: true,
     }
 
@@ -392,7 +392,7 @@ describe('ActivityService', () => {
 
     it('creates complied appointment filter', () => {
       const observed = subject.constructContactFilter(ActivityFilter.CompliedAppointments, { convictionId: 1 })
-      expect(observed).toEqual({ ...basicAppointmentFilters, complied: true } as GetContactsOptions)
+      expect(observed).toEqual({ ...basicAppointmentFilters, attended: true, complied: true } as GetContactsOptions)
     })
 
     it('creates acceptable absence appointment filter', () => {
@@ -402,14 +402,14 @@ describe('ActivityService', () => {
 
     it('creates FTC appointment filter', () => {
       const observed = subject.constructContactFilter(ActivityFilter.FailedToComplyAppointments, { convictionId: 1 })
-      expect(observed).toEqual({ ...basicAppointmentFilters, attended: false, complied: false } as GetContactsOptions)
+      expect(observed).toEqual({ ...basicAppointmentFilters, complied: false } as GetContactsOptions)
     })
 
     it('creates warning letter filter', () => {
       const observed = subject.constructContactFilter(ActivityFilter.WarningLetters, { convictionId: 1 })
       expect(observed).toEqual({
         convictionId: 1,
-        contactDateFrom: now.minus({ years: 1 }).toUTC().toISO(),
+        contactDateFrom: now.minus({ years: 1 }).toUTC().toISODate(),
         contactTypes: ['AWLI', 'AWL2', 'AWLF', 'AWLS', 'C040', 'CLBR', 'CBRC', 'CLOB'],
       } as GetContactsOptions)
     })
