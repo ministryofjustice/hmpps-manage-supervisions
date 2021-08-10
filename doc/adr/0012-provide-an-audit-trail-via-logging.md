@@ -44,7 +44,7 @@ These events will be written to:
 * Application `stdout` and `stderr`, which are [aggregated by Cloud Platform into their Elasticsearch/Kibana system](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/logging-an-app/log-collection-and-storage.html#application-log-collection-and-storage)
 * Azure Application Insights, for legacy monitoring purposes
 
-We will also write all log data to an S3 bucket for long-term retention. We will, if possible, configure this to happen at the infrastructure level, so that `stdout` and `stderr` are automatically stored there, rather than dealing with it separately in our code. This bucket will be set to expire data after 13 months.
+We will also write all log data to an S3 bucket for long-term retention. We will, if possible, [configure this to automatically happen at the infrastructure level](https://docs.fluentbit.io/manual/v/1.6/pipeline/outputs/s3), so that `stdout` and `stderr` are automatically stored there, rather than dealing with it separately in our code. This bucket will be set to expire data after 13 months.
 ## Consequences
 
 The upcoming MLAP system requires unmodified logs to ingest; AppInsights exports cannot be relied upon. When
