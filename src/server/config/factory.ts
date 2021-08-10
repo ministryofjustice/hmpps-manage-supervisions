@@ -6,6 +6,7 @@ import {
   WellKnownAppointmentTypeMeta,
   WellKnownCommunicationType,
   WellKnownCommunicationTypeMeta,
+  WellKnownWarningLetterType,
 } from './types'
 import { ApplicationVersion } from '../util'
 import { requirements } from './requirements'
@@ -68,6 +69,16 @@ export const CONTACT_DEFAULTS: WellKnownContactTypeConfig = {
     [WellKnownCommunicationType.PhoneCallToOther]: { name: 'Phone call to Other', code: 'CT3B' },
     [WellKnownCommunicationType.PhoneCallFromOther]: { name: 'Phone call from Other', code: 'CT3A' },
   },
+  warningLetter: {
+    [WellKnownWarningLetterType.First]: 'AWLI',
+    [WellKnownWarningLetterType.Second]: 'AWL2',
+    [WellKnownWarningLetterType.Final]: 'AWLF',
+    [WellKnownWarningLetterType.EnforcementLetterRequested]: 'AWLS',
+    [WellKnownWarningLetterType.Withdrawn]: 'C040',
+    [WellKnownWarningLetterType.BreachLetterSent]: 'CLBR',
+    [WellKnownWarningLetterType.BreachConfirmationSent]: 'CBRC',
+    [WellKnownWarningLetterType.GenericLetterToOffender]: 'CLOB',
+  },
 }
 
 const DEBUG_DEFAULTS: Record<DebugFlags, string> = {
@@ -104,6 +115,16 @@ export function configFactory(): Config {
       }
     })
     .reduce((x, y) => ({ ...x, ...y })) as WellKnownContactTypeConfig['communication']
+
+  const warningLetter = Object.values(WellKnownWarningLetterType)
+    .map(type => {
+      const defaultCode = CONTACT_DEFAULTS['warningLetter'][type as WellKnownWarningLetterType]
+      const key = type.replace('-', '_').toUpperCase()
+      return {
+        [type]: string(`${key}_CODE`, fallback(defaultCode)).toUpperCase().trim() as string,
+      }
+    })
+    .reduce((x, y) => ({ ...x, ...y })) as WellKnownContactTypeConfig['warningLetter']
 
   return {
     server: {
@@ -173,6 +194,7 @@ export function configFactory(): Config {
     contacts: {
       appointment,
       communication,
+      warningLetter,
     },
     requirements,
   }

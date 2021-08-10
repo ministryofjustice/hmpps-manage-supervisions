@@ -26,7 +26,7 @@ export interface CommunicationMetaResult extends GetMetaResultBase<WellKnownComm
 
 export interface UnknownMetaResult
   extends GetMetaResultBase<{ name: string; appointment: boolean; communication: boolean }> {
-  type: ContactTypeCategory.Communication | ContactTypeCategory.Other | null
+  type: ContactTypeCategory.Communication | ContactTypeCategory.Other | ContactTypeCategory.WarningLetter | null
 }
 
 export type GetMetaResult = AppointmentMetaResult | CommunicationMetaResult | UnknownMetaResult

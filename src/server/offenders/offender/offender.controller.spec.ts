@@ -18,7 +18,7 @@ import {
 } from './personal/personal.fake'
 import { SentenceService } from './sentence'
 import { ScheduleService } from './schedule'
-import { ActivityService } from './activity'
+import { ActivityFilter, ActivityService } from './activity'
 import { RiskService } from './risk'
 import { fakeConvictionDetails, fakeConvictionRequirement } from './sentence/sentence.fake'
 import { fakeActivityLogEntry } from './activity/activity.fake'
@@ -158,6 +158,84 @@ describe('OffenderController', () => {
         size: contacts.size,
       },
       registrations,
+      filters: {
+        'acceptable-absence-appointments': {
+          description: 'Acceptable abscences',
+          name: 'Acceptable absences',
+        },
+        appointments: {
+          description: 'Appointments',
+          name: 'Appointments',
+        },
+        'complied-appointments': {
+          description: 'Complied appointments',
+          name: 'Complied',
+        },
+        'failed-to-comply-appointments': {
+          description: 'Failures to comply within 12 months',
+          name: 'Failures to comply',
+        },
+        'warning-letters': {
+          description: 'Warning letters',
+          name: 'Warning letters',
+        },
+      },
+      title: null,
+      currentFilter: undefined,
+    })
+  })
+
+  it('gets filtered activity list', async () => {
+    havingOffenderSummary()
+
+    const contacts = fakePaginated([fakeActivityLogEntry(), fakeActivityLogEntry()])
+
+    const registrations = [fakeRegistrationFlag()]
+    riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
+
+    const filter = { convictionId: 1234 }
+
+    sentenceService.getConvictionId.withArgs('some-crn').resolves(1234)
+
+    activityService.constructContactFilter
+      .withArgs(ActivityFilter.CompliedAppointments, { convictionId: 1234 })
+      .returns(filter)
+
+    activityService.getActivityLogPage.withArgs('some-crn', filter).resolves(contacts)
+
+    const observed = await subject.getActivityFiltered('some-crn', ActivityFilter.CompliedAppointments)
+    shouldReturnViewModel(observed, BreadcrumbType.CaseActivityLog, {
+      page: OffenderPage.Activity,
+      contacts: contacts.content,
+      pagination: {
+        page: contacts.number,
+        size: contacts.size,
+      },
+      registrations,
+      filters: {
+        'acceptable-absence-appointments': {
+          description: 'Acceptable abscences',
+          name: 'Acceptable absences',
+        },
+        appointments: {
+          description: 'Appointments',
+          name: 'Appointments',
+        },
+        'complied-appointments': {
+          description: 'Complied appointments',
+          name: 'Complied',
+        },
+        'failed-to-comply-appointments': {
+          description: 'Failures to comply within 12 months',
+          name: 'Failures to comply',
+        },
+        'warning-letters': {
+          description: 'Warning letters',
+          name: 'Warning letters',
+        },
+      },
+      title: 'Complied appointments',
+      currentFilter: ActivityFilter.CompliedAppointments,
     })
   })
 

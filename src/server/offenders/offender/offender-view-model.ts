@@ -1,4 +1,4 @@
-import { ActivityLogEntry } from './activity'
+import { ActivityFilter, ActivityLogEntry } from './activity'
 import { ConvictionDetails } from './sentence'
 import { AppointmentSummary, RecentAppointments } from './schedule'
 import { RegistrationFlag, Risks } from './risk/risk.types'
@@ -53,6 +53,9 @@ export interface OffenderActivityViewModel extends OffenderViewModelBase {
     page?: number
     size?: number
   }
+  filters: {}
+  currentFilter?: ActivityFilter
+  title: string
 }
 
 export interface OffenderPersonalViewModel extends OffenderViewModelBase, GetPersonalDetailsResult {

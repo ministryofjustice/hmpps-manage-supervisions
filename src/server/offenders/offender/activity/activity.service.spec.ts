@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing'
-import { ActivityService } from './activity.service'
+import { ActivityService, GetContactsOptions } from './activity.service'
 import { DateTime, Settings } from 'luxon'
 import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
 import * as faker from 'faker'
@@ -18,15 +18,17 @@ import { ContactTypeCategory } from '../../../config'
 import { fakeAppointmentDetail, fakeContactSummary, fakePaginated } from '../../../community-api/community-api.fake'
 import { fakeOkResponse } from '../../../common/rest/rest.fake'
 import {
+  ActivityFilter,
   ActivityLogEntry,
   ActivityLogEntryTag,
-  AppointmentActivityLogEntry,
   CommunicationActivityLogEntry,
+  AppointmentActivityLogEntry,
 } from './activity.types'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../../community-api/community-api.mock'
 import { fakeBreadcrumbUrl, MockLinksModule } from '../../../common/links/links.mock'
 import { BreadcrumbType } from '../../../common/links'
 import { merge } from 'lodash'
+import { FakeConfigModule } from '../../../config/config.fake'
 
 describe('ActivityService', () => {
   let subject: ActivityService
@@ -41,7 +43,7 @@ describe('ActivityService', () => {
 
     const module = await Test.createTestingModule({
       providers: [ActivityService, { provide: ContactMappingService, useValue: contactMapping }],
-      imports: [MockCommunityApiModule.register(), MockLinksModule],
+      imports: [MockCommunityApiModule.register(), MockLinksModule, FakeConfigModule.register()],
     }).compile()
 
     subject = module.get(ActivityService)
@@ -329,7 +331,7 @@ describe('ActivityService', () => {
     expect(stub.getCall(0).firstArg).toEqual({
       crn: 'some-crn',
       appointmentsOnly: true,
-      to: now.toUTC().toISO(),
+      contactDateTo: now.toUTC().toISODate(),
     } as ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest)
   })
 
@@ -373,5 +375,43 @@ describe('ActivityService', () => {
         view: '/offender/some-crn/activity/communication/111',
       },
     } as CommunicationActivityLogEntry)
+  })
+
+  describe('activity page filter', () => {
+    const basicAppointmentFilters = {
+      convictionId: 1,
+      appointmentsOnly: true,
+      contactDateFrom: now.minus({ years: 1 }).toUTC().toISODate(),
+      nationalStandard: true,
+    }
+
+    it('creates appointment filter', () => {
+      const observed = subject.constructContactFilter(ActivityFilter.Appointments, { convictionId: 1 })
+      expect(observed).toEqual(basicAppointmentFilters as GetContactsOptions)
+    })
+
+    it('creates complied appointment filter', () => {
+      const observed = subject.constructContactFilter(ActivityFilter.CompliedAppointments, { convictionId: 1 })
+      expect(observed).toEqual({ ...basicAppointmentFilters, attended: true, complied: true } as GetContactsOptions)
+    })
+
+    it('creates acceptable absence appointment filter', () => {
+      const observed = subject.constructContactFilter(ActivityFilter.AcceptableAbsenceAppointments, { convictionId: 1 })
+      expect(observed).toEqual({ ...basicAppointmentFilters, attended: false, complied: true } as GetContactsOptions)
+    })
+
+    it('creates FTC appointment filter', () => {
+      const observed = subject.constructContactFilter(ActivityFilter.FailedToComplyAppointments, { convictionId: 1 })
+      expect(observed).toEqual({ ...basicAppointmentFilters, complied: false } as GetContactsOptions)
+    })
+
+    it('creates warning letter filter', () => {
+      const observed = subject.constructContactFilter(ActivityFilter.WarningLetters, { convictionId: 1 })
+      expect(observed).toEqual({
+        convictionId: 1,
+        contactDateFrom: now.minus({ years: 1 }).toUTC().toISODate(),
+        contactTypes: ['AWLI', 'AWL2', 'AWLF', 'AWLS', 'C040', 'CLBR', 'CBRC', 'CLOB'],
+      } as GetContactsOptions)
+    })
   })
 })
