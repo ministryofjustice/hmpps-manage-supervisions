@@ -10,6 +10,12 @@ class Fixture extends ViewOffenderFixture {
     })
   }
 
+  whenClickingFailuresToComplyFilter() {
+    return this.shouldRenderOffenderTab('activity', page => {
+      page.filterLink('failed-to-comply-appointments').click()
+    })
+  }
+
   shouldRenderActivity({
     id,
     date,
@@ -52,6 +58,12 @@ class Fixture extends ViewOffenderFixture {
           .get(`a[href="/offender/${this.crn}/appointment/${id}/record-outcome"]`)
           .contains('Record attendance')
       }
+    })
+  }
+
+  shouldNotRenderActivity({ id }: { id: number }) {
+    return this.shouldRenderOffenderTab('activity', page => {
+      page.entry(id).title.should('not.exist')
     })
   }
 
@@ -238,6 +250,37 @@ context('ViewOffenderActivity', () => {
           page.detail('Time').contains('11am')
           page.detail('Details').contains('Phone call from Brian to double check when his next appointment was.')
           page.getLastUpdated().contains('Last updated by Andy Smith on Friday 4 September 2020 at 11:20am')
+        })
+    })
+
+    it('displays activity log filtered to display failure to complies', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('activity')
+        .whenClickingFailuresToComplyFilter()
+        .shouldRenderActivity({
+          id: 2,
+          date: 'Thursday 3 September 2020',
+          time: '10:30am to 11:15am',
+          name: 'Office visit',
+          notes: LONG_CONTACT_NOTES,
+          tags: [{ colour: 'red', text: 'failed to comply' }],
+          havingLongNotes: true,
+        })
+        .shouldRenderActivity({
+          id: 4,
+          date: 'Thursday 3 September 2020',
+          time: '10:30am to 11:15am',
+          name: 'Office visit',
+          notes: LONG_CONTACT_NOTES,
+          tags: [
+            { colour: 'purple', text: 'rar' },
+            { colour: 'red', text: 'unacceptable absence' },
+          ],
+          havingLongNotes: true,
+        })
+        .shouldNotRenderActivity({
+          id: 1, // a complied attended activity not returned by Wiremocked CAPI when the FTC filters are applied
         })
     })
   })

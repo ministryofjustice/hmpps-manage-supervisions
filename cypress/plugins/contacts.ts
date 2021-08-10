@@ -115,20 +115,28 @@ export function contacts(crn: string, partials: DeepPartial<ContactSummary>[] = 
   return async context => {
     const contacts = partials.map(p => fakeContactSummary(p))
     await Promise.all([
-      context.client.community.get(`/secure/offenders/crn/${crn}/contact-summary`).returns({
-        content: contacts,
-        number: 0,
-        size: contacts.length || 10,
-        numberOfElements: contacts.length,
-        totalPages: contacts.length === 0 ? 0 : 1,
-        totalElements: contacts.length,
-        first: true,
-        last: false,
-        empty: contacts.length === 0,
-      } as PageOfContactSummary),
+      context.client.community
+        .get(`/secure/offenders/crn/${crn}/contact-summary`)
+        .query({ complied: false, appointmentsOnly: true, nationalStandard: true }, 'equalTo')
+        .returns(contactResponse(contacts.filter(c => c.outcome && c.outcome.complied == false && c.type.appointment))),
+      context.client.community.get(`/secure/offenders/crn/${crn}/contact-summary`).returns(contactResponse(contacts)),
       ...contacts.map(c =>
         context.client.community.get(`/secure/offenders/crn/${crn}/contacts/${c.contactId}`).returns(c),
       ),
     ])
+  }
+
+  function contactResponse(contacts: ContactSummary[]): PageOfContactSummary {
+    return {
+      content: contacts,
+      number: 0,
+      size: contacts.length || 10,
+      numberOfElements: contacts.length,
+      totalPages: contacts.length === 0 ? 0 : 1,
+      totalElements: contacts.length,
+      first: true,
+      last: false,
+      empty: contacts.length === 0,
+    }
   }
 }
