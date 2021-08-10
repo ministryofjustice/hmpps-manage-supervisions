@@ -9,6 +9,13 @@ function urlJoin(...tokens: string[]) {
   return !result.startsWith('http') ? `/${result}` : result
 }
 
+function getQueryString(mapping: WireMock.StubMapping): string {
+  const values = Object.entries(mapping.request.queryParameters || {}).map(
+    ([k, v]) => `${k}=${Object.values(v).join()}`,
+  )
+  return values.length === 0 ? '' : '?' + values.join('&')
+}
+
 export class WiremockClient {
   private static readonly WIREMOCK_URL = process.env.WIRE_MOCK_URL || 'http://localhost:9091'
   private readonly helper: WiremockApiHelper
@@ -23,12 +30,11 @@ export class WiremockClient {
 
   async getAllStubs() {
     const mappings = await this.helper.getStubs()
-    // TODO to string the query string
     return mappings.map(
       x =>
         `${x.request.method} ${
           x.request.urlPattern || x.request.url || x.request.urlPathPattern || x.request.urlPath
-        } => ${(x.response as any).status}`,
+        }${getQueryString(x)} => ${(x.response as any).status}`,
     )
   }
 

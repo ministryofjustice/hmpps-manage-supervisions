@@ -1,5 +1,6 @@
-import { DateObject, DateTime } from 'luxon'
+import { DateObject, DateTime, DurationUnit } from 'luxon'
 import { TIME_FORMAT } from '../validators'
+import { quantity } from './math'
 
 export interface PotentiallyExpectedDateTime {
   value: DateTime
@@ -64,4 +65,33 @@ export function isActiveDateRange(range: { startDate?: RawDate; endDate?: RawDat
 
   const endDate = safeGetDateTime(range.endDate)
   return !endDate || endDate > now
+}
+
+export function getElapsed(
+  date: RawDate,
+  length: number,
+  units: DurationUnit,
+): { elapsed: string; length: string } | null {
+  if (!units || !length) {
+    return null
+  }
+
+  try {
+    const start = safeGetDateTime(date)
+    const diffToNow = DateTime.now().diff(start, units).as(units)
+    if (diffToNow < 0) {
+      // must start in the future
+      return null
+    }
+
+    const elapsed = Math.min(Math.floor(diffToNow), length)
+    return {
+      elapsed: quantity(elapsed, units),
+      length: quantity(length, units),
+    }
+  } catch (err) {
+    // probably bad units
+    this.logger.error(`Cannot determine duration ${JSON.stringify({ date, length, units })}: ${err.message}`)
+    return null
+  }
 }

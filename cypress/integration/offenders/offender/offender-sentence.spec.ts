@@ -72,7 +72,7 @@ context('ViewOffenderSentence', () => {
           })
 
           page.probationHistory(card => {
-            card.value('Previous orders').contains('Previous orders (1) Last ended on 1 December 2020')
+            card.value('Previous orders').contains('Previous orders (1) Last ended on 1 November 2018')
           })
         })
     })

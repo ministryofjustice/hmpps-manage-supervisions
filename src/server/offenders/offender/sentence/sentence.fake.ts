@@ -1,5 +1,12 @@
 import {
   AdditionalSentence,
+  ComplianceActiveBreachSummary,
+  ComplianceConvictionSummary,
+  ComplianceDetails,
+  CompliancePeriod,
+  ComplianceQuantity,
+  ComplianceStatus,
+  ComplianceStatusAlertLevel,
   ConvictionDetails,
   ConvictionOffence,
   ConvictionRequirement,
@@ -9,6 +16,7 @@ import {
 import { fake } from '../../../util/util.fake'
 import * as faker from 'faker'
 import { DateTime } from 'luxon'
+import { fakeBreachSummary } from '../../../community-api/breach/breach.fake'
 
 export const fakeConvictionOffence = fake<ConvictionOffence>(() => ({
   id: faker.datatype.uuid(),
@@ -89,3 +97,51 @@ export const fakeConvictionDetails = fake<ConvictionDetails>((options, partial =
     requirements: partial.requirements?.map(r => fakeConvictionRequirement(r)) || [fakeConvictionRequirement()],
   }
 })
+
+export const fakeComplianceConvictionSummary = fake<ComplianceConvictionSummary>((options, partial = {}) => {
+  const activeBreach = fakeBreachSummary({
+    active: true,
+    ...partial.activeBreach,
+  }) as ComplianceActiveBreachSummary
+  const previousBreaches = (partial.previousBreaches || [{}]).map(x => fakeBreachSummary({ active: false, ...x }))
+  return {
+    name: '12 month Community Order',
+    startDate: DateTime.fromJSDate(faker.date.past()),
+    length: '12 months',
+    progress: '6 months',
+    mainOffence: faker.company.bs(),
+    inBreach: true,
+    activeBreach,
+    previousBreaches,
+    allBreaches: [activeBreach, ...previousBreaches],
+    lastRecentBreachEnd: DateTime.fromJSDate(faker.date.past()),
+  }
+})
+
+function fakeComplianceQuantity(): ComplianceQuantity {
+  return {
+    name: `${faker.datatype.number({ min: 2, max: 10 })} ${faker.commerce.product()}s`,
+    link: faker.internet.url(),
+  }
+}
+
+export const fakeComplianceDetails = fake<ComplianceDetails>(() => ({
+  current: {
+    ...fakeComplianceConvictionSummary(),
+    period: faker.random.arrayElement(Object.values(CompliancePeriod)),
+    appointments: {
+      total: fakeComplianceQuantity(),
+      complied: fakeComplianceQuantity(),
+      acceptableAbsences: fakeComplianceQuantity(),
+      failureToComply: fakeComplianceQuantity(),
+    },
+    status: {
+      value: faker.random.arrayElement(Object.values(ComplianceStatus)),
+      description: faker.company.bs(),
+      alertLevel: faker.random.arrayElement(Object.values(ComplianceStatusAlertLevel)),
+    },
+    requirement: faker.company.bs(),
+  },
+  previous: [fakeComplianceConvictionSummary()],
+  previousFrom: DateTime.fromJSDate(faker.date.past()),
+}))

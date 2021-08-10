@@ -1,5 +1,10 @@
 import { AppointmentType, ContactType, StaffHuman } from '../client'
-import { WellKnownAppointmentTypeMeta, WellKnownCommunicationTypeMeta, ContactTypeCategory } from '../../config'
+import {
+  WellKnownAppointmentTypeMeta,
+  WellKnownContactTypeMeta,
+  ContactTypeCategory,
+  WellKnownBreachEndContactTypeMeta,
+} from '../../config'
 
 export interface GetMetaOptions {
   type: ContactType | AppointmentType
@@ -12,7 +17,7 @@ export interface GetMetaOptions {
 
 interface GetMetaResultBase<Meta> {
   name: string
-  type: ContactTypeCategory | null
+  type: ContactTypeCategory
   value: Meta
 }
 
@@ -20,16 +25,29 @@ export interface AppointmentMetaResult extends GetMetaResultBase<WellKnownAppoin
   type: ContactTypeCategory.Appointment
 }
 
-export interface CommunicationMetaResult extends GetMetaResultBase<WellKnownCommunicationTypeMeta> {
+export interface CommunicationMetaResult extends GetMetaResultBase<WellKnownContactTypeMeta> {
   type: ContactTypeCategory.Communication
 }
 
 export interface UnknownMetaResult
   extends GetMetaResultBase<{ name: string; appointment: boolean; communication: boolean }> {
-  type: ContactTypeCategory.Communication | ContactTypeCategory.Other | ContactTypeCategory.WarningLetter | null
+  type: ContactTypeCategory.Communication | ContactTypeCategory.Other | ContactTypeCategory.WarningLetter
 }
 
-export type GetMetaResult = AppointmentMetaResult | CommunicationMetaResult | UnknownMetaResult
+export interface BreachStartMetaResult extends GetMetaResultBase<WellKnownContactTypeMeta> {
+  type: ContactTypeCategory.BreachStart
+}
+
+export interface BreachEndMetaResult extends GetMetaResultBase<WellKnownBreachEndContactTypeMeta> {
+  type: ContactTypeCategory.BreachEnd
+}
+
+export type GetMetaResult =
+  | AppointmentMetaResult
+  | CommunicationMetaResult
+  | BreachStartMetaResult
+  | BreachEndMetaResult
+  | UnknownMetaResult
 
 export function isAppointment(result: GetMetaResult): boolean {
   return result.type === ContactTypeCategory.Appointment || ('appointment' in result.value && result.value.appointment)

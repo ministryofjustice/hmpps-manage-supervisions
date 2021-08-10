@@ -24,11 +24,13 @@ import { DateTime } from 'luxon'
 import { ContactTypeCategory, WellKnownContactTypeConfig } from '../../../config'
 import { BreadcrumbType, LinksService } from '../../../common/links'
 import { ConfigService } from '@nestjs/config'
+import { BreachService } from '../../../community-api/breach'
+import { Mutable } from '../../../@types/mutable'
 
 export type GetContactsOptions = Omit<
   ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
   'crn' | 'contactDateTo'
->
+> & { filter?: ActivityFilter }
 
 function getOutcomeFlags(outcome?: AppointmentOutcome): ActivityLogEntryTag[] {
   switch (outcome?.complied) {
@@ -61,14 +63,12 @@ export class ActivityService {
     private readonly contacts: ContactMappingService,
     private readonly links: LinksService,
     private readonly config: ConfigService,
+    private readonly breach: BreachService,
   ) {}
 
   async getActivityLogPage(crn: string, options: GetContactsOptions = {}): Promise<Paginated<ActivityLogEntry>> {
-    const { data } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET({
-      crn,
-      contactDateTo: DateTime.now().toUTC().toISODate(), // this endpoint does not accept offset date times.
-      ...options,
-    })
+    const resolvedOptions = await this.constructContactFilter(crn, options)
+    const { data } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET(resolvedOptions)
 
     return {
       totalPages: data.totalPages,
@@ -79,6 +79,21 @@ export class ActivityService {
       totalElements: data.totalElements,
       content: await Promise.all((data.content || []).map(contact => this.getActivityLogEntry(crn, contact))),
     }
+  }
+
+  async getActivityLogCount(crn: string, convictionId: number, filter: ActivityFilter, from: DateTime | null) {
+    // to get the appointment counts here we're using the totalElements property of the list api
+    // but requesting a single item on a single page and discarding the result.
+    const resolvedOptions = await this.constructContactFilter(crn, {
+      convictionId,
+      filter,
+      // we need to be careful to preserve a null contactDateFrom from a null lastRecentBreachEnd here
+      // as it has a special meaning: 'I already checked the last breach end date, dont check again'
+      contactDateFrom: from === null ? null : from?.toISODate(),
+      pageSize: 1,
+    })
+    const { data } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET(resolvedOptions)
+    return data.totalElements
   }
 
   async getAppointment(crn: string, appointmentId: number): Promise<AppointmentActivityLogEntry> {
@@ -104,6 +119,7 @@ export class ActivityService {
     const base = ActivityService.getActivityLogEntryBase(contact)
     return ActivityService.getCommunicationActivityLogEntry(crn, contact, meta, base)
   }
+
   private async getActivityLogEntry(crn: string, contact: ContactSummary): Promise<ActivityLogEntry> {
     const meta = await this.contacts.getTypeMeta(contact)
 
@@ -205,6 +221,7 @@ export class ActivityService {
       lastUpdatedBy: `${contact.lastUpdatedByUser.forenames} ${contact.lastUpdatedByUser.surname}`,
     }
   }
+
   private static getActivityLogEntryBase(
     contact: ContactSummary,
   ): Pick<ActivityLogEntryBase, 'id' | 'start' | 'notes' | 'sensitive'> {
@@ -216,10 +233,30 @@ export class ActivityService {
     }
   }
 
-  constructContactFilter(filter: ActivityFilter, options: GetContactsOptions): GetContactsOptions {
-    const contactDateFrom = DateTime.now().minus({ years: 1 }).toUTC().toISODate() // TODO this needs to be more sophisticated and take into consideration the date of the last breach
+  private async constructContactFilter(
+    crn: string,
+    { filter, ...options }: GetContactsOptions,
+  ): Promise<ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest> {
+    const defaultFilters: Mutable<ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest> = {
+      crn,
+      contactDateTo: DateTime.now().plus({ days: 1 }).toISODate(),
+      ...options,
+    }
 
-    const defaultFilters: GetContactsOptions = { ...options, contactDateFrom }
+    // first attempt to get default 'contact from date' from last breach
+    // this is short circuited contactDateFrom is null so client can specify not wanting to check last breach
+    if (defaultFilters.contactDateFrom === undefined && defaultFilters.convictionId) {
+      const breaches = await this.breach.getBreaches(crn, defaultFilters.convictionId, { includeOutcome: false })
+      if (breaches?.lastRecentBreachEnd) {
+        defaultFilters.contactDateFrom = breaches.lastRecentBreachEnd.toISODate()
+      }
+    }
+
+    // otherwise fallback to the last 12 months
+    // regardless of provided contactDateFrom being null, we default it to the last 12 months here
+    if (!defaultFilters.contactDateFrom) {
+      defaultFilters.contactDateFrom = DateTime.now().minus({ years: 1 }).toISODate()
+    }
 
     const defaultAppointmentFilters = { ...defaultFilters, appointmentsOnly: true, nationalStandard: true }
 
@@ -237,6 +274,8 @@ export class ActivityService {
           this.config.get<WellKnownContactTypeConfig>('contacts')[ContactTypeCategory.WarningLetter],
         )
         return { ...defaultFilters, contactTypes }
+      default:
+        return defaultFilters
     }
   }
 }

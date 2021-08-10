@@ -34,6 +34,11 @@
             active: page == 'activity',
             attributes: { 'data-qa': 'activity' }
         }, {
+            text: 'Compliance',
+            href: links.compliance,
+            active: page == 'compliance',
+            attributes: { 'data-qa': 'compliance' }
+        }, {
             text: 'Sentence',
             href: links.sentence,
             active: page == 'sentence',
@@ -45,6 +50,8 @@
             attributes: { 'data-qa': 'personal' }
         }]
     }) }}
+
+    {% block pageHeader %}{% endblock %}
 
     <h1 class='govuk-heading-l govuk-!-margin-bottom-4'>{{ pageName }}</h1>
 

@@ -2,7 +2,6 @@
   background-color: govuk-colour("light-grey");
   display: block;
   padding: govuk-spacing(2);
-  text-decoration: none;
   @include govuk-font($size: 19);
 
   @include govuk-media-query($from: desktop) {
@@ -10,12 +9,30 @@
   }
 }
 
+@mixin colorAndLinkColor($color) {
+  color: $color;
+  a {
+    color: $color;
+  }
+}
+
+
 .app-card--blue {
   background: govuk-colour("blue");
-  color: govuk-colour("white");
+  @include colorAndLinkColor(govuk-colour("white"));
 }
 
 .app-card--grey {
-  color: govuk-shade(govuk-colour("dark-grey", $legacy: "grey-1"), 30);
-  background: govuk-tint(govuk-colour("dark-grey", $legacy: "grey-1"), 90);
+  background: govuk-colour("dark-grey");
+  @include colorAndLinkColor(govuk-colour("white"));
+}
+
+.app-card--green {
+  background: govuk-colour("green");
+  @include colorAndLinkColor(govuk-colour("white"));
+}
+
+.app-card--red {
+  background: govuk-colour("red");
+  @include colorAndLinkColor(govuk-colour("white"));
 }

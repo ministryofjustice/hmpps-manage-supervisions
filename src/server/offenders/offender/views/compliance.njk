@@ -1,0 +1,193 @@
+{% extends "./_layout.njk" %}
+{% set pageName = 'Compliance' %}
+{% from 'components/summary-card.njk' import appSummaryCard %}
+
+{% macro maybeLink(value) %}
+    {% if value.link %}
+        <a href='{{ value.link }}'>{{ value.name }}</a>
+    {% else %}
+        {{ value.name }}
+    {% endif %}
+{% endmacro %}
+
+{% block pageHeader %}
+    {% if compliance.current.activeBreach.active and compliance.current.activeBreach.additionalActiveBreaches > 0 %}
+        {% set multipleBreachWarning %}
+            There are multiple breach NSIs in progress on Delius.<br>
+            Use Delius to check and correct any problems.<br>
+            <a href='/offender/{{ids.crn}}/to-delius'>Go to Delius</a>
+        {% endset %}
+        {{ govukWarningText({ html: multipleBreachWarning, iconFallbackText: "Warning" }) }}
+    {% endif %}
+{% endblock %}
+
+{% block page %}
+    {% if compliance.current %}
+
+        {{ govukButton({
+            text: 'Start a breach',
+            isStartButton: true,
+            href: '#TODO',
+            attributes: {
+                'data-qa': 'offender/compliance/start-breach'
+            }
+        }) }}
+
+        <div class="app-card app-card--{{ compliance.current.status.alertLevel }} govuk-!-margin-bottom-0 govuk-!-padding-3 govuk-!-font-weight-bold" data-qa='offender/compliance/current-status'>
+            {{ compliance.current.status.description }}
+            {% if compliance.current.status.value === 'pending-breach' and not compliance.current.inBreach %}
+                – <a href='#TODO'>Start a breach</a>
+            {% endif %}
+        </div>
+
+        {% if compliance.current.previousBreaches.length > 0 %}
+            {% set previousBreaches %}
+                <ul class='govuk-list'>
+                {% for breach in compliance.current.previousBreaches %}
+                    <li>
+                    <a href='#TODO'>{{ breach.outcome if breach.outcome else 'Outcome unknown' }}</a>
+                    <br>
+                    {% if breach.endDate %}
+                        Resolved {{ breach.endDate | shortDate }}
+                    {% else %}
+                        Resolved date unknown
+                    {% endif %}
+                    </li>
+                {% endfor %}
+                </ul>
+            {% endset %}
+        {% endif %}
+
+        <div class='app-summary-card-deck govuk-!-margin-bottom-6'>
+            {% call appSummaryCard({ titleText: 'Sentence', classes: 'app-summary-card--large-title' }) -%}
+            {{ govukSummaryList({
+                rows: [
+                    {
+                        key: { text: "Main offence" },
+                        value: { text: compliance.current.mainOffence }
+                    },
+                    {
+                        key: { text: "Order" },
+                        value: { text: compliance.current.name + (' (' + compliance.current.progress + ' elapsed)' if compliance.current.progress) }
+                    },
+                    {
+                        key: { text: "Start date" },
+                        value: { text: compliance.current.startDate | shortDate }
+                    },
+                    {
+                        key: { text: "Previous breaches" if compliance.current.status.value === 'in-breach' else "Breaches" },
+                        value: { html: previousBreaches if previousBreaches else 'None' }
+                    }
+                ]
+            }) }}
+            {%- endcall %}
+
+            {% if compliance.current.activeBreach %}
+                {% call appSummaryCard({ titleText: 'Breach details', classes: 'app-summary-card--large-title' }) -%}
+                {{ govukSummaryList({
+                    rows: [
+                        {
+                            key: { text: "Breach started" },
+                            value: { text: compliance.current.activeBreach.startDate | shortDate }
+                        },
+                        {
+                            key: { text: "Status" },
+                            value: { text: compliance.current.activeBreach.status if compliance.current.activeBreach.status else 'Unknown' }
+                        }
+                    ]
+                }) }}
+                {%- endcall %}
+            {% endif %}
+
+            {% if compliance.current.requirement %}
+                {% set requirementTitle %}
+                    <span class="govuk-!-font-size-19 govuk-!-font-weight-regular">Requirement</span>
+                    <br>
+                    <span data-qa='offender/compliance/requirement-name'>{{ compliance.current.requirement }}</span>
+                    {% if compliance.current.period === 'since last breach' %}
+                        <br>
+                        <span class="govuk-!-font-size-19 govuk-!-font-weight-regular" data-qa='offender/compliance/compliance-since-last-breach'>
+                            Showing compliance since previous breach
+                        </span>
+                    {% endif %}
+                {% endset %}
+                {% set compliancePeriod = ' ' + compliance.current.period if compliance.current.period !== 'since last breach' %}
+                {% call appSummaryCard({ titleHtml: requirementTitle, classes: 'app-summary-card--large-title' }) -%}
+                {{ govukSummaryList({
+                    rows: [
+                        {
+                            key: { text: "Appointments" },
+                            value: { html: maybeLink(compliance.current.appointments.total)  }
+                        },
+                        {
+                            key: { text: "Complied" },
+                            value: { html: maybeLink(compliance.current.appointments.complied)  }
+                        },
+                        {
+                            key: { text: "Failures to comply" + compliancePeriod },
+                            value: { html: maybeLink(compliance.current.appointments.failureToComply)  }
+                        },
+                        {
+                            key: { text: "Acceptable absences" },
+                            value: { html: maybeLink(compliance.current.appointments.acceptableAbsences)  }
+                        }
+                    ]
+                }) }}
+                {%- endcall %}
+            {% endif %}
+        </div>
+
+    {% else %}
+        {{ govukWarningText({
+            attributes: { 'data-qa': 'offender/compliance/no-current-conviction' },
+            text: "Current compliance details are unavailable.",
+            iconFallbackText: "Warning"
+        }) }}
+    {% endif %}
+
+    <h2 class="govuk-heading-m govuk-!-font-size-27 govuk-!-margin-bottom-5" data-qa='offender/compliance/previous-orders-title'>
+        Previous orders ({{ compliance.previousFrom | monthDate }} to present)
+    </h2>
+
+    {% if compliance.previous.length > 0 %}
+        {% for previous in compliance.previous %}
+            {% if previous.allBreaches.length %}
+                {% set breaches %}
+                    <ul class='govuk-list'>
+                        {% for breach in previous.allBreaches %}
+                            <li>{{ breach.outcome if breach.outcome else breach.status }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endset %}
+            {% endif %}
+            {% call appSummaryCard({ titleText: previous.name + (' (Ended ' + previous.endDate | shortDate + ')' if previous.endDate), classes: 'govuk-!-margin-bottom-6' }) -%}
+            {{ govukSummaryList({
+                rows: [
+                    {
+                        key: { text: "Main offence" },
+                        value: { text: previous.mainOffence if previous.mainOffence else 'Unknown' }
+                    },
+                    {
+                        key: { text: "Status" },
+                        value: { text: previous.terminationReason if previous.terminationReason else 'Unknown' }
+                    },
+                    {
+                        key: { text: "Started" },
+                        value: { text: previous.startDate | shortDate }
+                    },
+                    {
+                        key: { text: "Ended" },
+                        value: { text: previous.endDate | shortDate if previous.endDate else 'Unknown' }
+                    },
+                    {
+                        key: { text: "Breaches" },
+                        value: { html: breaches if breaches else 'None' }
+                    }
+                ]
+            }) }}
+            {%- endcall %}
+        {% endfor %}
+    {% else %}
+        <p class='govuk-body' data-qa='offender/compliance/no-previous-convictions'>No previous orders.</p>
+    {% endif %}
+{% endblock %}

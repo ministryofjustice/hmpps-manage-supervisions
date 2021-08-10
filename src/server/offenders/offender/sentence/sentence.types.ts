@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
 import { PotentiallyExpectedDateTime } from '../../../util'
+import { BreachSummary } from '../../../community-api/breach'
 
 export interface ConvictionOffence {
   id: string
@@ -73,4 +74,69 @@ export interface ConvictionDetails {
   offence?: ConvictionOffence
   sentence?: ConvictionSentenceDetail
   requirements: ConvictionRequirement[]
+}
+
+export interface ComplianceActiveBreachSummary extends BreachSummary {
+  active: true
+  additionalActiveBreaches: number
+}
+
+export interface ComplianceConvictionSummary {
+  name: string
+  progress?: string
+  mainOffence: string
+  startDate: DateTime
+  endDate?: DateTime
+  terminationReason?: string
+  length: string
+  inBreach: boolean
+  activeBreach?: ComplianceActiveBreachSummary
+  previousBreaches: BreachSummary[]
+  allBreaches: BreachSummary[]
+  lastRecentBreachEnd?: DateTime
+}
+
+export enum ComplianceStatus {
+  Clean = 'clean',
+  FailureToComply = 'failure-to-comply',
+  InBreach = 'in-breach',
+  PendingBreach = 'pending-breach',
+  PreviousBreach = 'previous-breach',
+}
+
+export enum ComplianceStatusAlertLevel {
+  Danger = 'red',
+  Warning = 'grey',
+  Success = 'green',
+}
+
+export interface ComplianceQuantity {
+  name: string
+  link?: string
+}
+
+export enum CompliancePeriod {
+  Last12Months = 'within 12 months',
+  SinceLastBreach = 'since last breach',
+}
+export interface CurrentComplianceConvictionSummary extends ComplianceConvictionSummary {
+  requirement: string
+  period: CompliancePeriod
+  appointments: {
+    total: ComplianceQuantity
+    complied: ComplianceQuantity
+    acceptableAbsences: ComplianceQuantity
+    failureToComply: ComplianceQuantity
+  }
+  status: {
+    value: ComplianceStatus
+    alertLevel: ComplianceStatusAlertLevel
+    description: string
+  }
+}
+
+export interface ComplianceDetails {
+  current?: CurrentComplianceConvictionSummary
+  previous: ComplianceConvictionSummary[]
+  previousFrom: DateTime
 }

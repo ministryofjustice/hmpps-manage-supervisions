@@ -1,5 +1,5 @@
 import { ActivityFilter, ActivityLogEntry } from './activity'
-import { ConvictionDetails } from './sentence'
+import { ComplianceDetails, ConvictionDetails } from './sentence'
 import { AppointmentSummary, RecentAppointments } from './schedule'
 import { RegistrationFlag, Risks } from './risk/risk.types'
 import { GetPersonalDetailsResult } from './personal'
@@ -11,6 +11,7 @@ export enum OffenderPage {
   Activity = 'activity',
   Personal = 'personal',
   Sentence = 'sentence',
+  Compliance = 'compliance',
 }
 
 export type OffenderPageLinks = { [Page in OffenderPage]: string }
@@ -67,9 +68,15 @@ export interface OffenderSentenceViewModel extends OffenderViewModelBase {
   conviction?: ConvictionDetails
 }
 
+export interface OffenderComplianceViewModel extends OffenderViewModelBase {
+  page: OffenderPage.Compliance
+  compliance: ComplianceDetails
+}
+
 export type OffenderViewModel =
   | OffenderOverviewViewModel
   | OffenderScheduleViewModel
   | OffenderActivityViewModel
   | OffenderPersonalViewModel
   | OffenderSentenceViewModel
+  | OffenderComplianceViewModel

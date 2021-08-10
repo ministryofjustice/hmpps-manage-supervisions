@@ -1,7 +1,7 @@
 import { PageBase } from './page'
 import { SummaryList } from './components/summary-list'
 
-export type TABS = 'overview' | 'schedule' | 'activity' | 'personal' | 'sentence'
+export type TABS = 'overview' | 'schedule' | 'activity' | 'personal' | 'sentence' | 'compliance'
 export type TABLE = 'future' | 'recent'
 export type COL = 'date' | 'time' | 'appointment'
 
@@ -162,6 +162,50 @@ export class OffenderPage extends PageBase {
 
       probationHistory(callback: (card: SummaryList) => void) {
         SummaryList.selectFromCard('Probation history', callback)
+      },
+    }
+  }
+
+  get compliance() {
+    return {
+      get startBreachButton() {
+        return cy.get('[data-qa="offender/compliance/start-breach"]')
+      },
+
+      get noCurrentConvictionWarning() {
+        return cy.get('[data-qa="offender/compliance/no-current-conviction"]')
+      },
+
+      get noPreviousConvictionsWarning() {
+        return cy.get('[data-qa="offender/compliance/no-previous-convictions"]')
+      },
+
+      get previousOrdersTitle() {
+        return cy.get('[data-qa="offender/compliance/previous-orders-title"]')
+      },
+
+      get currentStatus() {
+        return cy.get('[data-qa="offender/compliance/current-status"]')
+      },
+
+      sentence(callback: (card: SummaryList) => void) {
+        return SummaryList.selectFromCard('Sentence', callback)
+      },
+
+      breachDetails(callback: (card: SummaryList) => void) {
+        return SummaryList.selectFromCard('Breach details', callback)
+      },
+
+      requirement(callback: (card: SummaryList) => void) {
+        return SummaryList.selectFromCard('Requirement', callback)
+      },
+
+      get requirementName() {
+        return cy.get('[data-qa="offender/compliance/requirement-name"]')
+      },
+
+      get sinceLastBreachMessage() {
+        return cy.get('[data-qa="offender/compliance/compliance-since-last-breach"]')
       },
     }
   }

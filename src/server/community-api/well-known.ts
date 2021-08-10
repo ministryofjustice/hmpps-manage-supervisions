@@ -5,3 +5,7 @@ export enum WellKnownAddressTypes {
   Previous = 'P',
   Secondary = 'S',
 }
+
+export enum NsiType {
+  BreachRequest = 'BRE',
+}

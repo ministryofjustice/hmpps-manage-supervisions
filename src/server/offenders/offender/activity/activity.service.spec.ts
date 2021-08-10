@@ -1,18 +1,17 @@
 import { Test } from '@nestjs/testing'
-import { ActivityService, GetContactsOptions } from './activity.service'
+import { ActivityService } from './activity.service'
 import { DateTime, Settings } from 'luxon'
 import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
-import * as faker from 'faker'
 import {
   ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
   ContactSummary,
 } from '../../../community-api/client'
 import {
-  CommunityApiService,
-  Paginated,
-  ContactMappingService,
   AppointmentMetaResult,
   CommunicationMetaResult,
+  CommunityApiService,
+  ContactMappingService,
+  Paginated,
 } from '../../../community-api'
 import { ContactTypeCategory } from '../../../config'
 import { fakeAppointmentDetail, fakeContactSummary, fakePaginated } from '../../../community-api/community-api.fake'
@@ -20,29 +19,36 @@ import { fakeOkResponse } from '../../../common/rest/rest.fake'
 import {
   ActivityFilter,
   ActivityLogEntry,
-  ActivityLogEntryTag,
-  CommunicationActivityLogEntry,
   AppointmentActivityLogEntry,
+  CommunicationActivityLogEntry,
+  UnknownActivityLogEntry,
 } from './activity.types'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../../community-api/community-api.mock'
 import { fakeBreadcrumbUrl, MockLinksModule } from '../../../common/links/links.mock'
 import { BreadcrumbType } from '../../../common/links'
 import { merge } from 'lodash'
 import { FakeConfigModule } from '../../../config/config.fake'
+import { BreachService } from '../../../community-api/breach'
 
 describe('ActivityService', () => {
   let subject: ActivityService
   let community: MockCommunityApiService
   let contactMapping: SinonStubbedInstance<ContactMappingService>
-  const now = DateTime.now()
+  let breachService: SinonStubbedInstance<BreachService>
+  const now = DateTime.fromObject({ year: 2020, month: 3, day: 1 })
 
   beforeEach(async () => {
     Settings.now = () => now.valueOf()
 
     contactMapping = createStubInstance(ContactMappingService)
+    breachService = createStubInstance(BreachService)
 
     const module = await Test.createTestingModule({
-      providers: [ActivityService, { provide: ContactMappingService, useValue: contactMapping }],
+      providers: [
+        ActivityService,
+        { provide: ContactMappingService, useValue: contactMapping },
+        { provide: BreachService, useValue: breachService },
+      ],
       imports: [MockCommunityApiModule.register(), MockLinksModule, FakeConfigModule.register()],
     }).compile()
 
@@ -81,7 +87,7 @@ describe('ActivityService', () => {
 
     expect(observed).toEqual({
       id: 91747,
-      category: 'Previous appointment',
+      category: 'Future appointment',
       start: DateTime.fromObject({ year: 2020, month: 7, day: 13, hour: 12 }),
       end: DateTime.fromObject({ year: 2020, month: 7, day: 13, hour: 13 }),
       name: 'Some appointment with some staff member',
@@ -110,229 +116,325 @@ describe('ActivityService', () => {
     } as AppointmentActivityLogEntry)
   })
 
-  it('gets activity log page', async () => {
-    const start = DateTime.fromJSDate(faker.date.past()).set({ hour: 12, minute: 0, second: 0, millisecond: 0 })
-    const end = start.plus({ hour: 1 })
-    const contacts: ContactSummary[] = []
-    const lastUpdatedDateTime = DateTime.fromJSDate(faker.date.past()).set({
-      hour: 12,
-      minute: 0,
-      second: 0,
-      millisecond: 0,
-    })
-    const lastUpdatedBy = { forenames: faker.datatype.string(), surname: faker.datatype.string() }
+  describe('activity log filters', () => {
+    let stub: ReturnType<typeof havingContacts>
 
-    function havingContact(
-      partial: DeepPartial<ContactSummary> & { notes: string },
-      type: ContactTypeCategory | null,
-      lastUpdatedDateTime: DateTime | null,
-      lastUpdatedByUser: { forenames: string; surname: string } | null,
-      meta: any = {},
+    function havingContacts() {
+      return community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET.resolves(
+        fakeOkResponse(fakePaginated([])),
+      )
+    }
+
+    function shouldHaveFilteredContacts(
+      expected: Omit<ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest, 'crn'>,
     ) {
-      const contact = fakeContactSummary(
-        merge(
+      expect(stub.getCall(0).firstArg).toEqual({
+        crn: 'some-crn',
+        contactDateFrom: '2019-03-01',
+        contactDateTo: '2020-03-02',
+        ...expected,
+      } as ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest)
+    }
+
+    function havingLastBreachEnd(value: DateTime | null) {
+      breachService.getBreaches
+        .withArgs('some-crn', 1, match({ includeOutcome: false }))
+        .resolves({ breaches: [], lastRecentBreachEnd: value })
+    }
+
+    beforeEach(() => {
+      stub = havingContacts()
+    })
+
+    it('gets unfiltered contacts & falls back to last 12 months when no breach', async () => {
+      havingLastBreachEnd(null)
+      await subject.getActivityLogPage('some-crn', { convictionId: 1 })
+      shouldHaveFilteredContacts({ convictionId: 1 })
+    })
+
+    it('filters appointments', async () => {
+      await subject.getActivityLogPage('some-crn', { filter: ActivityFilter.Appointments })
+      shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true })
+    })
+
+    it('filters complied appointments', async () => {
+      await subject.getActivityLogPage('some-crn', { filter: ActivityFilter.CompliedAppointments })
+      shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true, attended: true, complied: true })
+    })
+
+    it('filters acceptable absence appointments', async () => {
+      await subject.getActivityLogPage('some-crn', { filter: ActivityFilter.AcceptableAbsenceAppointments })
+      shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true, attended: false, complied: true })
+    })
+
+    it('filters failed to comply appointments', async () => {
+      await subject.getActivityLogPage('some-crn', { filter: ActivityFilter.FailedToComplyAppointments })
+      shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true, complied: false })
+    })
+
+    it('filters warning letter contacts', async () => {
+      await subject.getActivityLogPage('some-crn', { filter: ActivityFilter.WarningLetters })
+      shouldHaveFilteredContacts({ contactTypes: ['AWLI', 'AWL2', 'AWLF', 'AWLS', 'C040', 'CLBR', 'CBRC', 'CLOB'] })
+    })
+
+    it('filters appointments from last breach end', async () => {
+      havingLastBreachEnd(DateTime.fromObject({ year: 2018, month: 5, day: 6 }))
+      await subject.getActivityLogPage('some-crn', { filter: ActivityFilter.Appointments, convictionId: 1 })
+      shouldHaveFilteredContacts({
+        appointmentsOnly: true,
+        nationalStandard: true,
+        contactDateFrom: '2018-05-06',
+        convictionId: 1,
+      })
+    })
+
+    it('filters appointments from specified date', async () => {
+      havingLastBreachEnd(DateTime.fromObject({ year: 2018, month: 5, day: 6 }))
+      await subject.getActivityLogPage('some-crn', {
+        filter: ActivityFilter.Appointments,
+        convictionId: 1,
+        contactDateFrom: '2018-04-05',
+      })
+      shouldHaveFilteredContacts({
+        appointmentsOnly: true,
+        nationalStandard: true,
+        contactDateFrom: '2018-04-05',
+        convictionId: 1,
+      })
+    })
+  })
+
+  describe('activity log page', () => {
+    function havingContacts(
+      ...partials: (DeepPartial<ContactSummary> & { notes: string; type: ContactTypeCategory | null; meta?: any })[]
+    ) {
+      const contacts = partials.map(({ type, meta, ...partial }, i) => {
+        const contact = fakeContactSummary([
           {
-            contactId: contacts.length + 1,
-            contactStart: start.toISO(),
-            contactEnd: end.toISO(),
+            contactStart: '2018-01-01T12:00:00',
+            contactEnd: '2018-01-01T13:00:00',
+            contactId: i + 1,
             sensitive: false,
             outcome: {
               complied: true,
               attended: true,
               description: 'Some outcome',
             },
-          },
-          {
-            lastUpdatedDateTime: lastUpdatedDateTime,
-            lastUpdatedByUser: lastUpdatedByUser,
+            lastUpdatedByUser: { forenames: 'Some', surname: 'User' },
+            lastUpdatedDateTime: '2018-04-01T12:00:00',
           },
           partial,
-        ),
-      )
-      contacts.push(contact)
-      contactMapping.getTypeMeta.withArgs(contact).returns(
-        Promise.resolve({
+        ])
+        contactMapping.getTypeMeta.withArgs(contact).resolves({
           name: `some ${contact.notes}`,
-          type,
+          type: type,
           value: { ...meta, name: 'Some type' },
-        }),
+        })
+        return contact
+      })
+
+      community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET.resolves(
+        fakeOkResponse(fakePaginated(contacts)),
       )
     }
 
-    havingContact(
-      {
+    function shouldReturnAppointment(
+      observed: Paginated<ActivityLogEntry>,
+      expected: DeepPartial<AppointmentActivityLogEntry>,
+    ) {
+      expect(observed.content).toEqual([
+        merge(
+          {
+            id: 1,
+            type: ContactTypeCategory.Appointment,
+            category: 'Previous appointment',
+            start: DateTime.fromObject({ year: 2018, month: 1, day: 1, hour: 12 }),
+            end: DateTime.fromObject({ year: 2018, month: 1, day: 1, hour: 13 }),
+            links: {
+              addNotes: '/offender/some-crn/appointment/1/add-notes',
+              recordMissingAttendance: null,
+              view: fakeBreadcrumbUrl(BreadcrumbType.Appointment, { crn: 'some-crn', id: 1 }),
+            },
+            name: `some ${expected.notes}`,
+            outcome: {
+              attended: true,
+              complied: true,
+              description: 'Some outcome',
+            },
+            rarActivity: false,
+            requirement: null,
+            sensitive: false,
+            tags: [],
+            typeName: 'Some type',
+          } as ActivityLogEntry,
+          expected,
+        ),
+      ])
+    }
+
+    function shouldReturnCommunication(
+      observed: Paginated<ActivityLogEntry>,
+      expected: DeepPartial<CommunicationActivityLogEntry>,
+    ) {
+      expect(observed.content).toEqual([
+        merge(
+          {
+            id: 1,
+            type: ContactTypeCategory.Communication,
+            category: 'Other communication',
+            start: DateTime.fromObject({ year: 2018, month: 1, day: 1, hour: 12 }),
+            links: {
+              addNotes: '/offender/some-crn/activity/communication/1/add-notes',
+              view: '/offender/some-crn/activity/communication/1',
+            },
+            name: `some ${expected.notes}`,
+            sensitive: false,
+            tags: [],
+            typeName: 'Some type',
+            lastUpdatedBy: 'Some User',
+            lastUpdatedDateTime: DateTime.fromObject({ year: 2018, month: 4, day: 1, hour: 12 }),
+          } as ActivityLogEntry,
+          expected,
+        ),
+      ])
+    }
+
+    function shouldReturnUnknown(
+      observed: Paginated<ActivityLogEntry>,
+      expected: DeepPartial<UnknownActivityLogEntry>,
+    ) {
+      expect(observed.content).toEqual([
+        merge(
+          {
+            id: 1,
+            type: ContactTypeCategory.Other,
+            category: 'Unclassified contact',
+            start: DateTime.fromObject({ year: 2018, month: 1, day: 1, hour: 12 }),
+            links: null,
+            name: `some ${expected.notes}`,
+            sensitive: false,
+            tags: [],
+            typeName: 'Some type',
+          } as ActivityLogEntry,
+          expected,
+        ),
+      ])
+    }
+
+    it('gets well known, complied RAR appointment', async () => {
+      havingContacts({
+        type: ContactTypeCategory.Appointment,
         notes: 'well known, complied RAR appointment',
         outcome: { complied: true, attended: true },
         rarActivity: true,
-      },
-      ContactTypeCategory.Appointment,
-      null,
-      null,
-    )
-    havingContact(
-      {
+      })
+
+      const observed = await subject.getActivityLogPage('some-crn')
+
+      shouldReturnAppointment(observed, {
+        notes: 'well known, complied RAR appointment',
+        rarActivity: true,
+        tags: [
+          { colour: 'purple', name: 'rar' },
+          { colour: 'green', name: 'complied' },
+        ],
+      })
+    })
+
+    it('gets well known, not complied sensitive appointment', async () => {
+      havingContacts({
+        type: ContactTypeCategory.Appointment,
         notes: 'well known, not complied sensitive appointment',
         outcome: { complied: false, attended: true },
         sensitive: true,
-      },
-      ContactTypeCategory.Appointment,
-      null,
-      null,
-    )
-    havingContact({ notes: 'other appointment, not recorded', outcome: null }, null, null, null, {
-      appointment: true,
+      })
+
+      const observed = await subject.getActivityLogPage('some-crn')
+
+      shouldReturnAppointment(observed, {
+        notes: 'well known, not complied sensitive appointment',
+        outcome: { complied: false },
+        sensitive: true,
+        tags: [
+          { colour: 'grey', name: 'sensitive' },
+          { colour: 'red', name: 'failed to comply' },
+        ],
+      })
     })
-    havingContact(
-      { notes: 'well known communication' },
-      ContactTypeCategory.Communication,
-      lastUpdatedDateTime,
-      lastUpdatedBy,
-    )
-    havingContact({ notes: 'unknown' }, null, null, null, { appointment: false })
-    havingContact(
-      {
+
+    it('gets well known, unacceptable absence appointment', async () => {
+      havingContacts({
+        type: ContactTypeCategory.Appointment,
         notes: 'well known, unacceptable absence appointment',
         outcome: { complied: false, attended: false },
-      },
-      ContactTypeCategory.Appointment,
-      null,
-      null,
-    )
-    havingContact(
-      {
+      })
+
+      const observed = await subject.getActivityLogPage('some-crn')
+
+      shouldReturnAppointment(observed, {
+        notes: 'well known, unacceptable absence appointment',
+        outcome: { attended: false, complied: false },
+        tags: [{ colour: 'red', name: 'unacceptable absence' }],
+      })
+    })
+
+    it('gets well known, acceptable absence appointment', async () => {
+      havingContacts({
+        type: ContactTypeCategory.Appointment,
         notes: 'well known, acceptable absence appointment',
         outcome: { complied: true, attended: false },
-      },
-      ContactTypeCategory.Appointment,
-      null,
-      null,
-    )
+      })
 
-    const stub = community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET.resolves(
-      fakeOkResponse(fakePaginated(contacts)),
-    )
+      const observed = await subject.getActivityLogPage('some-crn')
 
-    const observed = await subject.getActivityLogPage('some-crn', { appointmentsOnly: true })
+      shouldReturnAppointment(observed, {
+        notes: 'well known, acceptable absence appointment',
+        outcome: { attended: false, complied: true },
+        tags: [{ colour: 'green', name: 'acceptable absence' }],
+      })
+    })
 
-    function expectedAppointment(
-      id: number,
-      notes: string,
-      tags: ActivityLogEntryTag[],
-      {
-        rarActivity = false,
-        recorded = true,
-        sensitive = false,
-        outcome = { complied: true, attended: true },
-      }: {
-        rarActivity?: boolean
-        recorded?: boolean
-        sensitive?: boolean
-        outcome?: { complied: boolean; attended: boolean }
-      } = {},
-    ): ActivityLogEntry {
-      return {
-        id,
+    it('gets other appointment, not recorded', async () => {
+      havingContacts({
         type: ContactTypeCategory.Appointment,
-        name: `some ${notes}`,
-        start,
-        end,
-        notes,
-        tags,
+        notes: 'other appointment, not recorded',
+        outcome: null,
+      })
+
+      const observed = await subject.getActivityLogPage('some-crn')
+
+      shouldReturnAppointment(observed, {
+        notes: 'other appointment, not recorded',
         links: {
-          view: fakeBreadcrumbUrl(BreadcrumbType.Appointment, { id, crn: 'some-crn' }),
-          addNotes: `/offender/some-crn/appointment/${id}/add-notes`,
-          recordMissingAttendance: recorded ? null : `/offender/some-crn/appointment/${id}/record-outcome`,
+          recordMissingAttendance: '/offender/some-crn/appointment/1/record-outcome',
         },
-        category: 'Previous appointment',
-        sensitive,
-        typeName: 'Some type',
-        requirement: null,
-        outcome: outcome
-          ? {
-              ...outcome,
-              description: 'Some outcome',
-            }
-          : null,
-        rarActivity,
-      }
-    }
+        outcome: null,
+      })
+    })
 
-    expect(observed).toEqual({
-      totalPages: 1,
-      first: true,
-      last: false,
-      number: 0,
-      size: 7,
-      totalElements: 7,
-      content: [
-        expectedAppointment(
-          1,
-          'well known, complied RAR appointment',
-          [
-            { colour: 'purple', name: 'rar' },
-            { colour: 'green', name: 'complied' },
-          ],
-          { rarActivity: true, outcome: { complied: true, attended: true } },
-        ),
-        expectedAppointment(
-          2,
-          'well known, not complied sensitive appointment',
-          [
-            { colour: 'grey', name: 'sensitive' },
-            { colour: 'red', name: 'failed to comply' },
-          ],
-          { sensitive: true, outcome: { complied: false, attended: true } },
-        ),
-        expectedAppointment(3, 'other appointment, not recorded', [], { recorded: false, outcome: null }),
-        {
-          id: 4,
-          type: ContactTypeCategory.Communication,
-          name: 'some well known communication',
-          category: 'Other communication',
-          sensitive: false,
-          typeName: 'Some type',
-          start,
-          notes: 'well known communication',
-          lastUpdatedBy: `${lastUpdatedBy.forenames} ${lastUpdatedBy.surname}`,
-          lastUpdatedDateTime,
-          tags: [],
-          links: {
-            view: `/offender/some-crn/activity/communication/4`,
-            addNotes: `/offender/some-crn/activity/communication/4/add-notes`,
-          },
-        },
-        {
-          id: 5,
-          type: ContactTypeCategory.Other,
-          name: 'some unknown',
-          category: 'Unclassified contact',
-          sensitive: false,
-          typeName: 'Some type',
-          start,
-          notes: 'unknown',
-          tags: [],
-          links: null,
-        },
-        expectedAppointment(
-          6,
-          'well known, unacceptable absence appointment',
-          [{ colour: 'red', name: 'unacceptable absence' }],
-          { outcome: { complied: false, attended: false } },
-        ),
-        expectedAppointment(
-          7,
-          'well known, acceptable absence appointment',
-          [{ colour: 'green', name: 'acceptable absence' }],
-          { outcome: { complied: true, attended: false } },
-        ),
-      ],
-    } as Paginated<ActivityLogEntry>)
+    it('gets well known communication', async () => {
+      havingContacts({
+        type: ContactTypeCategory.Communication,
+        notes: 'well known communication',
+      })
 
-    expect(stub.getCall(0).firstArg).toEqual({
-      crn: 'some-crn',
-      appointmentsOnly: true,
-      contactDateTo: now.toUTC().toISODate(),
-    } as ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest)
+      const observed = await subject.getActivityLogPage('some-crn')
+
+      shouldReturnCommunication(observed, {
+        notes: 'well known communication',
+      })
+    })
+
+    it('gets unknown contact', async () => {
+      havingContacts({
+        type: ContactTypeCategory.Other,
+        notes: 'unknown contact',
+      })
+
+      const observed = await subject.getActivityLogPage('some-crn')
+
+      shouldReturnUnknown(observed, { notes: 'unknown contact' })
+    })
   })
 
   it('gets a communication contact', async () => {
@@ -375,43 +477,5 @@ describe('ActivityService', () => {
         view: '/offender/some-crn/activity/communication/111',
       },
     } as CommunicationActivityLogEntry)
-  })
-
-  describe('activity page filter', () => {
-    const basicAppointmentFilters = {
-      convictionId: 1,
-      appointmentsOnly: true,
-      contactDateFrom: now.minus({ years: 1 }).toUTC().toISODate(),
-      nationalStandard: true,
-    }
-
-    it('creates appointment filter', () => {
-      const observed = subject.constructContactFilter(ActivityFilter.Appointments, { convictionId: 1 })
-      expect(observed).toEqual(basicAppointmentFilters as GetContactsOptions)
-    })
-
-    it('creates complied appointment filter', () => {
-      const observed = subject.constructContactFilter(ActivityFilter.CompliedAppointments, { convictionId: 1 })
-      expect(observed).toEqual({ ...basicAppointmentFilters, attended: true, complied: true } as GetContactsOptions)
-    })
-
-    it('creates acceptable absence appointment filter', () => {
-      const observed = subject.constructContactFilter(ActivityFilter.AcceptableAbsenceAppointments, { convictionId: 1 })
-      expect(observed).toEqual({ ...basicAppointmentFilters, attended: false, complied: true } as GetContactsOptions)
-    })
-
-    it('creates FTC appointment filter', () => {
-      const observed = subject.constructContactFilter(ActivityFilter.FailedToComplyAppointments, { convictionId: 1 })
-      expect(observed).toEqual({ ...basicAppointmentFilters, complied: false } as GetContactsOptions)
-    })
-
-    it('creates warning letter filter', () => {
-      const observed = subject.constructContactFilter(ActivityFilter.WarningLetters, { convictionId: 1 })
-      expect(observed).toEqual({
-        convictionId: 1,
-        contactDateFrom: now.minus({ years: 1 }).toUTC().toISODate(),
-        contactTypes: ['AWLI', 'AWL2', 'AWLF', 'AWLS', 'C040', 'CLBR', 'CBRC', 'CLOB'],
-      } as GetContactsOptions)
-    })
   })
 })

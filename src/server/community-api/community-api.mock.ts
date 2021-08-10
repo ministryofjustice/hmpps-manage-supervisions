@@ -26,6 +26,7 @@ export class MockCommunityApiModule {
       personalCircumstances: createStubInstance(PersonalCircumstancesApi),
       contactAndAttendance: createStubInstance(ContactAndAttendanceApi),
       risks: createStubInstance(RisksAndRegistrationsApi),
+      breach: createStubInstance(SentenceRequirementsAndBreachApi),
     }
 
     return {
