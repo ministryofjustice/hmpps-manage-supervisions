@@ -53,3 +53,9 @@ we need to get our data into that system, we will be able to use the raw logs st
 Logs are only retained for [30 days](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/logging-an-app/log-collection-and-storage.html#application-log-collection-and-storage) in Kibana. This is insufficient for audit purposes,
 so the S3 bucket will be the "channel of record" for our auditable logs. Both Kibana and AppInsights will only be used for
 debugging and short-term monitoring of the service.
+
+## References
+
+* [MoJ Security Guidance](https://security-guidance.service.justice.gov.uk/#cyber-and-technical-security-guidance)
+* [NCSC Introduction to logging for security purposes](https://www.ncsc.gov.uk/guidance/introduction-logging-security-purposes)
+* [NIST Guide to Computer Security Log Management](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-92.pdf)
