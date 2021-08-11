@@ -19,6 +19,8 @@ import { fakeComplianceConvictionSummary, fakeConvictionRequirement } from './se
 import { Conviction } from '../../../community-api/client'
 import { ComplianceService } from './compliance.service'
 import { ActivityFilter, ActivityService } from '../activity'
+import { BreachService } from '../../../community-api/breach'
+import { fakeBreachSummary } from '../../../community-api/breach/breach.fake'
 
 describe('SentenceService', () => {
   let subject: SentenceService
@@ -26,18 +28,20 @@ describe('SentenceService', () => {
   let requirementService: SinonStubbedInstance<RequirementService>
   let complianceService: SinonStubbedInstance<ComplianceService>
   let activityService: SinonStubbedInstance<ActivityService>
+  let breachService: SinonStubbedInstance<BreachService>
 
   beforeEach(async () => {
     requirementService = createStubInstance(RequirementService)
     complianceService = createStubInstance(ComplianceService)
     activityService = createStubInstance(ActivityService)
-
+    breachService = createStubInstance(BreachService)
     const module = await Test.createTestingModule({
       providers: [
         SentenceService,
         { provide: RequirementService, useValue: requirementService },
         { provide: ComplianceService, useValue: complianceService },
         { provide: ActivityService, useValue: activityService },
+        { provide: BreachService, useValue: breachService },
       ],
       imports: [MockCommunityApiModule.register()],
     }).compile()
@@ -52,6 +56,16 @@ describe('SentenceService', () => {
       .withArgs({ crn: 'some-crn' })
       .resolves(fakeOkResponse(convictions))
     return convictions
+  }
+  function havingBreaches(convictionId: number) {
+    const activeBreach = fakeBreachSummary({ active: true })
+    const inactiveBreaches = [fakeBreachSummary({ active: false, proven: true }), fakeBreachSummary({ active: false })]
+    const breachesResult = {
+      breaches: [activeBreach, ...inactiveBreaches],
+      lastRecentBreachEnd: DateTime.fromObject({ year: 2018, month: 2, day: 1 }),
+    }
+    breachService.getBreaches.withArgs('some-crn', convictionId).resolves(breachesResult)
+    return breachesResult
   }
 
   function havingRequirements(convictionId: number, ...partials: DeepPartial<ConvictionRequirement>[]) {
@@ -110,18 +124,23 @@ describe('SentenceService', () => {
           }),
         ],
       },
-      { active: false, convictionDate: '2019-01-02' },
+      { active: false, convictionDate: '2019-01-02', convictionId: 101 },
+      { active: false, convictionDate: '2019-01-02', convictionId: 102 },
     )
-
+    havingBreaches(101)
+    havingBreaches(102)
     const requirements = havingRequirements(100, {})
 
     const observed = await subject.getConvictionDetails('some-crn')
 
     expect(observed).toEqual({
       previousConvictions: {
-        count: 1,
+        count: 2,
         lastEnded: DateTime.fromObject({ year: 2019, month: 1, day: 2 }),
         link: '/offenders/some-crn/previous-convictions',
+      },
+      previousBreaches: {
+        count: 2,
       },
       offence: {
         id: '1',

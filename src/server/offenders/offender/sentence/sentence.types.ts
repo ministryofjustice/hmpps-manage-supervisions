@@ -69,8 +69,13 @@ export interface AdditionalSentence {
   notes?: string
 }
 
+export interface PreviousBreaches {
+  count: number
+}
+
 export interface ConvictionDetails {
   previousConvictions?: PreviousConvictions
+  previousBreaches?: PreviousBreaches
   offence?: ConvictionOffence
   sentence?: ConvictionSentenceDetail
   requirements: ConvictionRequirement[]
