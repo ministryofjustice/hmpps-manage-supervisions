@@ -17,6 +17,18 @@ export enum DebugFlags {
   SetProviderCode = 'set-provider',
 }
 
+/**
+ * These align to a subset of npm log levels that are supported by winston.
+ * https://github.com/winstonjs/winston#logging-levels
+ */
+export enum LogLevel {
+  Error = 'error',
+  Warn = 'warn',
+  Info = 'info',
+  Debug = 'debug',
+  Verbose = 'verbose',
+}
+
 export interface ServerConfig {
   name: string
   description: string
@@ -31,6 +43,7 @@ export interface ServerConfig {
   domain: URL
   staticResourceCacheDuration: number
   debug: Partial<Record<DebugFlags, string>>
+  logLevel: LogLevel
 }
 
 export interface RedisConfig {

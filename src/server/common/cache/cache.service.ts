@@ -23,7 +23,7 @@ export class CacheService implements ICacheService {
   constructor(config: ConfigService<Config>) {
     this.client = createNodeRedisClient({ ...config.get<RedisConfig>('redis') })
     this.client.nodeRedis.on('error', error => {
-      this.logger.error(`Redis error ${error}`)
+      this.logger.error('redis error', error)
     })
   }
 
