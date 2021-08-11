@@ -60,6 +60,10 @@ export class CommunityApiService {
     return this.api(RisksAndRegistrationsApi)
   }
 
+  get breach() {
+    return this.api(SentenceRequirementsAndBreachApi)
+  }
+
   private api<Api extends BaseAPI>(type: ApiConstructor<Api>): Api {
     return new type(null, '', this.axios)
   }

@@ -1,4 +1,7 @@
-import { ContactSummary, PageOfContactSummary } from '../../src/server/community-api/client'
+import {
+  ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
+  ContactSummary,
+} from '../../src/server/community-api/client'
 import { SeedFn } from './wiremock'
 import { fakeContactSummary } from '../../src/server/community-api/community-api.fake'
 
@@ -109,34 +112,66 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     lastUpdatedDateTime: '2020-09-04T14:20:23+01:00',
     lastUpdatedByUser: { forenames: `Michael`, surname: `Smith` },
   },
+  {
+    type: {
+      code: 'ABNP',
+      description: 'Breach Outcome - not proven',
+      appointment: false,
+    },
+    contactStart: '2019-05-05T00:00:00+01:00',
+    contactEnd: '2019-05-05T00:00:00+01:00',
+    outcome: null,
+  },
 ]
 
 export function contacts(crn: string, partials: DeepPartial<ContactSummary>[] = CONTACTS): SeedFn {
   return async context => {
     const contacts = partials.map(p => fakeContactSummary(p))
-    await Promise.all([
-      context.client.community
+
+    let priority = 1
+    function all(
+      query: Omit<ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest, 'crn'> = {},
+      predicate?: (contact: ContactSummary) => boolean,
+    ) {
+      const filtered = predicate ? contacts.filter(predicate) : contacts
+      return context.client.community
+        .priority(priority++)
         .get(`/secure/offenders/crn/${crn}/contact-summary`)
-        .query({ complied: false, appointmentsOnly: true, nationalStandard: true }, 'equalTo')
-        .returns(contactResponse(contacts.filter(c => c.outcome && c.outcome.complied == false && c.type.appointment))),
-      context.client.community.get(`/secure/offenders/crn/${crn}/contact-summary`).returns(contactResponse(contacts)),
+        .query(query)
+        .returns({
+          content: filtered,
+          number: 0,
+          size: filtered.length || 10,
+          numberOfElements: filtered.length,
+          totalPages: filtered.length === 0 ? 0 : 1,
+          totalElements: filtered.length,
+          first: true,
+          last: false,
+          empty: filtered.length === 0,
+        })
+    }
+
+    await Promise.all([
+      // complied appointments only
+      all(
+        { appointmentsOnly: true, attended: true, complied: true },
+        c => c.type.appointment && c.outcome?.attended && c.outcome?.complied,
+      ),
+      // acceptable absence appointments only
+      all(
+        { appointmentsOnly: true, attended: false, complied: true },
+        c => c.type.appointment && c.outcome?.attended === false && c.outcome?.complied,
+      ),
+      // ftc appointments only
+      all({ appointmentsOnly: true, complied: false }, c => c.type.appointment && c.outcome?.complied === false),
+      // appointments only
+      all({ appointmentsOnly: true }, c => c.type.appointment),
+      // all contacts with no filter
+      all(),
+      // get each contact by id
       ...contacts.map(c =>
         context.client.community.get(`/secure/offenders/crn/${crn}/contacts/${c.contactId}`).returns(c),
       ),
     ])
-  }
-
-  function contactResponse(contacts: ContactSummary[]): PageOfContactSummary {
-    return {
-      content: contacts,
-      number: 0,
-      size: contacts.length || 10,
-      numberOfElements: contacts.length,
-      totalPages: contacts.length === 0 ? 0 : 1,
-      totalElements: contacts.length,
-      first: true,
-      last: false,
-      empty: contacts.length === 0,
-    }
   }
 }

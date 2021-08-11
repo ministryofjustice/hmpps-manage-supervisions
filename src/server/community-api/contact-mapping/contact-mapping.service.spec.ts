@@ -5,12 +5,12 @@ import {
   WellKnownAppointmentType,
   WellKnownAppointmentTypeMeta,
   WellKnownCommunicationType,
-  WellKnownCommunicationTypeMeta,
+  WellKnownContactTypeMeta,
   ContactTypeCategory,
   WellKnownContactTypeConfig,
 } from '../../config'
 import { ConfigService } from '@nestjs/config'
-import { fakeAppointmentType, fakeContactType, fakeStaffHuman } from '../../community-api/community-api.fake'
+import { fakeAppointmentType, fakeContactType, fakeStaffHuman } from '../community-api.fake'
 import { AppointmentMetaResult, CommunicationMetaResult, UnknownMetaResult } from './types'
 import { ContactTypesService } from '../contact-types'
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
@@ -18,7 +18,7 @@ import { createStubInstance, SinonStubbedInstance } from 'sinon'
 describe('ContactMappingService', () => {
   let subject: ContactMappingService
   let officeVisit: WellKnownAppointmentTypeMeta
-  let emailText: WellKnownCommunicationTypeMeta
+  let emailText: WellKnownContactTypeMeta
   let mockContactTypesService: SinonStubbedInstance<ContactTypesService>
 
   beforeEach(async () => {

@@ -6,13 +6,13 @@ import { trimEnd } from 'lodash'
 export function quantity(
   value: number,
   units: string,
-  { plural = true, noneForZero = false }: { plural?: boolean; noneForZero?: boolean } = {},
+  { plural = true, alternativeZero }: { plural?: boolean; alternativeZero?: string } = {},
 ) {
   const singular = trimEnd(units, 's').toLowerCase()
 
   switch (value) {
     case 0:
-      return noneForZero ? 'none' : `0 ${plural ? singular + 's' : singular}`
+      return `${alternativeZero || '0'} ${plural ? singular + 's' : singular}`
     case 1:
       return `${value} ${singular}`
     default:

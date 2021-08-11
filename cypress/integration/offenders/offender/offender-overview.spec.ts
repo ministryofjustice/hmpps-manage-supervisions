@@ -32,7 +32,7 @@ context('ViewOffenderOverview', () => {
         page.progress('Sentence').contains('12 months elapsed (of 12 months)')
         page.progress('RAR').contains('44 days RAR, 29 completed (2 requirements)')
 
-        page.previousOrders.contains('Previous orders (1) Last ended on 1 December 2020')
+        page.previousOrders.contains('Previous orders (1) Last ended on 1 November 2018')
 
         page.nextAppointment.contains('The next appointment is Tuesday 25 May 2100 at 12pm Home visit with Laura Smith')
         page.appointmentAttendance.contains('1 Complied')

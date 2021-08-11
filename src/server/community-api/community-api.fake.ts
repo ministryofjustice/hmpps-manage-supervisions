@@ -25,6 +25,9 @@ import {
   PersonalContact,
   OffenderDetailSummary,
   AdditionalSentence,
+  Nsi,
+  ProbationArea,
+  Team,
 } from './client'
 import { merge } from 'lodash'
 import * as faker from 'faker'
@@ -330,7 +333,7 @@ export const fakeContactSummary = fake<ContactSummary, { when?: 'past' | 'recent
       team: fakeKeyValue(),
       staff: fakeStaffHuman(),
       lastUpdatedDateTime: date.toISO(),
-      lastUpdatedByUser: { forenames: faker.datatype.string(), surname: faker.datatype.string() },
+      lastUpdatedByUser: { forenames: faker.name.firstName(), surname: faker.name.lastName() },
     }
   },
 )
@@ -382,70 +385,77 @@ export const fakeAdditionalSentence = fake<AdditionalSentence>((options, partial
   }
 })
 
-export const fakeConviction = fake<Conviction>((options, partial = {}) => ({
-  convictionId: faker.datatype.number(),
-  index: faker.datatype.number().toString(),
-  active: true,
-  inBreach: faker.datatype.boolean(),
-  convictionDate: fakeIsoDate(),
-  referralDate: fakeIsoDate(),
-  offences: partial.offences || [fakeOffence({ mainOffence: true })],
-  sentence: {
-    sentenceId: faker.datatype.number(),
-    description: faker.commerce.productDescription(),
-    originalLength: 12,
-    originalLengthUnits: 'Months',
-    defaultLength: 12,
-    lengthInDays: 364,
-    expectedSentenceEndDate: fakeIsoDate('future'),
-    startDate: fakeIsoDate('recent'),
-    sentenceType: {
-      code: faker.random.alphaNumeric(2),
-      description: faker.commerce.productMaterial(),
+export const fakeConviction = fake<Conviction>((options, { active = true, inBreach = false, offences } = {}) => {
+  return {
+    convictionId: faker.datatype.number(),
+    index: faker.datatype.number().toString(),
+    active,
+    convictionDate: fakeIsoDate(),
+    referralDate: fakeIsoDate(),
+    offences: offences || [fakeOffence({ mainOffence: true })],
+    inBreach,
+    failureToComplyCount: inBreach ? 3 : 0,
+    breachEnd: inBreach ? fakeIsoDate('future') : null,
+    sentence: {
+      sentenceId: faker.datatype.number(),
+      description: faker.random.arrayElement(['ORA Community Order', 'CJA Community Order']),
+      originalLength: 12,
+      originalLengthUnits: 'Months',
+      defaultLength: 12,
+      lengthInDays: 364,
+      expectedSentenceEndDate: active ? fakeIsoDate('future') : fakeIsoDate('past'),
+      startDate: active ? fakeIsoDate('recent') : fakeIsoDate('past'),
+      terminationDate: active ? null : fakeIsoDate('recent'),
+      terminationReason: active ? null : faker.random.arrayElement(['Auto-terminated', 'Revoked']),
+      sentenceType: {
+        code: faker.random.alphaNumeric(2),
+        description: faker.random.arrayElement(['ORA Community Order', 'CJA Community Order']),
+      },
+      additionalSentences: [],
+      failureToComplyLimit: 3,
     },
-    additionalSentences: [],
-  },
-  latestCourtAppearanceOutcome: {
-    code: faker.random.alphaNumeric(3),
-    description: faker.commerce.productMaterial(),
-  },
-  responsibleCourt: {
-    courtId: faker.datatype.number(),
-    code: faker.random.alphaNumeric(5),
-    selectable: true,
-    courtName: faker.address.streetAddress(),
-    telephoneNumber: faker.phone.phoneNumber(),
-    fax: faker.phone.phoneNumber(),
-    buildingName: faker.lorem.words(3),
-    town: faker.address.city(),
-    county: faker.address.county(),
-    postcode: faker.address.zipCode(),
-    country: faker.address.country(),
-    courtTypeId: faker.datatype.number(),
-    createdDatetime: faker.date.past().toISOString(),
-    lastUpdatedDatetime: faker.date.past().toISOString(),
-    probationAreaId: faker.datatype.number(),
-    probationArea: {
-      code: faker.random.alphaNumeric(3),
-      description: faker.address.city(),
-    },
-    courtType: {
+    latestCourtAppearanceOutcome: {
       code: faker.random.alphaNumeric(3),
       description: faker.commerce.productMaterial(),
     },
-  },
-  courtAppearance: {
-    courtAppearanceId: faker.datatype.number(),
-    appearanceDate: fakeIsoDate(),
-    courtCode: faker.random.alphaNumeric(5),
-    courtName: faker.address.streetAddress(),
-    appearanceType: {
-      code: faker.random.alphaNumeric(2),
-      description: faker.commerce.productMaterial(),
+    responsibleCourt: {
+      courtId: faker.datatype.number(),
+      code: faker.random.alphaNumeric(5),
+      selectable: true,
+      courtName: faker.address.streetAddress(),
+      telephoneNumber: faker.phone.phoneNumber(),
+      fax: faker.phone.phoneNumber(),
+      buildingName: faker.lorem.words(3),
+      town: faker.address.city(),
+      county: faker.address.county(),
+      postcode: faker.address.zipCode(),
+      country: faker.address.country(),
+      courtTypeId: faker.datatype.number(),
+      createdDatetime: faker.date.past().toISOString(),
+      lastUpdatedDatetime: faker.date.past().toISOString(),
+      probationAreaId: faker.datatype.number(),
+      probationArea: {
+        code: faker.random.alphaNumeric(3),
+        description: faker.address.city(),
+      },
+      courtType: {
+        code: faker.random.alphaNumeric(3),
+        description: faker.commerce.productMaterial(),
+      },
     },
-    crn: fakeCrn(),
-  },
-}))
+    courtAppearance: {
+      courtAppearanceId: faker.datatype.number(),
+      appearanceDate: fakeIsoDate(),
+      courtCode: faker.random.alphaNumeric(5),
+      courtName: faker.address.streetAddress(),
+      appearanceType: {
+        code: faker.random.alphaNumeric(2),
+        description: faker.commerce.productMaterial(),
+      },
+      crn: fakeCrn(),
+    },
+  }
+})
 
 export const fakeRequirement = fake<Requirement>(() => ({
   requirementId: faker.datatype.number(),
@@ -471,4 +481,77 @@ export const fakeRegistration = fake<Registration>((partial: DeepPartial<Registr
     } as Registration,
     partial,
   )
+})
+
+export const fakeProbationArea = fake<ProbationArea>(() => ({
+  probationAreaId: faker.datatype.number(),
+  code: faker.random.alphaNumeric(3).toUpperCase(),
+  description: faker.address.streetAddress(),
+  organisation: {
+    code: faker.random.alphaNumeric(4).toUpperCase(),
+    description: faker.company.companyName(),
+  },
+}))
+
+export const fakeTeam = fake<Team>(() => ({
+  code: faker.random.alphaNumeric(6).toUpperCase(),
+  description: faker.company.companyName(),
+  startDate: fakeIsoDate(),
+  localDeliveryUnit: {
+    code: faker.random.alphaNumeric(6).toUpperCase(),
+    description: faker.address.city(),
+  },
+  teamType: {
+    code: faker.random.alphaNumeric(6).toUpperCase(),
+    description: faker.company.bs(),
+  },
+  district: {
+    code: faker.random.alphaNumeric(6).toUpperCase(),
+    description: faker.address.city(),
+  },
+  borough: {
+    code: faker.random.alphaNumeric(6).toUpperCase(),
+    description: faker.address.city(),
+  },
+}))
+
+export const fakeNsi = fake<Nsi>((options, { active = true } = {}) => {
+  return {
+    nsiId: faker.datatype.number(),
+    nsiType: {
+      code: faker.random.alphaNumeric(3).toUpperCase(),
+      description: faker.company.bs(),
+    },
+    nsiSubType: {
+      code: faker.random.alphaNumeric(5).toUpperCase(),
+      description: faker.company.bs(),
+    },
+    nsiStatus: {
+      code: faker.random.alphaNumeric(5).toUpperCase(),
+      description: faker.random.arrayElement([
+        'Warrant Issued',
+        'Warrant Executed',
+        'Breach Proven - Committed to Custody',
+        'Breach Not Proven',
+      ]),
+    },
+    statusDateTime: faker.date.past().toISOString(),
+    referralDate: fakeIsoDate(),
+    lengthUnit: faker.random.arrayElement(['Months', 'Days']),
+    active,
+    nsiManagers: [
+      {
+        probationArea: fakeProbationArea(),
+        team: fakeTeam(),
+        staff: fakeStaffDetails(),
+        startDate: fakeIsoDate(),
+      },
+    ],
+    intendedProvider: fakeProbationArea(),
+    notes: faker.lorem.sentence(),
+    length: faker.datatype.number({ min: 1, max: 12 }),
+    softDeleted: false,
+    actualStartDate: fakeIsoDate(),
+    actualEndDate: active ? null : fakeIsoDate(),
+  }
 })

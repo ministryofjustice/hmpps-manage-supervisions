@@ -4,6 +4,7 @@ import {
   AppointmentDetail,
   ContactSummary,
   Conviction,
+  Nsi,
   OffenderDetail,
   PersonalCircumstance,
   PersonalContact,
@@ -16,7 +17,7 @@ import { staff } from './staff'
 import { get, set } from 'lodash'
 import { AllRoshRiskDto } from '../../src/server/assess-risks-and-needs-api'
 import { CRN, offender } from './offender'
-import { ACTIVE_CONVICTION_ID, convictions } from './convictions'
+import { ACTIVE_CONVICTION_ID, convictions, PREVIOUS_CONVICTION_IDS } from './convictions'
 import { personalContacts } from './personal-contacts'
 import { personalCircumstances } from './personal-circumstances'
 import { registrations } from './registrations'
@@ -25,6 +26,8 @@ import { requirements } from './requirements'
 import { appointments } from './appointments'
 import { contacts } from './contacts'
 import { contactTypes } from './contact-types'
+import { nsis } from './nsis'
+import * as faker from 'faker'
 
 /**
  * Resets the wiremock server, this should always be the first seed module loaded.
@@ -57,11 +60,17 @@ export function referenceDataSeed(options: ReferenceDataSeedOptions = {}) {
 
 function getOrSet<T>(object: any, path: string, value: T): T {
   let result = get(object, path)
-  if (!result) {
+  if (result === undefined) {
     result = value
     set(object, path, result)
   }
   return result
+}
+
+export interface ConvictionSeedOptions {
+  conviction?: DeepPartial<Conviction>
+  requirements?: DeepPartial<Requirement>[]
+  nsis?: DeepPartial<Nsi>[]
 }
 
 export interface OffenderSeedOptions {
@@ -70,8 +79,7 @@ export interface OffenderSeedOptions {
   personalCircumstances?: DeepPartial<PersonalCircumstance>[]
   registrations?: DeepPartial<Registration>[]
   risks?: DeepPartial<AllRoshRiskDto>
-  convictions?: { active: DeepPartial<Conviction> | null; previous: DeepPartial<Conviction>[] }
-  requirements?: DeepPartial<Requirement>[]
+  convictions?: { active: ConvictionSeedOptions | null; previous?: ConvictionSeedOptions[] }
 }
 
 /**
@@ -80,10 +88,34 @@ export interface OffenderSeedOptions {
 export function offenderSeed(options: OffenderSeedOptions = {}) {
   // create some common identifiers so all tasks can run async
   const crn = getOrSet(options, 'offender.otherIds.crn', CRN)
-  const activeConvictionId =
-    options.convictions?.active === null
-      ? null // pass in null for the active conviction to remove it, otherwise Liz's active conviction will be used.
-      : getOrSet(options, 'convictions.active.convictionId', ACTIVE_CONVICTION_ID)
+
+  const defaultPreviousConvictions = PREVIOUS_CONVICTION_IDS.map(convictionId => ({ conviction: { convictionId } }))
+  if (!options.convictions) {
+    options.convictions = {
+      active: { conviction: { convictionId: ACTIVE_CONVICTION_ID } },
+      previous: defaultPreviousConvictions,
+    }
+  } else {
+    // null is a special case to remove the active conviction, otherwise (undefined), Liz's active conviction will be used.
+    if (options.convictions.active !== null) {
+      getOrSet(options, 'convictions.active.conviction.convictionId', ACTIVE_CONVICTION_ID)
+    }
+
+    if (!options.convictions.previous) {
+      options.convictions.previous = defaultPreviousConvictions
+    }
+
+    for (let i = 0; i < options.convictions.previous.length; i++) {
+      getOrSet(
+        options.convictions.previous[i],
+        'conviction.convictionId',
+        // prefer to use the well known previous conviction ids otherwise fallback to a random number
+        i < PREVIOUS_CONVICTION_IDS.length ? PREVIOUS_CONVICTION_IDS[i] : faker.datatype.number(),
+      )
+    }
+  }
+
+  const { active, previous } = options.convictions
 
   return seedModule(
     { title: 'Offender' },
@@ -92,8 +124,24 @@ export function offenderSeed(options: OffenderSeedOptions = {}) {
     personalCircumstances(crn, options.personalCircumstances),
     registrations(crn, options.registrations),
     risks(crn, options.risks),
-    convictions(crn, options.convictions?.active, options.convictions?.previous),
-    ...(activeConvictionId ? [requirements(crn, activeConvictionId, options.requirements)] : []),
+    convictions(
+      crn,
+      active === null ? null : active?.conviction,
+      previous.map(x => x.conviction),
+    ),
+    ...(active?.conviction
+      ? [
+          requirements(crn, active.conviction.convictionId, active.requirements),
+          nsis(crn, active.conviction.convictionId, active.nsis),
+        ]
+      : []),
+    ...previous
+      .map(x => [
+        // prefer no requirements or nsis for previous convictions
+        requirements(crn, x.conviction.convictionId, x.requirements || []),
+        nsis(crn, x.conviction.convictionId, x.nsis || []),
+      ])
+      .reduce((agg, x) => [...agg, ...x], []),
   )
 }
 

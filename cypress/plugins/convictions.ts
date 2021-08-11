@@ -3,10 +3,12 @@ import { fakeConviction } from '../../src/server/community-api/community-api.fak
 import { SeedFn } from './wiremock'
 
 export const ACTIVE_CONVICTION_ID = 100
+export const PREVIOUS_CONVICTION_IDS = [101]
 
 export const ACTIVE_CONVICTION: DeepPartial<Conviction> = {
   convictionId: ACTIVE_CONVICTION_ID,
   active: true,
+  inBreach: false,
   convictionDate: '2020-02-05',
   offences: [
     {
@@ -58,26 +60,44 @@ export const ACTIVE_CONVICTION: DeepPartial<Conviction> = {
   },
 }
 
-export const PREVIOUS_CONVICTIONS: DeepPartial<Conviction>[] = [{ active: false, convictionDate: '2020-12-01' }]
+export const PREVIOUS_CONVICTIONS: DeepPartial<Conviction>[] = [
+  {
+    convictionId: PREVIOUS_CONVICTION_IDS[0],
+    active: false,
+    convictionDate: '2018-11-01',
+    sentence: {
+      sentenceType: {
+        description: 'ORA Community Order',
+      },
+      startDate: '2018-12-01',
+      terminationDate: '2020-12-01',
+      originalLength: 24,
+      originalLengthUnits: 'Months',
+    },
+  },
+]
 
 export function convictions(
   crn: string,
   active: DeepPartial<Conviction> | null,
-  previous: DeepPartial<Conviction>[] = PREVIOUS_CONVICTIONS,
+  previous: DeepPartial<Conviction>[],
 ): SeedFn {
   return async context => {
     const convictions = [
       active === null ? null : fakeConviction([ACTIVE_CONVICTION, active]),
-      ...previous.map(p => fakeConviction(p)),
+      ...previous.map((p, i) =>
+        fakeConviction([i < PREVIOUS_CONVICTIONS.length ? PREVIOUS_CONVICTIONS[i] : { active: false }, p]),
+      ),
     ].filter(x => x)
 
+    const url = `/secure/offenders/crn/${crn}/convictions`
     await Promise.all([
       context.client.community
-        .get(`/secure/offenders/crn/${crn}/convictions`)
+        .get(url)
         .query({ activeOnly: true })
         .priority(1)
         .returns(convictions.filter(x => x.active)),
-      context.client.community.get(`/secure/offenders/crn/${crn}/convictions`).priority(2).returns(convictions),
+      context.client.community.get(url).priority(2).returns(convictions),
     ])
   }
 }

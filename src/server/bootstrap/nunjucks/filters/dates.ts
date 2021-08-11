@@ -60,6 +60,12 @@ export class ShortDate implements NunjucksFilter {
   }
 }
 
+export class MonthDate implements NunjucksFilter {
+  filter(value: RawDate): string {
+    return safeGetDateTime(value).toFormat('MMMM yyyy')
+  }
+}
+
 export class Dob implements NunjucksFilter {
   filter(value: RawDate): string {
     const date = safeGetDateTime(value)

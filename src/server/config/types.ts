@@ -99,9 +99,13 @@ export enum WellKnownCommunicationType {
   PhoneCallFromOther = 'phone-call-from-other',
 }
 
-export interface WellKnownCommunicationTypeMeta {
+export interface WellKnownContactTypeMeta {
   name: string
   code: string
+}
+
+export interface WellKnownBreachEndContactTypeMeta extends WellKnownContactTypeMeta {
+  proven: boolean
 }
 
 export enum WellKnownWarningLetterType {
@@ -120,12 +124,16 @@ export enum ContactTypeCategory {
   Communication = 'communication',
   WarningLetter = 'warningLetter',
   Other = 'other',
+  BreachStart = 'breach-start',
+  BreachEnd = 'breach-end',
 }
 
 export interface WellKnownContactTypeConfig {
   [ContactTypeCategory.Appointment]: { [Type in WellKnownAppointmentType]: WellKnownAppointmentTypeMeta }
-  [ContactTypeCategory.Communication]: { [Type in WellKnownCommunicationType]: WellKnownCommunicationTypeMeta }
+  [ContactTypeCategory.Communication]: { [Type in WellKnownCommunicationType]: WellKnownContactTypeMeta }
   [ContactTypeCategory.WarningLetter]: { [Type in WellKnownWarningLetterType]: string }
+  [ContactTypeCategory.BreachStart]: WellKnownContactTypeMeta[]
+  [ContactTypeCategory.BreachEnd]: WellKnownBreachEndContactTypeMeta[]
 }
 
 export type WellKnownRequirementTypeConfig = {

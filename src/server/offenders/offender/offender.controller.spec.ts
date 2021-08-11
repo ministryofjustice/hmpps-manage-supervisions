@@ -20,7 +20,7 @@ import { SentenceService } from './sentence'
 import { ScheduleService } from './schedule'
 import { ActivityFilter, ActivityService } from './activity'
 import { RiskService } from './risk'
-import { fakeConvictionDetails, fakeConvictionRequirement } from './sentence/sentence.fake'
+import { fakeComplianceDetails, fakeConvictionDetails, fakeConvictionRequirement } from './sentence/sentence.fake'
 import { fakeActivityLogEntry } from './activity/activity.fake'
 import { fakeAppointmentSummary, fakeRecentAppointments } from './schedule/schedule.fake'
 import { fakeBreadcrumbs, fakeBreadcrumbUrl, MockLinksModule } from '../../common/links/links.mock'
@@ -189,19 +189,13 @@ describe('OffenderController', () => {
     havingOffenderSummary()
 
     const contacts = fakePaginated([fakeActivityLogEntry(), fakeActivityLogEntry()])
-
     const registrations = [fakeRegistrationFlag()]
+
     riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
-
-    const filter = { convictionId: 1234 }
-
     sentenceService.getConvictionId.withArgs('some-crn').resolves(1234)
-
-    activityService.constructContactFilter
-      .withArgs(ActivityFilter.CompliedAppointments, { convictionId: 1234 })
-      .returns(filter)
-
-    activityService.getActivityLogPage.withArgs('some-crn', filter).resolves(contacts)
+    activityService.getActivityLogPage
+      .withArgs('some-crn', match({ convictionId: 1234, filter: ActivityFilter.CompliedAppointments }))
+      .resolves(contacts)
 
     const observed = await subject.getActivityFiltered('some-crn', ActivityFilter.CompliedAppointments)
     shouldReturnViewModel(observed, BreadcrumbType.CaseActivityLog, {
@@ -285,6 +279,24 @@ describe('OffenderController', () => {
     })
   })
 
+  it('gets compliance', async () => {
+    havingOffenderSummary()
+
+    const compliance = fakeComplianceDetails()
+    sentenceService.getSentenceComplianceDetails.withArgs('some-crn').resolves(compliance)
+
+    const registrations = [fakeRegistrationFlag()]
+    riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
+
+    const observed = await subject.getCompliance('some-crn')
+
+    shouldReturnViewModel(observed, BreadcrumbType.Compliance, {
+      page: OffenderPage.Compliance,
+      compliance,
+      registrations,
+    })
+  })
+
   function havingOffender() {
     const offender = fakeOffenderDetail({
       otherIds: { crn: 'some-crn', pncNumber: 'some-prn' },
@@ -333,6 +345,7 @@ describe('OffenderController', () => {
         schedule: fakeBreadcrumbUrl(BreadcrumbType.CaseSchedule, breadcrumbOptions),
         sentence: fakeBreadcrumbUrl(BreadcrumbType.CaseSentence, breadcrumbOptions),
         activity: fakeBreadcrumbUrl(BreadcrumbType.CaseActivityLog, breadcrumbOptions),
+        compliance: fakeBreadcrumbUrl(BreadcrumbType.Compliance, breadcrumbOptions),
       },
       ...expected,
     } as OffenderViewModel)

@@ -15,8 +15,7 @@ function fakeFullName() {
   return `${faker.name.firstName()} ${faker.name.lastName()}`
 }
 
-export const fakeAddressDetail = fake<AddressDetail>((partial = {}) => {
-  const active = partial.active === undefined ? faker.datatype.boolean() : partial.active
+export const fakeAddressDetail = fake<AddressDetail>(({ active = faker.datatype.boolean() } = {}) => {
   return {
     name: faker.lorem.sentence(),
     lines: [faker.address.streetAddress(), faker.address.city(), faker.address.zipCode()],

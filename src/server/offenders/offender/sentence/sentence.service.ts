@@ -1,45 +1,47 @@
-import { Injectable, Logger } from '@nestjs/common'
-import { Conviction, Offence, Sentence } from '../../../community-api/client'
+import { Injectable } from '@nestjs/common'
+import { Conviction, Sentence } from '../../../community-api/client'
 import { maxBy } from 'lodash'
 import { DateTime, DurationUnit } from 'luxon'
-import { quantity, titleCase } from '../../../util'
-import { ConvictionDetails } from './sentence.types'
+import { getElapsed, quantity } from '../../../util'
+import {
+  ComplianceDetails,
+  CompliancePeriod,
+  ComplianceQuantity,
+  ComplianceStatus,
+  ComplianceStatusAlertLevel,
+  ConvictionDetails,
+  ConvictionRequirement,
+} from './sentence.types'
 import { RequirementService } from './requirement.service'
 import { CommunityApiService } from '../../../community-api'
-
-function getOffenceName(offence: Offence): string {
-  return `${offence.detail.subCategoryDescription} (${quantity(offence.offenceCount || 1, 'count')})`
-}
+import { getOffenceName, getSentenceName } from './util'
+import { ComplianceService } from './compliance.service'
+import { ActivityFilter, ActivityService } from '../activity'
 
 @Injectable()
 export class SentenceService {
-  private readonly logger = new Logger(SentenceService.name)
-
-  constructor(private readonly community: CommunityApiService, private readonly requirements: RequirementService) {}
+  constructor(
+    private readonly community: CommunityApiService,
+    private readonly requirements: RequirementService,
+    private readonly compliance: ComplianceService,
+    private readonly activity: ActivityService,
+  ) {}
 
   async getConvictionDetails(crn: string): Promise<ConvictionDetails | null> {
-    const { data: convictions } = await this.community.offender.getConvictionsForOffenderByCrnUsingGET({ crn })
+    const { requirements, current, previous } = await this.getConvictions(crn)
 
-    const conviction = SentenceService.getLatestConviction(convictions)
-
-    if (!conviction) {
+    if (!current) {
       return null
     }
 
-    const requirements = await this.requirements.getConvictionRequirements({
-      crn,
-      convictionId: conviction.convictionId,
-    })
-
-    const previousConvictions = convictions.filter(x => !x.active)
-    const sentence = conviction.sentence
-    const mainOffence = conviction.offences.find(x => x.mainOffence)
+    const sentence = current.sentence
+    const mainOffence = current.offences.find(x => x.mainOffence)
 
     return {
-      previousConvictions: previousConvictions.length
+      previousConvictions: previous.length
         ? {
-            count: previousConvictions.length,
-            lastEnded: DateTime.fromISO(maxBy(previousConvictions, x => x.convictionDate).convictionDate),
+            count: previous.length,
+            lastEnded: DateTime.fromISO(maxBy(previous, x => x.convictionDate).convictionDate),
             link: `/offenders/${crn}/previous-convictions`,
           }
         : null,
@@ -48,22 +50,19 @@ export class SentenceService {
         description: getOffenceName(mainOffence),
         category: mainOffence.detail.mainCategoryDescription,
         date: DateTime.fromISO(mainOffence.offenceDate),
-        additionalOffences: conviction.offences.filter(x => !x.mainOffence).map(getOffenceName),
+        additionalOffences: current.offences.filter(x => !x.mainOffence).map(getOffenceName),
       },
       sentence: sentence
         ? {
-            // TODO HACK: building this title is messy as the data is messy, we probably need a well known data source to clean it up.
-            description: `${quantity(sentence.originalLength, sentence.originalLengthUnits, {
-              plural: false,
-            })} ${titleCase(sentence.sentenceType.description.replace('ORA', '').trim(), { ignoreAcronyms: true })}`,
-            convictionDate: DateTime.fromISO(conviction.convictionDate),
+            description: getSentenceName(sentence),
+            convictionDate: DateTime.fromISO(current.convictionDate),
             startDate: DateTime.fromISO(sentence.startDate),
             endDate: DateTime.fromISO(sentence.expectedSentenceEndDate),
-            elapsed: this.getElapsed(sentence),
-            courtAppearance: conviction.courtAppearance?.courtName,
-            responsibleCourt: conviction.responsibleCourt?.courtName,
+            elapsed: SentenceService.getElapsedOf(sentence),
+            courtAppearance: current.courtAppearance?.courtName,
+            responsibleCourt: current.responsibleCourt?.courtName,
             additionalSentences:
-              conviction.sentence.additionalSentences?.map(x => ({
+              current.sentence.additionalSentences?.map(x => ({
                 name: x.type.description,
                 length: x.length,
                 value: x.amount,
@@ -81,6 +80,112 @@ export class SentenceService {
     return SentenceService.getLatestConviction(convictions)?.convictionId
   }
 
+  async getSentenceComplianceDetails(crn: string): Promise<ComplianceDetails> {
+    const from = DateTime.now().minus({ years: 2 }).set({ day: 1, hour: 0, minute: 0, second: 0, millisecond: 0 })
+    const { requirements, current, previous } = await this.getConvictions(crn, from)
+
+    const [currentSummary, ...previousSummaries] = await Promise.all([
+      this.compliance.convictionSummary(crn, current),
+      ...previous.map(x => this.compliance.convictionSummary(crn, x)),
+    ])
+
+    let compliancePeriod = CompliancePeriod.Last12Months
+    const appointmentCounts = {
+      [ActivityFilter.Appointments]: 0,
+      [ActivityFilter.CompliedAppointments]: 0,
+      [ActivityFilter.FailedToComplyAppointments]: 0,
+      [ActivityFilter.AcceptableAbsenceAppointments]: 0,
+    }
+    if (currentSummary) {
+      if (currentSummary.lastRecentBreachEnd) {
+        compliancePeriod = CompliancePeriod.SinceLastBreach
+      }
+
+      await Promise.all(
+        Object.keys(appointmentCounts).map(async (filter: ActivityFilter) => {
+          appointmentCounts[filter] = await this.activity.getActivityLogCount(
+            crn,
+            current.convictionId,
+            filter,
+            currentSummary.lastRecentBreachEnd,
+          )
+        }),
+      )
+    }
+
+    function getAppointmentQuantity(filter: ActivityFilter, name: string, plural = true): ComplianceQuantity {
+      const value = appointmentCounts[filter]
+      if (value === 0) {
+        return { name: 'None' }
+      }
+      return {
+        name: quantity(value, name, { plural }),
+        link: `/offender/${crn}/activity/${filter}`,
+      }
+    }
+
+    function getStatus(): ComplianceDetails['current']['status'] {
+      const value = currentSummary.inBreach
+        ? ComplianceStatus.InBreach
+        : appointmentCounts[ActivityFilter.FailedToComplyAppointments] >= current.sentence.failureToComplyLimit
+        ? ComplianceStatus.PendingBreach
+        : appointmentCounts[ActivityFilter.FailedToComplyAppointments] > 0
+        ? ComplianceStatus.FailureToComply
+        : compliancePeriod === CompliancePeriod.SinceLastBreach
+        ? ComplianceStatus.PreviousBreach
+        : ComplianceStatus.Clean
+      let alertLevel: ComplianceStatusAlertLevel
+      switch (value) {
+        case ComplianceStatus.InBreach:
+        case ComplianceStatus.PendingBreach:
+          alertLevel = ComplianceStatusAlertLevel.Danger
+          break
+        case ComplianceStatus.FailureToComply:
+        case ComplianceStatus.PreviousBreach:
+          alertLevel = ComplianceStatusAlertLevel.Warning
+          break
+        default:
+          alertLevel = ComplianceStatusAlertLevel.Success
+          break
+      }
+      return {
+        value,
+        alertLevel,
+        description:
+          value === ComplianceStatus.InBreach
+            ? 'Breach in progress'
+            : `${quantity(appointmentCounts[ActivityFilter.FailedToComplyAppointments], 'failure', {
+                alternativeZero: 'No',
+              })} to comply ${compliancePeriod}`,
+      }
+    }
+
+    return {
+      current: currentSummary
+        ? {
+            ...currentSummary,
+            period: compliancePeriod,
+            appointments: {
+              total: getAppointmentQuantity(ActivityFilter.Appointments, 'appointment'),
+              complied: getAppointmentQuantity(ActivityFilter.CompliedAppointments, 'appointment', false),
+              acceptableAbsences: getAppointmentQuantity(
+                ActivityFilter.AcceptableAbsenceAppointments,
+                'acceptable absence',
+              ),
+              failureToComply: getAppointmentQuantity(
+                ActivityFilter.FailedToComplyAppointments,
+                'unacceptable absence',
+              ),
+            },
+            status: getStatus(),
+            requirement: requirements.find(r => r.isRar)?.name,
+          }
+        : null,
+      previous: previousSummaries.filter(x => x),
+      previousFrom: from,
+    }
+  }
+
   private static getLatestConviction(convictions: Conviction[]): Conviction {
     // TODO we are assuming only a single active conviction per offender at this time
     // TODO so in the case where we have multiple then just take the latest
@@ -90,24 +195,44 @@ export class SentenceService {
     )
   }
 
-  private getElapsed(sentence: Sentence): string | null {
-    if (!sentence.originalLengthUnits || !sentence.originalLength) {
-      return null
-    }
-    try {
-      const units = sentence.originalLengthUnits.toLowerCase() as DurationUnit
-      const start = DateTime.fromISO(sentence.startDate)
-      const elapsed = Math.min(Math.floor(DateTime.now().diff(start, units).as(units)), sentence.originalLength)
-      if (elapsed < 0) {
-        // a future sentence
-        return null
-      }
+  private async getConvictions(
+    crn: string,
+    from?: DateTime,
+  ): Promise<{ current?: Conviction; previous: Conviction[]; requirements: ConvictionRequirement[] }> {
+    const { data: convictions } = await this.community.offender.getConvictionsForOffenderByCrnUsingGET({ crn })
 
-      return `${quantity(elapsed, units)} elapsed (of ${quantity(sentence.originalLength, units)})`
-    } catch (err) {
-      // probably bad units
-      this.logger.error(`Cannot determine sentence duration ${JSON.stringify(sentence)}: ${err.message}`)
-      return null
+    const current = SentenceService.getLatestConviction(convictions)
+    const previous = convictions.filter(
+      c =>
+        !c.active && (!from || (c.sentence?.terminationDate && DateTime.fromISO(c.sentence.terminationDate) >= from)),
+    )
+
+    if (!current) {
+      return {
+        previous,
+        requirements: [],
+      }
     }
+
+    const requirements = await this.requirements.getConvictionRequirements({
+      crn,
+      convictionId: current.convictionId,
+    })
+
+    return {
+      current,
+      previous,
+      requirements,
+    }
+  }
+
+  private static getElapsedOf(sentence: Sentence): string | null {
+    const result = getElapsed(
+      sentence.startDate,
+      sentence.originalLength,
+      sentence.originalLengthUnits?.toLowerCase() as DurationUnit,
+    )
+
+    return result && `${result.elapsed} elapsed (of ${result.length})`
   }
 }

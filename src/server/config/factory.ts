@@ -1,12 +1,14 @@
+import { pick } from 'lodash'
 import {
   Config,
+  ContactTypeCategory,
   DebugFlags,
   WellKnownAppointmentType,
-  WellKnownContactTypeConfig,
   WellKnownAppointmentTypeMeta,
   WellKnownCommunicationType,
-  WellKnownCommunicationTypeMeta,
+  WellKnownContactTypeConfig,
   WellKnownWarningLetterType,
+  WellKnownContactTypeMeta,
 } from './types'
 import { ApplicationVersion } from '../util'
 import { requirements } from './requirements'
@@ -79,6 +81,19 @@ export const CONTACT_DEFAULTS: WellKnownContactTypeConfig = {
     [WellKnownWarningLetterType.BreachConfirmationSent]: 'CBRC',
     [WellKnownWarningLetterType.GenericLetterToOffender]: 'CLOB',
   },
+  [ContactTypeCategory.BreachStart]: [{ code: 'AIBR', name: 'Breach started' }],
+  [ContactTypeCategory.BreachEnd]: [
+    { code: 'ABCC', name: 'Breach proven, committed to custody', proven: true },
+    { code: 'ABCF', name: 'Breach proven, fine issued', proven: true },
+    { code: 'ABNA', name: 'Breach proven, no action', proven: true },
+    { code: 'ABNP', name: 'Breach not proven', proven: false },
+    { code: 'ABPC', name: 'Breach proven, concluded', proven: true },
+    { code: 'ABPP', name: 'Breach proven, re-sentenced', proven: true },
+    { code: 'ABSD', name: 'Breach proven, SDO imposed', proven: true },
+    { code: 'ABWD', name: 'Breach withdrawn', proven: false },
+    { code: 'CPSS', name: 'Start of post sentence supervision', proven: true },
+    { code: 'ERCL', name: 'Recalled to prison', proven: true },
+  ],
 }
 
 const DEBUG_DEFAULTS: Record<DebugFlags, string> = {
@@ -111,7 +126,7 @@ export function configFactory(): Config {
         [type]: {
           name: string(`${key}_NAME`, fallback(defaults.name)).trim(),
           code: string(`${key}_CODE`, fallback(defaults.code)).toUpperCase().trim(),
-        } as WellKnownCommunicationTypeMeta,
+        } as WellKnownContactTypeMeta,
       }
     })
     .reduce((x, y) => ({ ...x, ...y })) as WellKnownContactTypeConfig['communication']
@@ -195,6 +210,8 @@ export function configFactory(): Config {
       appointment,
       communication,
       warningLetter,
+      // TODO allow overriding?
+      ...pick(CONTACT_DEFAULTS, [ContactTypeCategory.BreachStart, ContactTypeCategory.BreachEnd]),
     },
     requirements,
   }
