@@ -9,30 +9,30 @@
   }
 }
 
-@mixin colorAndLinkColor($color) {
-  color: $color;
+@mixin colourAndLinkColour($colour) {
+  color: $colour;
   a {
-    color: $color;
+    color: $colour;
   }
 }
 
 
 .app-card--blue {
   background: govuk-colour("blue");
-  @include colorAndLinkColor(govuk-colour("white"));
+  @include colourAndLinkColour(govuk-colour("white"));
 }
 
 .app-card--grey {
   background: govuk-colour("dark-grey");
-  @include colorAndLinkColor(govuk-colour("white"));
+  @include colourAndLinkColour(govuk-colour("white"));
 }
 
 .app-card--green {
   background: govuk-colour("green");
-  @include colorAndLinkColor(govuk-colour("white"));
+  @include colourAndLinkColour(govuk-colour("white"));
 }
 
 .app-card--red {
   background: govuk-colour("red");
-  @include colorAndLinkColor(govuk-colour("white"));
+  @include colourAndLinkColour(govuk-colour("white"));
 }
