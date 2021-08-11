@@ -11,7 +11,7 @@ export class OffenderPage extends PageBase {
   }
 
   get currentTab() {
-    return cy.url().then(url => url.match(/\/offender\/.+\/(.+)/)[1])
+    return cy.url().then(url => url.match(/\/offender\/[A-Za-z0-9]+\/(\w+)\/?/)[1])
   }
 
   get registrations() {
@@ -90,6 +90,10 @@ export class OffenderPage extends PageBase {
 
       get emptyMessage() {
         return cy.get('[data-qa="offender/activity/empty"]')
+      },
+
+      filterLink(filterType: string) {
+        return cy.get(`[data-qa="offender/activity-filter-${filterType}"]`)
       },
 
       entry(id: number) {

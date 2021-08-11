@@ -19,7 +19,7 @@
                 <li><a {% if not currentFilter %}class="govuk-!-font-weight-bold" aria-current="page"{% endif %} href="{{links.activity}}">All activity</a></li>
 
                 {% for key, value in filters %}
-                    <li><a {% if currentFilter == key %}class="govuk-!-font-weight-bold" aria-current="page"{% endif %} href="{{links.activity}}/{{ key }}">{{ value.name }}</a></li>
+                    <li><a {% if currentFilter == key %}class="govuk-!-font-weight-bold" aria-current="page"{% endif %} data-qa="offender/activity-filter-{{ key }}" href="{{links.activity}}/{{ key }}">{{ value.name }}</a></li>
                 {% endfor %}
                 </ul>
             </div>
