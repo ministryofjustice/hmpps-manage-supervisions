@@ -17,6 +17,14 @@ export enum DebugFlags {
   SetProviderCode = 'set-provider',
 }
 
+export enum LogLevel {
+  Error = 'error',
+  Warn = 'warn',
+  Info = 'info',
+  Debug = 'debug',
+  Verbose = 'verbose',
+}
+
 export interface ServerConfig {
   name: string
   description: string
@@ -31,6 +39,7 @@ export interface ServerConfig {
   domain: URL
   staticResourceCacheDuration: number
   debug: Partial<Record<DebugFlags, string>>
+  logLevel: LogLevel
 }
 
 export interface RedisConfig {

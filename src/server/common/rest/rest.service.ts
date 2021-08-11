@@ -28,9 +28,7 @@ export class RestService {
     // response logging
     axios.interceptors.response.use(
       r => {
-        logger.log(
-          `[${user.username}] ${getRequestName(r.config)} -> ${r.status} ${r.statusText} ${JSON.stringify(r.data)}`,
-        )
+        logger.log(`${getRequestName(r.config)} -> ${r.status} ${r.statusText} ${JSON.stringify(r.data)}`)
         return r
       },
       err => {
@@ -40,9 +38,9 @@ export class RestService {
             currentRetryAttempt ? `[retry ${currentRetryAttempt}/${retry}] ` : '',
             SanitisedAxiosError.getMessage(err),
           ].filter(x => x)
-          logger.error(`[${user.username}] ${messages.join(' ')}`)
+          logger.error(messages.join(' '))
         } else {
-          logger.error(`[${user.username}] ${err.message}`)
+          logger.error('rest request failed', err)
         }
         // we have to re-throw as-is for the retry to work
         throw err

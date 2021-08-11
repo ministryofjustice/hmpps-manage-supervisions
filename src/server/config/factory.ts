@@ -3,12 +3,13 @@ import {
   Config,
   ContactTypeCategory,
   DebugFlags,
+  LogLevel,
   WellKnownAppointmentType,
   WellKnownAppointmentTypeMeta,
   WellKnownCommunicationType,
   WellKnownContactTypeConfig,
-  WellKnownWarningLetterType,
   WellKnownContactTypeMeta,
+  WellKnownWarningLetterType,
 } from './types'
 import { ApplicationVersion } from '../util'
 import { requirements } from './requirements'
@@ -32,7 +33,10 @@ export function isProduction(): boolean {
 
 function env<T>(name: string, parse: (value: string) => T, fallbackFn?: EnvironmentFallback<T>): T {
   if (process.env[name] !== undefined) {
-    return parse(process.env[name])
+    const value = parse(process.env[name])
+    if (value !== undefined) {
+      return value
+    }
   }
 
   if (fallbackFn !== undefined && (!isProduction() || !fallbackFn.developmentOnly)) {
@@ -52,6 +56,15 @@ function int(name: string, fallbackFn?: EnvironmentFallback<number>): number {
 
 function bool(name: string, fallbackFn?: EnvironmentFallback<boolean>): boolean {
   return env(name, x => x === 'true', fallbackFn)
+}
+
+function stringEnum<T>(cls: T, name: string, fallbackFn?: EnvironmentFallback<T[keyof T]>): T[keyof T] {
+  const values = Object.values(cls)
+  return env(
+    name,
+    x => values.find(v => v.localeCompare(x.trim(), undefined, { sensitivity: 'base' }) === 0),
+    fallbackFn,
+  )
 }
 
 export const CONTACT_DEFAULTS: WellKnownContactTypeConfig = {
@@ -160,6 +173,7 @@ export function configFactory(): Config {
           agg[k] = v || DEBUG_DEFAULTS[k]
           return agg
         }, {}),
+      logLevel: stringEnum(LogLevel, 'LOG_LEVEL', fallback(LogLevel.Info)),
     },
     redis: {
       host: string('REDIS_HOST', developmentOnly('localhost')),

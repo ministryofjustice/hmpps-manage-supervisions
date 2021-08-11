@@ -1,4 +1,5 @@
-import { HttpService, Injectable, Logger } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
+import { HttpService } from '@nestjs/axios'
 import { ConfigService } from '@nestjs/config'
 import { HealthResult } from './types'
 import { ApiConfig, Config, DependentApisConfig, ServerConfig } from '../config'
@@ -38,9 +39,9 @@ export class HealthService {
     return this.http.get(urlJoin(config.url, 'health', 'ping'), { timeout: config.timeout }).pipe(
       map(() => ({ name, healthy: true, result: 'OK' })),
       catchError(err => {
-        const message = err.response?.data || err.message || '[no data]'
-        this.logger.error(`${name} is unhealthy ${JSON.stringify(message)}`)
-        return of({ name, healthy: false, result: message })
+        const reason = err.response?.data && typeof err.response.data === 'object' ? err.response.data : err.message
+        this.logger.error(`${name} is unhealthy`, { reason, service: name })
+        return of({ name, healthy: false, result: reason })
       }),
     )
   }

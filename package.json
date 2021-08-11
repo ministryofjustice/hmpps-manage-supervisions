@@ -30,6 +30,7 @@
     "seed": "ts-node-transpile-only scripts/dev.seed.ts"
   },
   "dependencies": {
+    "@nestjs/axios": "^0.0.1",
     "@nestjs/common": "^8.0.6",
     "@nestjs/config": "^1.0.1",
     "@nestjs/core": "^8.0.6",
@@ -58,7 +59,8 @@
     "retry-axios": "^2.4.0",
     "rimraf": "^3.0.2",
     "rxjs": "^7.3.0",
-    "source-map-support": "^0.5.19"
+    "source-map-support": "^0.5.19",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@ministryofjustice/frontend": "^0.2.5",

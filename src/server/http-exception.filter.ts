@@ -21,7 +21,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
   private renderErrorPage(exception: Error, host: ArgumentsHost, status = 500) {
     const viewModel = { message: exception.message, status, stack: exception.stack }
-    this.logger.error(JSON.stringify(viewModel))
+    this.logger.error('unhandled exception', exception)
     return host.switchToHttp().getResponse<Response>().status(status).render('pages/error', viewModel)
   }
 
