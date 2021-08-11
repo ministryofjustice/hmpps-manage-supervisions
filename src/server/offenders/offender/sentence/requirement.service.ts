@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { Requirement } from '../../../community-api/client'
-import { Duration, DurationObjectUnits } from 'luxon'
+import { Duration, DurationUnit } from 'luxon'
 import {
   ConvictionRequirement,
   ConvictionRequirementDetail,
@@ -82,7 +82,7 @@ export class RequirementService {
     }
   }
 
-  private transformUnits(value: number, units: string, targetUnits: keyof DurationObjectUnits): number {
+  private transformUnits(value: number, units: string, targetUnits: DurationUnit): number {
     if (targetUnits === units) {
       // short circuit
       return value

@@ -80,30 +80,21 @@ module.exports = function (options) {
               },
             },
           ],
+          type: 'javascript/auto',
         },
         {
-          test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
-          use: [
-            {
-              loader: 'file-loader',
-              options: {
-                name: '[name].[ext]',
-                outputPath: 'assets/fonts/',
-              },
-            },
-          ],
+          test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
+          type: 'asset/resource',
+          generator: {
+            filename: 'assets/fonts/[name][ext][query]'
+          },
         },
         {
-          test: /\.(png|jp(e)?g)$/,
-          use: [
-            {
-              loader: 'file-loader',
-              options: {
-                name: '[name].[ext]',
-                outputPath: 'assets/images/',
-              },
-            },
-          ],
+          test: /\.(png|jp(e)?g|svg)$/,
+          type: 'asset/resource',
+          generator: {
+            filename: 'assets/images/[name][ext][query]'
+          },
         },
       ],
     },
