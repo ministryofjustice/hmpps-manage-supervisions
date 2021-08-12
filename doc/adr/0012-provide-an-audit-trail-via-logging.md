@@ -12,6 +12,7 @@ Some terms are used interchangeably. In this document, we use the following defi
 
 * Action: Something that a user or system does.
 * Recording: The process of storing historical information that can be analysed later on.
+* Auditing: the process of analysing recorded information for security purposes.
 * Logs / Log messages: textual strings, including structured data such as timestamps, that are written to a log file.
 * Log file: a file containing a stream of log messages.
 * Logging: the process of writing log messages.
