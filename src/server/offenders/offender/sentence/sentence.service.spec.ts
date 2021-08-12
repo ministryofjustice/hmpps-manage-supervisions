@@ -57,14 +57,14 @@ describe('SentenceService', () => {
       .resolves(fakeOkResponse(convictions))
     return convictions
   }
-  function havingBreaches(convictionId: number) {
+  function havingBreaches(crn: string, convictionId: number) {
     const activeBreach = fakeBreachSummary({ active: true })
     const inactiveBreaches = [fakeBreachSummary({ active: false, proven: true }), fakeBreachSummary({ active: false })]
     const breachesResult = {
       breaches: [activeBreach, ...inactiveBreaches],
       lastRecentBreachEnd: DateTime.fromObject({ year: 2018, month: 2, day: 1 }),
     }
-    breachService.getBreaches.withArgs('some-crn', convictionId).resolves(breachesResult)
+    breachService.getBreaches.withArgs(crn, convictionId).resolves(breachesResult)
     return breachesResult
   }
 
@@ -127,8 +127,8 @@ describe('SentenceService', () => {
       { active: false, convictionDate: '2019-01-02', convictionId: 101 },
       { active: false, convictionDate: '2019-01-02', convictionId: 102 },
     )
-    havingBreaches(101)
-    havingBreaches(102)
+    havingBreaches('some-crn', 101)
+    havingBreaches('some-crn', 102)
     const requirements = havingRequirements(100, {})
 
     const observed = await subject.getConvictionDetails('some-crn')
