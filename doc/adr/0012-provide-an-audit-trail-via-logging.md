@@ -54,6 +54,9 @@ Logs are only retained for [30 days](https://user-guide.cloud-platform.service.j
 so the S3 bucket will be the "channel of record" for our auditable logs. Both Kibana and AppInsights will only be used for
 debugging and short-term monitoring of the service.
 
+A new [HMPPS Audit API](https://github.com/ministryofjustice/hmpps-audit-api) is also under development; this service monitors a queue
+for audit events, and stores them for future inspection. We should investigate adding these granular audit events to our service once this project reaches a suitable level of maturity.
+
 ## References
 
 * [MoJ Security Guidance](https://security-guidance.service.justice.gov.uk/#cyber-and-technical-security-guidance)
