@@ -20,7 +20,7 @@ Some terms are used interchangeably. In this document, we use the following defi
 
 ## Context
 
-MoJ monitors use of its services [by recording actions that are performed](https://security-guidance.service.justice.gov.uk/logging-and-monitoring) via logging or event recording. Raw log files for internal services are normally [retained for 13 months](https://security-guidance.service.justice.gov.uk/logging-and-monitoring/#log-retention).
+MoJ monitors use of its services [by recording actions that are performed](https://security-guidance.service.justice.gov.uk/logging-and-monitoring) via log or event recording. Raw log files for internal services are normally [retained for 13 months](https://security-guidance.service.justice.gov.uk/logging-and-monitoring/#log-retention).
 
 To comply with security requirements, our service must not provide "unsupervised" access to
 service user data. Keeping an audit trail of who has accessed and updated data is considered sufficient "supervision" for
