@@ -153,13 +153,16 @@ context('ViewOffenderCompliance', () => {
           page.previousOrdersTitle.contains(
             `Previous orders (${DateTime.now().minus({ year: 2 }).toFormat('MMMM yyyy')} to present)`,
           )
-          SummaryList.selectFromCard('24 month CJA Community Order (Ended 11 September 2019)', card => {
-            card.value('Main offence').contains('Common Assault and Battery (2 counts)')
-            card.value('Status').contains('Revoked')
-            card.value('Started').contains('9 December 2018')
-            card.value('Ended').contains(previousTerminationDate.toFormat('d MMMM yyyy'))
-            card.value('Breaches').contains('Breach not proven') // this comes from the ABNP contact & overrides the status
-          })
+          SummaryList.selectFromCard(
+            `24 month CJA Community Order (Ended ${previousTerminationDate.toFormat('d MMMM yyyy')})`,
+            card => {
+              card.value('Main offence').contains('Common Assault and Battery (2 counts)')
+              card.value('Status').contains('Revoked')
+              card.value('Started').contains('9 December 2018')
+              card.value('Ended').contains(previousTerminationDate.toFormat('d MMMM yyyy'))
+              card.value('Breaches').contains('Breach not proven') // this comes from the ABNP contact & overrides the status
+            },
+          )
         })
     })
   })
