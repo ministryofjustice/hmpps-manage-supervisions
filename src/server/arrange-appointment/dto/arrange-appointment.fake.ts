@@ -13,7 +13,7 @@ import { fakeConfig } from '../../config/config.fake'
 export const fakeAppointmentBuilderDto = fakeClass(
   AppointmentBuilderDto,
   () => {
-    const date = DateTime.fromJSDate(faker.date.future(), { locale: 'en-gb' }).set({ hour: 12 })
+    const date = DateTime.fromJSDate(faker.date.future()).set({ hour: 12 })
     return {
       type: faker.random.arrayElement(Object.values(WellKnownAppointmentType)),
       requiresLocation: AppointmentTypeRequiresLocation.Required,
@@ -21,8 +21,8 @@ export const fakeAppointmentBuilderDto = fakeClass(
       location: faker.datatype.uuid(),
       locationDescription: faker.address.streetAddress(),
       date: { day: date.day, month: date.month, year: date.year } as any,
-      startTime: date.toFormat(TIME_FORMAT, { locale: 'en-gb' }),
-      endTime: date.plus({ hour: 1 }).toFormat(TIME_FORMAT, { locale: 'en-gb' }),
+      startTime: date.toFormat(TIME_FORMAT),
+      endTime: date.plus({ hour: 1 }).toFormat(TIME_FORMAT),
       addNotes: true,
       notes: faker.lorem.sentences(3),
       sensitive: faker.datatype.boolean(),

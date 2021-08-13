@@ -24,11 +24,10 @@ export function getDateTime(dateOrIso: RawDate, time?: string): DateTime {
 
   const date = safeGetDateTime(dateOrIso)
   return DateTime.fromObject({
-    ...DateTime.fromFormat(time, TIME_FORMAT, { locale: 'en-gb' }).toObject(),
+    ...DateTime.fromFormat(time, TIME_FORMAT).toObject(),
     day: date.day,
     month: date.month,
     year: date.year,
-    locale: 'en-gb',
   })
 }
 

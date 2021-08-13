@@ -71,7 +71,7 @@ export class AppointmentDateDto implements DateInput {
       return null
     }
 
-    return DateTime.fromObject({ day: this.day, month: this.month, year: this.year, locale: 'en-gb' })
+    return DateTime.fromObject({ day: this.day, month: this.month, year: this.year })
   }
 
   set value(value: DateTime | null) {

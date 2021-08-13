@@ -1,5 +1,10 @@
 import { merge } from 'lodash'
 import { ClassConstructor, ClassTransformOptions, plainToClass } from 'class-transformer'
+import { Settings } from 'luxon'
+
+// Put this here as most tests consume a faker factory.
+// Any tests that do not consume this file & are interested in times should also set this.
+Settings.defaultZone = 'Europe/London'
 
 export type FakeFn<Faked, Options = any> = (
   partialOrPartials?: DeepPartial<Faked> | DeepPartial<Faked>[],
