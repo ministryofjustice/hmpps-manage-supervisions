@@ -22,7 +22,32 @@ context('ViewOffenderSentence', () => {
 
   describe('with active conviction', () => {
     before(() => {
-      cy.seed()
+      cy.seed({
+        convictions: {
+          active: {
+            conviction: { inBreach: false },
+            nsis: [],
+          },
+          previous: [
+            {
+              nsis: [
+                {
+                  active: false,
+                  nsiType: { code: 'BRE' },
+                  actualStartDate: '2018-12-10',
+                  actualEndDate: '2019-12-03',
+                },
+              ],
+            },
+          ],
+        },
+        contacts: [
+          {
+            contactStart: '2018-12-11T00:00:00+00:00',
+            type: { code: 'ABCF', appointment: true },
+          },
+        ],
+      })
     })
 
     it('displays sentence details', () => {
@@ -73,7 +98,7 @@ context('ViewOffenderSentence', () => {
 
           page.probationHistory(card => {
             card.value('Previous orders').contains('Previous orders (1) Last ended on 1 November 2018')
-            card.value('Previous breaches').contains('0 previous breaches')
+            card.value('Previous breaches').contains('1 previous breach')
           })
         })
     })
