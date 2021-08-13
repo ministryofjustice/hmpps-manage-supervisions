@@ -171,6 +171,10 @@
                 {
                     key: { text: "Previous orders" },
                     value: { html: previousOrders }
+                },
+                {
+                    key: { text: "Previous breaches" },
+                    value: { text: conviction.previousBreaches.count | quantity('previous breach', 'previous breaches') }
                 }
             ]
         }) }}

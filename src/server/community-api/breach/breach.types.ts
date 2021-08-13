@@ -15,6 +15,7 @@ export interface BreachSummary {
   endDate?: DateTime
   status?: string
   outcome?: string
+  proven: boolean
 }
 
 export interface GetBreachesResult {

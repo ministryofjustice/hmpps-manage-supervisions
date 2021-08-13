@@ -76,6 +76,7 @@ export class BreachService {
         endDate: nsi.actualEndDate,
         outcome: breachOutcome?.name || nsi.nsiOutcome?.description, // fall back to poor quality outcome field if present
         status: nsi.nsiStatus.description,
+        proven: breachOutcome?.type === ContactTypeCategory.BreachEnd ? breachOutcome.value.proven : false,
       }
     })
 

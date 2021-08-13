@@ -17,6 +17,7 @@ import { CommunityApiService } from '../../../community-api'
 import { getOffenceName, getSentenceName } from './util'
 import { ComplianceService } from './compliance.service'
 import { ActivityFilter, ActivityService } from '../activity'
+import { BreachService } from '../../../community-api/breach'
 
 @Injectable()
 export class SentenceService {
@@ -25,10 +26,13 @@ export class SentenceService {
     private readonly requirements: RequirementService,
     private readonly compliance: ComplianceService,
     private readonly activity: ActivityService,
+    private readonly breach: BreachService,
   ) {}
 
   async getConvictionDetails(crn: string): Promise<ConvictionDetails | null> {
     const { requirements, current, previous } = await this.getConvictions(crn)
+
+    const breachesResult = await Promise.all(previous.map(x => this.breach.getBreaches(crn, x.convictionId)))
 
     if (!current) {
       return null
@@ -45,6 +49,12 @@ export class SentenceService {
             link: `/offenders/${crn}/previous-convictions`,
           }
         : null,
+      previousBreaches: {
+        count: breachesResult
+          .map(x => x.breaches)
+          .reduce((agg, x) => [...agg, ...x], [])
+          .filter(x => !x.active && x.proven).length,
+      },
       offence: mainOffence && {
         id: mainOffence.offenceId,
         description: getOffenceName(mainOffence),
