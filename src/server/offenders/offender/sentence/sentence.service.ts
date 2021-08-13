@@ -32,9 +32,7 @@ export class SentenceService {
   async getConvictionDetails(crn: string): Promise<ConvictionDetails | null> {
     const { requirements, current, previous } = await this.getConvictions(crn)
 
-    const breachesResult = previous.length
-      ? await Promise.all([...previous.map(x => this.breach.getBreaches(crn, x.convictionId))].filter(x => x))
-      : []
+    const breachesResult = await Promise.all(previous.map(x => this.breach.getBreaches(crn, x.convictionId)))
 
     if (!current) {
       return null
@@ -52,14 +50,10 @@ export class SentenceService {
           }
         : null,
       previousBreaches: {
-        count: breachesResult.length
-          ? [
-              ...breachesResult
-                .map(x => x.breaches)
-                .reduce((accumulator, currentValue) => accumulator.concat(currentValue))
-                .filter(x => !x.active && x.proven),
-            ].length
-          : 0,
+        count: breachesResult
+          .map(x => x.breaches)
+          .reduce((agg, x) => [...agg, ...x], [])
+          .filter(x => !x.active && x.proven).length,
       },
       offence: mainOffence && {
         id: mainOffence.offenceId,

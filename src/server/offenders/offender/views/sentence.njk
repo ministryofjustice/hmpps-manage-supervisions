@@ -165,9 +165,6 @@
             </a>
             Last ended on {{ conviction.previousConvictions.lastEnded | shortDate }}
         {% endset %}
-        {% set previousBreaches %}
-             {{ conviction.previousBreaches.count }} previous {% if conviction.previousBreaches.count == 1 %} breach {% else %} breaches {% endif %}
-        {% endset %}
         {% call appSummaryCard({ titleText: 'Probation history', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
         {{ govukSummaryList({
             rows: [
@@ -177,7 +174,7 @@
                 },
                 {
                     key: { text: "Previous breaches" },
-                    value: { html: previousBreaches }
+                    value: { text: conviction.previousBreaches.count | quantity('previous breach', 'previous breaches') }
                 }
             ]
         }) }}
