@@ -11,7 +11,6 @@ image:
 
 ingress:
   enabled: true
-  enable_whitelist: false
   host: hmpps-manage-supervisions-dev.apps.live-1.cloud-platform.service.justice.gov.uk
   cert_secret: hmpps-manage-supervisions-cert
   path: /
