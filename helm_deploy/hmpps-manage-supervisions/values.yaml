@@ -3,3 +3,8 @@
 
 generic-prometheus-alerts:
   targetApplication: hmpps-manage-supervisions
+
+whitelist:
+  mojvpn: "81.134.202.29/32"
+  moj-official-tgw-prod: "51.149.250.0/24"
+  moj-official-tgw-preprod: "51.149.251.0/24"
