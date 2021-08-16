@@ -15,6 +15,14 @@ generic-service:
     cert_secret: hmpps-manage-supervisions-cert
     path: /
 
+  livenessProbe:
+    httpGet:
+      path: /health/ping
+
+  readinessProbe:
+    httpGet:
+      path: /health
+
   allowlist:
     mojvpn: "81.134.202.29/32"
     moj-official-tgw-prod: "51.149.250.0/24"
