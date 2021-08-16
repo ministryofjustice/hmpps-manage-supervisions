@@ -61,7 +61,7 @@ These log messages will be written to application `stdout` and `stderr`, which a
 
 ## Consequences
 
-The upcoming MLAP system requires unmodified log files to ingest; they cannot rely on AppInsights exports cannot be relied upon. When
+The upcoming MLAP system requires unmodified log files to ingest; they cannot rely on data obtained through AppInsights. When
 we need to get our data into that system, we will need to send log data directly to it. Hopefully, this can happen automatically at the Cloud Platform infrastructure level using a FluentBit output plugin.
 
 We are not currently planning to store any extra custom event data in AppInsights, but should the demand arise, we can add that capability.
