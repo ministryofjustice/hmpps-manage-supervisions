@@ -110,9 +110,9 @@ export function requirements(
   convictionId: number,
   partials: DeepPartial<Requirement>[] = REQUIREMENTS,
 ): SeedFn {
-  return async context => {
+  return context => {
     const requirements = partials.map(p => fakeRequirement(p))
-    await context.client.community
+    context.client.community
       .get(`/secure/offenders/crn/${crn}/convictions/${convictionId}/requirements`)
       .returns({ requirements })
   }

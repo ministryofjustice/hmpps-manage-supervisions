@@ -68,9 +68,9 @@ export const REGISTRATIONS: DeepPartial<Registration>[] = [
 ]
 
 export function registrations(crn: string, partials: DeepPartial<Registration>[] = REGISTRATIONS): SeedFn {
-  return async context => {
+  return context => {
     const registrations = partials.map(p => fakeRegistration(p))
-    await context.client.community
+    context.client.community
       .get(`/secure/offenders/crn/${crn}/registrations`)
       .returns({ registrations } as Registrations)
   }

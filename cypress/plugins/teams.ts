@@ -44,8 +44,8 @@ export function teamOfficeLocations({
   teamCode = TEAM_CODE,
   officeLocations: partials = OFFICE_LOCATIONS,
 }: SeedTeamOfficeLocationsOptions = {}): SeedFn {
-  const officeLocations = partials.map(p => fakeOfficeLocation(p))
-  return async ({ client }) => {
-    await client.community.get(`/secure/teams/${teamCode}/office-locations`).returns(officeLocations)
+  return ({ client }) => {
+    const officeLocations = partials.map(p => fakeOfficeLocation(p))
+    client.community.get(`/secure/teams/${teamCode}/office-locations`).returns(officeLocations)
   }
 }

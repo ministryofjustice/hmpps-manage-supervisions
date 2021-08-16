@@ -32,13 +32,11 @@ import * as faker from 'faker'
 /**
  * Resets the wiremock server, this should always be the first seed module loaded.
  */
-export const reset = seedModule({ title: 'Reset' }, async context => {
-  await context.client.reset()
-  await Promise.all([
-    context.client.community.stubPing(),
-    context.client.assessRisksAndNeeds.stubPing(),
-    context.client.hmppsAuth.stubPing(),
-  ])
+export const reset = seedModule({ title: 'Reset' }, context => {
+  context.client.setReset()
+  context.client.community.stubPing()
+  context.client.assessRisksAndNeeds.stubPing()
+  context.client.hmppsAuth.stubPing()
 })
 
 export interface ReferenceDataSeedOptions extends SeedTeamOfficeLocationsOptions {

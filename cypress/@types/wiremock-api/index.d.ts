@@ -150,7 +150,7 @@ declare namespace WireMock {
     /**
      * The stub mapping's name
      */
-    name: string
+    name?: string
 
     request: StubMappingRequest
 

@@ -43,6 +43,6 @@ const CONTACT_TYPES = [
   },
 ]
 
-export const contactTypes: SeedFn = async context => {
-  await context.client.community.get('/secure/contact-types').query({ categories: 'LT' }).returns(CONTACT_TYPES)
+export const contactTypes: SeedFn = context => {
+  context.client.community.get('/secure/contact-types').query({ categories: 'LT' }).returns(CONTACT_TYPES)
 }

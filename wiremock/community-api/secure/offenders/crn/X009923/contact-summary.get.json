@@ -1,0 +1,481 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/community-api/secure/offenders/crn/X009923/contact-summary",
+    "queryParameters": {}
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "content": [
+        {
+          "contactId": 1,
+          "contactStart": "2020-09-04T12:00:00+01:00",
+          "contactEnd": "2020-09-04T13:00:00+01:00",
+          "notes": "Some home visit appointment\n\nWith a new line!",
+          "officeLocation": {
+            "code": "23c76bfa-23db-4935-9b72-60abaff8427e",
+            "buildingName": "Theodore",
+            "buildingNumber": "251",
+            "streetName": "Sandra Pine",
+            "townCity": "South Troy",
+            "county": "Avon",
+            "postcode": "00947-3762",
+            "description": "810 Morar Brook"
+          },
+          "outcome": {
+            "code": "09671167-d10a-47b7-aef5-162d18dcb3a3",
+            "attended": true,
+            "complied": true,
+            "description": "repurpose ubiquitous e-commerce",
+            "hoursCredited": 71173
+          },
+          "sensitive": false,
+          "type": {
+            "code": "CHVS",
+            "description": "Home Visit to Case (NS)",
+            "shortDescription": "expedite killer users",
+            "appointment": true
+          },
+          "provider": {
+            "code": "c639752b-bad2-4738-91bc-41c28f8a71b0",
+            "description": "incubate B2C vortals"
+          },
+          "team": {
+            "code": "7e181dc7-db75-4447-a98a-57e344b2c72c",
+            "description": "orchestrate ubiquitous methodologies"
+          },
+          "staff": {
+            "code": "f6b840c7-e9e3-4b05-8db3-377d0027deec",
+            "forenames": "Catherine",
+            "surname": "Ellis",
+            "unallocated": false
+          },
+          "lastUpdatedDateTime": "2021-08-13T11:18:29.905+01:00",
+          "lastUpdatedByUser": {
+            "forenames": "Ora",
+            "surname": "Daniel"
+          }
+        },
+        {
+          "contactId": 2,
+          "contactStart": "2020-09-03T10:30:00+01:00",
+          "contactEnd": "2020-09-03T11:15:00+01:00",
+          "notes": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed vestibulum risus, sed pretium nulla. Proin euismod nisl leo, eu porta purus tristique id. Morbi vel imperdiet magna. In eget ipsum a sem ullamcorper rhoncus sit amet eu metus. Donec dapibus ut leo vel finibus. Quisque quis lobortis risus. Sed massa erat, bibendum vitae ex malesuada, aliquet tristique risus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Praesent ac tempus est, eu pretium ipsum.\nQuisque eget nisl vel enim interdum ultrices. Etiam at orci sodales, dignissim leo ac, iaculis odio. Sed a arcu suscipit, aliquet velit in, ultricies lectus. Suspendisse potenti. Nulla sagittis rhoncus facilisis. Quisque laoreet molestie malesuada. Cras ac varius diam. Maecenas lacinia volutpat magna. Maecenas hendrerit enim nec magna aliquet, tempor interdum magna tempor.\nSuspendisse sed nisi faucibus, dapibus lorem eu, sollicitudin mi. Phasellus ac luctus massa, sit amet maximus ex. Duis auctor mauris nec tincidunt elementum. Nunc molestie, ligula vel iaculis venenatis, nulla velit accumsan orci, eu laoreet justo metus eu mauris. Nulla eros nulla, interdum vitae tristique non, ornare at purus. Duis sed diam consequat, elementum magna quis, feugiat dui. Nunc et nulla nunc. Cras facilisis nec arcu vitae pulvinar. Phasellus ex tellus, hendrerit id enim semper, vestibulum pharetra ipsum. Donec sagittis fermentum metus, vitae rhoncus tortor. Fusce sit amet aliquet tellus. Nunc imperdiet lectus id mi volutpat, vitae venenatis eros tincidunt. Duis non nibh et nunc mollis posuere quis egestas elit. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam eu lacinia metus, at sollicitudin est. Proin at massa imperdiet, porttitor magna non, lacinia nisl.\nCras congue vitae odio eu rutrum. Donec in dictum massa. Vivamus at placerat neque, at dictum est. Etiam facilisis magna at tempor mattis. Pellentesque finibus condimentum justo, at efficitur nibh.",
+          "officeLocation": {
+            "code": "41b25d8f-822b-46c6-b960-8fb87ac917e4",
+            "buildingName": "Reinhold",
+            "buildingNumber": "158",
+            "streetName": "Schimmel Fort",
+            "townCity": "Catonsville",
+            "county": "Bedfordshire",
+            "postcode": "51018-5817",
+            "description": "87089 Walsh Stravenue"
+          },
+          "outcome": {
+            "code": "4a9e8ff1-84cc-4bb8-a6cd-0149c3eef402",
+            "attended": true,
+            "complied": false,
+            "description": "brand killer channels",
+            "hoursCredited": 54774
+          },
+          "sensitive": false,
+          "type": {
+            "code": "APAT",
+            "description": "Office visit",
+            "shortDescription": "matrix B2C deliverables",
+            "appointment": true
+          },
+          "provider": {
+            "code": "305cbedc-9469-41bc-b7d5-c599b1a5a088",
+            "description": "extend sexy deliverables"
+          },
+          "team": {
+            "code": "ea69f5bf-648b-4b22-98b6-d0d03dc721bd",
+            "description": "recontextualize real-time markets"
+          },
+          "staff": {
+            "code": "b0e953ca-b130-40e4-9e45-592aa1866daa",
+            "forenames": "Lorena",
+            "surname": "Wolff",
+            "unallocated": true
+          },
+          "lastUpdatedDateTime": "2021-08-13T06:49:35.270+01:00",
+          "lastUpdatedByUser": {
+            "forenames": "Eleanore",
+            "surname": "Ullrich"
+          }
+        },
+        {
+          "contactId": 3,
+          "contactStart": "2020-09-03T10:30:00+01:00",
+          "contactEnd": "2020-09-03T11:15:00+01:00",
+          "notes": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed vestibulum risus, sed pretium nulla. Proin euismod nisl leo, eu porta purus tristique id. Morbi vel imperdiet magna. In eget ipsum a sem ullamcorper rhoncus sit amet eu metus. Donec dapibus ut leo vel finibus. Quisque quis lobortis risus. Sed massa erat, bibendum vitae ex malesuada, aliquet tristique risus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Praesent ac tempus est, eu pretium ipsum.\nQuisque eget nisl vel enim interdum ultrices. Etiam at orci sodales, dignissim leo ac, iaculis odio. Sed a arcu suscipit, aliquet velit in, ultricies lectus. Suspendisse potenti. Nulla sagittis rhoncus facilisis. Quisque laoreet molestie malesuada. Cras ac varius diam. Maecenas lacinia volutpat magna. Maecenas hendrerit enim nec magna aliquet, tempor interdum magna tempor.\nSuspendisse sed nisi faucibus, dapibus lorem eu, sollicitudin mi. Phasellus ac luctus massa, sit amet maximus ex. Duis auctor mauris nec tincidunt elementum. Nunc molestie, ligula vel iaculis venenatis, nulla velit accumsan orci, eu laoreet justo metus eu mauris. Nulla eros nulla, interdum vitae tristique non, ornare at purus. Duis sed diam consequat, elementum magna quis, feugiat dui. Nunc et nulla nunc. Cras facilisis nec arcu vitae pulvinar. Phasellus ex tellus, hendrerit id enim semper, vestibulum pharetra ipsum. Donec sagittis fermentum metus, vitae rhoncus tortor. Fusce sit amet aliquet tellus. Nunc imperdiet lectus id mi volutpat, vitae venenatis eros tincidunt. Duis non nibh et nunc mollis posuere quis egestas elit. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam eu lacinia metus, at sollicitudin est. Proin at massa imperdiet, porttitor magna non, lacinia nisl.\nCras congue vitae odio eu rutrum. Donec in dictum massa. Vivamus at placerat neque, at dictum est. Etiam facilisis magna at tempor mattis. Pellentesque finibus condimentum justo, at efficitur nibh.",
+          "officeLocation": {
+            "code": "d060f213-3689-4c23-b15a-1637a41c575c",
+            "buildingName": "Yessenia",
+            "buildingNumber": "172",
+            "streetName": "Schroeder Glen",
+            "townCity": "East Mekhi",
+            "county": "Buckinghamshire",
+            "postcode": "64370",
+            "description": "236 Daniella Prairie"
+          },
+          "outcome": {
+            "code": "fe9e89af-6ac8-4b5f-950f-d71b3ffab4cb",
+            "attended": false,
+            "complied": true,
+            "description": "enhance dynamic e-markets",
+            "hoursCredited": 93656
+          },
+          "sensitive": true,
+          "type": {
+            "code": "APAT",
+            "description": "Office visit",
+            "shortDescription": "transition out-of-the-box relationships",
+            "appointment": true
+          },
+          "provider": {
+            "code": "655b5ed9-8b6e-40e3-9a0f-6b742f354bf4",
+            "description": "optimize magnetic systems"
+          },
+          "team": {
+            "code": "ccf7d6c6-b77d-4d9e-a21c-b0bbe5b70ea4",
+            "description": "target back-end communities"
+          },
+          "staff": {
+            "code": "4f6996c8-461a-46d0-bda2-a8b0537d8a39",
+            "forenames": "Unallocated",
+            "surname": "Staff",
+            "unallocated": true
+          },
+          "lastUpdatedDateTime": "2021-08-13T12:44:32.469+01:00",
+          "lastUpdatedByUser": {
+            "forenames": "Percival",
+            "surname": "Kuhn"
+          }
+        },
+        {
+          "contactId": 4,
+          "contactStart": "2020-09-03T10:30:00+01:00",
+          "contactEnd": "2020-09-03T11:15:00+01:00",
+          "notes": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed vestibulum risus, sed pretium nulla. Proin euismod nisl leo, eu porta purus tristique id. Morbi vel imperdiet magna. In eget ipsum a sem ullamcorper rhoncus sit amet eu metus. Donec dapibus ut leo vel finibus. Quisque quis lobortis risus. Sed massa erat, bibendum vitae ex malesuada, aliquet tristique risus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Praesent ac tempus est, eu pretium ipsum.\nQuisque eget nisl vel enim interdum ultrices. Etiam at orci sodales, dignissim leo ac, iaculis odio. Sed a arcu suscipit, aliquet velit in, ultricies lectus. Suspendisse potenti. Nulla sagittis rhoncus facilisis. Quisque laoreet molestie malesuada. Cras ac varius diam. Maecenas lacinia volutpat magna. Maecenas hendrerit enim nec magna aliquet, tempor interdum magna tempor.\nSuspendisse sed nisi faucibus, dapibus lorem eu, sollicitudin mi. Phasellus ac luctus massa, sit amet maximus ex. Duis auctor mauris nec tincidunt elementum. Nunc molestie, ligula vel iaculis venenatis, nulla velit accumsan orci, eu laoreet justo metus eu mauris. Nulla eros nulla, interdum vitae tristique non, ornare at purus. Duis sed diam consequat, elementum magna quis, feugiat dui. Nunc et nulla nunc. Cras facilisis nec arcu vitae pulvinar. Phasellus ex tellus, hendrerit id enim semper, vestibulum pharetra ipsum. Donec sagittis fermentum metus, vitae rhoncus tortor. Fusce sit amet aliquet tellus. Nunc imperdiet lectus id mi volutpat, vitae venenatis eros tincidunt. Duis non nibh et nunc mollis posuere quis egestas elit. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam eu lacinia metus, at sollicitudin est. Proin at massa imperdiet, porttitor magna non, lacinia nisl.\nCras congue vitae odio eu rutrum. Donec in dictum massa. Vivamus at placerat neque, at dictum est. Etiam facilisis magna at tempor mattis. Pellentesque finibus condimentum justo, at efficitur nibh.",
+          "officeLocation": {
+            "code": "ec99b826-a4db-400a-8f30-c8cb87784436",
+            "buildingName": "Derick",
+            "buildingNumber": "896",
+            "streetName": "VonRueden Fords",
+            "townCity": "Abbottborough",
+            "county": "Cambridgeshire",
+            "postcode": "18006",
+            "description": "74423 Tillman Prairie"
+          },
+          "outcome": {
+            "code": "a7c344e7-9c18-44ca-9980-7864faeba70a",
+            "attended": false,
+            "complied": false,
+            "description": "scale real-time technologies",
+            "hoursCredited": 60480
+          },
+          "sensitive": false,
+          "type": {
+            "code": "APAT",
+            "description": "Office visit",
+            "shortDescription": "incentivize bricks-and-clicks convergence",
+            "appointment": true
+          },
+          "provider": {
+            "code": "32afaa1a-9b6f-4ab3-8e77-c8b481ccc61c",
+            "description": "aggregate world-class ROI"
+          },
+          "team": {
+            "code": "9f1281a3-7491-4e1b-860f-614073e5d374",
+            "description": "whiteboard ubiquitous niches"
+          },
+          "staff": {
+            "code": "b30d1d09-7f05-49e6-84a1-57e40d0d875e",
+            "forenames": "Unallocated",
+            "surname": "Staff",
+            "unallocated": true
+          },
+          "lastUpdatedDateTime": "2021-08-13T07:06:43.242+01:00",
+          "lastUpdatedByUser": {
+            "forenames": "Olaf",
+            "surname": "Kling"
+          },
+          "rarActivity": true
+        },
+        {
+          "contactId": 5,
+          "contactStart": "2020-09-02T11:00:00+01:00",
+          "contactEnd": "2020-09-02T13:00:00+01:00",
+          "notes": "Some unknown appointment",
+          "officeLocation": {
+            "code": "76ec91d8-c4ee-4d07-b2cb-71bfaa2e1ad5",
+            "buildingName": "Kyleigh",
+            "buildingNumber": "486",
+            "streetName": "Brendan Turnpike",
+            "townCity": "South Chesleyport",
+            "county": "Cambridgeshire",
+            "postcode": "00042",
+            "description": "565 Ruecker Meadows"
+          },
+          "outcome": null,
+          "sensitive": false,
+          "type": {
+            "code": "NOT_WELL_KNOWN",
+            "description": "Not a well known appointment",
+            "shortDescription": "extend bleeding-edge technologies",
+            "appointment": true
+          },
+          "provider": {
+            "code": "65736449-c65e-4dd5-9535-bdfbd9d532f3",
+            "description": "enable ubiquitous vortals"
+          },
+          "team": {
+            "code": "86e033ba-9dd9-4650-b115-34cdad7145af",
+            "description": "integrate cross-media bandwidth"
+          },
+          "staff": {
+            "code": "96d50b0c-4fbe-419f-9192-5b2a081ac08a",
+            "forenames": "Robert",
+            "surname": "Ohagan",
+            "unallocated": false
+          },
+          "lastUpdatedDateTime": "2021-08-12T19:42:34.380+01:00",
+          "lastUpdatedByUser": {
+            "forenames": "Cornell",
+            "surname": "Franecki"
+          }
+        },
+        {
+          "contactId": 6,
+          "contactStart": "2020-09-04T11:00:00+01:00",
+          "contactEnd": "2020-09-04T00:00:00+01:00",
+          "notes": "Phone call from Brian to double check when his next appointment was.",
+          "officeLocation": {
+            "code": "34ebf066-570f-43e3-804f-3ad655eda534",
+            "buildingName": "Estefania",
+            "buildingNumber": "261",
+            "streetName": "Salma Rue",
+            "townCity": "Robertsview",
+            "county": "Avon",
+            "postcode": "11223",
+            "description": "7168 Brayan Estates"
+          },
+          "outcome": null,
+          "sensitive": true,
+          "type": {
+            "code": "CTOA",
+            "description": "Phone Contact from Offender",
+            "shortDescription": "enable open-source architectures",
+            "appointment": false
+          },
+          "provider": {
+            "code": "1163fa84-e5b3-4658-b0fc-25d1a363f649",
+            "description": "incubate value-added architectures"
+          },
+          "team": {
+            "code": "4da1242f-b27b-415f-8240-2ea60709cf08",
+            "description": "scale robust portals"
+          },
+          "staff": {
+            "code": "f60b5987-b0b9-44d0-8c38-c116d9861a23",
+            "forenames": "Paxton",
+            "surname": "Leffler",
+            "unallocated": true
+          },
+          "lastUpdatedDateTime": "2020-09-04T11:20:23+01:00",
+          "lastUpdatedByUser": {
+            "forenames": "Andy",
+            "surname": "Smith"
+          }
+        },
+        {
+          "contactId": 7,
+          "contactStart": "2020-09-04T13:00:00+01:00",
+          "contactEnd": "2020-09-04T00:00:00+01:00",
+          "notes": "Hi Brian - it was good to speak today. To confirm, your next probation appointment is by telephone on 7th April 2021 at 10:00.",
+          "officeLocation": {
+            "code": "53264f6e-8fd3-4e89-ac78-305953beace0",
+            "buildingName": "Verlie",
+            "buildingNumber": "54",
+            "streetName": "Schmitt Hollow",
+            "townCity": "Country Club",
+            "county": "Bedfordshire",
+            "postcode": "76321-5024",
+            "description": "4215 Ivory Park"
+          },
+          "outcome": null,
+          "sensitive": true,
+          "type": {
+            "code": "CMOB",
+            "description": "eMail/Text to Offender",
+            "shortDescription": "engineer turn-key communities",
+            "appointment": false
+          },
+          "provider": {
+            "code": "fa47f396-f575-4687-8585-c31a002c708e",
+            "description": "syndicate 24/365 networks"
+          },
+          "team": {
+            "code": "05c470fb-f9be-45d5-82a5-72887067da26",
+            "description": "drive compelling infomediaries"
+          },
+          "staff": {
+            "code": "16c6a967-ea4a-46f2-b855-28176e406a9e",
+            "forenames": "Letha",
+            "surname": "Schmeler",
+            "unallocated": true
+          },
+          "lastUpdatedDateTime": "2020-09-04T14:20:23+01:00",
+          "lastUpdatedByUser": {
+            "forenames": "John",
+            "surname": "Smith"
+          }
+        },
+        {
+          "contactId": 8,
+          "contactStart": "2020-09-04T14:00:00+01:00",
+          "contactEnd": "2020-09-04T00:00:00+01:00",
+          "notes": "Some unknown communication",
+          "officeLocation": {
+            "code": "eefeba0d-67f4-46a0-83e4-abc8fe32f4c4",
+            "buildingName": "Jeanne",
+            "buildingNumber": "275",
+            "streetName": "Emmerich Ports",
+            "townCity": "West Joanchester",
+            "county": "Cambridgeshire",
+            "postcode": "40614-9022",
+            "description": "850 Brakus Points"
+          },
+          "outcome": null,
+          "sensitive": true,
+          "type": {
+            "code": "NOT_WELL_KNOWN_COMMUNICATION",
+            "description": "Not a well known communication",
+            "shortDescription": "syndicate value-added partnerships",
+            "appointment": false
+          },
+          "provider": {
+            "code": "4865690f-713b-4abc-b399-e5944cc816a4",
+            "description": "synergize world-class interfaces"
+          },
+          "team": {
+            "code": "84772a48-2143-4143-9b12-4d87b5654575",
+            "description": "empower B2C e-business"
+          },
+          "staff": {
+            "code": "cdc0fe54-e0d8-408c-a66d-00092d1c962e",
+            "forenames": "Roberta",
+            "surname": "Schimmel",
+            "unallocated": false
+          },
+          "lastUpdatedDateTime": "2020-09-04T15:20:23+01:00",
+          "lastUpdatedByUser": {
+            "forenames": "John",
+            "surname": "Rover"
+          }
+        },
+        {
+          "contactId": 9,
+          "contactStart": "2020-09-04T14:00:00+01:00",
+          "contactEnd": "2020-09-04T00:00:00+01:00",
+          "notes": "Unknown system generated contact",
+          "officeLocation": {
+            "code": "0d997046-95ec-488a-8794-73b82d86cf93",
+            "buildingName": "Rosemarie",
+            "buildingNumber": "567",
+            "streetName": "Champlin Light",
+            "townCity": "West Aishabury",
+            "county": "Berkshire",
+            "postcode": "87999",
+            "description": "79843 Cathrine Divide"
+          },
+          "outcome": null,
+          "sensitive": false,
+          "type": {
+            "code": "SYSTEM_GENERATED_UNKNOWN",
+            "description": "System generated unknown contact",
+            "shortDescription": "disintermediate user-centric mindshare",
+            "appointment": false
+          },
+          "provider": {
+            "code": "1233c67b-f3a8-4005-8541-d59c6f3d40d4",
+            "description": "facilitate magnetic web-readiness"
+          },
+          "team": {
+            "code": "222f0b3c-7085-4d0c-9bb6-e3d4b8e93f83",
+            "description": "synergize cross-platform methodologies"
+          },
+          "staff": {
+            "code": "eb436dc4-e2ef-4d8c-804a-d7fba2758e25",
+            "forenames": "Waino",
+            "surname": "O'Reilly",
+            "unallocated": true
+          },
+          "lastUpdatedDateTime": "2020-09-04T14:20:23+01:00",
+          "lastUpdatedByUser": {
+            "forenames": "Michael",
+            "surname": "Smith"
+          }
+        },
+        {
+          "contactId": 10,
+          "contactStart": "2019-05-05T00:00:00+01:00",
+          "contactEnd": "2019-05-05T00:00:00+01:00",
+          "notes": "empower sticky functionalities",
+          "officeLocation": {
+            "code": "f92b1f21-032d-4288-aece-82b034dc5d00",
+            "buildingName": "Ramon",
+            "buildingNumber": "420",
+            "streetName": "Willa Row",
+            "townCity": "Lake Easterport",
+            "county": "Buckinghamshire",
+            "postcode": "14860",
+            "description": "568 Millie Harbor"
+          },
+          "outcome": null,
+          "sensitive": true,
+          "type": {
+            "code": "ABNP",
+            "description": "Breach Outcome - not proven",
+            "shortDescription": "drive global functionalities",
+            "appointment": false
+          },
+          "provider": {
+            "code": "b2630dd8-387a-4496-97e0-a1afddb03164",
+            "description": "facilitate robust models"
+          },
+          "team": {
+            "code": "36b2206e-21df-4e59-8970-cd99454bc6d2",
+            "description": "extend end-to-end eyeballs"
+          },
+          "staff": {
+            "code": "c4b2ba64-eefa-4b38-92ad-f6c81e795ae5",
+            "forenames": "John",
+            "surname": "Yost",
+            "unallocated": false
+          },
+          "lastUpdatedDateTime": "2021-08-12T17:04:59.414+01:00",
+          "lastUpdatedByUser": {
+            "forenames": "Carmela",
+            "surname": "Jones"
+          }
+        }
+      ],
+      "number": 0,
+      "size": 10,
+      "numberOfElements": 10,
+      "totalPages": 1,
+      "totalElements": 10,
+      "first": true,
+      "last": false,
+      "empty": false
+    }
+  },
+  "priority": 5
+}

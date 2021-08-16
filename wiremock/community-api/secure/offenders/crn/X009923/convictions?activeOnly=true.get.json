@@ -1,0 +1,123 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/community-api/secure/offenders/crn/X009923/convictions",
+    "queryParameters": {
+      "activeOnly": {
+        "equalTo": "true"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": [
+      {
+        "convictionId": 100,
+        "index": "26975",
+        "active": true,
+        "convictionDate": "2020-02-05",
+        "referralDate": "2020-12-20",
+        "offences": [
+          {
+            "mainOffence": true,
+            "detail": {
+              "mainCategoryDescription": "Betting, Gaming and Lotteries (Indictable)",
+              "subCategoryDescription": "Cheats at gambling or enables or assists person to cheat (Gambling Act 2005)"
+            },
+            "offenceDate": "2021-02-01T00:00:00",
+            "offenceCount": 1
+          },
+          {
+            "mainOffence": false,
+            "detail": {
+              "mainCategoryDescription": "Assault on Police Officer",
+              "subCategoryDescription": "Assault on Police Officer"
+            },
+            "offenceDate": "2019-09-09T00:00:00",
+            "offenceCount": 1
+          }
+        ],
+        "inBreach": false,
+        "failureToComplyCount": 0,
+        "breachEnd": null,
+        "sentence": {
+          "sentenceId": 93182,
+          "description": "CJA Community Order",
+          "originalLength": 12,
+          "originalLengthUnits": "Months",
+          "defaultLength": 12,
+          "lengthInDays": 364,
+          "expectedSentenceEndDate": "2021-02-16",
+          "startDate": "2020-02-17",
+          "terminationDate": null,
+          "terminationReason": null,
+          "sentenceType": {
+            "code": "SP",
+            "description": "ORA Community Order"
+          },
+          "additionalSentences": [
+            {
+              "type": {
+                "description": "Fine"
+              },
+              "amount": 500,
+              "notes": "£500 fine"
+            },
+            {
+              "type": {
+                "description": "Disqualified from Driving"
+              },
+              "length": 6,
+              "notes": null
+            }
+          ],
+          "failureToComplyLimit": 3
+        },
+        "latestCourtAppearanceOutcome": {
+          "code": "xlp",
+          "description": "Metal"
+        },
+        "responsibleCourt": {
+          "courtId": 54714,
+          "code": "f7uxy",
+          "selectable": true,
+          "courtName": "Sheffield Magistrates Court",
+          "telephoneNumber": "931-540-9275",
+          "fax": "(811) 728-6781",
+          "buildingName": "dolorem voluptas ipsa",
+          "town": "Zboncakton",
+          "county": "Cambridgeshire",
+          "postcode": "64089",
+          "country": "Costa Rica",
+          "courtTypeId": 40606,
+          "createdDatetime": "2020-10-15T13:51:20.470Z",
+          "lastUpdatedDatetime": "2020-09-27T09:45:29.646Z",
+          "probationAreaId": 39528,
+          "probationArea": {
+            "code": "tb6",
+            "description": "East Nicole"
+          },
+          "courtType": {
+            "code": "u0g",
+            "description": "Metal"
+          }
+        },
+        "courtAppearance": {
+          "courtAppearanceId": 38543,
+          "appearanceDate": "2021-01-20",
+          "courtCode": "1y0dq",
+          "courtName": "Nottingham Crown Court",
+          "appearanceType": {
+            "code": "gx",
+            "description": "Soft"
+          },
+          "crn": "G96197"
+        }
+      }
+    ]
+  },
+  "priority": 1
+}

@@ -113,6 +113,7 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     lastUpdatedByUser: { forenames: `Michael`, surname: `Smith` },
   },
   {
+    contactId: 10,
     type: {
       code: 'ABNP',
       description: 'Breach Outcome - not proven',
@@ -125,7 +126,7 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
 ]
 
 export function contacts(crn: string, partials: DeepPartial<ContactSummary>[] = CONTACTS): SeedFn {
-  return async context => {
+  return context => {
     const contacts = partials.map(p => fakeContactSummary(p))
 
     let priority = 1
@@ -134,7 +135,7 @@ export function contacts(crn: string, partials: DeepPartial<ContactSummary>[] = 
       predicate?: (contact: ContactSummary) => boolean,
     ) {
       const filtered = predicate ? contacts.filter(predicate) : contacts
-      return context.client.community
+      context.client.community
         .priority(priority++)
         .get(`/secure/offenders/crn/${crn}/contact-summary`)
         .query(query)
@@ -151,27 +152,30 @@ export function contacts(crn: string, partials: DeepPartial<ContactSummary>[] = 
         })
     }
 
-    await Promise.all([
-      // complied appointments only
-      all(
-        { appointmentsOnly: true, attended: true, complied: true },
-        c => c.type.appointment && c.outcome?.attended && c.outcome?.complied,
-      ),
-      // acceptable absence appointments only
-      all(
-        { appointmentsOnly: true, attended: false, complied: true },
-        c => c.type.appointment && c.outcome?.attended === false && c.outcome?.complied,
-      ),
-      // ftc appointments only
-      all({ appointmentsOnly: true, complied: false }, c => c.type.appointment && c.outcome?.complied === false),
-      // appointments only
-      all({ appointmentsOnly: true }, c => c.type.appointment),
-      // all contacts with no filter
-      all(),
-      // get each contact by id
-      ...contacts.map(c =>
-        context.client.community.get(`/secure/offenders/crn/${crn}/contacts/${c.contactId}`).returns(c),
-      ),
-    ])
+    // complied appointments only
+    all(
+      { appointmentsOnly: true, attended: true, complied: true },
+      c => c.type.appointment && c.outcome?.attended && c.outcome?.complied,
+    )
+
+    // acceptable absence appointments only
+    all(
+      { appointmentsOnly: true, attended: false, complied: true },
+      c => c.type.appointment && c.outcome?.attended === false && c.outcome?.complied,
+    )
+
+    // ftc appointments only
+    all({ appointmentsOnly: true, complied: false }, c => c.type.appointment && c.outcome?.complied === false)
+
+    // appointments only
+    all({ appointmentsOnly: true }, c => c.type.appointment)
+
+    // all contacts with no filter
+    all()
+
+    // get each contact by id
+    for (const contact of contacts) {
+      context.client.community.get(`/secure/offenders/crn/${crn}/contacts/${contact.contactId}`).returns(contact)
+    }
   }
 }

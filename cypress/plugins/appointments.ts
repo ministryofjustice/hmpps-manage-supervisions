@@ -47,16 +47,16 @@ export function appointments(
   convictionId: number,
   partials: DeepPartial<AppointmentDetail>[] = APPOINTMENTS,
 ): SeedFn {
-  return async context => {
+  return context => {
     const appointments = partials.map(p => fakeAppointmentDetail(p))
-    await Promise.all([
-      context.client.community.get(`/secure/offenders/crn/${crn}/appointments`).returns(appointments),
-      context.client.community.post(`/secure/offenders/crn/${crn}/sentence/${convictionId}/appointments`).returns({
-        appointmentId: 1,
-      }),
-      ...appointments.map(a =>
-        context.client.community.get(`/secure/offenders/crn/${crn}/appointments/${a.appointmentId}`).returns(a),
-      ),
-    ])
+    context.client.community.get(`/secure/offenders/crn/${crn}/appointments`).returns(appointments)
+    context.client.community.post(`/secure/offenders/crn/${crn}/sentence/${convictionId}/appointments`).returns({
+      appointmentId: 1,
+    })
+    for (const appointment of appointments) {
+      context.client.community
+        .get(`/secure/offenders/crn/${crn}/appointments/${appointment.appointmentId}`)
+        .returns(appointment)
+    }
   }
 }

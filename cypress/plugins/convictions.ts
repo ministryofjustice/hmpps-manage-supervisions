@@ -82,7 +82,7 @@ export function convictions(
   active: DeepPartial<Conviction> | null,
   previous: DeepPartial<Conviction>[],
 ): SeedFn {
-  return async context => {
+  return context => {
     const convictions = [
       active === null ? null : fakeConviction([ACTIVE_CONVICTION, active]),
       ...previous.map((p, i) =>
@@ -91,13 +91,11 @@ export function convictions(
     ].filter(x => x)
 
     const url = `/secure/offenders/crn/${crn}/convictions`
-    await Promise.all([
-      context.client.community
-        .get(url)
-        .query({ activeOnly: true })
-        .priority(1)
-        .returns(convictions.filter(x => x.active)),
-      context.client.community.get(url).priority(2).returns(convictions),
-    ])
+    context.client.community
+      .get(url)
+      .query({ activeOnly: true })
+      .priority(1)
+      .returns(convictions.filter(x => x.active))
+    context.client.community.get(url).priority(2).returns(convictions)
   }
 }

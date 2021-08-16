@@ -1,0 +1,62 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/community-api/secure/offenders/crn/X009923/appointments/2"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "appointmentId": 2,
+      "appointmentStart": "2020-02-03T10:00:00",
+      "appointmentEnd": "2020-02-03T11:00:00",
+      "notes": "Some unknown appointment type",
+      "officeLocation": {
+        "code": "7a7a8c25-864b-4e65-bd56-3b4abafdb310",
+        "buildingName": "Sibyl",
+        "buildingNumber": "610",
+        "streetName": "Maggie Ramp",
+        "townCity": "Kaleborough",
+        "county": "Berkshire",
+        "postcode": "34134",
+        "description": "517 Simeon Walk"
+      },
+      "outcome": {
+        "code": "9d37afb6-e662-45ae-a210-cf715f49e122",
+        "attended": true,
+        "complied": true,
+        "description": "Some outcome description",
+        "hoursCredited": 55277
+      },
+      "sensitive": true,
+      "type": {
+        "contactType": "P123",
+        "description": "Some recent appointment",
+        "orderTypes": ["CJA", "CJA"],
+        "requiresLocation": "REQUIRED"
+      },
+      "provider": {
+        "code": "45b291ab-998c-45bd-ad13-1255fcf0e432",
+        "description": "embrace mission-critical functionalities"
+      },
+      "team": {
+        "code": "9c709dd6-9ba3-4b87-a48a-3b795f9a8ea2",
+        "description": "empower best-of-breed channels"
+      },
+      "staff": {
+        "code": "2b36fa32-cf39-4da3-8542-c824c7e34ee2",
+        "forenames": "Unallocated",
+        "surname": "Staff",
+        "unallocated": true
+      },
+      "rarActivity": true,
+      "requirement": {
+        "isRar": true,
+        "requirementId": 30660,
+        "isActive": true
+      }
+    }
+  }
+}

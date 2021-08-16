@@ -1,0 +1,55 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/community-api/secure/offenders/crn/X009923/contacts/5"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "contactId": 5,
+      "contactStart": "2020-09-02T11:00:00+01:00",
+      "contactEnd": "2020-09-02T13:00:00+01:00",
+      "notes": "Some unknown appointment",
+      "officeLocation": {
+        "code": "76ec91d8-c4ee-4d07-b2cb-71bfaa2e1ad5",
+        "buildingName": "Kyleigh",
+        "buildingNumber": "486",
+        "streetName": "Brendan Turnpike",
+        "townCity": "South Chesleyport",
+        "county": "Cambridgeshire",
+        "postcode": "00042",
+        "description": "565 Ruecker Meadows"
+      },
+      "outcome": null,
+      "sensitive": false,
+      "type": {
+        "code": "NOT_WELL_KNOWN",
+        "description": "Not a well known appointment",
+        "shortDescription": "extend bleeding-edge technologies",
+        "appointment": true
+      },
+      "provider": {
+        "code": "65736449-c65e-4dd5-9535-bdfbd9d532f3",
+        "description": "enable ubiquitous vortals"
+      },
+      "team": {
+        "code": "86e033ba-9dd9-4650-b115-34cdad7145af",
+        "description": "integrate cross-media bandwidth"
+      },
+      "staff": {
+        "code": "96d50b0c-4fbe-419f-9192-5b2a081ac08a",
+        "forenames": "Robert",
+        "surname": "Ohagan",
+        "unallocated": false
+      },
+      "lastUpdatedDateTime": "2021-08-12T19:42:34.380+01:00",
+      "lastUpdatedByUser": {
+        "forenames": "Cornell",
+        "surname": "Franecki"
+      }
+    }
+  }
+}

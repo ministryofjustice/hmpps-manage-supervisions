@@ -1,0 +1,51 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/community-api/secure/offenders/crn/X009923/personalCircumstances"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "personalCircumstances": [
+        {
+          "startDate": "2021-03-03",
+          "evidenced": false,
+          "notes": null,
+          "offenderId": 15115,
+          "personalCircumstanceId": 66487,
+          "personalCircumstanceSubType": {
+            "code": "3VF",
+            "description": "Temporary/casual work (30 or more hours per week)"
+          },
+          "personalCircumstanceType": {
+            "code": "B",
+            "description": "Employment"
+          },
+          "createdDatetime": "2021-03-03T12:02:00",
+          "lastUpdatedDatetime": "2021-03-04T13:04:00"
+        },
+        {
+          "startDate": "2005-04-01",
+          "evidenced": true,
+          "notes": "Divorced",
+          "offenderId": 44432,
+          "personalCircumstanceId": 17733,
+          "personalCircumstanceSubType": {
+            "code": "LNA",
+            "description": "Married / Civil partnership"
+          },
+          "personalCircumstanceType": {
+            "code": "H",
+            "description": "Relationship"
+          },
+          "createdDatetime": "2005-04-01T12:02:00",
+          "lastUpdatedDatetime": "2021-07-02T13:04:00",
+          "endDate": "2021-07-02"
+        }
+      ]
+    }
+  }
+}

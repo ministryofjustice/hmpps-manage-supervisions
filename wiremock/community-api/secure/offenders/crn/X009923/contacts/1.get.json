@@ -1,0 +1,61 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/community-api/secure/offenders/crn/X009923/contacts/1"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "contactId": 1,
+      "contactStart": "2020-09-04T12:00:00+01:00",
+      "contactEnd": "2020-09-04T13:00:00+01:00",
+      "notes": "Some home visit appointment\n\nWith a new line!",
+      "officeLocation": {
+        "code": "23c76bfa-23db-4935-9b72-60abaff8427e",
+        "buildingName": "Theodore",
+        "buildingNumber": "251",
+        "streetName": "Sandra Pine",
+        "townCity": "South Troy",
+        "county": "Avon",
+        "postcode": "00947-3762",
+        "description": "810 Morar Brook"
+      },
+      "outcome": {
+        "code": "09671167-d10a-47b7-aef5-162d18dcb3a3",
+        "attended": true,
+        "complied": true,
+        "description": "repurpose ubiquitous e-commerce",
+        "hoursCredited": 71173
+      },
+      "sensitive": false,
+      "type": {
+        "code": "CHVS",
+        "description": "Home Visit to Case (NS)",
+        "shortDescription": "expedite killer users",
+        "appointment": true
+      },
+      "provider": {
+        "code": "c639752b-bad2-4738-91bc-41c28f8a71b0",
+        "description": "incubate B2C vortals"
+      },
+      "team": {
+        "code": "7e181dc7-db75-4447-a98a-57e344b2c72c",
+        "description": "orchestrate ubiquitous methodologies"
+      },
+      "staff": {
+        "code": "f6b840c7-e9e3-4b05-8db3-377d0027deec",
+        "forenames": "Catherine",
+        "surname": "Ellis",
+        "unallocated": false
+      },
+      "lastUpdatedDateTime": "2021-08-13T11:18:29.905+01:00",
+      "lastUpdatedByUser": {
+        "forenames": "Ora",
+        "surname": "Daniel"
+      }
+    }
+  }
+}

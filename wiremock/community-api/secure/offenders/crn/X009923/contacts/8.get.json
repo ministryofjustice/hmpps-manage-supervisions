@@ -1,0 +1,55 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/community-api/secure/offenders/crn/X009923/contacts/8"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "contactId": 8,
+      "contactStart": "2020-09-04T14:00:00+01:00",
+      "contactEnd": "2020-09-04T00:00:00+01:00",
+      "notes": "Some unknown communication",
+      "officeLocation": {
+        "code": "eefeba0d-67f4-46a0-83e4-abc8fe32f4c4",
+        "buildingName": "Jeanne",
+        "buildingNumber": "275",
+        "streetName": "Emmerich Ports",
+        "townCity": "West Joanchester",
+        "county": "Cambridgeshire",
+        "postcode": "40614-9022",
+        "description": "850 Brakus Points"
+      },
+      "outcome": null,
+      "sensitive": true,
+      "type": {
+        "code": "NOT_WELL_KNOWN_COMMUNICATION",
+        "description": "Not a well known communication",
+        "shortDescription": "syndicate value-added partnerships",
+        "appointment": false
+      },
+      "provider": {
+        "code": "4865690f-713b-4abc-b399-e5944cc816a4",
+        "description": "synergize world-class interfaces"
+      },
+      "team": {
+        "code": "84772a48-2143-4143-9b12-4d87b5654575",
+        "description": "empower B2C e-business"
+      },
+      "staff": {
+        "code": "cdc0fe54-e0d8-408c-a66d-00092d1c962e",
+        "forenames": "Roberta",
+        "surname": "Schimmel",
+        "unallocated": false
+      },
+      "lastUpdatedDateTime": "2020-09-04T15:20:23+01:00",
+      "lastUpdatedByUser": {
+        "forenames": "John",
+        "surname": "Rover"
+      }
+    }
+  }
+}

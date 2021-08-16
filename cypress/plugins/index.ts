@@ -17,7 +17,8 @@ export type SeedOptions = ReferenceDataSeedOptions & OffenderSeedOptions & Conta
 const pluginConfig: Cypress.PluginConfig = on => {
   on('task', {
     async resetSeed() {
-      return wiremocker([reset], { silent: true })
+      await wiremocker([reset], { silent: true })
+      return null
     },
 
     async seed(options: SeedOptions = {}) {
