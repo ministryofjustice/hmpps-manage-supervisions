@@ -51,22 +51,16 @@ We will write log messages for at least the following events in our service, in 
 * API calls we make to other services such as Community API (perhaps using [Axios request interceptors](https://itnext.io/advanced-nestjs-techniques-part-2-logging-outgoing-http-requests-3c75d47c5768))
 * Any unexpected exceptions
 
-We will include the [UUID](https://github.com/ministryofjustice/hmpps-auth/blob/9296135ad842e6ec01945d679666ffd46c98654a/src/main/kotlin/uk/gov/justice/digital/hmpps/oauth2server/model/UserDetail.kt) of the current authenticated user in all log messages, in a suitable form to be [parsed by FluentBit](https://docs.fluentbit.io/manual/v/1.7/concepts/data-pipeline/parser).
+We will include the [UUID](https://github.com/ministryofjustice/hmpps-auth/blob/9296135ad842e6ec01945d679666ffd46c98654a/src/main/kotlin/uk/gov/justice/digital/hmpps/oauth2server/model/UserDetail.kt) of the current authenticated user in all log messages.
 
-These log messages will be written to:
+These log messages will be written to application `stdout` and `stderr`, which are [automatically aggregated by Cloud Platform into Azure Application Insights](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/logging-an-app/log-collection-and-storage.html#application-log-collection-and-storage), and which are retained there for 13 months. Correlation IDs in AppInsights allow reconstruction of cross-service data for comprehensive audit purposes; we should test that this is working before going live.
 
-* Application `stdout` and `stderr`, which are [aggregated by Cloud Platform into their Elasticsearch/Kibana system](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/logging-an-app/log-collection-and-storage.html#application-log-collection-and-storage)
-* Azure Application Insights, for legacy monitoring purposes
-
-We will also write all log messages to log files in an S3 bucket for long-term retention. We will, if possible, [configure this to automatically happen at the infrastructure level](https://docs.fluentbit.io/manual/v/1.6/pipeline/outputs/s3), so that `stdout` and `stderr` are automatically stored there, rather than dealing with it separately in our code. This bucket will be set to expire data after 13 months.
 ## Consequences
 
-The upcoming MLAP system requires unmodified log files to ingest; AppInsights exports cannot be relied upon. When
-we need to get our data into that system, we will be able to use the raw logs files stored in S3.
+The upcoming MLAP system requires unmodified log files to ingest; they cannot rely on AppInsights exports cannot be relied upon. When
+we need to get our data into that system, we will need to send log data directly to it. Hopefully, this can happen automatically at the Cloud Platform infrastructure level using a FluentBit output plugin.
 
-Logs are only retained for [30 days](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/logging-an-app/log-collection-and-storage.html#application-log-collection-and-storage) by Cloud Platform. This is insufficient for audit purposes,
-so the S3 bucket will be the "channel of record" for our auditable logs. Both Cloud Platform and AppInsights will only be used for
-debugging and short-term monitoring of the service.
+We are not currently planning to store any extra custom event data in AppInsights, but should the demand arise, we can add that capability.
 
 A new [HMPPS Audit API](https://github.com/ministryofjustice/hmpps-audit-api) is also under development; this service monitors an event queue
 for audit events, and stores them for future inspection. We should investigate adding these granular audit events to our service once this project reaches a suitable level of maturity.
