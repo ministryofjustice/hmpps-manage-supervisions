@@ -1,6 +1,11 @@
 declare namespace WireMock {
   export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
+  export interface MatchRules {
+    equalTo?: string
+    matches?: string
+  }
+
   export interface StubMappingRequest {
     /**
      * The HTTP request method e.g. GET.
@@ -34,17 +39,17 @@ declare namespace WireMock {
     /**
      * Query parameter patterns to match against.
      */
-    queryParameters?: Record<string, any>
+    queryParameters?: Record<string, MatchRules>
 
     /**
      * Header patterns to match against.
      */
-    headers?: Record<string, string>
+    headers?: Record<string, MatchRules>
 
     /**
      * Pre-emptive basic auth credentials to match against.
      */
-    basicAuthCredentials?: {
+    basicAuth?: {
       username: string
       password: string
     }

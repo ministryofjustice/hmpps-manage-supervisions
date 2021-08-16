@@ -16,6 +16,13 @@ function urlJoin(...tokens: string[]) {
   return !result.startsWith('http') ? `/${result}` : result
 }
 
+function getUrl({ url, urlPath, urlPattern, urlPathPattern, queryParameters }: WireMock.StubMappingRequest): string {
+  const queryTokens = Object.entries(queryParameters || {}).map(([k, v]) => `${k}=${Object.values(v).join()}`)
+  return [url || urlPath || urlPattern || urlPathPattern, queryTokens.length === 0 ? '' : '?' + queryTokens.join('&')]
+    .filter(x => x)
+    .join('')
+}
+
 function getMappingName(
   mapping: Pick<WireMock.StubMapping, 'name' | 'request' | 'response'>,
   filename = false,
@@ -24,19 +31,18 @@ function getMappingName(
     return mapping.name
   }
 
-  const { method, url, urlPath, urlPattern, urlPathPattern, queryParameters } = mapping.request
-  const queryTokens = Object.entries(queryParameters || {}).map(([k, v]) => `${k}=${Object.values(v).join()}`)
-  const name = [
-    url || urlPath || urlPattern || urlPathPattern,
-    queryTokens.length === 0 ? '' : '?' + queryTokens.join('&'),
-  ].filter(x => x)
+  const name = [getUrl(mapping.request)]
 
   if (filename) {
-    return [...name, '.', method.toLowerCase(), '.json'].join('')
+    return [...name, '.', mapping.request.method.toLowerCase(), '.json'].join('')
   }
 
-  return [...name, '=>', (mapping.response as any).status].join(' ')
+  return [mapping.request.method, ...name, '=>', (mapping.response as any).status].join(' ')
 }
+
+type Mutation = (context: Omit<FluentWiremockContext, 'mutate'>) => void
+
+export type ApiName = 'community' | 'assessRisksAndNeeds'
 
 export interface WiremockClientOptions {
   writeMappings?: boolean
@@ -57,6 +63,10 @@ export class WiremockClient {
   async getAllStubs() {
     const mappings = await this.helper.getStubs()
     return mappings.map(x => getMappingName(x))
+  }
+
+  async getRequests(basePath: string) {
+    return this.helper.getRequests(basePath)
   }
 
   /**
@@ -80,24 +90,32 @@ export class WiremockClient {
     return new FluentWiremockContext(this.helper, 'hmpps-auth')
   }
 
+  /**
+   * Registers a mutation for all requests to the specified api that will be run during commit.
+   */
+  mutate(api: ApiName, mutation: Mutation) {
+    const { basePath } = this[api]
+    this.helper.addMutation(basePath, mutation)
+  }
+
   async commit() {
     await this.helper.commit()
   }
 }
 
 class WiremockApiHelper {
-  private readonly stubs: WireMock.CreateStubMappingRequest[] = []
+  private readonly mappings: WireMock.CreateStubMappingRequest[] = []
+  private readonly mutations: Record<string, Mutation[]> = {}
   private reset = true
 
   constructor(public readonly wiremockUrl: string, private readonly writeMappings: boolean) {}
 
   stub(mapping: WireMock.CreateStubMappingRequest) {
-    this.stubs.push(mapping)
+    this.mappings.push(mapping)
   }
 
-  setReset(value: boolean): this {
+  setReset(value: boolean) {
     this.reset = value
-    return this
   }
 
   async getStubs(): Promise<WireMock.StubMapping[]> {
@@ -119,14 +137,30 @@ class WiremockApiHelper {
     return requests.filter(x => x.request.url.startsWith(basePath))
   }
 
+  addMutation(basePath: string, mutation: Mutation) {
+    if (!this.mutations[basePath]?.push(mutation)) {
+      this.mutations[basePath] = [mutation]
+    }
+  }
+
   async commit() {
-    if (this.stubs.length === 0) {
+    if (this.mappings.length === 0) {
       return
+    }
+
+    for (const [basePath, mutations] of Object.entries(this.mutations)) {
+      const mappings = this.mappings.filter(x => getUrl(x.request).startsWith(`/${basePath}`))
+      for (const mutation of mutations) {
+        for (const mapping of mappings) {
+          const context = new FluentWiremockContext(this, basePath, mapping)
+          mutation(context)
+        }
+      }
     }
 
     if (this.writeMappings) {
       await rm(path.join(wiremockPath, '**', '*'))
-      for (const mapping of this.stubs) {
+      for (const mapping of this.mappings) {
         const name = path.resolve(wiremockPath, ...getMappingName(mapping, true).split('/'))
         const json = JSON.stringify(mapping, null, 2)
         await fs.promises.mkdir(path.dirname(name), { recursive: true })
@@ -138,7 +172,7 @@ class WiremockApiHelper {
         await axios.post(this.admin('reset'))
       }
       await axios.post(this.admin('mappings', 'import'), {
-        mappings: this.stubs,
+        mappings: this.mappings,
         importOptions: {
           duplicatePolicy: 'IGNORE',
           deleteAllNotInImport: this.reset,
@@ -147,7 +181,7 @@ class WiremockApiHelper {
     }
 
     // remove all stubs
-    this.stubs.splice(0, this.stubs.length)
+    this.mappings.splice(0, this.mappings.length)
   }
 
   private admin(...pathTokens: string[]): string {
@@ -156,9 +190,14 @@ class WiremockApiHelper {
 }
 
 class FluentWiremockContext {
-  private mapping: WireMock.CreateStubMappingRequest = { request: { method: 'GET' }, response: { status: 200 } }
-
-  constructor(private readonly helper: WiremockApiHelper, private readonly basePath: string) {}
+  constructor(
+    private readonly helper: WiremockApiHelper,
+    readonly basePath: string,
+    readonly mapping: WireMock.CreateStubMappingRequest = {
+      request: { method: 'GET', headers: {} },
+      response: { status: 200 },
+    },
+  ) {}
 
   async getRequests(path: string) {
     return this.helper.getRequests(this.resolvePath(path))
@@ -181,11 +220,33 @@ class FluentWiremockContext {
     return this
   }
 
-  query(query: Record<string, any>, comparison: 'matches' | 'equalTo' = 'equalTo'): this {
+  basicAuth(username: string, password: string): this {
+    this.mapping.request.basicAuth = { username, password }
+    return this
+  }
+
+  bearer(token: string) {
+    return this.header('Authorization', `Bearer ${token}`)
+  }
+
+  header(key: string, value: string, rule: keyof WireMock.MatchRules = 'equalTo'): this {
+    this.mapping.request.headers[key] = { [rule]: value }
+    return this
+  }
+
+  formData(data: Record<string, string>): this {
+    this.header('Content-Type', 'application/x-www-form-urlencoded')
+    this.mapping.request.bodyPatterns = Object.entries(data).map(([k, v]) => ({
+      contains: `${k}=${encodeURIComponent(v)}`,
+    }))
+    return this
+  }
+
+  query(query: Record<string, any>, rule: keyof WireMock.MatchRules = 'equalTo'): this {
     this.mapping.request.queryParameters = {
       ...this.mapping.request.queryParameters,
       ...Object.entries(query)
-        .map(([k, v]) => ({ [k]: { [comparison]: typeof v === 'string' ? v : v.toString() } }))
+        .map(([k, v]) => ({ [k]: { [rule]: typeof v === 'string' ? v : v.toString() } }))
         .reduce((x, y) => ({ ...x, ...y }), {}),
     }
     return this

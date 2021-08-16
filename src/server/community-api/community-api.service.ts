@@ -14,7 +14,7 @@ import {
   StaffApi,
   TeamsApi,
 } from './client'
-import { AuthenticationMethod, RestService } from '../common'
+import { RestService } from '../common'
 
 type ApiConstructor<Api> = {
   new (configuration?: Configuration, basePath?: string, axios?: AxiosInstance): Api
@@ -25,7 +25,7 @@ export class CommunityApiService {
   private readonly axios: AxiosInstance
 
   constructor(@Inject(REQUEST) request: Request, rest: RestService) {
-    this.axios = rest.build('community', request.user as User, AuthenticationMethod.ReissueForDeliusUser)
+    this.axios = rest.build('community', request.user as User)
   }
 
   get appointment() {
