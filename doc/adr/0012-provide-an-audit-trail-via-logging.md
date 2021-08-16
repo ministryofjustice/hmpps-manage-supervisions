@@ -39,8 +39,8 @@ For Authority to Operate, the following [actions should be recorded](https://dsd
 * Who completed transactions
 * Who added/removed data
 
-NDelius keeps a history of read and write actions taken through its UI, but not for its API. API
-clients are responsible for recording of actions taken by their users.
+NDelius keeps a history of read and write actions taken through its UI. The Delius API (which manages writing data into NDelius) records audit information automatically, but the read APIs in Community API do not. Community API
+clients are responsible for recording of read actions taken by their users.
 
 HTTP-level logging is handled upstream by Cloud Platform, and user authentication actions
 are recorded by HMPPS Auth.
@@ -54,6 +54,8 @@ We will write log messages for at least the following events in our service, in 
 * Any unexpected exceptions
 
 We will include the [UUID](https://github.com/ministryofjustice/hmpps-auth/blob/9296135ad842e6ec01945d679666ffd46c98654a/src/main/kotlin/uk/gov/justice/digital/hmpps/oauth2server/model/UserDetail.kt) of the current authenticated user in all log messages.
+
+In particular, we need to make sure we log all read operations done through our UI, because they will not be recorded by any other system.
 
 These log messages will be written to application `stdout` and `stderr`, which are [automatically aggregated by Cloud Platform into Azure Application Insights](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/logging-an-app/log-collection-and-storage.html#application-log-collection-and-storage), and which are retained there for 13 months. Correlation IDs in AppInsights allow reconstruction of cross-service data for comprehensive audit purposes; we should test that this is working before going live.
 
