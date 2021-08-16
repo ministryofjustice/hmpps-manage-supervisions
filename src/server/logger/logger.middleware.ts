@@ -7,7 +7,7 @@ export class LoggerMiddleware implements NestMiddleware {
   constructor(private readonly logger: LoggerService) {}
 
   use(req: any, res: any, next: () => void) {
-    return LOGGER_HOOK.run({ user: req.user }, async () => {
+    return LOGGER_HOOK.run({ user: req.user?.uuid || null }, async () => {
       const { ip, method, originalUrl } = req
       const userAgent = req.get('user-agent') || ''
 
