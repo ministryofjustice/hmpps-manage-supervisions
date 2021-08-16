@@ -1,24 +1,16 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+generic-service:
 
-replicaCount: 2
+  replicaCount: 2
 
-image:
-  repository: quay.io/hmpps/hmpps-manage-supervisions
-  tag: latest
-  pullPolicy: IfNotPresent
-  port: 3000
+  ingress:
+    host: hmpps-manage-supervisions-dev.apps.live-1.cloud-platform.service.justice.gov.uk
 
-ingress:
-  enabled: true
-  host: hmpps-manage-supervisions-dev.apps.live-1.cloud-platform.service.justice.gov.uk
-  cert_secret: hmpps-manage-supervisions-cert
-  path: /
-
-env:
-  HMPPS_AUTH_URL: https://sign-in-dev.hmpps.service.justice.gov.uk/auth
-  TOKEN_VERIFICATION_API_URL: https://token-verification-api-dev.prison.service.justice.gov.uk
-  TOKEN_VERIFICATION_ENABLED: true
-  COMMUNITY_API_URL: https://community-api-secure.test.delius.probation.hmpps.dsd.io
-  ASSESS_RISKS_AND_NEEDS_API_URL: https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk
-  DELIUS_BASE_URL: https://ndelius.test.probation.service.justice.gov.uk
+  env:
+    HMPPS_AUTH_URL: https://sign-in-dev.hmpps.service.justice.gov.uk/auth
+    TOKEN_VERIFICATION_API_URL: https://token-verification-api-dev.prison.service.justice.gov.uk
+    TOKEN_VERIFICATION_ENABLED: true
+    COMMUNITY_API_URL: https://community-api-secure.test.delius.probation.hmpps.dsd.io
+    ASSESS_RISKS_AND_NEEDS_API_URL: https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk
+    DELIUS_BASE_URL: https://ndelius.test.probation.service.justice.gov.uk
