@@ -5,8 +5,8 @@ import {
 } from '../../src/server/community-api/client'
 import { SeedFn } from './wiremock'
 
-export const appointmentTypes: SeedFn = async ({ client }) => {
-  await client.community.get('/secure/appointment-types').returns(APPOINTMENT_TYPES)
+export const appointmentTypes: SeedFn = ({ client }) => {
+  client.community.get('/secure/appointment-types').returns(APPOINTMENT_TYPES)
 }
 
 export const APPOINTMENT_TYPES: AppointmentType[] = [

@@ -40,8 +40,8 @@ const STAFF: StaffDetails = {
 }
 
 export function staff(partial: DeepPartial<StaffDetails> = {}): SeedFn {
-  return async context => {
+  return context => {
     const staff = fakeStaffDetails([STAFF, partial])
-    await context.client.community.get(`/secure/staff/username/${staff.username}`).returns(staff)
+    context.client.community.get(`/secure/staff/username/${staff.username}`).returns(staff)
   }
 }

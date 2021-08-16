@@ -1,0 +1,55 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/community-api/secure/offenders/crn/X009923/contacts/9"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "contactId": 9,
+      "contactStart": "2020-09-04T14:00:00+01:00",
+      "contactEnd": "2020-09-04T00:00:00+01:00",
+      "notes": "Unknown system generated contact",
+      "officeLocation": {
+        "code": "0d997046-95ec-488a-8794-73b82d86cf93",
+        "buildingName": "Rosemarie",
+        "buildingNumber": "567",
+        "streetName": "Champlin Light",
+        "townCity": "West Aishabury",
+        "county": "Berkshire",
+        "postcode": "87999",
+        "description": "79843 Cathrine Divide"
+      },
+      "outcome": null,
+      "sensitive": false,
+      "type": {
+        "code": "SYSTEM_GENERATED_UNKNOWN",
+        "description": "System generated unknown contact",
+        "shortDescription": "disintermediate user-centric mindshare",
+        "appointment": false
+      },
+      "provider": {
+        "code": "1233c67b-f3a8-4005-8541-d59c6f3d40d4",
+        "description": "facilitate magnetic web-readiness"
+      },
+      "team": {
+        "code": "222f0b3c-7085-4d0c-9bb6-e3d4b8e93f83",
+        "description": "synergize cross-platform methodologies"
+      },
+      "staff": {
+        "code": "eb436dc4-e2ef-4d8c-804a-d7fba2758e25",
+        "forenames": "Waino",
+        "surname": "O'Reilly",
+        "unallocated": true
+      },
+      "lastUpdatedDateTime": "2020-09-04T14:20:23+01:00",
+      "lastUpdatedByUser": {
+        "forenames": "Michael",
+        "surname": "Smith"
+      }
+    }
+  }
+}

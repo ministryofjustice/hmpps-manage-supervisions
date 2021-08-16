@@ -1,0 +1,55 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/community-api/secure/offenders/crn/X009923/contacts/6"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "contactId": 6,
+      "contactStart": "2020-09-04T11:00:00+01:00",
+      "contactEnd": "2020-09-04T00:00:00+01:00",
+      "notes": "Phone call from Brian to double check when his next appointment was.",
+      "officeLocation": {
+        "code": "34ebf066-570f-43e3-804f-3ad655eda534",
+        "buildingName": "Estefania",
+        "buildingNumber": "261",
+        "streetName": "Salma Rue",
+        "townCity": "Robertsview",
+        "county": "Avon",
+        "postcode": "11223",
+        "description": "7168 Brayan Estates"
+      },
+      "outcome": null,
+      "sensitive": true,
+      "type": {
+        "code": "CTOA",
+        "description": "Phone Contact from Offender",
+        "shortDescription": "enable open-source architectures",
+        "appointment": false
+      },
+      "provider": {
+        "code": "1163fa84-e5b3-4658-b0fc-25d1a363f649",
+        "description": "incubate value-added architectures"
+      },
+      "team": {
+        "code": "4da1242f-b27b-415f-8240-2ea60709cf08",
+        "description": "scale robust portals"
+      },
+      "staff": {
+        "code": "f60b5987-b0b9-44d0-8c38-c116d9861a23",
+        "forenames": "Paxton",
+        "surname": "Leffler",
+        "unallocated": true
+      },
+      "lastUpdatedDateTime": "2020-09-04T11:20:23+01:00",
+      "lastUpdatedByUser": {
+        "forenames": "Andy",
+        "surname": "Smith"
+      }
+    }
+  }
+}

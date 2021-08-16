@@ -1,0 +1,44 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/community-api/secure/staff/username/USER1"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "username": "USER1",
+      "staffIdentifier": 1234567,
+      "staffCode": "CRSSTAFF1",
+      "email": "john.smith@test",
+      "staff": {
+        "forenames": "John",
+        "surname": "Smith"
+      },
+      "teams": [
+        {
+          "code": "N07UAT",
+          "description": "Unallocated",
+          "localDeliveryUnit": {
+            "code": "CRSUAT",
+            "description": "Unallocated LDU"
+          },
+          "teamType": {
+            "code": "CRSUAT",
+            "description": "Unallocated Team Type"
+          },
+          "district": {
+            "code": "CRSUAT",
+            "description": "Unallocated LDU"
+          },
+          "borough": {
+            "code": "CRSUAT",
+            "description": "Unallocated Cluster"
+          }
+        }
+      ]
+    }
+  }
+}

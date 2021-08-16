@@ -141,7 +141,7 @@ export const OFFENDER: DeepPartial<OffenderDetail> = {
 }
 
 export function offender(partial: DeepPartial<OffenderDetail> = {}): SeedFn {
-  return async context => {
+  return context => {
     const detail = fakeOffenderDetail([OFFENDER, partial])
     const summary = omit(detail, [
       'contactDetails.addresses',
@@ -153,9 +153,7 @@ export function offender(partial: DeepPartial<OffenderDetail> = {}): SeedFn {
     ]) as OffenderDetailSummary
 
     const crn = detail.otherIds.crn
-    await Promise.all([
-      context.client.community.get(`/secure/offenders/crn/${crn}`).returns(summary),
-      context.client.community.get(`/secure/offenders/crn/${crn}/all`).returns(detail),
-    ])
+    context.client.community.get(`/secure/offenders/crn/${crn}`).returns(summary)
+    context.client.community.get(`/secure/offenders/crn/${crn}/all`).returns(detail)
   }
 }

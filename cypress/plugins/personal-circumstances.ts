@@ -38,9 +38,9 @@ export function personalCircumstances(
   crn: string,
   partials: DeepPartial<PersonalCircumstance>[] = PERSONAL_CIRCUMSTANCES,
 ): SeedFn {
-  return async context => {
+  return context => {
     const personalCircumstances = partials.map(p => fakePersonalCircumstance(p))
-    await context.client.community
+    context.client.community
       .get(`/secure/offenders/crn/${crn}/personalCircumstances`)
       .returns({ personalCircumstances } as PersonalCircumstances)
   }

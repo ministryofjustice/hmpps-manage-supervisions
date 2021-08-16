@@ -45,20 +45,18 @@ const NSIS: Nsi[] = [
 ]
 
 export function nsis(crn: string, convictionId: number, partials: DeepPartial<Nsi>[] = NSIS): SeedFn {
-  return async context => {
+  return context => {
     const nsis = partials.map(p => fakeNsi(p))
 
     const url = `/secure/offenders/crn/${crn}/convictions/${convictionId}/nsis`
-    await Promise.all([
-      context.client.community
-        .get(url)
-        .query({ nsiCodes: 'BRE' })
-        .priority(1)
-        .returns({ nsis: nsis.filter(x => x.nsiType.code === 'BRE') } as NsiWrapper),
-      context.client.community
-        .get(url)
-        .priority(2)
-        .returns({ nsis } as NsiWrapper),
-    ])
+    context.client.community
+      .get(url)
+      .query({ nsiCodes: 'BRE' })
+      .priority(1)
+      .returns({ nsis: nsis.filter(x => x.nsiType.code === 'BRE') } as NsiWrapper)
+    context.client.community
+      .get(url)
+      .priority(2)
+      .returns({ nsis } as NsiWrapper)
   }
 }

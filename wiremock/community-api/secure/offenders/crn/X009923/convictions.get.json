@@ -1,0 +1,208 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/community-api/secure/offenders/crn/X009923/convictions"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": [
+      {
+        "convictionId": 100,
+        "index": "26975",
+        "active": true,
+        "convictionDate": "2020-02-05",
+        "referralDate": "2020-12-20",
+        "offences": [
+          {
+            "mainOffence": true,
+            "detail": {
+              "mainCategoryDescription": "Betting, Gaming and Lotteries (Indictable)",
+              "subCategoryDescription": "Cheats at gambling or enables or assists person to cheat (Gambling Act 2005)"
+            },
+            "offenceDate": "2021-02-01T00:00:00",
+            "offenceCount": 1
+          },
+          {
+            "mainOffence": false,
+            "detail": {
+              "mainCategoryDescription": "Assault on Police Officer",
+              "subCategoryDescription": "Assault on Police Officer"
+            },
+            "offenceDate": "2019-09-09T00:00:00",
+            "offenceCount": 1
+          }
+        ],
+        "inBreach": false,
+        "failureToComplyCount": 0,
+        "breachEnd": null,
+        "sentence": {
+          "sentenceId": 93182,
+          "description": "CJA Community Order",
+          "originalLength": 12,
+          "originalLengthUnits": "Months",
+          "defaultLength": 12,
+          "lengthInDays": 364,
+          "expectedSentenceEndDate": "2021-02-16",
+          "startDate": "2020-02-17",
+          "terminationDate": null,
+          "terminationReason": null,
+          "sentenceType": {
+            "code": "SP",
+            "description": "ORA Community Order"
+          },
+          "additionalSentences": [
+            {
+              "type": {
+                "description": "Fine"
+              },
+              "amount": 500,
+              "notes": "£500 fine"
+            },
+            {
+              "type": {
+                "description": "Disqualified from Driving"
+              },
+              "length": 6,
+              "notes": null
+            }
+          ],
+          "failureToComplyLimit": 3
+        },
+        "latestCourtAppearanceOutcome": {
+          "code": "xlp",
+          "description": "Metal"
+        },
+        "responsibleCourt": {
+          "courtId": 54714,
+          "code": "f7uxy",
+          "selectable": true,
+          "courtName": "Sheffield Magistrates Court",
+          "telephoneNumber": "931-540-9275",
+          "fax": "(811) 728-6781",
+          "buildingName": "dolorem voluptas ipsa",
+          "town": "Zboncakton",
+          "county": "Cambridgeshire",
+          "postcode": "64089",
+          "country": "Costa Rica",
+          "courtTypeId": 40606,
+          "createdDatetime": "2020-10-15T13:51:20.470Z",
+          "lastUpdatedDatetime": "2020-09-27T09:45:29.646Z",
+          "probationAreaId": 39528,
+          "probationArea": {
+            "code": "tb6",
+            "description": "East Nicole"
+          },
+          "courtType": {
+            "code": "u0g",
+            "description": "Metal"
+          }
+        },
+        "courtAppearance": {
+          "courtAppearanceId": 38543,
+          "appearanceDate": "2021-01-20",
+          "courtCode": "1y0dq",
+          "courtName": "Nottingham Crown Court",
+          "appearanceType": {
+            "code": "gx",
+            "description": "Soft"
+          },
+          "crn": "G96197"
+        }
+      },
+      {
+        "convictionId": 101,
+        "index": "17056",
+        "active": false,
+        "convictionDate": "2018-11-01",
+        "referralDate": "2021-05-22",
+        "offences": [
+          {
+            "offenceId": "f4c3001c-fe92-47bb-9477-f2b408ad2132",
+            "mainOffence": true,
+            "detail": {
+              "code": "medo9",
+              "description": "Chips",
+              "mainCategoryCode": "w00",
+              "mainCategoryDescription": "Carbonite web goalkeeper gloves are ergonomically designed to give easy fit",
+              "mainCategoryAbbreviation": "cupiditate",
+              "ogrsOffenceCategory": "Automotive",
+              "subCategoryCode": "tg",
+              "subCategoryDescription": "Incredible Frozen Ball",
+              "form20Code": "uh"
+            },
+            "offenceDate": "2021-06-01",
+            "offenceCount": 8,
+            "offenderId": 82288,
+            "createdDatetime": "2021-06-01T14:45:48.338Z",
+            "lastUpdatedDatetime": "2020-12-12T02:22:23.902Z"
+          }
+        ],
+        "inBreach": false,
+        "failureToComplyCount": 0,
+        "breachEnd": null,
+        "sentence": {
+          "sentenceId": 1558,
+          "description": "ORA Community Order",
+          "originalLength": 24,
+          "originalLengthUnits": "Months",
+          "defaultLength": 12,
+          "lengthInDays": 364,
+          "expectedSentenceEndDate": "2020-10-01",
+          "startDate": "2018-12-01",
+          "terminationDate": "2020-12-01",
+          "terminationReason": "Revoked",
+          "sentenceType": {
+            "code": "ns",
+            "description": "ORA Community Order"
+          },
+          "additionalSentences": [],
+          "failureToComplyLimit": 3
+        },
+        "latestCourtAppearanceOutcome": {
+          "code": "hgv",
+          "description": "Fresh"
+        },
+        "responsibleCourt": {
+          "courtId": 54575,
+          "code": "q5v5t",
+          "selectable": true,
+          "courtName": "1474 Wisozk Estates",
+          "telephoneNumber": "(218) 274-5691 x356",
+          "fax": "1-605-525-5827 x31455",
+          "buildingName": "dolores laboriosam optio",
+          "town": "O'Haraside",
+          "county": "Cambridgeshire",
+          "postcode": "29712",
+          "country": "Barbados",
+          "courtTypeId": 66852,
+          "createdDatetime": "2021-04-13T10:27:22.656Z",
+          "lastUpdatedDatetime": "2021-07-13T19:33:06.080Z",
+          "probationAreaId": 25436,
+          "probationArea": {
+            "code": "319",
+            "description": "Lake Kipland"
+          },
+          "courtType": {
+            "code": "nmw",
+            "description": "Frozen"
+          }
+        },
+        "courtAppearance": {
+          "courtAppearanceId": 96753,
+          "appearanceDate": "2021-01-17",
+          "courtCode": "uwiey",
+          "courtName": "54605 Gislason Springs",
+          "appearanceType": {
+            "code": "uk",
+            "description": "Metal"
+          },
+          "crn": "V484391"
+        }
+      }
+    ]
+  },
+  "priority": 2
+}

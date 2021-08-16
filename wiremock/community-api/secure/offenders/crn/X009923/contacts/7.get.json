@@ -1,0 +1,55 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/community-api/secure/offenders/crn/X009923/contacts/7"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "contactId": 7,
+      "contactStart": "2020-09-04T13:00:00+01:00",
+      "contactEnd": "2020-09-04T00:00:00+01:00",
+      "notes": "Hi Brian - it was good to speak today. To confirm, your next probation appointment is by telephone on 7th April 2021 at 10:00.",
+      "officeLocation": {
+        "code": "53264f6e-8fd3-4e89-ac78-305953beace0",
+        "buildingName": "Verlie",
+        "buildingNumber": "54",
+        "streetName": "Schmitt Hollow",
+        "townCity": "Country Club",
+        "county": "Bedfordshire",
+        "postcode": "76321-5024",
+        "description": "4215 Ivory Park"
+      },
+      "outcome": null,
+      "sensitive": true,
+      "type": {
+        "code": "CMOB",
+        "description": "eMail/Text to Offender",
+        "shortDescription": "engineer turn-key communities",
+        "appointment": false
+      },
+      "provider": {
+        "code": "fa47f396-f575-4687-8585-c31a002c708e",
+        "description": "syndicate 24/365 networks"
+      },
+      "team": {
+        "code": "05c470fb-f9be-45d5-82a5-72887067da26",
+        "description": "drive compelling infomediaries"
+      },
+      "staff": {
+        "code": "16c6a967-ea4a-46f2-b855-28176e406a9e",
+        "forenames": "Letha",
+        "surname": "Schmeler",
+        "unallocated": true
+      },
+      "lastUpdatedDateTime": "2020-09-04T14:20:23+01:00",
+      "lastUpdatedByUser": {
+        "forenames": "John",
+        "surname": "Smith"
+      }
+    }
+  }
+}

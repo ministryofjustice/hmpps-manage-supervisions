@@ -1,67 +1,40 @@
-import * as Listr from 'listr'
 import { SeedContext, SeedFn, SeedModule, SeedPrimitive } from './types'
-import { WiremockClient } from './wiremock-client'
+import { WiremockClient, WiremockClientOptions } from './wiremock-client'
 
 function isModule(x: SeedPrimitive): x is SeedModule {
   return typeof x === 'object' && 'title' in x
 }
 
-type ListrTaskFn = Listr.ListrTask<any>['task']
+export interface WiremockerOptions extends WiremockClientOptions {
+  silent?: boolean
+}
 
-function toListr(context: SeedContext, { title, body }: SeedModule): Listr.ListrTask {
-  function task(task: ListrTaskFn) {
-    return { title, task }
+export async function wiremocker(modules: SeedModule[], { silent, ...options }: WiremockerOptions = {}): Promise<void> {
+  const context: SeedContext = {
+    client: new WiremockClient(options),
   }
 
-  if (body.length === 0) {
-    return task(() => {
-      // No task body, nothing to see here
-    })
-  }
-
-  const subModules: SeedModule[] = []
-  const subTasks: SeedFn[] = []
-  for (const sub of body) {
-    if (isModule(sub)) {
-      subModules.push(sub)
-    } else {
-      subTasks.push(sub)
+  const functions: SeedFn[] = []
+  const toVisit = [...modules].reverse()
+  while (toVisit.length) {
+    const next = toVisit.pop()
+    for (const primitive of next.body) {
+      if (isModule(primitive)) {
+        toVisit.push(primitive)
+      } else {
+        functions.push(primitive)
+      }
     }
   }
 
-  const results = subModules.map(x => toListr(context, x))
-  if (subTasks.length) {
-    const collapsedSubTasks = task(async () => await Promise.all(subTasks.map(fn => fn(context))))
-    results.push(collapsedSubTasks)
-  }
+  await Promise.all(functions.map(fn => fn(context)))
+  await context.client.commit()
 
-  if (subModules.length === 0) {
-    return results[0]
-  }
-
-  return task(() => new Listr(results))
-}
-
-export async function wiremocker(modules: SeedModule[], { silent = false }: { silent?: boolean } = {}): Promise<void> {
-  const context: SeedContext = {
-    client: new WiremockClient(),
-  }
-
-  try {
-    return await new Listr(
-      modules.map(x => toListr(context, x)),
-      {
-        collapse: false,
-        renderer: silent ? 'silent' : 'default',
-      } as any,
-    ).run()
-  } finally {
-    if (!silent) {
-      console.log('\nWiremocking complete  🎉')
-      const stubs = await context.client.getAllStubs()
-      for (const stub of stubs) {
-        console.log(stub)
-      }
+  if (!silent) {
+    console.log('\nWiremocking complete  🎉')
+    const stubs = await context.client.getAllStubs()
+    for (const stub of stubs) {
+      console.log(stub)
     }
   }
 }

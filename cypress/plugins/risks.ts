@@ -13,13 +13,13 @@ export const RISKS: DeepPartial<AllRoshRiskDto> = {
 }
 
 export function risks(crn: string, partial?: DeepPartial<AllRoshRiskDto>): SeedFn {
-  return async context => {
+  return context => {
     if (partial === null) {
       // special case, no risk data return a 404
-      await context.client.assessRisksAndNeeds.get(`/risks/crn/${crn}`).notFound()
+      context.client.assessRisksAndNeeds.get(`/risks/crn/${crn}`).notFound()
     } else {
       const risks = fakeAllRoshRiskDto([RISKS, partial])
-      await context.client.assessRisksAndNeeds.get(`/risks/crn/${crn}`).returns(risks)
+      context.client.assessRisksAndNeeds.get(`/risks/crn/${crn}`).returns(risks)
     }
   }
 }

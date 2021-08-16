@@ -1,0 +1,174 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/community-api/secure/offenders/crn/X009923/convictions/100/nsis",
+    "queryParameters": {
+      "nsiCodes": {
+        "equalTo": "BRE"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "nsis": [
+        {
+          "nsiId": 76036,
+          "nsiType": {
+            "code": "BRE",
+            "description": "Breach Request"
+          },
+          "nsiSubType": {
+            "code": "BRE01",
+            "description": "Community Order"
+          },
+          "nsiStatus": {
+            "code": "BRE01",
+            "description": "Breach Initiated"
+          },
+          "statusDateTime": "2021-03-20T10:25:18.967Z",
+          "referralDate": "2020-03-05",
+          "lengthUnit": "Months",
+          "active": true,
+          "nsiManagers": [
+            {
+              "probationArea": {
+                "probationAreaId": 98481,
+                "code": "ETL",
+                "description": "57767 Zieme Keys",
+                "organisation": {
+                  "code": "SYKX",
+                  "description": "Rohan - Frami"
+                }
+              },
+              "team": {
+                "code": "43OI0C",
+                "description": "Abernathy Group",
+                "startDate": "2021-08-06",
+                "localDeliveryUnit": {
+                  "code": "ZWE2L1",
+                  "description": "Streichmouth"
+                },
+                "teamType": {
+                  "code": "Q8UUC6",
+                  "description": "extend viral convergence"
+                },
+                "district": {
+                  "code": "84R112",
+                  "description": "South Donald"
+                },
+                "borough": {
+                  "code": "G9WJBT",
+                  "description": "Lake Jarrettborough"
+                }
+              },
+              "staff": {
+                "username": "atque-quo-qui-nemo-excepturi-est-libero-ab-sed-suscipit",
+                "staffIdentifier": 188,
+                "staffCode": "in-fugiat-alias-minus-exercitationem-voluptas-et-esse-vel-dicta",
+                "email": "Sanford67@gmail.com"
+              },
+              "startDate": "2021-05-27"
+            }
+          ],
+          "intendedProvider": {
+            "probationAreaId": 11216,
+            "code": "8CD",
+            "description": "683 Sandy Park",
+            "organisation": {
+              "code": "XLZD",
+              "description": "Denesik - Dibbert"
+            }
+          },
+          "notes": "Maiores facilis harum laboriosam vel esse non rerum.",
+          "length": 12,
+          "softDeleted": false,
+          "actualStartDate": "2020-04-05",
+          "actualEndDate": null
+        },
+        {
+          "nsiId": 55200,
+          "nsiType": {
+            "code": "BRE",
+            "description": "Breach Request"
+          },
+          "nsiSubType": {
+            "code": "BRE01",
+            "description": "Community Order"
+          },
+          "nsiStatus": {
+            "code": "BRE08",
+            "description": "Breach Proven - Order to Continue"
+          },
+          "statusDateTime": "2020-10-14T17:22:25.287Z",
+          "referralDate": "2019-03-05",
+          "lengthUnit": "Days",
+          "active": false,
+          "nsiManagers": [
+            {
+              "probationArea": {
+                "probationAreaId": 32496,
+                "code": "ZWR",
+                "description": "45767 Smith Dam",
+                "organisation": {
+                  "code": "X1RX",
+                  "description": "Batz - D'Amore"
+                }
+              },
+              "team": {
+                "code": "QO0I88",
+                "description": "Kiehn, Krajcik and Skiles",
+                "startDate": "2020-10-29",
+                "localDeliveryUnit": {
+                  "code": "CGUUHV",
+                  "description": "Lynchside"
+                },
+                "teamType": {
+                  "code": "S6PDOP",
+                  "description": "iterate holistic solutions"
+                },
+                "district": {
+                  "code": "KF7CHY",
+                  "description": "Schmelermouth"
+                },
+                "borough": {
+                  "code": "AOJDLS",
+                  "description": "Tessfort"
+                }
+              },
+              "staff": {
+                "username": "sed-tempora-esse-odit-culpa-et-sed-sint-sit-corrupti",
+                "staffIdentifier": 713,
+                "staffCode": "fuga-minus-libero-dolores-id-voluptate-expedita-officiis-debitis-cumque",
+                "email": "Beau_Douglas@gmail.com"
+              },
+              "startDate": "2020-12-05"
+            }
+          ],
+          "intendedProvider": {
+            "probationAreaId": 66734,
+            "code": "9K6",
+            "description": "84671 Fisher Parks",
+            "organisation": {
+              "code": "1OD6",
+              "description": "Kuhn - Treutel"
+            }
+          },
+          "notes": "Ut sequi consequatur at molestias cumque.",
+          "length": 10,
+          "softDeleted": false,
+          "actualStartDate": "2019-04-05",
+          "actualEndDate": "2019-05-05",
+          "nsiOutcome": {
+            "code": "BRE09",
+            "description": "Withdrawn"
+          }
+        }
+      ]
+    }
+  },
+  "priority": 1
+}

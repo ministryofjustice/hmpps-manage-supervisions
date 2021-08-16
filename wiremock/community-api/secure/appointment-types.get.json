@@ -1,0 +1,842 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/community-api/secure/appointment-types"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": [
+      {
+        "contactType": "CITI",
+        "description": "Citizenship Induction Session (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "CITA",
+        "description": "Citizenship Alcohol Session (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA"]
+      },
+      {
+        "contactType": "CITD",
+        "description": "Citizenship Drugs Session (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "CITE",
+        "description": "Citizenship Emotions Session (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "CITL",
+        "description": "Citizenship Lifestyle Session (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "CITR",
+        "description": "Citizenship Relationships Session (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "CITV",
+        "description": "Citizenship Variation from Citizenship (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "CITN",
+        "description": "Citizenship Next Steps Session/Handover (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "CIRS",
+        "description": "Citizenship Induct. Sex Offender (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "APAT",
+        "description": "Programme Session (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "APRE",
+        "description": "Programme Pre-work (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "APOS",
+        "description": "Programme Post Work (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "CHVS",
+        "description": "Home Visit to Case (NS)",
+        "requiresLocation": "NOT_REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "COAP",
+        "description": "Planned Office Visit (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "CAIE",
+        "description": "IOM External Provider Appointment",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "CAIS",
+        "description": "IOM Office Visit planned",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "EAPK",
+        "description": "AP - Keyworker Session (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "CGTS",
+        "description": "Test",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C007",
+        "description": "ETE Appointment (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C031",
+        "description": "Other Appointment (Non NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C085",
+        "description": "Programme Session (Non NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C086",
+        "description": "Programme Pre-Work (Non NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C087",
+        "description": "Programme Post-Work (Non NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C089",
+        "description": "Alcohol Key Worker Session (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C090",
+        "description": "Drug Key Worker Session (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C101",
+        "description": "Appointment with External Agency",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C133",
+        "description": "Clinic Appointment (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C175",
+        "description": "ETE Appointment (Non NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C234",
+        "description": "Restorative Justice Attendance",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C240",
+        "description": "Drug Test (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C241",
+        "description": "Court Review (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C242",
+        "description": "Drug Group Work Session (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C243",
+        "description": "Alcohol Group Work Session (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C251",
+        "description": "Post Citizenship Contact (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C258",
+        "description": "CSS Appointment - Enforceable (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "C259",
+        "description": "CSS Appointment with Volunteer / Agency",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "C264",
+        "description": "OM Appointments During Comunity Phase",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "C307",
+        "description": "IAG Appointment (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C314",
+        "description": "Appointment with External Agency (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C334",
+        "description": "Biometric Reporting Appointment",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C352",
+        "description": "Learning and Skills Appointment (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "C353",
+        "description": "Finance / Benefits / Debt Appointment (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "C379",
+        "description": "START Programme Attendance (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "C444",
+        "description": "Other Appointment (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "APPA03",
+        "description": "AP PA - Accommodation",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "ATCA",
+        "description": "Attendance Centre Appointment (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "CGAP01",
+        "description": "Pre group 1:1 - Motivating and engaging",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGAP02",
+        "description": "Session 1 - Introduction",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGAP03",
+        "description": "Session 2 - Why I did it",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGAP04",
+        "description": "Session 3 - What I believe",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGAP05",
+        "description": "Session 4 - Living up to expectations",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGAP06",
+        "description": "Session 5 - Accurate Perceptions?",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGAP07",
+        "description": "Session 6 - Coping with other people",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGAP08",
+        "description": "Session 7 - Review",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGAP09",
+        "description": "Session 8 - My Goals, My Plan",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGAP10",
+        "description": "Post-group 1:1-Applying what I've learned...",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGEN01",
+        "description": "Pre-Group 1-1",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGEN02",
+        "description": "Session 1 - Introductions",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGEN03",
+        "description": "Session 2.  Lifestyles",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGEN04",
+        "description": "Session 3.  Life management plans",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGEN05",
+        "description": "Session 4.  Progress review",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGEN06",
+        "description": "Session 5.  Emotional Management (Attitudes)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGEN07",
+        "description": "Session 6.  Coping with Reality 1",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGEN08",
+        "description": "Session 7.  Coping with Reality 2",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGEN09",
+        "description": "Session 8.  Offending and its Consequences",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGEN10",
+        "description": "Session 9.  Alternative Lifestyles",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGEN11",
+        "description": "Session 10. Action plans and the Future",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGIR01",
+        "description": "Assessment One to One (Induction) ",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGIR02",
+        "description": "Session 1: Introductions",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGIR03",
+        "description": "Session 2: What is Domestic Abuse?",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGIR04",
+        "description": "Session 3: What causes Domestic Abuse?",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGIR05",
+        "description": "Session 4: Identifying core beliefs",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGIR06",
+        "description": "Session 5: Identifying the impact on others",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGIR07",
+        "description": "Session 6: Identifying the case for change",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGIR08",
+        "description": "Session 7: Control of Emotions",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGIR09",
+        "description": "Session 8: Promoting positive self talk",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGIR10",
+        "description": "Session 9: Negotiation skills",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGIR11",
+        "description": "Session 10: Structured Time Outs",
+        "requiresLocation": "NOT_REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGIR12",
+        "description": "Session 11: Review",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "CGIR13",
+        "description": "Session 12: Planning for the Future",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "COPT",
+        "description": "Planned Telephone Contact (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "DLND2",
+        "description": "Cannabis Groupwork Session (DLNR)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "DLND3",
+        "description": "NPS Groupwork Session (DLNR)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "DLNRBRA",
+        "description": "Biometric Reporting Appointment (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA", "LEGACY"]
+      },
+      {
+        "contactType": "DLNRD1",
+        "description": "Cocaine Groupwork Session (DLNR)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "DLNRD4",
+        "description": "Cocaine 1:1 Session (DLNR)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "DLNRD5",
+        "description": "Cannabis 1:1 session (DLNR)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "DLNRD6",
+        "description": "NPS 1:1 Session (DLNR)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "KRAR01",
+        "description": "Session 1 (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "KRAR02",
+        "description": "Session 2 (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "KRAR03",
+        "description": "Session 3 (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "KRAR04",
+        "description": "Session 4 (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "KRAR05",
+        "description": "Session 5 (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "KRAR06",
+        "description": "Session 6 (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "KRAR07",
+        "description": "Session 7 (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "KRAR08",
+        "description": "Session 8 (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "KRAR09",
+        "description": "Session 9 (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "KRAR10",
+        "description": "Session 10 (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "KRAR11",
+        "description": "Session 11 (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "KRAR12",
+        "description": "Session 12 (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "KRAR13",
+        "description": "Session 13 (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "KRAR14",
+        "description": "Session 14 (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP01",
+        "description": "MSRP Module",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP19",
+        "description": "Module 19(NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP20",
+        "description": "Module 20(NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP21",
+        "description": "Learning Module 1(NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP22",
+        "description": "Learning Module 2 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP23",
+        "description": "Learning Module 3 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP24",
+        "description": "Learning Module 4 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP25",
+        "description": "Learning Module 5 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP26",
+        "description": "Learning Module 6 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP27",
+        "description": "Learning Module 7 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP28",
+        "description": "Learning Module 8 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP29",
+        "description": "Learning Module 9 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP30",
+        "description": "Learning Module 10 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP31",
+        "description": "Practice Module 1 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP32",
+        "description": "Practice Module 2 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP33",
+        "description": "Practice Module 3 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP34",
+        "description": "Practice Module 4 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP35",
+        "description": "Practice Module 5 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP36",
+        "description": "Practice Module 6 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP37",
+        "description": "Practice Module 7 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP41",
+        "description": "Doing Module 1 (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP42",
+        "description": "Doing Module 2 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP43",
+        "description": "Doing Module 3 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP44",
+        "description": "Doing Module 4 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "MSRP45",
+        "description": "Doing Module 5 (NS)",
+        "requiresLocation": "OPTIONAL",
+        "orderTypes": []
+      },
+      {
+        "contactType": "NBRS1",
+        "description": "Session 1 - Lets get confident & go to Work",
+        "requiresLocation": "NOT_REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "NBRS2",
+        "description": "Session 2: Me - A Great Employee",
+        "requiresLocation": "NOT_REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "NBRS3",
+        "description": "Session 3: Getting Motivated to Overcome Hurdles",
+        "requiresLocation": "NOT_REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "NBRS4",
+        "description": "Session 4: Selling Myself on Paper ",
+        "requiresLocation": "NOT_REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "NBRS5",
+        "description": "Session 5: Let's Have a Go",
+        "requiresLocation": "NOT_REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "NBRS6",
+        "description": "Session 6: Celebration event",
+        "requiresLocation": "NOT_REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "POLY01",
+        "description": "Polygraph Attendance (NS)",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "RJC01",
+        "description": "Restorative Justice Preparation Work",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "RJC02",
+        "description": "Restorative Justice Conference ",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "RJC03",
+        "description": "Restorative Justice Post Work",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": []
+      },
+      {
+        "contactType": "RJI01",
+        "description": "Restorative Justice Individual Tailored Work",
+        "requiresLocation": "REQUIRED",
+        "orderTypes": ["CJA"]
+      }
+    ]
+  }
+}

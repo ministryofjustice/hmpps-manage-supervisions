@@ -1,0 +1,72 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/community-api/secure/offenders/crn/X009923/personalContacts"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": [
+      {
+        "personalContactId": 2240,
+        "title": "Dr",
+        "firstName": "Pippa",
+        "otherNames": "b",
+        "surname": "Wade",
+        "previousSurname": "Brekke",
+        "relationship": "Wife",
+        "gender": "Female",
+        "relationshipType": {
+          "code": "NK",
+          "description": "Next of Kin"
+        },
+        "startDate": "2019-09-13T00:00:00",
+        "createdDatetime": "2019-09-13T00:00:00",
+        "lastUpdatedDatetime": "2019-09-13T00:00:00",
+        "emailAddress": "Itzel.Jacobs44@gmail.com",
+        "mobileNumber": "07700 900 141",
+        "notes": "Divorced",
+        "address": {
+          "addressNumber": "64",
+          "streetName": "Ermin Street",
+          "buildingName": null,
+          "town": "Wrenthorpe",
+          "county": "West Yorkshire",
+          "postcode": "WF2 8WT",
+          "telephoneNumber": "07073735801"
+        }
+      },
+      {
+        "personalContactId": 53552,
+        "title": "Mr",
+        "firstName": "Jonathon",
+        "otherNames": "a",
+        "surname": "Bacon",
+        "previousSurname": "Farrell",
+        "relationship": "Father",
+        "gender": "Male",
+        "relationshipType": {
+          "code": "NK",
+          "description": "Family member"
+        },
+        "startDate": "2019-09-13T00:00:00",
+        "createdDatetime": "2019-09-13T00:00:00",
+        "lastUpdatedDatetime": "2019-09-13T00:00:00",
+        "emailAddress": "Lesley63@yahoo.com",
+        "mobileNumber": "333-864-6073 x205",
+        "notes": "Cum et voluptatem quo est distinctio possimus.",
+        "address": {
+          "addressNumber": "18107",
+          "streetName": "Schiller Field",
+          "buildingName": "Garden",
+          "town": "Gleichnerside",
+          "county": "Berkshire",
+          "postcode": "86224-0111",
+          "telephoneNumber": "792-683-7362"
+        }
+      }
+    ]
+  }
+}

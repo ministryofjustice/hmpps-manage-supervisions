@@ -39,8 +39,8 @@ export const PERSONAL_CONTACTS: DeepPartial<PersonalContact>[] = [
 ]
 
 export function personalContacts(crn: string, partials: DeepPartial<PersonalContact>[] = PERSONAL_CONTACTS): SeedFn {
-  return async context => {
+  return context => {
     const personalContacts = partials.map(p => fakePersonalContact(p))
-    await context.client.community.get(`/secure/offenders/crn/${crn}/personalContacts`).returns(personalContacts)
+    context.client.community.get(`/secure/offenders/crn/${crn}/personalContacts`).returns(personalContacts)
   }
 }

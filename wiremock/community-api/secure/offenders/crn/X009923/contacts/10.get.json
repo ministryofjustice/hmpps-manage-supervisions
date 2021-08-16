@@ -1,0 +1,55 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/community-api/secure/offenders/crn/X009923/contacts/10"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "contactId": 10,
+      "contactStart": "2019-05-05T00:00:00+01:00",
+      "contactEnd": "2019-05-05T00:00:00+01:00",
+      "notes": "empower sticky functionalities",
+      "officeLocation": {
+        "code": "f92b1f21-032d-4288-aece-82b034dc5d00",
+        "buildingName": "Ramon",
+        "buildingNumber": "420",
+        "streetName": "Willa Row",
+        "townCity": "Lake Easterport",
+        "county": "Buckinghamshire",
+        "postcode": "14860",
+        "description": "568 Millie Harbor"
+      },
+      "outcome": null,
+      "sensitive": true,
+      "type": {
+        "code": "ABNP",
+        "description": "Breach Outcome - not proven",
+        "shortDescription": "drive global functionalities",
+        "appointment": false
+      },
+      "provider": {
+        "code": "b2630dd8-387a-4496-97e0-a1afddb03164",
+        "description": "facilitate robust models"
+      },
+      "team": {
+        "code": "36b2206e-21df-4e59-8970-cd99454bc6d2",
+        "description": "extend end-to-end eyeballs"
+      },
+      "staff": {
+        "code": "c4b2ba64-eefa-4b38-92ad-f6c81e795ae5",
+        "forenames": "John",
+        "surname": "Yost",
+        "unallocated": false
+      },
+      "lastUpdatedDateTime": "2021-08-12T17:04:59.414+01:00",
+      "lastUpdatedByUser": {
+        "forenames": "Carmela",
+        "surname": "Jones"
+      }
+    }
+  }
+}

@@ -32,6 +32,8 @@ services:
     restart: always
     ports:
       - "9091:8080"
+    volumes:
+      - ./wiremock:/home/wiremock/mappings
     command:
       - -global-response-templating
       - -verbose

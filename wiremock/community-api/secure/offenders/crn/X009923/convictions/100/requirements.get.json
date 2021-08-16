@@ -1,0 +1,140 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/community-api/secure/offenders/crn/X009923/convictions/100/requirements"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "requirements": [
+        {
+          "requirementId": 2500076972,
+          "length": 1,
+          "lengthUnit": "Hours",
+          "active": false,
+          "startDate": "2018-08-01",
+          "expectedStartDate": "2019-04-03",
+          "expectedEndDate": "2021-09-30",
+          "requirementNotes": "Some inactive unpaid work requirement",
+          "requirementTypeMainCategory": {
+            "code": "W",
+            "description": "Unpaid Work"
+          },
+          "requirementTypeSubCategory": {
+            "code": "W06",
+            "description": "Hours Concurrent to another Order"
+          },
+          "terminationDate": "2019-04-04",
+          "createdDatetime": "2019-04-09T14:20:39",
+          "terminationReason": {
+            "description": "CBA"
+          }
+        },
+        {
+          "requirementId": 58579,
+          "length": 18,
+          "lengthUnit": "Hours",
+          "active": true,
+          "startDate": "2018-08-01",
+          "expectedStartDate": "2019-04-01",
+          "expectedEndDate": "2019-06-01",
+          "requirementNotes": "CHANGE HOUSRS FROM 22 TO 19",
+          "requirementTypeMainCategory": {
+            "code": "W",
+            "description": "Unpaid Work"
+          },
+          "requirementTypeSubCategory": {
+            "code": "W01",
+            "description": "Regular"
+          },
+          "createdDatetime": "2019-04-08T14:48:17"
+        },
+        {
+          "requirementId": 93585,
+          "length": 3,
+          "lengthUnit": "Hours",
+          "active": true,
+          "startDate": "2018-08-01",
+          "expectedStartDate": "2019-04-03",
+          "expectedEndDate": "2022-01-04",
+          "requirementNotes": "3 ADD HOURS",
+          "requirementTypeMainCategory": {
+            "code": "W",
+            "description": "Unpaid Work"
+          },
+          "requirementTypeSubCategory": {
+            "code": "W03",
+            "description": "Additional Hours"
+          },
+          "createdDatetime": "2019-04-08T15:04:01"
+        },
+        {
+          "requirementId": 2500199144,
+          "length": 34,
+          "lengthUnit": "Days",
+          "active": true,
+          "startDate": "2018-08-01",
+          "expectedStartDate": "2020-08-24",
+          "expectedEndDate": "2021-11-07",
+          "requirementNotes": null,
+          "requirementTypeMainCategory": {
+            "code": "F",
+            "description": "RAR category"
+          },
+          "requirementTypeSubCategory": {
+            "code": "3pm0z",
+            "description": "Wooden"
+          },
+          "commencementDate": "2018-08-01",
+          "createdDatetime": "2019-04-08T13:59:45",
+          "rarCount": 20
+        },
+        {
+          "requirementId": 2500199145,
+          "length": 10,
+          "lengthUnit": "Days",
+          "active": true,
+          "startDate": "2018-09-01",
+          "expectedStartDate": "2021-03-19",
+          "expectedEndDate": null,
+          "requirementNotes": null,
+          "requirementTypeMainCategory": {
+            "code": "F",
+            "description": "RAR category"
+          },
+          "requirementTypeSubCategory": {
+            "code": "7t2uy",
+            "description": "Fresh"
+          },
+          "commencementDate": "2018-08-01",
+          "createdDatetime": "2019-04-08T13:59:45",
+          "rarCount": 9,
+          "restrictive": false
+        },
+        {
+          "requirementId": 30304,
+          "length": 7,
+          "lengthUnit": "Hours",
+          "active": true,
+          "startDate": "2018-08-01",
+          "expectedStartDate": "2019-04-01",
+          "expectedEndDate": "2021-10-06",
+          "requirementNotes": null,
+          "requirementTypeMainCategory": {
+            "code": "W",
+            "description": "Unpaid Work"
+          },
+          "requirementTypeSubCategory": {
+            "code": "W03",
+            "description": "Additional Hours"
+          },
+          "createdDatetime": "2019-04-08T14:01:41",
+          "softDeleted": true
+        }
+      ]
+    }
+  }
+}

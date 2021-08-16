@@ -7,17 +7,16 @@ export const USER_ROLES = ['SOME_USER_ROLE']
 const AUTHORIZE_PATH = '/oauth/authorize'
 const TOKEN_PATH = '/oauth/token'
 
-const oidcDiscovery: SeedFn = async context => {
-  await context.client.hmppsAuth.get('/issuer/.well-known/openid-configuration').returns({
+const oidcDiscovery: SeedFn = context =>
+  context.client.hmppsAuth.get('/issuer/.well-known/openid-configuration').returns({
     issuer: context.client.hmppsAuth.resolveUrl('/issuer'),
     authorization_endpoint: context.client.hmppsAuth.resolveUrl(AUTHORIZE_PATH),
     token_endpoint: context.client.hmppsAuth.resolveUrl(TOKEN_PATH),
     jwks_uri: context.client.hmppsAuth.resolveUrl('/.well-known/jwks.json'),
   })
-}
 
-const login: SeedFn = async context => {
-  await context.client.hmppsAuth
+const login: SeedFn = context =>
+  context.client.hmppsAuth
     .get(AUTHORIZE_PATH)
     .query({ response_type: 'code', client_id: 'clientid' })
     .queryMatches({ redirect_uri: '.+', state: '.+' }).html(`<html>
@@ -26,10 +25,9 @@ const login: SeedFn = async context => {
          <a href="{{ request.query.redirect_uri }}&code=codexxxx&state={{ request.query.state }}">Login</a>
        </body>
      </html>`)
-}
 
 function token(username: string): SeedFn {
-  return async context => {
+  return context => {
     const payload = {
       user_name: username,
       scope: ['read'],
@@ -42,7 +40,7 @@ function token(username: string): SeedFn {
     const token = jwt.sign(payload, 'secret', { expiresIn: '1h' })
 
     // TODO determine which token is being requested
-    await context.client.hmppsAuth.post(TOKEN_PATH).returns({
+    context.client.hmppsAuth.post(TOKEN_PATH).returns({
       access_token: token,
       token_type: 'bearer',
       user_name: username,
@@ -54,24 +52,20 @@ function token(username: string): SeedFn {
 }
 
 function user(username: string): SeedFn {
-  return async context => {
-    await context.client.hmppsAuth.get('/api/user/me').returns({
+  return context =>
+    context.client.hmppsAuth.get('/api/user/me').returns({
       username,
       active: true,
       name: 'john smith',
     })
-  }
 }
 
 function userRoles(roles: string[]): SeedFn {
-  return async context => {
-    await context.client.hmppsAuth.get('/api/user/me/roles').returns(roles.map(roleId => ({ roleId })))
-  }
+  return context => context.client.hmppsAuth.get('/api/user/me/roles').returns(roles.map(roleId => ({ roleId })))
 }
 
-const logout: SeedFn = async context => {
-  await context.client.hmppsAuth.get('/logout').html('<html><body><h1>HMPPS Auth Logout</h1></body></html>')
-}
+const logout: SeedFn = context =>
+  context.client.hmppsAuth.get('/logout').html('<html><body><h1>HMPPS Auth Logout</h1></body></html>')
 
 export interface StubHmppsAuthOptions {
   username?: string
