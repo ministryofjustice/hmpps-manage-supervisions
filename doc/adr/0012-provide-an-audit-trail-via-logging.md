@@ -1,6 +1,6 @@
 # 12. Provide an Audit Trail via Logging
 
-Date: 2021-08-06
+Date: 2021-08-16
 
 ## Status
 
@@ -19,6 +19,8 @@ Some terms are used interchangeably. In this document, we use the following defi
 * Event: a structured data object which records an action. May contain a log message as well as structured data on the actors and actions involved.
 
 ## Context
+
+Manage a Supervision is a frontend-only application at present, and does not manage its own database. Therefore, all data required for auditing needs to be stored outside the application, somewhere.
 
 MoJ monitors use of its services [by recording actions that are performed](https://security-guidance.service.justice.gov.uk/logging-and-monitoring) via log or event recording. Raw log files for internal services are normally [retained for 13 months](https://security-guidance.service.justice.gov.uk/logging-and-monitoring/#log-retention).
 
