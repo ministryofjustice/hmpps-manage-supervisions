@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing'
-import { HttpModule } from '@nestjs/common'
+import { HttpModule } from '@nestjs/axios'
 import { ConfigService } from '@nestjs/config'
 import * as nock from 'nock'
 import { HealthService } from './health.service'

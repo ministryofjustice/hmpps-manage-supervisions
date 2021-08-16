@@ -97,7 +97,7 @@ export class RequirementService {
     try {
       return Math.floor(Duration.fromObject({ [units]: value }).as(targetUnits))
     } catch (err) {
-      this.logger.error(`Cannot convert '${value}' from '${units}' to '${targetUnits}': ${err.message}`)
+      this.logger.error(`Cannot convert '${value}' from '${units}' to '${targetUnits}'`, err)
       return 0
     }
   }

@@ -9,7 +9,7 @@ export interface TokenVerificationResponse {
 
 @Injectable()
 export class TokenVerificationService {
-  private readonly logger = new Logger()
+  private readonly logger = new Logger(TokenVerificationService.name)
 
   constructor(private readonly config: ConfigService<Config>, private readonly rest: RestService) {}
 
@@ -22,8 +22,8 @@ export class TokenVerificationService {
     try {
       const { data } = await client.post<TokenVerificationResponse>('/token/verify')
       return data?.active === true
-    } catch (e) {
-      this.logger.log(`Token expired '${user.username}': ${e.message}`)
+    } catch (err) {
+      this.logger.log('token expired', err)
       return false
     }
   }
