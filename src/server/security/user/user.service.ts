@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { Expose, plainToClass } from 'class-transformer'
 import { StaffApi, StaffDetails } from '../../community-api/client'
-import { RestService } from '../../common'
+import { AuthenticationMethod, RestService } from '../../common'
 
 export class UserProfile {
   @Expose()
@@ -44,7 +44,11 @@ export class UserService {
   }
 
   async getStaffDetails(user: User): Promise<StaffDetails> {
-    const staffApi = new StaffApi(null, '', this.rest.build('community', user))
+    const staffApi = new StaffApi(
+      null,
+      '',
+      this.rest.build('community', user, AuthenticationMethod.ReissueForDeliusUser),
+    )
     const { data } = await staffApi.getStaffDetailsForUsernameUsingGET({ username: user.username })
     return data
   }

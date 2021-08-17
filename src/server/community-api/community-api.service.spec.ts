@@ -6,6 +6,7 @@ import { fakeAppointmentType } from './community-api.fake'
 import { Logger } from '@nestjs/common'
 import { MockRestModule } from '../common/rest/rest.mock'
 import MockAdapter from 'axios-mock-adapter'
+import { AuthenticationMethod } from '../common'
 
 describe('CommunityApiService', () => {
   let subject: CommunityApiService
@@ -16,7 +17,9 @@ describe('CommunityApiService', () => {
     user = fakeUser()
 
     const module = await Test.createTestingModule({
-      imports: [MockRestModule.register([{ name: 'community', user }])],
+      imports: [
+        MockRestModule.register([{ name: 'community', user, authMethod: AuthenticationMethod.ReissueForDeliusUser }]),
+      ],
       providers: [CommunityApiService, { provide: REQUEST, useValue: { user } }],
     })
       .setLogger(new Logger())
