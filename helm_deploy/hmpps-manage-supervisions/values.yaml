@@ -25,8 +25,7 @@ generic-service:
 
   allowlist:
     mojvpn: "81.134.202.29/32"
-    moj-official-tgw-prod: "51.149.250.0/24"
-    moj-official-tgw-preprod: "51.149.251.0/24"
+    moj-official-tgw-alpha: "35.176.93.186/32" # Gateway IP address for Global Protect alpha vpn firewall
 
   env:
     NODE_ENV: "production"
