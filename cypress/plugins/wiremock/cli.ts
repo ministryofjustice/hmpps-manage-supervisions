@@ -1,5 +1,5 @@
 import * as yargs from 'yargs'
-import { set } from 'lodash'
+import { set, orderBy } from 'lodash'
 import { wiremocker } from './runner'
 import {
   reset,
@@ -10,6 +10,8 @@ import {
   OffenderSeedOptions,
   ContactSeedOptions,
 } from '../seeds'
+import { WiremockClient } from './wiremock-client'
+import { hmppsAuthStub } from '../hmpps-auth'
 
 const { argv } = yargs
   .option('write-mappings', {
@@ -33,27 +35,69 @@ const { argv } = yargs
     default: true,
     group: 'convictions',
   })
+  .option('hmpps-auth', {
+    type: 'boolean',
+    default: false,
+    description: 'stub hmpps-auth',
+  })
+  .option('get-requests', {
+    alias: 'm',
+    type: 'string',
+    description: 'get mappings for specified url and quit',
+    group: 'client',
+  })
 
 type SeedOptions = ReferenceDataSeedOptions & OffenderSeedOptions & ContactSeedOptions
 
-async function seed(args: typeof argv) {
+type KebabToCamelCase<T extends string> = T extends `${infer L}-${infer R}`
+  ? `${Lowercase<L>}${Capitalize<KebabToCamelCase<R>>}`
+  : Lowercase<T>
+
+/**
+ * yargs camelCases all kebab case properties but fails to type them.
+ */
+type CamelCased<T> = { [K in keyof T as K extends string ? KebabToCamelCase<K> : K]: T[K] }
+
+async function seed(args: CamelCased<typeof argv>) {
+  if (args.getRequests) {
+    const client = new WiremockClient()
+    const requests = await client.getRequests(args.getRequests)
+    const summaries = orderBy(requests, x => x.request.loggedDate).map(x =>
+      [
+        x.request.loggedDateString,
+        x.request.method,
+        x.request.url,
+        x.request.body,
+        JSON.stringify(x.request.headers),
+        '=>',
+        x.responseDefinition.status,
+      ].join(' '),
+    )
+    for (const summary of summaries) {
+      console.log(summary)
+    }
+    return
+  }
+
   const options: SeedOptions = {}
 
-  if (args['current-conviction'] === false) {
+  if (args.currentConviction === false) {
     // null means none in this case
     set(options, 'convictions.active', null)
   }
 
-  if (args['previous-convictions'] === false) {
+  if (args.previousConvictions === false) {
     set(options, 'convictions.previous', [])
   }
 
-  await wiremocker([reset, referenceDataSeed(options), offenderSeed(options), contactsSeed(options)], {
-    writeMappings: args['write-mappings'],
-  })
+  const modules = [reset, referenceDataSeed(options), offenderSeed(options), contactsSeed(options)]
+  if (args.hmppsAuth) {
+    modules.push(hmppsAuthStub())
+  }
+  await wiremocker(modules, { writeMappings: args.writeMappings })
 }
 
-seed(argv)
+seed(argv as any)
   .then(() => process.exit(0))
   .catch(err => {
     console.error(err)
