@@ -18,8 +18,7 @@ export class ViewOffenderFixture {
   shouldDisplayCommonHeader(): this {
     this.page.pageTitle.contains(`CRN: ${this.crn}`)
     this.page.pageTitle.contains('Liz Danger Haggis (Bob)')
-    this.page.registrations.should('have.length', 2)
-    this.page.registrations.contains('High RoSH').parent().should('have.class', 'govuk-tag--red')
+    this.page.registrations.should('have.length', 1)
     this.page.registrations.contains('Restraining Order').parent().should('have.class', 'govuk-tag--orange')
     return this
   }

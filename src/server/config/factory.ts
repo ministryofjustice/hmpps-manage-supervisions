@@ -228,5 +228,12 @@ export function configFactory(): Config {
       ...pick(CONTACT_DEFAULTS, [ContactTypeCategory.BreachStart, ContactTypeCategory.BreachEnd]),
     },
     requirements,
+    risk: {
+      // default is Low RoSH, Medium RoSH, High RoSH & Very High RoSH
+      ignoredRegistrationTypes: string('RISK_IGNORED_REGISTRATION_TYPES', fallback('RLRH,RMRH,RHRH,RVHR'))
+        .split(',')
+        .map(x => x.trim().toUpperCase())
+        .filter(x => x),
+    },
   }
 }

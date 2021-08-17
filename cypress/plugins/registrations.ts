@@ -64,6 +64,7 @@ export const REGISTRATIONS: DeepPartial<Registration>[] = [
     warnUser: false,
     active: true,
     numberOfPreviousDeregistrations: 0,
+    notes: 'This registration is on the ignore list so will be excluded from the ui',
   },
 ]
 

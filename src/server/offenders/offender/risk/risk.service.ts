@@ -3,12 +3,15 @@ import { map, reduce, forEach } from 'lodash'
 import { CommunityApiService } from '../../../community-api'
 import { AssessRisksAndNeedsApiService } from '../../../assess-risks-and-needs-api'
 import { RegistrationFlag, Risks, RoshRisk } from './risk.types'
+import { ConfigService } from '@nestjs/config'
+import { Config, RiskConfig } from '../../../config'
 
 @Injectable()
 export class RiskService {
   constructor(
     private readonly community: CommunityApiService,
     private readonly assessRisksAndNeeds: AssessRisksAndNeedsApiService,
+    private readonly config: ConfigService<Config>,
   ) {}
 
   async getRisks(crn: string): Promise<Risks> {
@@ -16,7 +19,9 @@ export class RiskService {
       {
         crn,
       },
-      { validateStatus: (status: number) => (status >= 200 && status < 300) || status === 404 },
+      {
+        validateStatus: (status: number) => (status >= 200 && status < 300) || status === 404,
+      },
     )
 
     if (response.status === 404) {
@@ -40,14 +45,17 @@ export class RiskService {
   }
 
   async getRiskRegistrations(crn: string): Promise<RegistrationFlag[]> {
-    const registration = (await this.community.risks.getOffenderRegistrationsByCrnUsingGET({ crn, activeOnly: true }))
-      .data
+    const {
+      data: { registrations },
+    } = await this.community.risks.getOffenderRegistrationsByCrnUsingGET({ crn, activeOnly: true })
 
-    if (!registration.registrations) {
+    if (!registrations) {
       return []
     }
 
-    return registration.registrations
+    const { ignoredRegistrationTypes } = this.config.get<RiskConfig>('risk')
+    return registrations
+      .filter(x => !ignoredRegistrationTypes.includes(x.type.code))
       .map(r => {
         return {
           text: r.type.description,

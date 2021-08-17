@@ -11,6 +11,9 @@ import {
 import { CommunityApiService } from '../../../community-api'
 import { fakeAllRoshRiskDto } from '../../../assess-risks-and-needs-api/assess-risks-and-needs-api.fake'
 import { fakeRegistration } from '../../../community-api/community-api.fake'
+import { FakeConfigModule } from '../../../config/config.fake'
+
+const IGNORED_REGISTRATION = 'some-ignored-registration-type'
 
 describe('RiskService', () => {
   let subject: RiskService
@@ -20,7 +23,11 @@ describe('RiskService', () => {
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [RiskService],
-      imports: [MockCommunityApiModule.register(), MockAssessRisksAndNeedsApiModule.register()],
+      imports: [
+        MockCommunityApiModule.register(),
+        MockAssessRisksAndNeedsApiModule.register(),
+        FakeConfigModule.register({ risk: { ignoredRegistrationTypes: [IGNORED_REGISTRATION] } }),
+      ],
     }).compile()
 
     subject = module.get(RiskService)
@@ -105,6 +112,16 @@ describe('RiskService', () => {
 
   it('returns an empty array if no risk registrations available for CRN', async () => {
     const stub = community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({}))
+    const observed = await subject.getRiskRegistrations('some-crn')
+
+    expect(observed).toEqual([])
+    expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn', activeOnly: true })
+  })
+
+  it('filters excluded registrations ', async () => {
+    const registrations = [fakeRegistration({ type: { code: IGNORED_REGISTRATION } })]
+
+    const stub = community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({ registrations }))
     const observed = await subject.getRiskRegistrations('some-crn')
 
     expect(observed).toEqual([])
