@@ -135,7 +135,7 @@ export function hmppsAuthStub({ roles = USER_ROLES }: StubHmppsAuthOptions = {})
     user,
     userRoles(roles),
     logout,
-    requireBearerToken('community', 'deliusUser'),
+    requireBearerToken('community', 'clientCredentials'),
     requireBearerToken('assessRisksAndNeeds', 'clientCredentials'),
   )
 }
