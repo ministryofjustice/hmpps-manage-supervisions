@@ -23,10 +23,6 @@ generic-service:
     httpGet:
       path: /health
 
-  allowlist:
-    mojvpn: "81.134.202.29/32"
-    moj-official-tgw-alpha: "35.176.93.186/32" # Gateway IP address for Global Protect alpha vpn firewall
-
   env:
     NODE_ENV: "production"
     REDIS_TLS_ENABLED: "true"
