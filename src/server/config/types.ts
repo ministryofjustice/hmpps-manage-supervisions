@@ -161,6 +161,10 @@ export enum WellKnownRequirementTypePattern {
   Progress = '{progress}',
 }
 
+export interface RiskConfig {
+  ignoredRegistrationTypes: string[]
+}
+
 export interface Config {
   server: ServerConfig
   redis: RedisConfig
@@ -169,4 +173,5 @@ export interface Config {
   contacts: WellKnownContactTypeConfig
   requirements: WellKnownRequirementTypeConfig
   delius: DeliusConfig
+  risk: RiskConfig
 }

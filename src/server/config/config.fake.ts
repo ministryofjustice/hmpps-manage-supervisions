@@ -68,6 +68,9 @@ export const fakeConfig = fake<Config>(() => ({
   },
   contacts: CONTACT_DEFAULTS,
   requirements,
+  risk: {
+    ignoredRegistrationTypes: ['RLRH', 'RMRH', 'RHRH', 'RVHR'],
+  },
 }))
 
 @Module({})
