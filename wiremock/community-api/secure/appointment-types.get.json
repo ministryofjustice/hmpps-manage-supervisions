@@ -1,6 +1,7 @@
 {
   "request": {
     "method": "GET",
+    "headers": {},
     "urlPath": "/community-api/secure/appointment-types"
   },
   "response": {

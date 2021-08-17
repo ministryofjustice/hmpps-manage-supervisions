@@ -1,4 +1,4 @@
-import { AxiosError, AxiosRequestConfig } from 'axios'
+import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { HttpStatus } from '@nestjs/common'
 
 export function getRequestName(request: AxiosRequestConfig): string {
@@ -31,5 +31,21 @@ export class SanitisedAxiosError extends Error {
           .join(' ')
       : err.message
     return `${requestName} -> ${message}`
+  }
+
+  static async catchStatus<T>(action: () => Promise<AxiosResponse<T>>, ...statuses: HttpStatus[]): Promise<T | null> {
+    try {
+      const { data } = await action()
+      return data
+    } catch (err) {
+      if (err instanceof SanitisedAxiosError && statuses.includes(err.status)) {
+        return null
+      }
+      throw err
+    }
+  }
+
+  static async catchNotFound<T>(action: () => Promise<AxiosResponse<T>>) {
+    return this.catchStatus(action, HttpStatus.NOT_FOUND)
   }
 }

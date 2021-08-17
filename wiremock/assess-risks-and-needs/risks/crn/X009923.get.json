@@ -1,6 +1,7 @@
 {
   "request": {
     "method": "GET",
+    "headers": {},
     "urlPath": "/assess-risks-and-needs/risks/crn/X009923"
   },
   "response": {
@@ -11,63 +12,62 @@
     "jsonBody": {
       "riskToSelf": {
         "suicide": {
-          "risk": "YES",
-          "previous": "YES",
-          "previousConcernsText": "lkdlskf;k",
+          "risk": "NO",
+          "previous": "NO",
+          "previousConcernsText": null,
           "current": "YES",
-          "currentConcernsText": "fskdkf;lk"
+          "currentConcernsText": null
         },
         "selfHarm": {
-          "risk": "YES",
+          "risk": "NO",
           "previous": "YES",
-          "previousConcernsText": "lkdlskf;k",
+          "previousConcernsText": null,
           "current": "YES",
-          "currentConcernsText": "fskdkf;lk"
+          "currentConcernsText": null
         },
         "custody": {
           "risk": "YES",
           "previous": "YES",
-          "previousConcernsText": "dsjflksdkljfksdj",
-          "current": "YES",
-          "currentConcernsText": "skjdfkljlksd"
+          "previousConcernsText": "Soluta tempore nemo et velit est perspiciatis.\n\nNeque error aut est nemo quasi. Et labore impedit omnis numquam id et eaque facere itaque. Ipsam et atque eos tempora possimus.",
+          "current": "NO",
+          "currentConcernsText": null
         },
         "hostelSetting": {
-          "risk": "YES",
+          "risk": "DK",
           "previous": "YES",
-          "previousConcernsText": "dsjflksdkljfksdj",
-          "current": "YES",
-          "currentConcernsText": "skjdfkljlksd"
+          "previousConcernsText": null,
+          "current": "NO",
+          "currentConcernsText": null
         },
         "vulnerability": {
           "risk": "YES",
-          "previous": "YES",
-          "previousConcernsText": "lksdlfkd;lk",
-          "current": "YES",
-          "currentConcernsText": "jdshfkhskdjhfksd"
+          "previous": "NO",
+          "previousConcernsText": null,
+          "current": "NO",
+          "currentConcernsText": null
         }
       },
       "otherRisks": {
-        "escapeOrAbscond": "YES",
-        "controlIssuesDisruptiveBehaviour": "YES",
-        "breachOfTrust": "YES",
-        "riskToOtherPrisoners": "YES"
+        "escapeOrAbscond": "DK",
+        "controlIssuesDisruptiveBehaviour": "DK",
+        "breachOfTrust": "DK",
+        "riskToOtherPrisoners": "NO"
       },
       "summary": {
-        "whoIsAtRisk": "kjlkj",
-        "natureOfRisk": "jjlklkkj",
-        "riskImminence": "kjjkjlkj",
-        "riskIncreaseFactors": "kjkjlk",
-        "riskMitigationFactors": "jbjkhk",
+        "whoIsAtRisk": "Known Adult and Public",
+        "natureOfRisk": "Some nature of risk",
+        "riskImminence": "Some risk imminence",
+        "riskIncreaseFactors": "Some risk increase factors",
+        "riskMitigationFactors": "Some risk mitigation factors",
         "riskInCommunity": {
           "VERY_HIGH": ["Children", "Staff"],
           "HIGH": ["Public"],
           "LOW": ["Known Adult"]
         },
         "riskInCustody": {
-          "MEDIUM": ["Children"],
-          "VERY_HIGH": ["Public", "Staff"],
-          "LOW": ["Known Adult"],
-          "HIGH": ["Prisoners"]
+          "VERY_HIGH": ["Staff", "Public"],
+          "HIGH": ["Prisoners", "Children"],
+          "LOW": ["Children"]
         }
       }
     }

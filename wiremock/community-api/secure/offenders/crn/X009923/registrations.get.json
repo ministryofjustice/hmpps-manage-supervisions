@@ -1,6 +1,7 @@
 {
   "request": {
     "method": "GET",
+    "headers": {},
     "urlPath": "/community-api/secure/offenders/crn/X009923/registrations"
   },
   "response": {
@@ -70,7 +71,8 @@
           },
           "warnUser": false,
           "active": true,
-          "numberOfPreviousDeregistrations": 0
+          "numberOfPreviousDeregistrations": 0,
+          "notes": "This registration is on the ignore list so will be excluded from the ui"
         }
       ]
     }

@@ -1,6 +1,7 @@
 import { merge } from 'lodash'
 import { ClassConstructor, ClassTransformOptions, plainToClass } from 'class-transformer'
 import { Settings } from 'luxon'
+import * as faker from 'faker'
 
 // Put this here as most tests consume a faker factory.
 // Any tests that do not consume this file & are interested in times should also set this.
@@ -37,4 +38,8 @@ export function fakeClass<Faked, Options = ClassTransformOptions>(
   defaultOptions?: ClassTransformOptions,
 ): FakeFn<Faked> {
   return (partial, options) => plainToClass(cls, merge(factory(options), partial), { ...options, ...defaultOptions })
+}
+
+export function fakeEnum<Enum>(cls: Enum): Enum[keyof Enum] {
+  return faker.random.arrayElement(Object.values(cls))
 }

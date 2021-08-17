@@ -58,7 +58,7 @@
                 {% endif %}
             {% endif %}
 
-            {% if risks.overallLevel %}
+            {% if risks.community %}
                 {% if conviction.sentence %}
                     <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
                 {% endif %}
@@ -68,7 +68,7 @@
 
                 <p>
                 Risk of Serious Harm (ROSH)
-                <span class="govuk-tag {{ risks.overallLevel.class }} govuk-!-margin-left-2">{{ risks.overallLevel.text }}</span>
+                <span class="govuk-tag {{ risks.community.level.class }} govuk-!-margin-left-2">{{ risks.community.level.text }}</span>
                 </p>
 
                 {% set riskTable %}
@@ -80,7 +80,7 @@
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">
-                    {% for risk in risks.communityRisks %}
+                    {% for risk in risks.community.risks %}
                     <tr class="govuk-table__row">
                     <td class="govuk-table__cell">{{ risk.riskTo }}</td>
                     <td class="govuk-table__cell">
@@ -92,14 +92,11 @@
                 </table>
                 {% endset %}
                 
-                {{ govukDetails({
-                summaryText: "View those at risk",
-                html: riskTable
-                }) }}
+                {{ govukDetails({ summaryText: "View those at risk", html: riskTable }) }}
             {% endif %}
 
             {% if conviction and conviction.previousConvictions %}
-                {% if risks.overallLevel %}
+                {% if risks.community.overallLevel %}
                     <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
                 {% endif %}
                 {{ probationHistorySummary({

@@ -10,6 +10,7 @@ export enum BreadcrumbType {
   Compliance,
   CaseActivityLog,
   CaseSchedule,
+  CaseRisk,
   NewAppointment,
   Appointment,
   OtherCommunication,

@@ -1,6 +1,7 @@
 {
   "request": {
     "method": "GET",
+    "headers": {},
     "urlPath": "/community-api/secure/offenders/crn/X009923/personalContacts"
   },
   "response": {
@@ -10,12 +11,12 @@
     },
     "jsonBody": [
       {
-        "personalContactId": 2240,
+        "personalContactId": 60655,
         "title": "Dr",
         "firstName": "Pippa",
-        "otherNames": "b",
+        "otherNames": "c",
         "surname": "Wade",
-        "previousSurname": "Brekke",
+        "previousSurname": "Reynolds",
         "relationship": "Wife",
         "gender": "Female",
         "relationshipType": {
@@ -25,7 +26,7 @@
         "startDate": "2019-09-13T00:00:00",
         "createdDatetime": "2019-09-13T00:00:00",
         "lastUpdatedDatetime": "2019-09-13T00:00:00",
-        "emailAddress": "Itzel.Jacobs44@gmail.com",
+        "emailAddress": "Eugene77@gmail.com",
         "mobileNumber": "07700 900 141",
         "notes": "Divorced",
         "address": {
@@ -39,12 +40,12 @@
         }
       },
       {
-        "personalContactId": 53552,
+        "personalContactId": 91165,
         "title": "Mr",
         "firstName": "Jonathon",
         "otherNames": "a",
         "surname": "Bacon",
-        "previousSurname": "Farrell",
+        "previousSurname": "Dare",
         "relationship": "Father",
         "gender": "Male",
         "relationshipType": {
@@ -54,17 +55,17 @@
         "startDate": "2019-09-13T00:00:00",
         "createdDatetime": "2019-09-13T00:00:00",
         "lastUpdatedDatetime": "2019-09-13T00:00:00",
-        "emailAddress": "Lesley63@yahoo.com",
-        "mobileNumber": "333-864-6073 x205",
-        "notes": "Cum et voluptatem quo est distinctio possimus.",
+        "emailAddress": "Bobbie30@gmail.com",
+        "mobileNumber": "(230) 506-6182 x67442",
+        "notes": "Quidem non quo corrupti id facere similique praesentium suscipit.",
         "address": {
-          "addressNumber": "18107",
-          "streetName": "Schiller Field",
-          "buildingName": "Garden",
-          "town": "Gleichnerside",
+          "addressNumber": "54715",
+          "streetName": "Annabell Shore",
+          "buildingName": "Toys",
+          "town": "Claudborough",
           "county": "Berkshire",
-          "postcode": "86224-0111",
-          "telephoneNumber": "792-683-7362"
+          "postcode": "13631-0859",
+          "telephoneNumber": "1-738-926-4761 x7066"
         }
       }
     ]

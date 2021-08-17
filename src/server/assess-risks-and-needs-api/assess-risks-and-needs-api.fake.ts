@@ -4,72 +4,66 @@ import {
   OtherRoshRisksDtoControlIssuesDisruptiveBehaviour,
   OtherRoshRisksDtoEscapeOrAbscond,
   OtherRoshRisksDtoRiskToOtherPrisoners,
+  RiskDto,
   RiskDtoCurrent,
   RiskDtoPrevious,
   RiskDtoRisk,
 } from './client'
-import { fake } from '../util/util.fake'
+import { fake, fakeEnum } from '../util/util.fake'
+import * as faker from 'faker'
+import { toList } from '../util'
 
-export const fakeAllRoshRiskDto = fake<AllRoshRiskDto>(() => ({
+const fakeRiskDto = fake<RiskDto>((options, partial = {}) => {
+  const current = partial.current || fakeEnum(RiskDtoCurrent)
+  const previous = partial.previous || fakeEnum(RiskDtoPrevious)
+  return {
+    risk: fakeEnum(RiskDtoRisk),
+    previous,
+    previousConcernsText:
+      previous === RiskDtoPrevious.Yes && faker.datatype.boolean() ? faker.lorem.paragraphs() : null,
+    current,
+    currentConcernsText: current === RiskDtoCurrent.Yes && faker.datatype.boolean() ? faker.lorem.paragraphs() : null,
+  }
+})
+
+function fakeRandomArray<T>(factory: () => T, options: { min: number; max: number } = { min: 1, max: 3 }): T[] {
+  const length = faker.datatype.number(options)
+  return [...Array(length)].map(() => factory())
+}
+
+function fakeRiskSubject() {
+  return faker.random.arrayElement(['Children', 'Staff', 'Public', 'Known Adult', 'Prisoners'])
+}
+
+function fakeRiskLevels() {
+  return {
+    VERY_HIGH: fakeRandomArray(fakeRiskSubject),
+    HIGH: fakeRandomArray(fakeRiskSubject),
+    LOW: fakeRandomArray(fakeRiskSubject),
+  }
+}
+
+export const fakeAllRoshRiskDto = fake<AllRoshRiskDto>((options, partial = {}) => ({
   riskToSelf: {
-    suicide: {
-      risk: RiskDtoRisk.Yes,
-      previous: RiskDtoPrevious.Yes,
-      previousConcernsText: 'lkdlskf;k',
-      current: RiskDtoCurrent.Yes,
-      currentConcernsText: 'fskdkf;lk',
-    },
-    selfHarm: {
-      risk: RiskDtoRisk.Yes,
-      previous: RiskDtoPrevious.Yes,
-      previousConcernsText: 'lkdlskf;k',
-      current: RiskDtoCurrent.Yes,
-      currentConcernsText: 'fskdkf;lk',
-    },
-    custody: {
-      risk: RiskDtoRisk.Yes,
-      previous: RiskDtoPrevious.Yes,
-      previousConcernsText: 'dsjflksdkljfksdj',
-      current: RiskDtoCurrent.Yes,
-      currentConcernsText: 'skjdfkljlksd',
-    },
-    hostelSetting: {
-      risk: RiskDtoRisk.Yes,
-      previous: RiskDtoPrevious.Yes,
-      previousConcernsText: 'dsjflksdkljfksdj',
-      current: RiskDtoCurrent.Yes,
-      currentConcernsText: 'skjdfkljlksd',
-    },
-    vulnerability: {
-      risk: RiskDtoRisk.Yes,
-      previous: RiskDtoPrevious.Yes,
-      previousConcernsText: 'lksdlfkd;lk',
-      current: RiskDtoCurrent.Yes,
-      currentConcernsText: 'jdshfkhskdjhfksd',
-    },
+    suicide: fakeRiskDto(),
+    selfHarm: fakeRiskDto(),
+    custody: fakeRiskDto(),
+    hostelSetting: fakeRiskDto(),
+    vulnerability: fakeRiskDto(),
   },
   otherRisks: {
-    escapeOrAbscond: OtherRoshRisksDtoEscapeOrAbscond.Yes,
-    controlIssuesDisruptiveBehaviour: OtherRoshRisksDtoControlIssuesDisruptiveBehaviour.Yes,
-    breachOfTrust: OtherRoshRisksDtoBreachOfTrust.Yes,
-    riskToOtherPrisoners: OtherRoshRisksDtoRiskToOtherPrisoners.Yes,
+    escapeOrAbscond: fakeEnum(OtherRoshRisksDtoEscapeOrAbscond),
+    controlIssuesDisruptiveBehaviour: fakeEnum(OtherRoshRisksDtoControlIssuesDisruptiveBehaviour),
+    breachOfTrust: fakeEnum(OtherRoshRisksDtoBreachOfTrust),
+    riskToOtherPrisoners: fakeEnum(OtherRoshRisksDtoRiskToOtherPrisoners),
   },
   summary: {
-    whoIsAtRisk: 'kjlkj',
-    natureOfRisk: 'jjlklkkj',
-    riskImminence: 'kjjkjlkj',
-    riskIncreaseFactors: 'kjkjlk',
-    riskMitigationFactors: 'jbjkhk',
-    riskInCommunity: {
-      VERY_HIGH: ['Children', 'Staff'],
-      HIGH: ['Public'],
-      LOW: ['Known Adult'],
-    },
-    riskInCustody: {
-      MEDIUM: ['Children'],
-      VERY_HIGH: ['Public', 'Staff'],
-      LOW: ['Known Adult'],
-      HIGH: ['Prisoners'],
-    },
+    whoIsAtRisk: toList(fakeRandomArray(fakeRiskSubject)),
+    natureOfRisk: 'Some nature of risk',
+    riskImminence: 'Some risk imminence',
+    riskIncreaseFactors: 'Some risk increase factors',
+    riskMitigationFactors: 'Some risk mitigation factors',
+    riskInCommunity: partial.summary?.riskInCommunity || fakeRiskLevels(),
+    riskInCustody: partial.summary?.riskInCustody || fakeRiskLevels(),
   },
 }))

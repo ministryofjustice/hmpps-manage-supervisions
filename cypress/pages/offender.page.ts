@@ -1,7 +1,7 @@
 import { PageBase } from './page'
 import { SummaryList } from './components/summary-list'
 
-export type TABS = 'overview' | 'schedule' | 'activity' | 'personal' | 'sentence' | 'compliance'
+export type TABS = 'overview' | 'schedule' | 'activity' | 'personal' | 'sentence' | 'compliance' | 'risk'
 export type TABLE = 'future' | 'recent'
 export type COL = 'date' | 'time' | 'appointment'
 
@@ -206,6 +206,22 @@ export class OffenderPage extends PageBase {
 
       get sinceLastBreachMessage() {
         return cy.get('[data-qa="offender/compliance/compliance-since-last-breach"]')
+      },
+    }
+  }
+
+  get risk() {
+    return {
+      rosh(callback: (card: SummaryList) => void) {
+        SummaryList.selectFromCard('Risk of serious harm to themselves', callback)
+      },
+
+      get currentNotes() {
+        return cy.get('[data-qa="offender/risk/current-notes"]')
+      },
+
+      get previousNotes() {
+        return cy.get('[data-qa="offender/risk/previous-notes"]')
       },
     }
   }

@@ -1,6 +1,7 @@
 {
   "request": {
     "method": "GET",
+    "headers": {},
     "urlPath": "/hmpps-auth/health/ping"
   },
   "response": {
