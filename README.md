@@ -43,7 +43,7 @@ docker compose -f docker-compose.yml -f docker-compose.community-api.yml up
 * redis - session store and token caching
 * [hmpps-auth](https://github.com/ministryofjustice/hmpps-auth) - authentication
 * [community-api](https://github.com/ministryofjustice/community-api) - Delius data access
-* assess risks & needs API - OASys data access
+* [hmpps-assess-risks-and-needs](https://github.com/ministryofjustice/hmpps-assess-risks-and-needs) - OASys data access
 
 ## Development
 
