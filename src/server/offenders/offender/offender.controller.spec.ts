@@ -31,7 +31,6 @@ import { ConfigService } from '@nestjs/config'
 import { FakeConfigModule } from '../../config/config.fake'
 import { ContactTypesService } from '../../community-api'
 import { FeatureFlags } from '../../config'
-import { ConfigService } from '@nestjs/config'
 
 describe('OffenderController', () => {
   let subject: OffenderController
