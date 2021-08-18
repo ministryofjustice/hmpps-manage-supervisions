@@ -11,7 +11,7 @@
     {% else %}
         {% set mainAddressWarning %}
             There is no main address<br>
-            <a href='TODO'>Add a main address in Delius</a>
+            <a href='/offender/{{ids.crn}}/to-delius'>Add a main address in Delius</a>
         {% endset %}
         {{ govukWarningText({
             html: mainAddressWarning,

@@ -43,3 +43,8 @@ export function fakeClass<Faked, Options = ClassTransformOptions>(
 export function fakeEnum<Enum>(cls: Enum): Enum[keyof Enum] {
   return faker.random.arrayElement(Object.values(cls))
 }
+
+export function fakeRandomArray<T>(factory: () => T, options: { min: number; max: number } = { min: 1, max: 3 }): T[] {
+  const length = faker.datatype.number(options)
+  return [...Array(length)].map(() => factory())
+}

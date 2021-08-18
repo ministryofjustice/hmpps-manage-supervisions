@@ -1,5 +1,5 @@
-import { FlatRiskToSelf, Level, RegistrationFlag, Risks, RoshRisk } from './risk.types'
-import { fake } from '../../../util/util.fake'
+import { FlatRiskToSelf, RiskLevelMeta, RegistrationFlag, Risks, RoshRisk, RiskLevel } from './risk.types'
+import { fake, fakeEnum, fakeRandomArray } from '../../../util/util.fake'
 import * as faker from 'faker'
 
 export const fakeRegistrationFlag = fake<RegistrationFlag>(() => ({
@@ -7,15 +7,20 @@ export const fakeRegistrationFlag = fake<RegistrationFlag>(() => ({
   class: faker.datatype.uuid(),
 }))
 
-const fakeLevel = fake<Level>(() => ({
+const fakeRiskLevelMeta = fake<RiskLevelMeta>(() => ({
   class: 'app-tag--dark-red',
   text: faker.random.arrayElement(['LOW', 'MEDIUM', 'HIGH', 'VERY HIGH']),
   index: faker.datatype.number(),
 }))
 
+function fakeRiskSubject(): string {
+  return faker.random.arrayElement(['Children', 'Staff', 'Public', 'Known Adult', 'Prisoners'])
+}
+
 const fakeRoshRisk = fake<RoshRisk>(() => ({
-  level: fakeLevel(),
-  riskTo: faker.random.arrayElement(['Children', 'Staff', 'Public', 'Known Adult', 'Prisoners']),
+  meta: fakeRiskLevelMeta(),
+  riskTo: fakeRiskSubject(),
+  level: fakeEnum(RiskLevel),
 }))
 
 const fakeFlatRiskToSelf = fake<FlatRiskToSelf>(() => ({
@@ -25,8 +30,17 @@ const fakeFlatRiskToSelf = fake<FlatRiskToSelf>(() => ({
 
 export const fakeRisks = fake<Risks>((options, partial = {}) => ({
   community: {
-    level: fakeLevel(),
+    level: fakeRiskLevelMeta(),
     risks: partial.community?.risks?.map(x => fakeRoshRisk(x)) || [fakeRoshRisk(), fakeRoshRisk()],
+    riskLevels: {
+      [RiskLevel.VeryHigh]: fakeRandomArray(fakeRiskSubject),
+      [RiskLevel.High]: fakeRandomArray(fakeRiskSubject),
+      [RiskLevel.Medium]: fakeRandomArray(fakeRiskSubject),
+      [RiskLevel.Low]: fakeRandomArray(fakeRiskSubject),
+    },
+    riskImminence: faker.lorem.sentence(),
+    natureOfRisk: faker.lorem.sentence(),
+    whoIsAtRisk: faker.lorem.sentence(),
   },
   self: {
     harm: fakeFlatRiskToSelf(),
