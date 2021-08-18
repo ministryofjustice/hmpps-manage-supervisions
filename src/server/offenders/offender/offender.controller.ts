@@ -21,6 +21,8 @@ import { ActivityFilter, ActivityService, FilterLinks, GetContactsOptions } from
 import { RiskService } from './risk'
 import { PersonalService } from './personal'
 import { Breadcrumb, BreadcrumbType, LinksService, ResolveBreadcrumbOptions } from '../../common/links'
+import { ConfigService } from '@nestjs/config'
+import { Config, FeatureFlags, ServerConfig } from '../../config'
 
 function getBreadcrumbType(type: OffenderPage): BreadcrumbType {
   switch (type) {
@@ -50,6 +52,7 @@ export class OffenderController {
     private readonly personalService: PersonalService,
     private readonly linksService: LinksService,
     private readonly contactTypesService: ContactTypesService,
+    private readonly config: ConfigService<Config>,
   ) {}
 
   @Get()
@@ -105,6 +108,8 @@ export class OffenderController {
       page: OffenderPage.Schedule,
       appointments,
       registrations,
+      appointmentBookingEnabled:
+        this.config.get<ServerConfig>('server').features[FeatureFlags.EnableAppointmentBooking],
     }
   }
 

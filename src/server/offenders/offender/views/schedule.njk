@@ -2,9 +2,11 @@
 {% set pageName = 'Schedule' %}
 
 {% block page %}
-    <a href='{{ links.arrangeAppointment }}' class='govuk-button govuk-!-margin-bottom-8' data-qa='offender/arrange-appointment-button'>
-        Arrange an appointment
-    </a>
+    {% if appointmentBookingEnabled %}
+        <a href='{{ links.arrangeAppointment }}' class='govuk-button govuk-!-margin-bottom-8' data-qa='offender/arrange-appointment-button'>
+            Arrange an appointment
+        </a>
+    {% endif %}
 
     {% set headers = [
         { text: 'Date', attributes: { 'data-qa': 'date' } },

@@ -27,10 +27,10 @@ import { fakeBreadcrumbs, fakeBreadcrumbUrl, MockLinksModule } from '../../commo
 import { PersonalService } from './personal'
 import { BreadcrumbType, ResolveBreadcrumbOptions } from '../../common/links'
 import { fakeRegistrationFlag } from './risk/risk.fake'
-import { ConfigService } from '@nestjs/config'
 import { FakeConfigModule } from '../../config/config.fake'
-import { WellKnownContactTypeConfig } from '../../config'
 import { ContactTypesService } from '../../community-api'
+import { FeatureFlags } from '../../config'
+import { ConfigService } from '@nestjs/config'
 
 describe('OffenderController', () => {
   let subject: OffenderController
@@ -40,9 +40,8 @@ describe('OffenderController', () => {
   let sentenceService: SinonStubbedInstance<SentenceService>
   let riskService: SinonStubbedInstance<RiskService>
   let personalService: SinonStubbedInstance<PersonalService>
-  let config: WellKnownContactTypeConfig
   let contactTypesService: SinonStubbedInstance<ContactTypesService>
-
+  let featuresConfig: Partial<Record<FeatureFlags, boolean>>
   beforeEach(async () => {
     offenderService = createStubInstance(OffenderService)
     scheduleService = createStubInstance(ScheduleService)
@@ -62,12 +61,12 @@ describe('OffenderController', () => {
         { provide: ActivityService, useValue: activityService },
         { provide: RiskService, useValue: riskService },
         { provide: PersonalService, useValue: personalService },
-        { provide: ConfigService, useValue: config },
         { provide: ContactTypesService, useValue: contactTypesService },
       ],
     }).compile()
-    config = module.get(ConfigService).get<WellKnownContactTypeConfig>('contacts')
     subject = module.get(OffenderController)
+
+    featuresConfig = module.get(ConfigService).get('server').features
   })
 
   it('redirects to overview', () => {
@@ -128,6 +127,7 @@ describe('OffenderController', () => {
       page: OffenderPage.Schedule,
       appointments,
       registrations,
+      appointmentBookingEnabled: featuresConfig[FeatureFlags.EnableAppointmentBooking],
     })
   })
 
