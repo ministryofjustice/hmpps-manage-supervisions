@@ -46,6 +46,7 @@ export interface OffenderOverviewViewModel extends OffenderViewModelBase, GetPer
 export interface OffenderScheduleViewModel extends OffenderViewModelBase {
   page: OffenderPage.Schedule
   appointments: RecentAppointments
+  appointmentBookingEnabled: boolean
 }
 
 export interface OffenderActivityViewModel extends OffenderViewModelBase {

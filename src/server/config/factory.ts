@@ -3,6 +3,7 @@ import {
   Config,
   ContactTypeCategory,
   DebugFlags,
+  FeatureFlags,
   LogLevel,
   WellKnownAppointmentType,
   WellKnownAppointmentTypeMeta,
@@ -115,13 +116,17 @@ const DEBUG_DEFAULTS: Record<DebugFlags, string> = {
   [DebugFlags.SetProviderCode]: 'N07',
 }
 
+const FEATURE_DEFAULTS: Record<FeatureFlags, boolean> = {
+  [FeatureFlags.EnableAppointmentBooking]: true,
+}
+
 export function configFactory(): Config {
   const authUrl = string('HMPPS_AUTH_URL', developmentOnly('http://localhost:9090/auth'))
 
   const appointment = Object.values(WellKnownAppointmentType)
     .map(type => {
       const defaults = CONTACT_DEFAULTS.appointment[type as WellKnownAppointmentType]
-      const key = type.replace('-', '_').toUpperCase()
+      const key = toEnvVar(type)
       return {
         [type]: {
           name: string(`${key}_NAME`, fallback(defaults.name)).trim(),
@@ -134,7 +139,7 @@ export function configFactory(): Config {
   const communication = Object.values(WellKnownCommunicationType)
     .map(type => {
       const defaults = CONTACT_DEFAULTS.communication[type as WellKnownCommunicationType]
-      const key = type.replace('-', '_').toUpperCase()
+      const key = toEnvVar(type)
       return {
         [type]: {
           name: string(`${key}_NAME`, fallback(defaults.name)).trim(),
@@ -147,12 +152,22 @@ export function configFactory(): Config {
   const warningLetter = Object.values(WellKnownWarningLetterType)
     .map(type => {
       const defaultCode = CONTACT_DEFAULTS['warningLetter'][type as WellKnownWarningLetterType]
-      const key = type.replace('-', '_').toUpperCase()
+      const key = toEnvVar(type)
       return {
         [type]: string(`${key}_CODE`, fallback(defaultCode)).toUpperCase().trim() as string,
       }
     })
     .reduce((x, y) => ({ ...x, ...y })) as WellKnownContactTypeConfig['warningLetter']
+
+  const features = Object.values(FeatureFlags)
+    .map(feature => {
+      const defaultCode = FEATURE_DEFAULTS[feature as FeatureFlags]
+      const key = toEnvVar(feature)
+      return {
+        [feature]: bool(key, fallback(defaultCode)),
+      }
+    })
+    .reduce((x, y) => ({ ...x, ...y })) as Record<FeatureFlags, boolean>
 
   return {
     server: {
@@ -173,6 +188,7 @@ export function configFactory(): Config {
           agg[k] = v || DEBUG_DEFAULTS[k]
           return agg
         }, {}),
+      features,
       logLevel: stringEnum(LogLevel, 'LOG_LEVEL', fallback(LogLevel.Info)),
     },
     redis: {
@@ -235,5 +251,9 @@ export function configFactory(): Config {
         .map(x => x.trim().toUpperCase())
         .filter(x => x),
     },
+  }
+
+  function toEnvVar(type: string) {
+    return type.replace(/-/g, '_').toUpperCase()
   }
 }

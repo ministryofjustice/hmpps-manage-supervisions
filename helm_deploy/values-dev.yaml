@@ -15,3 +15,4 @@ generic-service:
     ASSESS_RISKS_AND_NEEDS_API_URL: https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk
     DELIUS_BASE_URL: https://ndelius.test.probation.service.justice.gov.uk
     INGRESS_URL: https://hmpps-manage-supervisions-dev.apps.live-1.cloud-platform.service.justice.gov.uk
+    ENABLE_APPOINTMENT_BOOKING: false

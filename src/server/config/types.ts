@@ -17,6 +17,10 @@ export enum DebugFlags {
   SetProviderCode = 'set-provider',
 }
 
+export enum FeatureFlags {
+  EnableAppointmentBooking = 'enable-appointment-booking',
+}
+
 /**
  * These align to a subset of npm log levels that are supported by winston.
  * https://github.com/winstonjs/winston#logging-levels
@@ -43,6 +47,7 @@ export interface ServerConfig {
   domain: URL
   staticResourceCacheDuration: number
   debug: Partial<Record<DebugFlags, string>>
+  features: Partial<Record<FeatureFlags, boolean>>
   logLevel: LogLevel
 }
 
