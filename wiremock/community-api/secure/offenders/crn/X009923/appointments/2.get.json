@@ -1,6 +1,7 @@
 {
   "request": {
     "method": "GET",
+    "headers": {},
     "urlPath": "/community-api/secure/offenders/crn/X009923/appointments/2"
   },
   "response": {
@@ -14,39 +15,39 @@
       "appointmentEnd": "2020-02-03T11:00:00",
       "notes": "Some unknown appointment type",
       "officeLocation": {
-        "code": "7a7a8c25-864b-4e65-bd56-3b4abafdb310",
-        "buildingName": "Sibyl",
-        "buildingNumber": "610",
-        "streetName": "Maggie Ramp",
-        "townCity": "Kaleborough",
+        "code": "38158e09-402e-4325-ac82-505f9a278c8c",
+        "buildingName": "Cody",
+        "buildingNumber": "404",
+        "streetName": "Ryan Harbors",
+        "townCity": "East Dorian",
         "county": "Berkshire",
-        "postcode": "34134",
-        "description": "517 Simeon Walk"
+        "postcode": "83710-2243",
+        "description": "946 Caleigh Manors"
       },
       "outcome": {
-        "code": "9d37afb6-e662-45ae-a210-cf715f49e122",
+        "code": "76751b15-d52f-4d58-b6c8-e2e981a35bd1",
         "attended": true,
         "complied": true,
         "description": "Some outcome description",
-        "hoursCredited": 55277
+        "hoursCredited": 10706
       },
       "sensitive": true,
       "type": {
         "contactType": "P123",
         "description": "Some recent appointment",
         "orderTypes": ["CJA", "CJA"],
-        "requiresLocation": "REQUIRED"
+        "requiresLocation": "OPTIONAL"
       },
       "provider": {
-        "code": "45b291ab-998c-45bd-ad13-1255fcf0e432",
-        "description": "embrace mission-critical functionalities"
+        "code": "f2fae8c2-2c11-4e84-a287-b09c0ddbe1a6",
+        "description": "reintermediate one-to-one bandwidth"
       },
       "team": {
-        "code": "9c709dd6-9ba3-4b87-a48a-3b795f9a8ea2",
-        "description": "empower best-of-breed channels"
+        "code": "5a603fc4-6ae2-404d-844a-ca24cd631040",
+        "description": "embrace open-source convergence"
       },
       "staff": {
-        "code": "2b36fa32-cf39-4da3-8542-c824c7e34ee2",
+        "code": "927a7681-db2e-4ca8-a63a-f3acab9c90c2",
         "forenames": "Unallocated",
         "surname": "Staff",
         "unallocated": true
@@ -54,7 +55,7 @@
       "rarActivity": true,
       "requirement": {
         "isRar": true,
-        "requirementId": 30660,
+        "requirementId": 71487,
         "isActive": true
       }
     }

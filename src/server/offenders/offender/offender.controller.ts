@@ -6,6 +6,7 @@ import {
   OffenderPage,
   OffenderPageLinks,
   OffenderPersonalViewModel,
+  OffenderRiskViewModel,
   OffenderScheduleViewModel,
   OffenderSentenceViewModel,
   OffenderViewModelBase,
@@ -38,6 +39,8 @@ function getBreadcrumbType(type: OffenderPage): BreadcrumbType {
       return BreadcrumbType.CaseSentence
     case OffenderPage.Compliance:
       return BreadcrumbType.Compliance
+    case OffenderPage.Risk:
+      return BreadcrumbType.CaseRisk
   }
 }
 
@@ -221,6 +224,27 @@ export class OffenderController {
       page: OffenderPage.Compliance,
       compliance,
       registrations,
+    }
+  }
+
+  @Get(OffenderPage.Risk)
+  @Render('offenders/offender/views/risk')
+  @Breadcrumb({
+    type: getBreadcrumbType(OffenderPage.Risk),
+    parent: BreadcrumbType.Case,
+    title: 'Risk',
+  })
+  async getRisk(@Param('crn') crn: string): Promise<OffenderRiskViewModel> {
+    const [offender, registrations, risks] = await Promise.all([
+      this.offenderService.getOffenderSummary(crn),
+      this.riskService.getRiskRegistrations(crn),
+      this.riskService.getRisks(crn),
+    ])
+    return {
+      ...this.getBase(OffenderPage.Risk, offender),
+      page: OffenderPage.Risk,
+      registrations,
+      risks,
     }
   }
 

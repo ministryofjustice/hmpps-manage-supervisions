@@ -1,6 +1,7 @@
 {
   "request": {
     "method": "GET",
+    "headers": {},
     "urlPath": "/community-api/secure/offenders/crn/X009923"
   },
   "response": {
@@ -41,9 +42,9 @@
         },
         "disabilities": [
           {
-            "disabilityId": 8232,
+            "disabilityId": 14660,
             "disabilityType": {
-              "code": "EPQ",
+              "code": "7G9",
               "description": "Learning Difficulties"
             },
             "startDate": "2021-02-01",
@@ -59,9 +60,9 @@
             ]
           },
           {
-            "disabilityId": 58178,
+            "disabilityId": 91771,
             "disabilityType": {
-              "code": "NQU",
+              "code": "RIS",
               "description": "Speech Impairment"
             },
             "startDate": "2021-03-01",
@@ -69,9 +70,9 @@
             "provisions": null
           },
           {
-            "disabilityId": 57205,
+            "disabilityId": 64545,
             "disabilityType": {
-              "code": "9AI",
+              "code": "U3U",
               "description": "Dyslexia"
             },
             "startDate": "2020-04-01",

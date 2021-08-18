@@ -1,6 +1,7 @@
 {
   "request": {
     "method": "GET",
+    "headers": {},
     "urlPath": "/assess-risks-and-needs/health/ping"
   },
   "response": {

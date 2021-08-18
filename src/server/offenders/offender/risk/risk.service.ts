@@ -1,10 +1,18 @@
 import { Injectable } from '@nestjs/common'
-import { map, reduce, forEach } from 'lodash'
+import { orderBy } from 'lodash'
 import { CommunityApiService } from '../../../community-api'
-import { AssessRisksAndNeedsApiService } from '../../../assess-risks-and-needs-api'
-import { RegistrationFlag, Risks, RoshRisk } from './risk.types'
+import {
+  AssessRisksAndNeedsApiService,
+  RiskDto,
+  RiskDtoCurrent,
+  RiskDtoPrevious,
+  RoshRiskToSelfDto,
+} from '../../../assess-risks-and-needs-api'
+import { FlatRiskToSelf, Level, RegistrationFlag, Risks } from './risk.types'
 import { ConfigService } from '@nestjs/config'
 import { Config, RiskConfig } from '../../../config'
+import { toList } from '../../../util'
+import { SanitisedAxiosError } from '../../../common/rest'
 
 @Injectable()
 export class RiskService {
@@ -15,32 +23,37 @@ export class RiskService {
   ) {}
 
   async getRisks(crn: string): Promise<Risks> {
-    const response = await this.assessRisksAndNeeds.risk.getRoshRisksByCrn(
-      {
-        crn,
-      },
-      {
-        validateStatus: (status: number) => (status >= 200 && status < 300) || status === 404,
-      },
+    const risks = await SanitisedAxiosError.catchNotFound(() =>
+      this.assessRisksAndNeeds.risk.getRoshRisksByCrn({ crn }),
     )
 
-    if (response.status === 404) {
+    if (!risks) {
       return {}
     }
 
-    const communityRisks = invertRiskMap(response.data.summary.riskInCommunity)
+    const { riskToSelf, summary: { riskInCommunity } = {} } = risks
 
-    const overallLevel = communityRisks.reduce((agg, risk) => {
-      if (Object.keys(knownRiskLevels).indexOf(risk.level.key) > Object.keys(knownRiskLevels).indexOf(agg.level.key)) {
-        return risk
-      } else {
-        return agg
-      }
-    }).level
+    const communityRisks = orderBy(
+      Object.entries(riskInCommunity || {})
+        .map(([key, values]) => values.map(riskTo => ({ level: KNOWN_RISK_LEVELS[key], riskTo })))
+        .reduce((agg, x) => [...agg, ...x], []),
+      ['level.index', 'riskTo'],
+      ['desc', 'asc'],
+    )
 
     return {
-      overallLevel: overallLevel,
-      communityRisks,
+      community:
+        communityRisks.length > 0
+          ? {
+              level: communityRisks[0].level, // the highest risk is first
+              risks: communityRisks,
+            }
+          : null,
+      self: {
+        harm: flattenRisks({ selfHarm: 'self-harm', suicide: 'suicide' }, riskToSelf),
+        custody: flattenRisks({ hostelSetting: 'in a hostel', custody: 'in custody' }, riskToSelf, 'about coping'),
+        vulnerability: flattenRisks({ vulnerability: 'a vulnerability' }, riskToSelf),
+      },
     }
   }
 
@@ -66,22 +79,54 @@ export class RiskService {
   }
 }
 
-function invertRiskMap(obj: { [key: string]: Array<string> }): RoshRisk[] {
-  return map(
-    reduce(
-      obj,
-      (result, values, key) => {
-        forEach(values, value => {
-          result[value] = key
-        })
-        return result
-      },
-      {},
-    ),
-    (level, key) => {
-      return { riskTo: key, level: knownRiskLevels[level] }
-    },
-  )
+function flattenRisks(
+  meta: Partial<Record<keyof RoshRiskToSelfDto, string>>,
+  riskToSelf: RoshRiskToSelfDto,
+  about = 'about',
+): FlatRiskToSelf {
+  if (!riskToSelf) {
+    return {
+      value: null,
+      notes: { current: null, previous: null },
+    }
+  }
+
+  const result: FlatRiskToSelf = { value: null, notes: { current: null, previous: null } }
+  const currentConcerns: string[] = []
+  const previousConcerns: string[] = []
+  for (const [key, name] of Object.entries(meta)) {
+    const risk: RiskDto = riskToSelf[key]
+    if (!risk) {
+      continue
+    }
+
+    if (risk.current === RiskDtoCurrent.Yes) {
+      currentConcerns.push(name)
+      result.notes.current = risk.currentConcernsText
+    }
+
+    if (risk.previous === RiskDtoPrevious.Yes) {
+      previousConcerns.push(name)
+      result.notes.previous = risk.previousConcernsText
+    }
+  }
+
+  if (currentConcerns.length === 0 && previousConcerns.length === 0) {
+    result.value = null
+  } else if (previousConcerns.length === 0 || currentConcerns.length === Object.keys(meta).length) {
+    // no previous or all current then ignore previous
+    result.value = `There are concerns ${about} ${toList(currentConcerns)}`
+  } else if (currentConcerns.length === 0) {
+    // no current, just previous
+    result.value = `There were concerns ${about} ${toList(previousConcerns)}`
+  } else {
+    // current & previous
+    result.value = `There are concerns ${about} ${toList(currentConcerns)} and previous concerns ${about} ${toList(
+      previousConcerns,
+    )}`
+  }
+
+  return result
 }
 
 function mapDeliusRegistrationColour(deliusColour: string): string {
@@ -99,9 +144,9 @@ function mapDeliusRegistrationColour(deliusColour: string): string {
   }
 }
 
-const knownRiskLevels = {
-  LOW: { key: 'LOW', class: 'govuk-tag--green', text: 'LOW' },
-  MEDIUM: { key: 'MEDIUM', class: 'govuk-tag--yellow', text: 'MEDIUM' },
-  HIGH: { key: 'HIGH', class: 'govuk-tag--red', text: 'HIGH' },
-  VERY_HIGH: { key: 'VERY_HIGH', class: 'app-tag--dark-red', text: 'VERY HIGH' },
-}
+const KNOWN_RISK_LEVELS: Record<string, Level> = Object.freeze({
+  LOW: { class: 'govuk-tag--green', text: 'LOW', index: 0 },
+  MEDIUM: { class: 'govuk-tag--yellow', text: 'MEDIUM', index: 1 },
+  HIGH: { class: 'govuk-tag--red', text: 'HIGH', index: 2 },
+  VERY_HIGH: { class: 'app-tag--dark-red', text: 'VERY HIGH', index: 3 },
+})

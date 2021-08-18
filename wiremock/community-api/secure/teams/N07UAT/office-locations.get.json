@@ -1,6 +1,7 @@
 {
   "request": {
     "method": "GET",
+    "headers": {},
     "urlPath": "/community-api/secure/teams/N07UAT/office-locations"
   },
   "response": {
@@ -21,7 +22,7 @@
       },
       {
         "code": "LDN_BCR",
-        "buildingName": "Esperanza",
+        "buildingName": "Mathias",
         "buildingNumber": "29/31",
         "streetName": "Victoria Road",
         "townCity": "Romford",

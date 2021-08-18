@@ -41,3 +41,18 @@ export function safeCapitalize(s: string) {
   }
   return s.charAt(0).toUpperCase() + safeLowerCase(s.slice(1))
 }
+
+/**
+ * Gets a formatted list of the specified values.
+ * e.g. ['one', 'two', 'three'] => 'one, two and three'
+ */
+export function toList(values: string[]): string {
+  switch (values.length) {
+    case 0:
+      return null
+    case 1:
+      return values[0]
+    default:
+      return `${values.slice(0, values.length - 1).join(', ')} and ${values[values.length - 1]}`
+  }
+}

@@ -12,6 +12,7 @@ export enum OffenderPage {
   Personal = 'personal',
   Sentence = 'sentence',
   Compliance = 'compliance',
+  Risk = 'risk',
 }
 
 export type OffenderPageLinks = { [Page in OffenderPage]: string }
@@ -74,6 +75,11 @@ export interface OffenderComplianceViewModel extends OffenderViewModelBase {
   compliance: ComplianceDetails
 }
 
+export interface OffenderRiskViewModel extends OffenderViewModelBase {
+  page: OffenderPage.Risk
+  risks: Risks
+}
+
 export type OffenderViewModel =
   | OffenderOverviewViewModel
   | OffenderScheduleViewModel
@@ -81,3 +87,4 @@ export type OffenderViewModel =
   | OffenderPersonalViewModel
   | OffenderSentenceViewModel
   | OffenderComplianceViewModel
+  | OffenderRiskViewModel

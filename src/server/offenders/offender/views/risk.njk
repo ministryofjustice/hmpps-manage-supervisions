@@ -1,0 +1,49 @@
+{% extends "./_layout.njk" %}
+{% set pageName = 'Risk' %}
+{% from 'components/summary-card.njk' import appSummaryCard %}
+
+{% macro roshDetail(risk) %}
+    {% if not risk.value %}
+        No concerns
+    {% elseif risk.notes.current or risk.notes.previous %}
+        {% set detailsHtml %}
+            <h3 class="govuk-heading-s">Current circumstances, issues and needs</h3>
+            <p class='govuk-body' data-qa='offender/risk/current-notes'>
+                {{ (risk.notes.current or 'No detail given') | nl2br | safe }}
+            </p>
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+            <h3 class="govuk-heading-s">Previous circumstances, issues and needs</h3>
+            <p class='govuk-body' data-qa='offender/risk/previous-notes'>
+                {{ (risk.notes.previous or 'No detail given') | nl2br | safe }}
+            </p>
+        {% endset %}
+        {{ govukDetails({ summaryText: risk.value, html: detailsHtml }) }}
+    {% else %}
+        {{ risk.value }}
+    {% endif %}
+{% endmacro %}
+
+{% block page %}
+    {% call appSummaryCard({
+        titleText: 'Risk of serious harm to themselves',
+        classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
+        actions: { items: [{ href: "#TODO", text: "View OASys" }] }
+    }) -%}
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: { text: "Risk of suicide or self harm" },
+                    value: { html: roshDetail(risks.self.harm) }
+                },
+                {
+                    key: { text: "Coping in custody or a hostel" },
+                    value: { html: roshDetail(risks.self.custody) }
+                },
+                {
+                    key: { text: "Vulnerability (eg victimisation, being bullied or exploited)" },
+                    value: { html: roshDetail(risks.self.vulnerability) }
+                }
+            ]
+        }) }}
+    {%- endcall %}
+{% endblock %}

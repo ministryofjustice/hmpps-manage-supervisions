@@ -26,11 +26,11 @@ import { fakeAppointmentSummary, fakeRecentAppointments } from './schedule/sched
 import { fakeBreadcrumbs, fakeBreadcrumbUrl, MockLinksModule } from '../../common/links/links.mock'
 import { PersonalService } from './personal'
 import { BreadcrumbType, ResolveBreadcrumbOptions } from '../../common/links'
-import { fakeRegistrationFlag } from './risk/risk.fake'
+import { fakeRegistrationFlag, fakeRisks } from './risk/risk.fake'
+import { ConfigService } from '@nestjs/config'
 import { FakeConfigModule } from '../../config/config.fake'
 import { ContactTypesService } from '../../community-api'
 import { FeatureFlags } from '../../config'
-import { ConfigService } from '@nestjs/config'
 
 describe('OffenderController', () => {
   let subject: OffenderController
@@ -102,6 +102,9 @@ describe('OffenderController', () => {
     const registrations = [fakeRegistrationFlag()]
     riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
 
+    const risks = fakeRisks()
+    riskService.getRisks.withArgs('some-crn').resolves(risks)
+
     const observed = await subject.getOverview('some-crn')
     shouldReturnViewModel(observed, BreadcrumbType.Case, {
       page: OffenderPage.Overview,
@@ -110,6 +113,7 @@ describe('OffenderController', () => {
       personalDetails,
       appointmentSummary,
       registrations,
+      risks,
     })
   })
 
@@ -297,6 +301,24 @@ describe('OffenderController', () => {
     })
   })
 
+  it('gets risks', async () => {
+    havingOffenderSummary()
+
+    const risks = fakeRisks()
+    riskService.getRisks.withArgs('some-crn').resolves(risks)
+
+    const registrations = [fakeRegistrationFlag()]
+    riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
+
+    const observed = await subject.getRisk('some-crn')
+
+    shouldReturnViewModel(observed, BreadcrumbType.CaseRisk, {
+      page: OffenderPage.Risk,
+      risks,
+      registrations,
+    })
+  })
+
   function havingOffender() {
     const offender = fakeOffenderDetail({
       otherIds: { crn: 'some-crn', pncNumber: 'some-prn' },
@@ -346,6 +368,7 @@ describe('OffenderController', () => {
         sentence: fakeBreadcrumbUrl(BreadcrumbType.CaseSentence, breadcrumbOptions),
         activity: fakeBreadcrumbUrl(BreadcrumbType.CaseActivityLog, breadcrumbOptions),
         compliance: fakeBreadcrumbUrl(BreadcrumbType.Compliance, breadcrumbOptions),
+        risk: fakeBreadcrumbUrl(BreadcrumbType.CaseRisk, breadcrumbOptions),
       },
       ...expected,
     } as OffenderViewModel)

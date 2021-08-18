@@ -11,13 +11,19 @@ export class SummaryList {
     return this.title(title).siblings('dd')
   }
 
-  details(title: string, name: string, callback: (list: SummaryList) => void) {
+  detailsList(title: string, name: string, callback: (list: SummaryList) => void) {
     const details = this.value(title).find('details').contains(name)
     details.click()
     return details
       .parents('details')
       .find('dl')
       .within(() => callback(new SummaryList()))
+  }
+
+  details(title: string, name: string, callback: () => void) {
+    const details = this.value(title).find('details').contains(name)
+    details.click()
+    return details.parents('details').within(() => callback())
   }
 
   /**

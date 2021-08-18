@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing'
-import { AssessRisksAndNeedsApiService } from '../../../assess-risks-and-needs-api'
-import { fakeOkResponse } from '../../../common/rest/rest.fake'
+import { AssessRisksAndNeedsApiService, RiskDtoCurrent, RiskDtoPrevious } from '../../../assess-risks-and-needs-api'
+import { fakeOkResponse, fakeRestError } from '../../../common/rest/rest.fake'
 import { Risks } from './risk.types'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../../community-api/community-api.mock'
 import { RiskService } from './risk.service'
@@ -12,6 +12,7 @@ import { CommunityApiService } from '../../../community-api'
 import { fakeAllRoshRiskDto } from '../../../assess-risks-and-needs-api/assess-risks-and-needs-api.fake'
 import { fakeRegistration } from '../../../community-api/community-api.fake'
 import { FakeConfigModule } from '../../../config/config.fake'
+import { HttpStatus } from '@nestjs/common'
 
 const IGNORED_REGISTRATION = 'some-ignored-registration-type'
 
@@ -35,96 +36,158 @@ describe('RiskService', () => {
     arn = module.get(AssessRisksAndNeedsApiService)
   })
 
-  it('gets risks from AR&N', async () => {
-    const risks = fakeAllRoshRiskDto()
+  describe('getting risks', () => {
+    it('gets risks', async () => {
+      const risks = fakeAllRoshRiskDto({
+        riskToSelf: {
+          suicide: {
+            previous: RiskDtoPrevious.No,
+            previousConcernsText: null,
+            current: RiskDtoCurrent.Yes,
+            currentConcernsText: 'Some current concerns',
+          },
+          selfHarm: {
+            previous: RiskDtoPrevious.Yes,
+            previousConcernsText: null,
+            current: RiskDtoCurrent.Yes,
+            currentConcernsText: 'Some ignored current concerns',
+          },
+          custody: {
+            previous: RiskDtoPrevious.Yes,
+            previousConcernsText: 'Some previous concerns',
+            current: RiskDtoCurrent.No,
+            currentConcernsText: null,
+          },
+          hostelSetting: {
+            previous: RiskDtoPrevious.No,
+            previousConcernsText: null,
+            current: RiskDtoCurrent.No,
+            currentConcernsText: null,
+          },
+          vulnerability: {
+            previous: RiskDtoPrevious.No,
+            previousConcernsText: null,
+            current: RiskDtoCurrent.No,
+            currentConcernsText: null,
+          },
+        },
+        summary: {
+          riskInCommunity: {
+            VERY_HIGH: ['Children', 'Staff'],
+            HIGH: ['Public'],
+            LOW: ['Known Adult'],
+          },
+        },
+      })
 
-    const expected = {
-      communityRisks: [
-        {
-          level: {
-            class: 'app-tag--dark-red',
-            key: 'VERY_HIGH',
-            text: 'VERY HIGH',
-          },
-          riskTo: 'Children',
-        },
-        {
-          level: {
-            class: 'app-tag--dark-red',
-            key: 'VERY_HIGH',
-            text: 'VERY HIGH',
-          },
-          riskTo: 'Staff',
-        },
-        {
-          level: {
-            class: 'govuk-tag--red',
-            key: 'HIGH',
-            text: 'HIGH',
-          },
-          riskTo: 'Public',
-        },
-        {
-          level: {
-            class: 'govuk-tag--green',
-            key: 'LOW',
-            text: 'LOW',
-          },
-          riskTo: 'Known Adult',
-        },
-      ],
-      overallLevel: {
-        class: 'app-tag--dark-red',
-        key: 'VERY_HIGH',
-        text: 'VERY HIGH',
-      },
-    }
-    const stub = arn.risk.getRoshRisksByCrn.resolves(fakeOkResponse(risks))
-    const observed = await subject.getRisks('some-crn')
+      const stub = arn.risk.getRoshRisksByCrn.resolves(fakeOkResponse(risks))
+      const observed = await subject.getRisks('some-crn')
 
-    expect(observed).toEqual(expected as Risks)
-    expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn' })
+      expect(observed).toEqual({
+        community: {
+          level: { class: 'app-tag--dark-red', text: 'VERY HIGH', index: 3 },
+          risks: [
+            {
+              level: { class: 'app-tag--dark-red', text: 'VERY HIGH', index: 3 },
+              riskTo: 'Children',
+            },
+            {
+              level: { class: 'app-tag--dark-red', text: 'VERY HIGH', index: 3 },
+              riskTo: 'Staff',
+            },
+            {
+              level: { class: 'govuk-tag--red', text: 'HIGH', index: 2 },
+              riskTo: 'Public',
+            },
+            {
+              level: { class: 'govuk-tag--green', text: 'LOW', index: 0 },
+              riskTo: 'Known Adult',
+            },
+          ],
+        },
+        self: {
+          harm: {
+            notes: { current: 'Some current concerns', previous: null },
+            value: 'There are concerns about self-harm and suicide',
+          },
+          custody: {
+            notes: { current: null, previous: 'Some previous concerns' },
+            value: 'There were concerns about coping in custody',
+          },
+          vulnerability: {
+            notes: { current: null, previous: null },
+            value: null,
+          },
+        },
+      } as Risks)
+      expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn' })
+    })
+
+    it('handles missing offender', async () => {
+      arn.risk.getRoshRisksByCrn.throws(fakeRestError(HttpStatus.NOT_FOUND))
+      const observed = await subject.getRisks('some-crn')
+      expect(observed).toEqual({})
+    })
+
+    it('handles missing risk data', async () => {
+      const risks = fakeAllRoshRiskDto({
+        riskToSelf: null,
+        summary: { riskInCommunity: null },
+      })
+      arn.risk.getRoshRisksByCrn.resolves(fakeOkResponse(risks))
+      const observed = await subject.getRisks('some-crn')
+      expect(observed).toEqual({
+        community: null,
+        self: {
+          custody: { notes: { current: null, previous: null }, value: null },
+          harm: { notes: { current: null, previous: null }, value: null },
+          vulnerability: { notes: { current: null, previous: null }, value: null },
+        },
+      } as Risks)
+    })
   })
 
-  it('gets risk registrations from community API', async () => {
-    const registrations = [
-      fakeRegistration({ type: { description: 'Beta' }, riskColour: 'White' }),
-      fakeRegistration({ type: { description: 'Alpha' }, riskColour: 'Amber' }),
-    ]
+  describe('getting risk registrations', () => {
+    it('gets risk registrations', async () => {
+      const registrations = [
+        fakeRegistration({ type: { description: 'Beta' }, riskColour: 'White' }),
+        fakeRegistration({ type: { description: 'Alpha' }, riskColour: 'Amber' }),
+      ]
 
-    const expected = [
-      {
-        text: 'Alpha',
-        class: 'govuk-tag--orange',
-      },
-      {
-        text: 'Beta',
-        class: 'govuk-tag--grey',
-      },
-    ]
+      const expected = [
+        {
+          text: 'Alpha',
+          class: 'govuk-tag--orange',
+        },
+        {
+          text: 'Beta',
+          class: 'govuk-tag--grey',
+        },
+      ]
 
-    const stub = community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({ registrations }))
-    const observed = await subject.getRiskRegistrations('some-crn')
+      const stub = community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({ registrations }))
+      const observed = await subject.getRiskRegistrations('some-crn')
 
-    expect(observed).toEqual(expected)
-    expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn', activeOnly: true })
-  })
+      expect(observed).toEqual(expected)
+      expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn', activeOnly: true })
+    })
 
-  it('returns an empty array if no risk registrations available for CRN', async () => {
-    const stub = community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({}))
-    const observed = await subject.getRiskRegistrations('some-crn')
+    it('handles empty risk registrations', async () => {
+      const stub = community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({}))
+      const observed = await subject.getRiskRegistrations('some-crn')
 
-    expect(observed).toEqual([])
-    expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn', activeOnly: true })
-  })
+      expect(observed).toEqual([])
+      expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn', activeOnly: true })
+    })
 
-  it('filters excluded registrations ', async () => {
-    const registrations = [fakeRegistration({ type: { code: IGNORED_REGISTRATION } })]
+    it('filters excluded registrations ', async () => {
+      const registrations = [fakeRegistration({ type: { code: IGNORED_REGISTRATION } })]
 
-    const stub = community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({ registrations }))
-    const observed = await subject.getRiskRegistrations('some-crn')
+      const stub = community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({ registrations }))
+      const observed = await subject.getRiskRegistrations('some-crn')
 
-    expect(observed).toEqual([])
-    expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn', activeOnly: true })
+      expect(observed).toEqual([])
+      expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn', activeOnly: true })
+    })
   })
 })

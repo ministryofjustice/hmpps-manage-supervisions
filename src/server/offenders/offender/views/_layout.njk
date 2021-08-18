@@ -18,37 +18,50 @@
     
     {{ mojSubNavigation({
         attributes: { 'data-qa': 'offender/sub-nav' },
-        items: [{
-            text: 'Overview',
-            href: links.overview,
-            active: page == 'overview',
-            attributes: { 'data-qa': 'overview' }
-        }, {
-            text: 'Schedule',
-            href: links.schedule,
-            active: page == 'schedule',
-            attributes: { 'data-qa': 'schedule' }
-        }, {
-            text: 'Activity log',
-            href: links.activity,
-            active: page == 'activity',
-            attributes: { 'data-qa': 'activity' }
-        }, {
-            text: 'Compliance',
-            href: links.compliance,
-            active: page == 'compliance',
-            attributes: { 'data-qa': 'compliance' }
-        }, {
-            text: 'Sentence',
-            href: links.sentence,
-            active: page == 'sentence',
-            attributes: { 'data-qa': 'sentence' }
-        }, {
-            text: 'Personal details',
-            href: links.personal,
-            active: page == 'personal',
-            attributes: { 'data-qa': 'personal' }
-        }]
+        items: [
+            {
+                text: 'Overview',
+                href: links.overview,
+                active: page == 'overview',
+                attributes: { 'data-qa': 'overview' }
+            },
+            {
+                text: 'Schedule',
+                href: links.schedule,
+                active: page == 'schedule',
+                attributes: { 'data-qa': 'schedule' }
+            },
+            {
+                text: 'Personal details',
+                href: links.personal,
+                active: page == 'personal',
+                attributes: { 'data-qa': 'personal' }
+            },
+            {
+                text: 'Risk',
+                href: links.risk,
+                active: page == 'risk',
+                attributes: { 'data-qa': 'risk' }
+            },
+            {
+                text: 'Sentence',
+                href: links.sentence,
+                active: page == 'sentence',
+                attributes: { 'data-qa': 'sentence' }
+            },
+            {
+                text: 'Activity log',
+                href: links.activity,
+                active: page == 'activity',
+                attributes: { 'data-qa': 'activity' }
+            },
+            {
+                text: 'Compliance',
+                href: links.compliance,
+                active: page == 'compliance',
+                attributes: { 'data-qa': 'compliance' }
+            }
+        ]
     }) }}
 
     {% block pageHeader %}{% endblock %}

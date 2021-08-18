@@ -74,7 +74,7 @@ context('ViewOffenderSentence', () => {
 
           page.sentence(card => {
             card.value('Order').contains('12 month Community Order')
-            card.details('Requirements', '44 days RAR, 29 completed (2 requirements)', list => {
+            card.detailsList('Requirements', '44 days RAR, 29 completed (2 requirements)', list => {
               list.value('Length').contains('34 days')
               list.value('Progress').contains('20 days completed')
               list.value('Start date').contains('1 August 2018')
@@ -84,12 +84,12 @@ context('ViewOffenderSentence', () => {
             card.value('Start date').contains('17 February 2020')
             card.value('Expected end date').contains('16 February 2021')
             card.value('Time elapsed').contains('12 months elapsed (of 12 months)')
-            card.details('Additional sentences', 'Fine', list => {
+            card.detailsList('Additional sentences', 'Fine', list => {
               list.value('Sentence').contains('Fine')
               list.value('Value').contains('500')
               list.value('Notes').contains('£500 fine')
             })
-            card.details('Additional sentences', 'Disqualified from Driving', list => {
+            card.detailsList('Additional sentences', 'Disqualified from Driving', list => {
               list.value('Sentence').contains('Disqualified from Driving')
               list.value('Length').contains('6')
               list.value('Notes').contains('No notes')
