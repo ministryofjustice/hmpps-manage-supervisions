@@ -72,6 +72,9 @@ describe('RiskService', () => {
           },
         },
         summary: {
+          whoIsAtRisk: 'Someone at risk',
+          natureOfRisk: 'Some nature of risk',
+          riskImminence: 'Some risk imminence',
           riskInCommunity: {
             VERY_HIGH: ['Children', 'Staff'],
             HIGH: ['Public'],
@@ -85,25 +88,29 @@ describe('RiskService', () => {
 
       expect(observed).toEqual({
         community: {
-          level: { class: 'app-tag--dark-red', text: 'VERY HIGH', index: 3 },
+          level: { class: 'app-tag--dark-red', index: 3, text: 'Very high' },
+          riskLevels: { HIGH: ['Public'], LOW: ['Known Adult'], VERY_HIGH: ['Children', 'Staff'] },
           risks: [
             {
-              level: { class: 'app-tag--dark-red', text: 'VERY HIGH', index: 3 },
+              level: 'VERY_HIGH',
+              meta: { class: 'app-tag--dark-red', index: 3, text: 'Very high' },
               riskTo: 'Children',
             },
+            { level: 'VERY_HIGH', meta: { class: 'app-tag--dark-red', index: 3, text: 'Very high' }, riskTo: 'Staff' },
             {
-              level: { class: 'app-tag--dark-red', text: 'VERY HIGH', index: 3 },
-              riskTo: 'Staff',
-            },
-            {
-              level: { class: 'govuk-tag--red', text: 'HIGH', index: 2 },
+              level: 'HIGH',
+              meta: { class: 'govuk-tag--red', index: 2, text: 'High' },
               riskTo: 'Public',
             },
             {
-              level: { class: 'govuk-tag--green', text: 'LOW', index: 0 },
+              level: 'LOW',
+              meta: { class: 'govuk-tag--green', index: 0, text: 'Low' },
               riskTo: 'Known Adult',
             },
           ],
+          natureOfRisk: 'Some nature of risk',
+          riskImminence: 'Some risk imminence',
+          whoIsAtRisk: 'Someone at risk',
         },
         self: {
           harm: {
@@ -126,18 +133,25 @@ describe('RiskService', () => {
     it('handles missing offender', async () => {
       arn.risk.getRoshRisksByCrn.throws(fakeRestError(HttpStatus.NOT_FOUND))
       const observed = await subject.getRisks('some-crn')
-      expect(observed).toEqual({})
+      expect(observed).toBeNull()
     })
 
     it('handles missing risk data', async () => {
       const risks = fakeAllRoshRiskDto({
         riskToSelf: null,
-        summary: { riskInCommunity: null },
+        summary: { riskInCommunity: null, natureOfRisk: null, riskImminence: null, whoIsAtRisk: null },
       })
       arn.risk.getRoshRisksByCrn.resolves(fakeOkResponse(risks))
       const observed = await subject.getRisks('some-crn')
       expect(observed).toEqual({
-        community: null,
+        community: {
+          level: null,
+          natureOfRisk: null,
+          riskImminence: null,
+          whoIsAtRisk: null,
+          risks: [],
+          riskLevels: {},
+        },
         self: {
           custody: { notes: { current: null, previous: null }, value: null },
           harm: { notes: { current: null, previous: null }, value: null },

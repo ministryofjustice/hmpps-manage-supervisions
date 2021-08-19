@@ -8,7 +8,7 @@ import {
   RiskDtoPrevious,
   RoshRiskToSelfDto,
 } from '../../../assess-risks-and-needs-api'
-import { FlatRiskToSelf, Level, RegistrationFlag, Risks } from './risk.types'
+import { FlatRiskToSelf, RiskLevelMeta, RegistrationFlag, RiskLevel, Risks, RoshRisk } from './risk.types'
 import { ConfigService } from '@nestjs/config'
 import { Config, RiskConfig } from '../../../config'
 import { toList } from '../../../util'
@@ -22,33 +22,36 @@ export class RiskService {
     private readonly config: ConfigService<Config>,
   ) {}
 
-  async getRisks(crn: string): Promise<Risks> {
+  async getRisks(crn: string): Promise<Risks | null> {
     const risks = await SanitisedAxiosError.catchNotFound(() =>
       this.assessRisksAndNeeds.risk.getRoshRisksByCrn({ crn }),
     )
 
     if (!risks) {
-      return {}
+      return null
     }
 
-    const { riskToSelf, summary: { riskInCommunity } = {} } = risks
+    const { riskToSelf, summary } = risks
 
-    const communityRisks = orderBy(
-      Object.entries(riskInCommunity || {})
-        .map(([key, values]) => values.map(riskTo => ({ level: KNOWN_RISK_LEVELS[key], riskTo })))
+    const communityRisks: RoshRisk[] = orderBy(
+      Object.entries(summary?.riskInCommunity || {})
+        .map(([key, values]) =>
+          values.map(riskTo => ({ meta: KNOWN_RISK_LEVELS[key as RiskLevel], level: key as RiskLevel, riskTo })),
+        )
         .reduce((agg, x) => [...agg, ...x], []),
-      ['level.index', 'riskTo'],
+      [x => x.meta.index, x => x.riskTo],
       ['desc', 'asc'],
     )
 
     return {
-      community:
-        communityRisks.length > 0
-          ? {
-              level: communityRisks[0].level, // the highest risk is first
-              risks: communityRisks,
-            }
-          : null,
+      community: {
+        level: communityRisks.length > 0 ? communityRisks[0].meta : null, // the highest risk is first
+        risks: communityRisks,
+        riskLevels: summary?.riskInCommunity || {},
+        riskImminence: summary?.riskImminence,
+        whoIsAtRisk: summary?.whoIsAtRisk,
+        natureOfRisk: summary?.natureOfRisk,
+      },
       self: {
         harm: flattenRisks({ selfHarm: 'self-harm', suicide: 'suicide' }, riskToSelf),
         custody: flattenRisks({ hostelSetting: 'in a hostel', custody: 'in custody' }, riskToSelf, 'about coping'),
@@ -144,9 +147,9 @@ function mapDeliusRegistrationColour(deliusColour: string): string {
   }
 }
 
-const KNOWN_RISK_LEVELS: Record<string, Level> = Object.freeze({
-  LOW: { class: 'govuk-tag--green', text: 'LOW', index: 0 },
-  MEDIUM: { class: 'govuk-tag--yellow', text: 'MEDIUM', index: 1 },
-  HIGH: { class: 'govuk-tag--red', text: 'HIGH', index: 2 },
-  VERY_HIGH: { class: 'app-tag--dark-red', text: 'VERY HIGH', index: 3 },
+const KNOWN_RISK_LEVELS: Record<RiskLevel, RiskLevelMeta> = Object.freeze({
+  LOW: { class: 'govuk-tag--green', text: 'Low', index: 0 },
+  MEDIUM: { class: 'govuk-tag--yellow', text: 'Medium', index: 1 },
+  HIGH: { class: 'govuk-tag--red', text: 'High', index: 2 },
+  VERY_HIGH: { class: 'app-tag--dark-red', text: 'Very high', index: 3 },
 })

@@ -37,6 +37,9 @@ export const RISKS: DeepPartial<AllRoshRiskDto> = {
     },
   },
   summary: {
+    whoIsAtRisk: 'Someone at risk',
+    natureOfRisk: 'Some nature of risk',
+    riskImminence: 'Some risk imminence',
     riskInCommunity: {
       VERY_HIGH: ['Children', 'Staff'],
       HIGH: ['Public'],

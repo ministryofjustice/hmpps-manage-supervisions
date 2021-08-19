@@ -1,21 +1,33 @@
 export interface Risks {
-  community?: {
-    level: Level
+  community: {
+    level?: RiskLevelMeta
     risks: RoshRisk[]
+    riskLevels: Partial<Record<RiskLevel, string[]>>
+    whoIsAtRisk?: string
+    natureOfRisk?: string
+    riskImminence?: string
   }
-  self?: {
+  self: {
     harm: FlatRiskToSelf
     custody: FlatRiskToSelf
     vulnerability: FlatRiskToSelf
   }
 }
 
-export interface RoshRisk {
-  riskTo: string
-  level: Level
+export enum RiskLevel {
+  Low = 'LOW',
+  Medium = 'MEDIUM',
+  High = 'HIGH',
+  VeryHigh = 'VERY_HIGH',
 }
 
-export interface Level {
+export interface RoshRisk {
+  riskTo: string
+  meta: RiskLevelMeta
+  level: RiskLevel
+}
+
+export interface RiskLevelMeta {
   class: string
   text: string
   index: number
