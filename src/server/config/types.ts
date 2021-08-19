@@ -115,11 +115,15 @@ export enum WellKnownCommunicationType {
   PhoneCallFromOffender = 'phone-call-from-offender',
   PhoneCallToOther = 'phone-call-to-other',
   PhoneCallFromOther = 'phone-call-from-other',
+  CpsPackageRequested = 'cps-package-requested',
 }
 
 export interface WellKnownContactTypeMeta {
   name: string
   code: string
+  from?: string
+  to?: string
+  description?: string
 }
 
 export interface WellKnownBreachEndContactTypeMeta extends WellKnownContactTypeMeta {

@@ -24,6 +24,14 @@
         },
         rows: [
             {
+                key: { text: "From" },
+                value: { text: contact.from }
+            } if contact.from ,
+            {
+                key: { text: "To" },
+                value: { text: contact.to }
+            } if contact.to ,
+            {
                 key: { text: "Date" },
                 value: { text: contact.start | shortDate }
             },

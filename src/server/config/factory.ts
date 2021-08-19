@@ -76,14 +76,29 @@ export const CONTACT_DEFAULTS: WellKnownContactTypeConfig = {
     [WellKnownAppointmentType.PhoneCall]: { name: 'Phone call', codes: { nonRar: 'COPT' } },
   },
   communication: {
-    [WellKnownCommunicationType.EmailTextToOffender]: { name: 'Email/Text to Offender', code: 'CMOB' },
+    [WellKnownCommunicationType.EmailTextToOffender]: {
+      name: 'Email/Text to Offender',
+      code: 'CMOB',
+      to: '{}',
+      description: 'Email or text message to {}',
+    },
     [WellKnownCommunicationType.EmailTextFromOffender]: { name: 'Email/Text from Offender', code: 'CMOA' },
     [WellKnownCommunicationType.EmailTextToOther]: { name: 'Email/Text to Other', code: 'CM3B' },
     [WellKnownCommunicationType.EmailTextFromOther]: { name: 'Email/Text from Other', code: 'CM3A' },
     [WellKnownCommunicationType.PhoneCallToOffender]: { name: 'Phone call to Offender', code: 'CTOB' },
-    [WellKnownCommunicationType.PhoneCallFromOffender]: { name: 'Phone call from Offender', code: 'CTOA' },
+    [WellKnownCommunicationType.PhoneCallFromOffender]: {
+      name: 'Phone call from Offender',
+      code: 'CTOA',
+      from: '{}',
+      description: 'Phone call from {}',
+    },
     [WellKnownCommunicationType.PhoneCallToOther]: { name: 'Phone call to Other', code: 'CT3B' },
     [WellKnownCommunicationType.PhoneCallFromOther]: { name: 'Phone call from Other', code: 'CT3A' },
+    [WellKnownCommunicationType.CpsPackageRequested]: {
+      name: 'CPS Package Request',
+      code: 'CMRQ',
+      description: 'CPS pack requested',
+    },
   },
   warningLetter: {
     [WellKnownWarningLetterType.First]: 'AWLI',
@@ -144,6 +159,9 @@ export function configFactory(): Config {
         [type]: {
           name: string(`${key}_NAME`, fallback(defaults.name)).trim(),
           code: string(`${key}_CODE`, fallback(defaults.code)).toUpperCase().trim(),
+          from: string(`${key}_FROM`, fallback(defaults.from))?.trim(),
+          to: string(`${key}_CODE`, fallback(defaults.to))?.trim(),
+          description: string(`${key}_DESCRIPTION`, fallback(defaults.description))?.trim(),
         } as WellKnownContactTypeMeta,
       }
     })

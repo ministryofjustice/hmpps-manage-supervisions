@@ -149,38 +149,45 @@ describe('ActivityService', () => {
 
     it('gets unfiltered contacts & falls back to last 12 months when no breach', async () => {
       havingLastBreachEnd(null)
-      await subject.getActivityLogPage('some-crn', { convictionId: 1 })
+      await subject.getActivityLogPage('some-crn', 'some offender', { convictionId: 1 })
       shouldHaveFilteredContacts({ convictionId: 1 })
     })
 
     it('filters appointments', async () => {
-      await subject.getActivityLogPage('some-crn', { filter: ActivityFilter.Appointments })
+      await subject.getActivityLogPage('some-crn', 'some offender', { filter: ActivityFilter.Appointments })
       shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true })
     })
 
     it('filters complied appointments', async () => {
-      await subject.getActivityLogPage('some-crn', { filter: ActivityFilter.CompliedAppointments })
+      await subject.getActivityLogPage('some-crn', 'some offender', { filter: ActivityFilter.CompliedAppointments })
       shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true, attended: true, complied: true })
     })
 
     it('filters acceptable absence appointments', async () => {
-      await subject.getActivityLogPage('some-crn', { filter: ActivityFilter.AcceptableAbsenceAppointments })
+      await subject.getActivityLogPage('some-crn', 'some offender', {
+        filter: ActivityFilter.AcceptableAbsenceAppointments,
+      })
       shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true, attended: false, complied: true })
     })
 
     it('filters failed to comply appointments', async () => {
-      await subject.getActivityLogPage('some-crn', { filter: ActivityFilter.FailedToComplyAppointments })
+      await subject.getActivityLogPage('some-crn', 'some offender', {
+        filter: ActivityFilter.FailedToComplyAppointments,
+      })
       shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true, complied: false })
     })
 
     it('filters warning letter contacts', async () => {
-      await subject.getActivityLogPage('some-crn', { filter: ActivityFilter.WarningLetters })
+      await subject.getActivityLogPage('some-crn', 'some offender', { filter: ActivityFilter.WarningLetters })
       shouldHaveFilteredContacts({ contactTypes: ['AWLI', 'AWL2', 'AWLF', 'AWLS', 'C040', 'CLBR', 'CBRC', 'CLOB'] })
     })
 
     it('filters appointments from last breach end', async () => {
       havingLastBreachEnd(DateTime.fromObject({ year: 2018, month: 5, day: 6 }))
-      await subject.getActivityLogPage('some-crn', { filter: ActivityFilter.Appointments, convictionId: 1 })
+      await subject.getActivityLogPage('some-crn', 'some offender', {
+        filter: ActivityFilter.Appointments,
+        convictionId: 1,
+      })
       shouldHaveFilteredContacts({
         appointmentsOnly: true,
         nationalStandard: true,
@@ -191,7 +198,7 @@ describe('ActivityService', () => {
 
     it('filters appointments from specified date', async () => {
       havingLastBreachEnd(DateTime.fromObject({ year: 2018, month: 5, day: 6 }))
-      await subject.getActivityLogPage('some-crn', {
+      await subject.getActivityLogPage('some-crn', 'some offender', {
         filter: ActivityFilter.Appointments,
         convictionId: 1,
         contactDateFrom: '2018-04-05',
@@ -330,7 +337,7 @@ describe('ActivityService', () => {
         rarActivity: true,
       })
 
-      const observed = await subject.getActivityLogPage('some-crn')
+      const observed = await subject.getActivityLogPage('some-crn', 'some offender')
 
       shouldReturnAppointment(observed, {
         notes: 'well known, complied RAR appointment',
@@ -350,7 +357,7 @@ describe('ActivityService', () => {
         sensitive: true,
       })
 
-      const observed = await subject.getActivityLogPage('some-crn')
+      const observed = await subject.getActivityLogPage('some-crn', 'some offender')
 
       shouldReturnAppointment(observed, {
         notes: 'well known, not complied sensitive appointment',
@@ -370,7 +377,7 @@ describe('ActivityService', () => {
         outcome: { complied: false, attended: false },
       })
 
-      const observed = await subject.getActivityLogPage('some-crn')
+      const observed = await subject.getActivityLogPage('some-crn', 'some offender')
 
       shouldReturnAppointment(observed, {
         notes: 'well known, unacceptable absence appointment',
@@ -386,7 +393,7 @@ describe('ActivityService', () => {
         outcome: { complied: true, attended: false },
       })
 
-      const observed = await subject.getActivityLogPage('some-crn')
+      const observed = await subject.getActivityLogPage('some-crn', 'some offender')
 
       shouldReturnAppointment(observed, {
         notes: 'well known, acceptable absence appointment',
@@ -402,7 +409,7 @@ describe('ActivityService', () => {
         outcome: null,
       })
 
-      const observed = await subject.getActivityLogPage('some-crn')
+      const observed = await subject.getActivityLogPage('some-crn', 'some offender')
 
       shouldReturnAppointment(observed, {
         notes: 'other appointment, not recorded',
@@ -419,7 +426,7 @@ describe('ActivityService', () => {
         notes: 'well known communication',
       })
 
-      const observed = await subject.getActivityLogPage('some-crn')
+      const observed = await subject.getActivityLogPage('some-crn', 'some offender')
 
       shouldReturnCommunication(observed, {
         notes: 'well known communication',
@@ -432,7 +439,7 @@ describe('ActivityService', () => {
         notes: 'unknown contact',
       })
 
-      const observed = await subject.getActivityLogPage('some-crn')
+      const observed = await subject.getActivityLogPage('some-crn', 'some offender')
 
       shouldReturnUnknown(observed, { notes: 'unknown contact' })
     })
@@ -455,17 +462,19 @@ describe('ActivityService', () => {
       Promise.resolve({
         name: 'Some communication with some offender',
         type: ContactTypeCategory.Communication,
-        value: { name: 'Some contact' },
+        value: { name: 'Some contact', from: '{}', to: '{}', description: 'Some contact with {}' },
       } as CommunicationMetaResult),
     )
 
-    const observed = await subject.getCommunicationContact('some-crn', 111)
+    const observed = await subject.getCommunicationContact('some-crn', 111, 'some offender')
 
     expect(observed).toEqual({
       id: 111,
       category: 'Other communication',
       start: DateTime.fromObject({ year: 2020, month: 7, day: 13, hour: 12 }),
-      name: 'Some communication with some offender',
+      name: 'Some contact with some offender',
+      from: 'some offender',
+      to: 'some offender',
       notes: 'Some contact notes',
       type: 'communication',
       lastUpdatedDateTime: DateTime.fromObject({ year: 2020, month: 7, day: 13, hour: 12 }),

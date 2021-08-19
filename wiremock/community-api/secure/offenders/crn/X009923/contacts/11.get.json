@@ -2,7 +2,7 @@
   "request": {
     "method": "GET",
     "headers": {},
-    "urlPath": "/community-api/secure/offenders/crn/X009923/contacts/7"
+    "urlPath": "/community-api/secure/offenders/crn/X009923/contacts/11"
   },
   "response": {
     "status": 200,
@@ -10,10 +10,10 @@
       "Content-Type": "application/json;charset=UTF-8"
     },
     "jsonBody": {
-      "contactId": 7,
-      "contactStart": "2020-09-04T13:00:00+01:00",
+      "contactId": 11,
+      "contactStart": "2020-09-04T14:00:00+01:00",
       "contactEnd": "2020-09-04T00:00:00+01:00",
-      "notes": "Hi Liz - it was good to speak today. To confirm, your next probation appointment is by telephone on 7th April 2021 at 10:00.",
+      "notes": "CPS request",
       "officeLocation": {
         "code": "523dc18a-660f-4e34-b20b-47fbe5e366a5",
         "buildingName": "Dora",
@@ -27,9 +27,9 @@
       "outcome": null,
       "sensitive": false,
       "type": {
-        "code": "CMOB",
-        "description": "eMail/Text to Offender",
-        "shortDescription": "generate B2C applications",
+        "code": "CMRQ",
+        "description": "CPS Package Request",
+        "shortDescription": "CPS Pack Requested",
         "appointment": false
       },
       "provider": {

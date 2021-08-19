@@ -38,10 +38,10 @@ describe('ActivityController', () => {
     const offender = havingOffenderSummary()
 
     const contact = fakeCommunicationActivityLogEntry()
-    activityService.getCommunicationContact.withArgs('some-crn', 111).resolves(contact)
+    const displayName = getDisplayName(offender)
+    activityService.getCommunicationContact.withArgs('some-crn', 111, displayName).resolves(contact)
 
     const observed = await subject.getCommunication('some-crn', 111)
-    const displayName = getDisplayName(offender)
     expect(observed).toEqual({
       displayName,
       breadcrumbs: fakeBreadcrumbs(BreadcrumbType.OtherCommunication, {
