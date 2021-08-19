@@ -1,8 +1,8 @@
 import { ViewOffenderFixture } from './view-offender.fixture'
-import { TABLE } from '../../../pages/offender.page'
+import { SCHEDULE_TABLE } from '../../../pages/offender.page'
 
 class Fixture extends ViewOffenderFixture {
-  shouldRenderAppointmentTableFurniture(table: TABLE, caption: string): this {
+  shouldRenderAppointmentTableFurniture(table: SCHEDULE_TABLE, caption: string): this {
     return this.shouldRenderOffenderTab('schedule', page => {
       page.emptyHeader(table).should('not.exist')
       page.tableCaption(table).contains(caption)
@@ -12,7 +12,7 @@ class Fixture extends ViewOffenderFixture {
     })
   }
 
-  shouldRenderAppointmentTableRow(table: TABLE, row: number, date: string, time: string, name: string): this {
+  shouldRenderAppointmentTableRow(table: SCHEDULE_TABLE, row: number, date: string, time: string, name: string): this {
     return this.shouldRenderOffenderTab('schedule', page => {
       page.tableData(table, row, 'date').contains(date)
       page.tableData(table, row, 'time').contains(time)
@@ -20,7 +20,7 @@ class Fixture extends ViewOffenderFixture {
     })
   }
 
-  shouldDisplayEmptyWarning(table: TABLE, title: string, message: string): this {
+  shouldDisplayEmptyWarning(table: SCHEDULE_TABLE, title: string, message: string): this {
     return this.shouldRenderOffenderTab('schedule', page => {
       page.emptyHeader(table).contains(title)
       page.emptyMessage(table).contains(message)

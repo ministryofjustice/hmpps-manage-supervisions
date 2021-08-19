@@ -1,9 +1,10 @@
 import { PageBase } from './page'
 import { SummaryList } from './components/summary-list'
+import { Table, TableCallback } from './components/Table'
 
 export type TABS = 'overview' | 'schedule' | 'activity' | 'personal' | 'sentence' | 'compliance' | 'risk'
-export type TABLE = 'future' | 'recent'
-export type COL = 'date' | 'time' | 'appointment'
+export type SCHEDULE_TABLE = 'future' | 'recent'
+export type SCHEDULE_COL = 'date' | 'time' | 'appointment'
 
 export class OffenderPage extends PageBase {
   subNavTab(name: TABS) {
@@ -60,23 +61,23 @@ export class OffenderPage extends PageBase {
         return cy.get('[data-qa="offender/arrange-appointment-button"]')
       },
 
-      tableCaption(table: TABLE) {
+      tableCaption(table: SCHEDULE_TABLE) {
         return cy.get(`table[data-qa="offender/schedule/${table}"] > caption`)
       },
 
-      tableHeader(table: TABLE, column: COL) {
+      tableHeader(table: SCHEDULE_TABLE, column: SCHEDULE_COL) {
         return cy.get(`table[data-qa="offender/schedule/${table}"] > thead > tr > th[data-qa="${column}"]`)
       },
 
-      tableData(table: TABLE, row: number, column: COL) {
+      tableData(table: SCHEDULE_TABLE, row: number, column: SCHEDULE_COL) {
         return cy.get(`table[data-qa="offender/schedule/${table}"] > tbody > tr:eq(${row}) > td[data-qa="${column}"]`)
       },
 
-      emptyHeader(table: TABLE) {
+      emptyHeader(table: SCHEDULE_TABLE) {
         return cy.get(`[data-qa="offender/schedule/empty-${table}"] > h2`)
       },
 
-      emptyMessage(table: TABLE) {
+      emptyMessage(table: SCHEDULE_TABLE) {
         return cy.get(`[data-qa="offender/schedule/empty-${table}"] > p`)
       },
     }
@@ -213,7 +214,7 @@ export class OffenderPage extends PageBase {
   get risk() {
     return {
       get noRisksWarning() {
-        return cy.get('[data-qa="offenders/risk/no-risk-assessment"]')
+        return cy.get('[data-qa="offender/risk/no-risk-assessment"]')
       },
 
       roshCommunity(callback: (card: SummaryList) => void) {
@@ -230,6 +231,18 @@ export class OffenderPage extends PageBase {
 
       get previousNotes() {
         return cy.get('[data-qa="offender/risk/previous-notes"]')
+      },
+
+      riskFlags(callback: TableCallback) {
+        Table.selectFromQa('offender/risk/registrations', callback)
+      },
+
+      get viewInactiveRegistrations() {
+        return cy.get('[data-qa="offender/risk/view-inactive-registrations"]')
+      },
+
+      get noActiveRegistrations() {
+        return cy.get('[data-qa="offender/risk/no-active-registrations"]')
       },
     }
   }

@@ -19,7 +19,7 @@ import { getDisplayName } from '../../util'
 import { SentenceService } from './sentence'
 import { ScheduleService } from './schedule'
 import { ActivityFilter, ActivityService, FilterLinks, GetContactsOptions } from './activity'
-import { RiskService } from './risk'
+import { RiskRegistrations, RiskService } from './risk'
 import { PersonalService } from './personal'
 import { Breadcrumb, BreadcrumbType, LinksService, ResolveBreadcrumbOptions } from '../../common/links'
 import { ConfigService } from '@nestjs/config'
@@ -83,13 +83,12 @@ export class OffenderController {
         this.personalService.getPersonalCircumstances(crn),
       ])
     return {
-      ...this.getBase(OffenderPage.Overview, offender),
+      ...this.getBase(OffenderPage.Overview, offender, registrations),
       page: OffenderPage.Overview,
       ...this.personalService.getPersonalDetails(offender, personalContacts, personalCircumstances),
       conviction: conviction && { ...conviction, rar: conviction.requirements.find(x => x.isRar)?.name },
       appointmentSummary,
       risks,
-      registrations,
     }
   }
 
@@ -107,10 +106,9 @@ export class OffenderController {
       this.riskService.getRiskRegistrations(crn),
     ])
     return {
-      ...this.getBase(OffenderPage.Schedule, offender),
+      ...this.getBase(OffenderPage.Schedule, offender, registrations),
       page: OffenderPage.Schedule,
       appointments,
-      registrations,
       appointmentBookingEnabled:
         this.config.get<ServerConfig>('server').features[FeatureFlags.EnableAppointmentBooking],
     }
@@ -142,27 +140,6 @@ export class OffenderController {
     return this.activityPageCommon(crn, { convictionId, filter })
   }
 
-  async activityPageCommon(crn: string, options: GetContactsOptions): Promise<OffenderActivityViewModel> {
-    const [offender, contacts, registrations] = await Promise.all([
-      this.offenderService.getOffenderSummary(crn),
-      this.activityService.getActivityLogPage(crn, options),
-      this.riskService.getRiskRegistrations(crn),
-    ])
-    return {
-      ...this.getBase(OffenderPage.Activity, offender),
-      page: OffenderPage.Activity,
-      contacts: contacts.content,
-      pagination: {
-        page: contacts.number,
-        size: contacts.size,
-      },
-      registrations,
-      filters: FilterLinks,
-      currentFilter: options.filter,
-      title: options.filter ? FilterLinks[options.filter].description : null,
-    }
-  }
-
   @Get(OffenderPage.Personal)
   @Render('offenders/offender/views/personal')
   @Breadcrumb({
@@ -178,10 +155,9 @@ export class OffenderController {
       this.personalService.getPersonalCircumstances(crn),
     ])
     return {
-      ...this.getBase(OffenderPage.Personal, offender),
+      ...this.getBase(OffenderPage.Personal, offender, registrations),
       ...this.personalService.getPersonalDetails(offender, personalContacts, personalCircumstances),
       page: OffenderPage.Personal,
-      registrations,
     }
   }
 
@@ -199,10 +175,9 @@ export class OffenderController {
       this.riskService.getRiskRegistrations(crn),
     ])
     return {
-      ...this.getBase(OffenderPage.Sentence, offender),
+      ...this.getBase(OffenderPage.Sentence, offender, registrations),
       page: OffenderPage.Sentence,
       conviction,
-      registrations,
     }
   }
 
@@ -220,10 +195,9 @@ export class OffenderController {
       this.riskService.getRiskRegistrations(crn),
     ])
     return {
-      ...this.getBase(OffenderPage.Compliance, offender),
+      ...this.getBase(OffenderPage.Compliance, offender, registrations),
       page: OffenderPage.Compliance,
       compliance,
-      registrations,
     }
   }
 
@@ -241,14 +215,17 @@ export class OffenderController {
       this.riskService.getRisks(crn),
     ])
     return {
-      ...this.getBase(OffenderPage.Risk, offender),
+      ...this.getBase(OffenderPage.Risk, offender, registrations),
       page: OffenderPage.Risk,
-      registrations,
       risks,
     }
   }
 
-  private getBase(page: OffenderPage, offender: OffenderDetailSummary): OffenderViewModelBase {
+  private getBase(
+    page: OffenderPage,
+    offender: OffenderDetailSummary,
+    registrations: RiskRegistrations,
+  ): OffenderViewModelBase {
     const crn = offender.otherIds.crn
     const breadcrumbOptions: ResolveBreadcrumbOptions = { crn, offenderName: getDisplayName(offender) }
     return {
@@ -258,6 +235,7 @@ export class OffenderController {
         pnc: offender.otherIds.pncNumber,
       },
       displayName: getDisplayName(offender, { preferredName: true }),
+      registrations,
       breadcrumbs: this.linksService.resolveAll(getBreadcrumbType(page), breadcrumbOptions),
       links: {
         ...Object.values(OffenderPage).reduce(
@@ -269,7 +247,30 @@ export class OffenderController {
         addressBook: this.linksService.getUrl(BreadcrumbType.PersonalAddresses, breadcrumbOptions),
         circumstances: this.linksService.getUrl(BreadcrumbType.PersonalCircumstances, breadcrumbOptions),
         disabilities: this.linksService.getUrl(BreadcrumbType.PersonalDisabilities, breadcrumbOptions),
+        toDelius: `/offender/${crn}/to-delius`,
+        toOASys: '#TODO',
+        viewInactiveRegistrations: '#TODO',
       },
+    }
+  }
+
+  private async activityPageCommon(crn: string, options: GetContactsOptions): Promise<OffenderActivityViewModel> {
+    const [offender, contacts, registrations] = await Promise.all([
+      this.offenderService.getOffenderSummary(crn),
+      this.activityService.getActivityLogPage(crn, options),
+      this.riskService.getRiskRegistrations(crn),
+    ])
+    return {
+      ...this.getBase(OffenderPage.Activity, offender, registrations),
+      page: OffenderPage.Activity,
+      contacts: contacts.content,
+      pagination: {
+        page: contacts.number,
+        size: contacts.size,
+      },
+      filters: FilterLinks,
+      currentFilter: options.filter,
+      title: options.filter ? FilterLinks[options.filter].description : null,
     }
   }
 }

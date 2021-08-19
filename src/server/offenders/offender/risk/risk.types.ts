@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon'
+
 export interface Risks {
   community: {
     level?: RiskLevelMeta
@@ -33,9 +35,17 @@ export interface RiskLevelMeta {
   index: number
 }
 
+export interface RiskRegistrations {
+  active: RegistrationFlag[]
+  inactive: number
+}
+
 export interface RegistrationFlag {
   text: string
   class: string
+  notes?: string
+  reviewDue?: DateTime
+  link: string
 }
 
 export interface FlatRiskToSelf {

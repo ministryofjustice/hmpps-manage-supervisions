@@ -1,7 +1,7 @@
 import { ActivityFilter, ActivityLogEntry } from './activity'
 import { ComplianceDetails, ConvictionDetails } from './sentence'
 import { AppointmentSummary, RecentAppointments } from './schedule'
-import { RegistrationFlag, Risks } from './risk/risk.types'
+import { RiskRegistrations, Risks } from './risk'
 import { GetPersonalDetailsResult } from './personal'
 import { ViewModel } from '../../common'
 
@@ -23,6 +23,9 @@ export interface OffenderLinks extends OffenderPageLinks {
   addressBook: string
   circumstances: string
   disabilities: string
+  toDelius: string
+  toOASys: string
+  viewInactiveRegistrations: string
 }
 
 export interface OffenderViewModelBase extends ViewModel {
@@ -33,7 +36,7 @@ export interface OffenderViewModelBase extends ViewModel {
   }
   displayName: string
   links: OffenderLinks
-  registrations?: RegistrationFlag[]
+  registrations: RiskRegistrations
 }
 
 export interface OffenderOverviewViewModel extends OffenderViewModelBase, GetPersonalDetailsResult {

@@ -1,10 +1,27 @@
-import { FlatRiskToSelf, RiskLevelMeta, RegistrationFlag, Risks, RoshRisk, RiskLevel } from './risk.types'
+import {
+  FlatRiskToSelf,
+  RiskLevelMeta,
+  RegistrationFlag,
+  Risks,
+  RoshRisk,
+  RiskLevel,
+  RiskRegistrations,
+} from './risk.types'
 import { fake, fakeEnum, fakeRandomArray } from '../../../util/util.fake'
 import * as faker from 'faker'
+import { DateTime } from 'luxon'
 
 export const fakeRegistrationFlag = fake<RegistrationFlag>(() => ({
   text: faker.lorem.sentence(),
   class: faker.datatype.uuid(),
+  notes: faker.lorem.sentence(),
+  link: faker.internet.url(),
+  reviewDue: DateTime.fromJSDate(faker.date.past()).set({ hour: 0, minute: 0, second: 0, millisecond: 0 }),
+}))
+
+export const fakeRiskRegistrations = fake<RiskRegistrations>(() => ({
+  active: [fakeRegistrationFlag()],
+  inactive: faker.datatype.number(),
 }))
 
 const fakeRiskLevelMeta = fake<RiskLevelMeta>(() => ({

@@ -29,7 +29,7 @@
         {% call appSummaryCard({
             titleText: 'Risk of serious harm (ROSH) in the community',
             classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
-            actions: { items: [{ href: "#TODO", text: "View OASys" }] }
+            actions: { items: [{ href: links.toOASys, text: "View OASys" }] }
         }) -%}
             {{ govukSummaryList({
                 rows: [
@@ -75,7 +75,7 @@
         {% call appSummaryCard({
             titleText: 'Risk of serious harm to themselves',
             classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
-            actions: { items: [{ href: "#TODO", text: "View OASys" }] }
+            actions: { items: [{ href: links.toOASys, text: "View OASys" }] }
         }) -%}
             {{ govukSummaryList({
                 rows: [
@@ -97,13 +97,57 @@
     {% else %}
         {% set noRisksWarning %}
             No risk assessment<br>
-            <a href='#TODO'>Create a risk assessment in OASys</a>
+            <a href='{{ links.toOASys }}'>Create a risk assessment in OASys</a>
         {% endset %}
         {{ govukWarningText({
             html: noRisksWarning,
             iconFallbackText: "Warning",
-            attributes: { 'data-qa': 'offenders/risk/no-risk-assessment' }
+            attributes: { 'data-qa': 'offender/risk/no-risk-assessment' }
         }) }}
     {% endif %}
+
+    {% call appSummaryCard({
+        titleText: 'Risk flags',
+        classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
+        actions: { items: [{ href: links.toDelius, text: "Add a risk flag in Delius" }] }
+    }) -%}
+        {% if registrations.active.length === 0 %}
+            <p class='govuk-body' data-qa='offender/risk/no-active-registrations'>
+                <strong>There are no current risk flags. Add risk flags in Delius.</strong>
+            </p>
+        {% endif %}
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <p class='govuk-body'>
+                    Risk flags (registrations) show circumstances that need prominent and constant visibility.
+                    Review flags regularly, and remove them when they are no longer appropriate.
+                </p>
+            </div>
+        </div>
+
+        {% if registrations.active.length > 0 %}
+            {{ govukTable({
+                classes: 'govuk-!-margin-bottom-4',
+                attributes: { 'data-qa': 'offender/risk/registrations' },
+                head: [
+                    { text: 'Flag', classes: 'app-width-30pc' },
+                    { text: 'Notes', classes: 'app-width-55pc' },
+                    { text: 'Review due', classes: 'app-width-15pc' }
+                ],
+                rows: registrations.active | toTableRows([
+                    { type: 'link', path: 'text', href: 'link', classes: 'govuk-!-padding-top-3 govuk-!-padding-bottom-3' },
+                    { type: 'text', path: 'notes', defaultValue: 'No notes', classes: 'govuk-!-padding-top-3 govuk-!-padding-bottom-3' },
+                    { type: 'short-date', path: 'reviewDue', defaultValue: 'None', classes: 'govuk-!-padding-top-3 govuk-!-padding-bottom-3' }
+                ])
+            }) }}
+        {% endif %}
+
+        {% if registrations.inactive > 0 %}
+            <p class="govuk-!-margin-bottom-0" data-qa='offender/risk/view-inactive-registrations'>
+                <a href="{{ links.viewInactiveRegistrations }}">View removed risk flags ({{ registrations.inactive }})</a>
+            </p>
+        {% endif %}
+    {%- endcall %}
 
 {% endblock %}

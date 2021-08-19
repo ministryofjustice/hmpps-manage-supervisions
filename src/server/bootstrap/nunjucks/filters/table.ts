@@ -1,7 +1,8 @@
 import { NunjucksFilter } from './types'
 import { get, pick } from 'lodash'
 import { DateTime } from 'luxon'
-import { LongDate, TimeRange } from './dates'
+import { LongDate, ShortDate, TimeRange } from './dates'
+import { safeGetDateTime } from '../../../util'
 
 export interface TableColumn {
   /**
@@ -43,11 +44,14 @@ export interface TableColumn {
 export enum ColumnType {
   Text = 'text',
   Link = 'link',
+  ShortDate = 'short-date',
   LongDate = 'long-date',
   TimeRange = 'time-range',
 }
 
-export type ColumnBase<Path extends string = 'path'> = { type: ColumnType } & { [P in Path]: string } &
+export type ColumnBase<Path extends string = 'path'> = { type: ColumnType; defaultValue?: any } & {
+  [P in Path]: string
+} &
   Omit<TableColumn, 'data' | 'html' | 'format'>
 
 export interface TextColumn extends ColumnBase {
@@ -67,6 +71,10 @@ export interface LongDateColumn extends ColumnBase {
   type: ColumnType.LongDate
 }
 
+export interface ShortDateColumn extends ColumnBase {
+  type: ColumnType.ShortDate
+}
+
 export interface TimeRangeColumn extends ColumnBase<'from'> {
   type: ColumnType.TimeRange
 
@@ -76,7 +84,7 @@ export interface TimeRangeColumn extends ColumnBase<'from'> {
   to: string
 }
 
-export type Column = TextColumn | LinkColumn | LongDateColumn | TimeRangeColumn
+export type Column = TextColumn | LinkColumn | ShortDateColumn | LongDateColumn | TimeRangeColumn
 
 export class ToTableRows implements NunjucksFilter {
   filter(data: any[], columns: Column[]): TableColumn[][] {
@@ -89,38 +97,30 @@ export class ToTableRows implements NunjucksFilter {
   }
 
   private static getContent(row: any, col: Column): Pick<TableColumn, 'text' | 'html' | 'format'> {
+    function getDateTime(path: string): DateTime {
+      return safeGetDateTime(get(row, path)) || col.defaultValue
+    }
+
+    function getAny(path: string) {
+      return get(row, path) || col.defaultValue || ''
+    }
+
     switch (col.type) {
       case ColumnType.Text:
-        return { text: get(row, col.path) }
+        return { text: getAny(col.path) }
       case ColumnType.Link:
-        return { html: `<a href="${get(row, col.href)}">${get(row, col.path)}</a>` }
+        return { html: `<a href="${getAny(col.href)}">${getAny(col.path)}</a>` }
+      case ColumnType.ShortDate:
+        return { text: ShortDate.apply(getDateTime(col.path)) }
       case ColumnType.LongDate:
-        return { text: LongDate.apply(this.getDateTime(row, col.path)) }
+        return { text: LongDate.apply(getDateTime(col.path)) }
       case ColumnType.TimeRange: {
-        const from = this.getDateTime(row, col.from)
-        const to = this.getDateTime(row, col.to)
+        const from = getDateTime(col.from)
+        const to = getDateTime(col.to)
         return {
           text: TimeRange.apply(from, to),
         }
       }
-    }
-  }
-
-  private static getDateTime(row: any, path: string): DateTime {
-    const raw = get(row, path)
-    if (raw instanceof DateTime) {
-      return raw
-    }
-    if (raw instanceof Date) {
-      return DateTime.fromJSDate(raw)
-    }
-    switch (typeof raw) {
-      case 'string':
-        return DateTime.fromISO(raw)
-      case 'object':
-        return DateTime.fromObject(raw)
-      default:
-        throw new Error(`Unknown date type '${raw}'`)
     }
   }
 }

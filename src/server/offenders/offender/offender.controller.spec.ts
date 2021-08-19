@@ -26,7 +26,7 @@ import { fakeAppointmentSummary, fakeRecentAppointments } from './schedule/sched
 import { fakeBreadcrumbs, fakeBreadcrumbUrl, MockLinksModule } from '../../common/links/links.mock'
 import { PersonalService } from './personal'
 import { BreadcrumbType, ResolveBreadcrumbOptions } from '../../common/links'
-import { fakeRegistrationFlag, fakeRisks } from './risk/risk.fake'
+import { fakeRiskRegistrations, fakeRisks } from './risk/risk.fake'
 import { ConfigService } from '@nestjs/config'
 import { FakeConfigModule } from '../../config/config.fake'
 import { ContactTypesService } from '../../community-api'
@@ -42,6 +42,7 @@ describe('OffenderController', () => {
   let personalService: SinonStubbedInstance<PersonalService>
   let contactTypesService: SinonStubbedInstance<ContactTypesService>
   let featuresConfig: Partial<Record<FeatureFlags, boolean>>
+
   beforeEach(async () => {
     offenderService = createStubInstance(OffenderService)
     scheduleService = createStubInstance(ScheduleService)
@@ -99,7 +100,7 @@ describe('OffenderController', () => {
     const appointmentSummary = fakeAppointmentSummary()
     scheduleService.getAppointmentSummary.withArgs('some-crn').resolves(appointmentSummary)
 
-    const registrations = [fakeRegistrationFlag()]
+    const registrations = fakeRiskRegistrations()
     riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
 
     const risks = fakeRisks()
@@ -123,7 +124,7 @@ describe('OffenderController', () => {
     const appointments = fakeRecentAppointments()
     scheduleService.getRecentAppointments.withArgs('some-crn').resolves(appointments)
 
-    const registrations = [fakeRegistrationFlag()]
+    const registrations = fakeRiskRegistrations()
     riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
 
     const observed = await subject.getSchedule('some-crn')
@@ -150,7 +151,7 @@ describe('OffenderController', () => {
       .withArgs('some-crn', match({ contactTypes: [...appointmentContactTypes, ...communicationContactTypes] }))
       .resolves(contacts)
 
-    const registrations = [fakeRegistrationFlag()]
+    const registrations = fakeRiskRegistrations()
     riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
 
     const observed = await subject.getActivity('some-crn')
@@ -193,7 +194,7 @@ describe('OffenderController', () => {
     havingOffenderSummary()
 
     const contacts = fakePaginated([fakeActivityLogEntry(), fakeActivityLogEntry()])
-    const registrations = [fakeRegistrationFlag()]
+    const registrations = fakeRiskRegistrations()
 
     riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
     sentenceService.getConvictionId.withArgs('some-crn').resolves(1234)
@@ -252,7 +253,7 @@ describe('OffenderController', () => {
       .withArgs(offender, personalContacts, circumstances)
       .returns({ contactDetails, personalDetails })
 
-    const registrations = [fakeRegistrationFlag()]
+    const registrations = fakeRiskRegistrations()
     riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
 
     const observed = await subject.getPersonal('some-crn')
@@ -271,7 +272,7 @@ describe('OffenderController', () => {
     const conviction = fakeConvictionDetails()
     sentenceService.getConvictionDetails.withArgs('some-crn').resolves(conviction)
 
-    const registrations = [fakeRegistrationFlag()]
+    const registrations = fakeRiskRegistrations()
     riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
 
     const observed = await subject.getSentence('some-crn')
@@ -289,7 +290,7 @@ describe('OffenderController', () => {
     const compliance = fakeComplianceDetails()
     sentenceService.getSentenceComplianceDetails.withArgs('some-crn').resolves(compliance)
 
-    const registrations = [fakeRegistrationFlag()]
+    const registrations = fakeRiskRegistrations()
     riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
 
     const observed = await subject.getCompliance('some-crn')
@@ -307,7 +308,7 @@ describe('OffenderController', () => {
     const risks = fakeRisks()
     riskService.getRisks.withArgs('some-crn').resolves(risks)
 
-    const registrations = [fakeRegistrationFlag()]
+    const registrations = fakeRiskRegistrations()
     riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
 
     const observed = await subject.getRisk('some-crn')
@@ -369,6 +370,9 @@ describe('OffenderController', () => {
         activity: fakeBreadcrumbUrl(BreadcrumbType.CaseActivityLog, breadcrumbOptions),
         compliance: fakeBreadcrumbUrl(BreadcrumbType.Compliance, breadcrumbOptions),
         risk: fakeBreadcrumbUrl(BreadcrumbType.CaseRisk, breadcrumbOptions),
+        toDelius: '/offender/some-crn/to-delius',
+        toOASys: '#TODO',
+        viewInactiveRegistrations: '#TODO',
       },
       ...expected,
     } as OffenderViewModel)

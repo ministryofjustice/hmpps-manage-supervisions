@@ -29,7 +29,6 @@ import {
   ProbationArea,
   Team,
 } from './client'
-import { merge } from 'lodash'
 import * as faker from 'faker'
 import { DateTime } from 'luxon'
 import { fake } from '../util/util.fake'
@@ -470,17 +469,48 @@ export const fakeRequirement = fake<Requirement>(() => ({
   requirementTypeSubCategory: { code: faker.random.alphaNumeric(5), description: faker.commerce.productMaterial() },
 }))
 
-export const fakeRegistration = fake<Registration>((partial: DeepPartial<Registration> = {}) => {
-  return merge(
-    {
-      riskColour: faker.random.arrayElement(['Red', 'Amber', 'Green', 'White']),
-      type: {
-        code: faker.random.alphaNumeric(4),
-        description: faker.commerce.productMaterial(),
-      },
-    } as Registration,
-    partial,
-  )
+export const fakeRegistration = fake<Registration>((options, partial = {}) => {
+  const active = partial.active !== undefined ? partial.active : true
+  return {
+    registrationId: faker.datatype.number(),
+    offenderId: faker.datatype.number(),
+    active,
+    startDate: fakeIsoDate(),
+    endDate: active ? null : fakeIsoDate(),
+    register: {
+      code: faker.random.alphaNumeric(5),
+      description: 'Alerts',
+    },
+    riskColour: faker.random.arrayElement(['Red', 'Amber', 'Green', 'White']),
+    type: {
+      code: faker.random.alphaNumeric(4),
+      description: faker.random.arrayElement([
+        'Restraining Order',
+        'Mental Health Issues',
+        'Warrant / Summons',
+        'Risk to Staff',
+      ]),
+    },
+    nextReviewDate: fakeIsoDate('future'),
+    reviewPeriodMonths: faker.random.arrayElement([3, 6, 12]),
+    registeringTeam: {
+      code: faker.random.alphaNumeric(5),
+      description: faker.company.bs(),
+    },
+    registeringOfficer: {
+      code: faker.random.alphaNumeric(5),
+      forenames: faker.name.firstName(),
+      surname: faker.name.lastName(),
+      unallocated: false,
+    },
+    registeringProbationArea: {
+      code: faker.random.alphaNumeric(5),
+      description: faker.address.streetAddress(),
+    },
+    warnUser: false,
+    numberOfPreviousDeregistrations: 0,
+    notes: faker.lorem.sentence(),
+  }
 })
 
 export const fakeProbationArea = fake<ProbationArea>(() => ({
