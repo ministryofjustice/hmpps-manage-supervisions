@@ -21,6 +21,17 @@ const { argv } = yargs
     default: false,
     group: 'global',
   })
+  .option('hmpps-auth', {
+    type: 'boolean',
+    default: false,
+    description: 'stub hmpps-auth',
+  })
+  .option('get-requests', {
+    alias: 'm',
+    type: 'string',
+    description: 'get mappings for specified url and quit',
+    group: 'client',
+  })
   .option('current-conviction', {
     alias: 'cc',
     type: 'boolean',
@@ -35,16 +46,11 @@ const { argv } = yargs
     default: true,
     group: 'convictions',
   })
-  .option('hmpps-auth', {
+  .option('rosh', {
     type: 'boolean',
-    default: false,
-    description: 'stub hmpps-auth',
-  })
-  .option('get-requests', {
-    alias: 'm',
-    type: 'string',
-    description: 'get mappings for specified url and quit',
-    group: 'client',
+    description: 'stub the ROSH assessment from OASys',
+    default: true,
+    group: 'risk',
   })
 
 type SeedOptions = ReferenceDataSeedOptions & OffenderSeedOptions & ContactSeedOptions
@@ -88,6 +94,10 @@ async function seed(args: CamelCased<typeof argv>) {
 
   if (args.previousConvictions === false) {
     set(options, 'convictions.previous', [])
+  }
+
+  if (args.rosh === false) {
+    options.risks = null
   }
 
   const modules = [reset, referenceDataSeed(options), offenderSeed(options), contactsSeed(options)]

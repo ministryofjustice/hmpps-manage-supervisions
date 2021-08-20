@@ -14,7 +14,7 @@ context('ViewOffenderPersonalDetails', () => {
         .whenClickingSubNavTab('risk')
         .shouldDisplayCommonHeader({ registrations: false })
         .shouldRenderOffenderTab('risk', page => {
-          page.noRisksWarning.contains('No risk assessment')
+          page.noRisksWarning.contains('There is no OASys risk assessment for Liz Haggis')
           page.noActiveRegistrations.contains('There are no current risk flags. Add risk flags in Delius.')
         })
     })

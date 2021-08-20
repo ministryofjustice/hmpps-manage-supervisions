@@ -96,12 +96,18 @@
         {%- endcall %}
     {% else %}
         {% set noRisksWarning %}
-            No risk assessment<br>
-            <a href='{{ links.toOASys }}'>Create a risk assessment in OASys</a>
+            <h2 class="govuk-heading-m">There is no OASys risk assessment for {{ shortName }}</h2>
+            <p>We do not know:</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>Risk of serious harm (ROSH) in the community</li>
+                <li>Risk of serious harm to themselves</li>
+            </ul>
+            <p class='govuk-body'>
+                <a href='{{ links.toOASys }}'>View OASys</a>
+            </p>
         {% endset %}
-        {{ govukWarningText({
+        {{ govukNotificationBanner({
             html: noRisksWarning,
-            iconFallbackText: "Warning",
             attributes: { 'data-qa': 'offender/risk/no-risk-assessment' }
         }) }}
     {% endif %}

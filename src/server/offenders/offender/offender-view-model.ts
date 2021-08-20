@@ -35,6 +35,7 @@ export interface OffenderViewModelBase extends ViewModel {
     pnc?: string
   }
   displayName: string
+  shortName: string
   links: OffenderLinks
   registrations: RiskRegistrations
 }

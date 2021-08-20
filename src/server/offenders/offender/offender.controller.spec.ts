@@ -357,6 +357,7 @@ describe('OffenderController', () => {
       },
       breadcrumbs: fakeBreadcrumbs(breadcrumbType, { crn: 'some-crn', offenderName: 'Liz Danger Haggis' }),
       displayName: 'Liz Danger Haggis (Bob)',
+      shortName: 'Liz Haggis',
       links: {
         arrangeAppointment: fakeBreadcrumbUrl(BreadcrumbType.NewAppointment, breadcrumbOptions),
         addActivity: '/offender/some-crn/activity/new',

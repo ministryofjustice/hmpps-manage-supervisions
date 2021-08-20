@@ -235,6 +235,7 @@ export class OffenderController {
         pnc: offender.otherIds.pncNumber,
       },
       displayName: getDisplayName(offender, { preferredName: true }),
+      shortName: getDisplayName(offender, { middleNames: false, preferredName: false }),
       registrations,
       breadcrumbs: this.linksService.resolveAll(getBreadcrumbType(page), breadcrumbOptions),
       links: {
