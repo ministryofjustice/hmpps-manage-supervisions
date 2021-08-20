@@ -121,7 +121,7 @@ export class ActivityService {
   async getCommunicationContact(
     crn: string,
     contactId: number,
-    displayName: string,
+    offenderName: string,
   ): Promise<CommunicationActivityLogEntry> {
     const { data: contact } = await this.community.contactAndAttendance.getOffenderContactSummaryByCrnUsingGET({
       crn,
@@ -129,7 +129,7 @@ export class ActivityService {
     })
     const meta = await this.contacts.getTypeMeta(contact)
     const base = ActivityService.getActivityLogEntryBase(contact)
-    return ActivityService.getCommunicationActivityLogEntry(crn, contact, meta, base, displayName)
+    return ActivityService.getCommunicationActivityLogEntry(crn, contact, meta, base, offenderName)
   }
 
   private async getActivityLogEntry(
