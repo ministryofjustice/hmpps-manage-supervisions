@@ -9,7 +9,7 @@
         {{ displayName }}
     </h1>
 
-    {% for registration in registrations %}
+    {% for registration in registrations.active %}
         {% set flagHtml %}
             <a href="#">{{ registration.text }}</a>
         {% endset %}

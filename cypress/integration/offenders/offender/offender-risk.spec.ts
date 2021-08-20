@@ -6,15 +6,16 @@ context('ViewOffenderPersonalDetails', () => {
   const fixture = new Fixture()
 
   describe('empty risk page', () => {
-    before(() => cy.seed({ risks: null }))
+    before(() => cy.seed({ risks: null, registrations: [] }))
 
     it('displays no risk assessment warning', () => {
       fixture
         .whenViewingOffender()
         .whenClickingSubNavTab('risk')
-        .shouldDisplayCommonHeader()
+        .shouldDisplayCommonHeader({ registrations: false })
         .shouldRenderOffenderTab('risk', page => {
           page.noRisksWarning.contains('No risk assessment')
+          page.noActiveRegistrations.contains('There are no current risk flags. Add risk flags in Delius.')
         })
     })
   })
@@ -53,6 +54,15 @@ context('ViewOffenderPersonalDetails', () => {
             )
             card.value('Vulnerability').contains('No concerns')
           })
+
+          page.riskFlags(table => {
+            table.cell(0, 0).contains('Restraining Order')
+            table.cell(0, 1).contains('Harassment of ex-wife')
+            table.cell(0, 2).contains('2 January 2022')
+          })
+
+          page.viewInactiveRegistrations.contains('View removed risk flags (2)')
+          page.noActiveRegistrations.should('not.exist')
         })
     })
   })

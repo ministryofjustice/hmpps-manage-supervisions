@@ -49,6 +49,9 @@ export class LongDate implements NunjucksFilter {
 
   static apply(value: RawDate): string {
     const date = safeGetDateTime(value)
+    if (!date) {
+      return ''
+    }
     const format = date.year === DateTime.now().year ? 'cccc d MMMM' : 'cccc d MMMM yyyy'
     return date.toFormat(format)
   }
@@ -56,7 +59,11 @@ export class LongDate implements NunjucksFilter {
 
 export class ShortDate implements NunjucksFilter {
   filter(value: RawDate): string {
-    return safeGetDateTime(value).toFormat('d MMMM yyyy')
+    return ShortDate.apply(value)
+  }
+
+  static apply(value: RawDate): string {
+    return safeGetDateTime(value)?.toFormat('d MMMM yyyy') || ''
   }
 }
 

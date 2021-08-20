@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing'
 import { AssessRisksAndNeedsApiService, RiskDtoCurrent, RiskDtoPrevious } from '../../../assess-risks-and-needs-api'
 import { fakeOkResponse, fakeRestError } from '../../../common/rest/rest.fake'
-import { Risks } from './risk.types'
+import { RiskRegistrations, Risks } from './risk.types'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../../community-api/community-api.mock'
 import { RiskService } from './risk.service'
 import {
@@ -13,6 +13,7 @@ import { fakeAllRoshRiskDto } from '../../../assess-risks-and-needs-api/assess-r
 import { fakeRegistration } from '../../../community-api/community-api.fake'
 import { FakeConfigModule } from '../../../config/config.fake'
 import { HttpStatus } from '@nestjs/common'
+import { DateTime } from 'luxon'
 
 const IGNORED_REGISTRATION = 'some-ignored-registration-type'
 
@@ -162,46 +163,66 @@ describe('RiskService', () => {
   })
 
   describe('getting risk registrations', () => {
-    it('gets risk registrations', async () => {
+    it('gets active risk registrations', async () => {
       const registrations = [
-        fakeRegistration({ type: { description: 'Beta' }, riskColour: 'White' }),
-        fakeRegistration({ type: { description: 'Alpha' }, riskColour: 'Amber' }),
-      ]
-
-      const expected = [
-        {
-          text: 'Alpha',
-          class: 'govuk-tag--orange',
-        },
-        {
-          text: 'Beta',
-          class: 'govuk-tag--grey',
-        },
+        fakeRegistration({
+          active: true,
+          type: { description: 'Beta' },
+          riskColour: 'White',
+          notes: 'Some notes',
+          nextReviewDate: '2021-03-02',
+        }),
+        fakeRegistration({
+          active: true,
+          type: { description: 'Alpha' },
+          riskColour: 'Amber',
+          notes: null,
+          nextReviewDate: null,
+        }),
       ]
 
       const stub = community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({ registrations }))
       const observed = await subject.getRiskRegistrations('some-crn')
 
-      expect(observed).toEqual(expected)
-      expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn', activeOnly: true })
+      expect(observed).toEqual({
+        active: [
+          { text: 'Alpha', class: 'govuk-tag--orange', notes: null, link: '#TODO', reviewDue: null },
+          {
+            text: 'Beta',
+            class: 'govuk-tag--grey',
+            notes: 'Some notes',
+            link: '#TODO',
+            reviewDue: DateTime.fromObject({ day: 2, month: 3, year: 2021 }),
+          },
+        ],
+        inactive: 0,
+      } as RiskRegistrations)
+      expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn' })
+    })
+
+    it('counts inactive risk registrations', async () => {
+      const registrations = [fakeRegistration({ active: false }), fakeRegistration({ active: false })]
+
+      community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({ registrations }))
+      const observed = await subject.getRiskRegistrations('some-crn')
+
+      expect(observed).toEqual({ active: [], inactive: 2 } as RiskRegistrations)
     })
 
     it('handles empty risk registrations', async () => {
-      const stub = community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({}))
+      community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({}))
       const observed = await subject.getRiskRegistrations('some-crn')
 
-      expect(observed).toEqual([])
-      expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn', activeOnly: true })
+      expect(observed).toEqual({ active: [], inactive: 0 } as RiskRegistrations)
     })
 
     it('filters excluded registrations ', async () => {
       const registrations = [fakeRegistration({ type: { code: IGNORED_REGISTRATION } })]
 
-      const stub = community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({ registrations }))
+      community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({ registrations }))
       const observed = await subject.getRiskRegistrations('some-crn')
 
-      expect(observed).toEqual([])
-      expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn', activeOnly: true })
+      expect(observed).toEqual({ active: [], inactive: 0 } as RiskRegistrations)
     })
   })
 })

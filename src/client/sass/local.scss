@@ -1,0 +1,34 @@
+.govuk-main-wrapper {
+  min-height: 600px;
+}
+
+abbr {
+  text-decoration: none;
+}
+
+.app-tag--dark-red {
+  background: govuk-colour("red");
+}
+
+.app-tag--link {
+  padding: 0;
+  margin-bottom: govuk-spacing(2);
+}
+
+.app-tag--link a {
+  line-height: 1.5em;
+  color: inherit;
+  padding: 6px 10px;
+  display: inline-block;
+
+  &:focus {
+    color: $govuk-focus-text-colour;
+  }
+}
+
+$widths: ("15pc": 15%, "30pc": 30%, "55pc": 55%);
+@each $name, $width in $widths {
+  .app-width-#{$name} {
+    width: $width !important;
+  }
+}

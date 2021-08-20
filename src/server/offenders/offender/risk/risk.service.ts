@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { orderBy } from 'lodash'
+import { groupBy, orderBy } from 'lodash'
 import { CommunityApiService } from '../../../community-api'
 import {
   AssessRisksAndNeedsApiService,
@@ -8,11 +8,20 @@ import {
   RiskDtoPrevious,
   RoshRiskToSelfDto,
 } from '../../../assess-risks-and-needs-api'
-import { FlatRiskToSelf, RiskLevelMeta, RegistrationFlag, RiskLevel, Risks, RoshRisk } from './risk.types'
+import {
+  FlatRiskToSelf,
+  RiskLevelMeta,
+  RegistrationFlag,
+  RiskLevel,
+  Risks,
+  RoshRisk,
+  RiskRegistrations,
+} from './risk.types'
 import { ConfigService } from '@nestjs/config'
 import { Config, RiskConfig } from '../../../config'
 import { toList } from '../../../util'
 import { SanitisedAxiosError } from '../../../common/rest'
+import { DateTime } from 'luxon'
 
 @Injectable()
 export class RiskService {
@@ -60,25 +69,34 @@ export class RiskService {
     }
   }
 
-  async getRiskRegistrations(crn: string): Promise<RegistrationFlag[]> {
+  async getRiskRegistrations(crn: string): Promise<RiskRegistrations> {
     const {
       data: { registrations },
-    } = await this.community.risks.getOffenderRegistrationsByCrnUsingGET({ crn, activeOnly: true })
+    } = await this.community.risks.getOffenderRegistrationsByCrnUsingGET({ crn })
 
-    if (!registrations) {
-      return []
+    if (!registrations || registrations.length === 0) {
+      return { active: [], inactive: 0 }
     }
 
     const { ignoredRegistrationTypes } = this.config.get<RiskConfig>('risk')
-    return registrations
-      .filter(x => !ignoredRegistrationTypes.includes(x.type.code))
-      .map(r => {
-        return {
-          text: r.type.description,
-          class: `govuk-tag--${mapDeliusRegistrationColour(r.riskColour)}`,
-        }
-      })
-      .sort((a, b) => a.text.localeCompare(b.text))
+    const filtered = groupBy(
+      registrations.filter(x => !ignoredRegistrationTypes.includes(x.type.code)),
+      x => x.active,
+    )
+
+    return {
+      active:
+        filtered['true']
+          ?.map<RegistrationFlag>(r => ({
+            text: r.type.description,
+            class: `govuk-tag--${mapDeliusRegistrationColour(r.riskColour)}`,
+            notes: r.notes,
+            reviewDue: r.nextReviewDate && DateTime.fromISO(r.nextReviewDate),
+            link: '#TODO',
+          }))
+          .sort((a, b) => a.text.localeCompare(b.text)) || [],
+      inactive: filtered['false']?.length || 0,
+    }
   }
 }
 

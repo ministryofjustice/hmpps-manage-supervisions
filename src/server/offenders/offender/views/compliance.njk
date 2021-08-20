@@ -15,7 +15,7 @@
         {% set multipleBreachWarning %}
             There are multiple breach NSIs in progress on Delius.<br>
             Use Delius to check and correct any problems.<br>
-            <a href='/offender/{{ids.crn}}/to-delius'>Go to Delius</a>
+            <a href='{{ links.toDelius }}'>Go to Delius</a>
         {% endset %}
         {{ govukWarningText({ html: multipleBreachWarning, iconFallbackText: "Warning" }) }}
     {% endif %}
