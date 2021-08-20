@@ -8,12 +8,13 @@ import { DateTime } from 'luxon'
 import {
   ComplianceConvictionSummary,
   ComplianceDetails,
+  ComplianceStatusAlertLevel,
   ConvictionDetails,
   ConvictionRequirement,
   ConvictionRequirementType,
   CurrentComplianceConvictionSummary,
 } from './sentence.types'
-import { SinonStubbedInstance, createStubInstance, match } from 'sinon'
+import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
 import { RequirementService } from './requirement.service'
 import { fakeComplianceConvictionSummary, fakeConvictionRequirement } from './sentence.fake'
 import { Conviction } from '../../../community-api/client'
@@ -235,7 +236,7 @@ describe('SentenceService', () => {
           },
           period: 'since last breach',
           status: {
-            alertLevel: 'red',
+            alertLevel: ComplianceStatusAlertLevel.Danger,
             description: 'Breach in progress',
             value: 'in-breach',
           },
@@ -261,7 +262,7 @@ describe('SentenceService', () => {
       expect({ period: observed.current.period, status: observed.current.status }).toEqual({
         period: 'within 12 months',
         status: {
-          alertLevel: 'grey',
+          alertLevel: ComplianceStatusAlertLevel.Warning,
           description: '2 failures to comply within 12 months',
           value: 'failure-to-comply',
         },
@@ -284,7 +285,7 @@ describe('SentenceService', () => {
       expect({ period: observed.current.period, status: observed.current.status }).toEqual({
         period: 'within 12 months',
         status: {
-          alertLevel: 'red',
+          alertLevel: ComplianceStatusAlertLevel.Danger,
           description: '2 failures to comply within 12 months',
           value: 'pending-breach',
         },
@@ -307,7 +308,7 @@ describe('SentenceService', () => {
       expect({ period: observed.current.period, status: observed.current.status }).toEqual({
         period: 'within 12 months',
         status: {
-          alertLevel: 'green',
+          alertLevel: ComplianceStatusAlertLevel.Success,
           description: 'No failures to comply within 12 months',
           value: 'clean',
         },
@@ -333,7 +334,7 @@ describe('SentenceService', () => {
       expect({ period: observed.current.period, status: observed.current.status }).toEqual({
         period: 'since last breach',
         status: {
-          alertLevel: 'grey',
+          alertLevel: ComplianceStatusAlertLevel.Warning,
           description: 'No failures to comply since last breach',
           value: 'previous-breach',
         },

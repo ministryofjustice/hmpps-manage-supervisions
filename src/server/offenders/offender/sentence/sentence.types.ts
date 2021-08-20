@@ -109,6 +109,9 @@ export enum ComplianceStatus {
   PreviousBreach = 'previous-breach',
 }
 
+/**
+ * Alert levels that map to colours of the `app-card--#{colour}` classes.
+ */
 export enum ComplianceStatusAlertLevel {
   Danger = 'red',
   Warning = 'grey',

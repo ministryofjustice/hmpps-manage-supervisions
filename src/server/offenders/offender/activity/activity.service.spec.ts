@@ -29,6 +29,7 @@ import { BreadcrumbType } from '../../../common/links'
 import { merge } from 'lodash'
 import { FakeConfigModule } from '../../../config/config.fake'
 import { BreachService } from '../../../community-api/breach'
+import { GovUkUiTagColour } from '../../../util/govuk-ui'
 
 describe('ActivityService', () => {
   let subject: ActivityService
@@ -95,7 +96,7 @@ describe('ActivityService', () => {
       sensitive: false,
       tags: [
         {
-          colour: 'red',
+          colour: GovUkUiTagColour.Red,
           name: 'failed to comply',
         },
       ],
@@ -335,8 +336,8 @@ describe('ActivityService', () => {
         notes: 'well known, complied RAR appointment',
         rarActivity: true,
         tags: [
-          { colour: 'purple', name: 'rar' },
-          { colour: 'green', name: 'complied' },
+          { colour: GovUkUiTagColour.Purple, name: 'rar' },
+          { colour: GovUkUiTagColour.Green, name: 'complied' },
         ],
       })
     })
@@ -356,8 +357,8 @@ describe('ActivityService', () => {
         outcome: { complied: false },
         sensitive: true,
         tags: [
-          { colour: 'grey', name: 'sensitive' },
-          { colour: 'red', name: 'failed to comply' },
+          { colour: GovUkUiTagColour.Grey, name: 'sensitive' },
+          { colour: GovUkUiTagColour.Red, name: 'failed to comply' },
         ],
       })
     })
@@ -374,7 +375,7 @@ describe('ActivityService', () => {
       shouldReturnAppointment(observed, {
         notes: 'well known, unacceptable absence appointment',
         outcome: { attended: false, complied: false },
-        tags: [{ colour: 'red', name: 'unacceptable absence' }],
+        tags: [{ colour: GovUkUiTagColour.Red, name: 'unacceptable absence' }],
       })
     })
 
@@ -390,7 +391,7 @@ describe('ActivityService', () => {
       shouldReturnAppointment(observed, {
         notes: 'well known, acceptable absence appointment',
         outcome: { attended: false, complied: true },
-        tags: [{ colour: 'green', name: 'acceptable absence' }],
+        tags: [{ colour: GovUkUiTagColour.Green, name: 'acceptable absence' }],
       })
     })
 

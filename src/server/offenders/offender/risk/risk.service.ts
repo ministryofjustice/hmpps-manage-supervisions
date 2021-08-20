@@ -10,18 +10,19 @@ import {
 } from '../../../assess-risks-and-needs-api'
 import {
   FlatRiskToSelf,
-  RiskLevelMeta,
   RegistrationFlag,
   RiskLevel,
+  RiskLevelMeta,
+  RiskRegistrations,
   Risks,
   RoshRisk,
-  RiskRegistrations,
 } from './risk.types'
 import { ConfigService } from '@nestjs/config'
 import { Config, RiskConfig } from '../../../config'
 import { toList } from '../../../util'
 import { SanitisedAxiosError } from '../../../common/rest'
 import { DateTime } from 'luxon'
+import { GovUkUiTagColour } from '../../../util/govuk-ui'
 
 @Injectable()
 export class RiskService {
@@ -89,7 +90,6 @@ export class RiskService {
         filtered['true']
           ?.map<RegistrationFlag>(r => ({
             text: r.type.description,
-            class: `govuk-tag--${mapDeliusRegistrationColour(r.riskColour)}`,
             notes: r.notes,
             reviewDue: r.nextReviewDate && DateTime.fromISO(r.nextReviewDate),
             link: '#TODO',
@@ -150,24 +150,9 @@ function flattenRisks(
   return result
 }
 
-function mapDeliusRegistrationColour(deliusColour: string): string {
-  switch (deliusColour.toLowerCase()) {
-    case 'red':
-      return 'red'
-    case 'amber':
-      return 'orange'
-    case 'green':
-      return 'green'
-    case 'white':
-      return 'grey'
-    default:
-      return 'grey'
-  }
-}
-
 const KNOWN_RISK_LEVELS: Record<RiskLevel, RiskLevelMeta> = Object.freeze({
-  LOW: { class: 'govuk-tag--green', text: 'Low', index: 0 },
-  MEDIUM: { class: 'govuk-tag--yellow', text: 'Medium', index: 1 },
-  HIGH: { class: 'govuk-tag--red', text: 'High', index: 2 },
-  VERY_HIGH: { class: 'app-tag--dark-red', text: 'Very high', index: 3 },
+  LOW: { colour: GovUkUiTagColour.Green, text: 'Low', index: 0 },
+  MEDIUM: { colour: GovUkUiTagColour.Yellow, text: 'Medium', index: 1 },
+  HIGH: { colour: GovUkUiTagColour.Red, text: 'High', index: 2 },
+  VERY_HIGH: { colour: GovUkUiTagColour.DarkRed, text: 'Very high', index: 3 },
 })

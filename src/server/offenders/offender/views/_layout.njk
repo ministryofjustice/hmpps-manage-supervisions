@@ -8,13 +8,6 @@
         <span class="govuk-caption-l"><abbr title="Case reference number">CRN</abbr>: {{ ids.crn }}</span>
         {{ displayName }}
     </h1>
-
-    {% for registration in registrations.active %}
-        {% set flagHtml %}
-            <a href="#">{{ registration.text }}</a>
-        {% endset %}
-        {{ govukTag({ html: flagHtml, classes: 'app-tag--link govuk-!-margin-right-1 ' + registration.class, attributes: { 'data-qa': 'registration' } })}}
-    {% endfor %}
     
     {{ mojSubNavigation({
         attributes: { 'data-qa': 'offender/sub-nav' },

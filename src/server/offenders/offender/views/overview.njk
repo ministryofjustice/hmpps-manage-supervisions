@@ -67,8 +67,10 @@
                 </h2>
 
                 <p>
-                Risk of Serious Harm (ROSH)
-                <span class="govuk-tag {{ risks.community.level.class }} govuk-!-margin-left-2">{{ risks.community.level.text }}</span>
+                    Risk of Serious Harm (ROSH)
+                    <span class="govuk-tag {{ risks.community.level.colour | tagClassName }} govuk-!-margin-left-2">
+                        {{ risks.community.level.text }}
+                    </span>
                 </p>
 
                 {% set riskTable %}
@@ -84,7 +86,7 @@
                     <tr class="govuk-table__row">
                     <td class="govuk-table__cell">{{ risk.riskTo }}</td>
                     <td class="govuk-table__cell">
-                        <span class="govuk-tag {{ risk.meta.class }}">{{ risk.meta.text }}</span>
+                        <span class="govuk-tag {{ risk.meta.colour | tagClassName }}">{{ risk.meta.text }}</span>
                     </td>
                     </tr>
                     {% endfor %}

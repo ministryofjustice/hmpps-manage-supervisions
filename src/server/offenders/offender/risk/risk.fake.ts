@@ -10,10 +10,10 @@ import {
 import { fake, fakeEnum, fakeRandomArray } from '../../../util/util.fake'
 import * as faker from 'faker'
 import { DateTime } from 'luxon'
+import { GovUkUiTagColour } from '../../../util/govuk-ui'
 
 export const fakeRegistrationFlag = fake<RegistrationFlag>(() => ({
   text: faker.lorem.sentence(),
-  class: faker.datatype.uuid(),
   notes: faker.lorem.sentence(),
   link: faker.internet.url(),
   reviewDue: DateTime.fromJSDate(faker.date.past()).set({ hour: 0, minute: 0, second: 0, millisecond: 0 }),
@@ -25,7 +25,7 @@ export const fakeRiskRegistrations = fake<RiskRegistrations>(() => ({
 }))
 
 const fakeRiskLevelMeta = fake<RiskLevelMeta>(() => ({
-  class: 'app-tag--dark-red',
+  colour: fakeEnum(GovUkUiTagColour),
   text: faker.random.arrayElement(['LOW', 'MEDIUM', 'HIGH', 'VERY HIGH']),
   index: faker.datatype.number(),
 }))

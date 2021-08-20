@@ -124,14 +124,10 @@ describe('OffenderController', () => {
     const appointments = fakeRecentAppointments()
     scheduleService.getRecentAppointments.withArgs('some-crn').resolves(appointments)
 
-    const registrations = fakeRiskRegistrations()
-    riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
-
     const observed = await subject.getSchedule('some-crn')
     shouldReturnViewModel(observed, BreadcrumbType.CaseSchedule, {
       page: OffenderPage.Schedule,
       appointments,
-      registrations,
       appointmentBookingEnabled: featuresConfig[FeatureFlags.EnableAppointmentBooking],
     })
   })
@@ -151,9 +147,6 @@ describe('OffenderController', () => {
       .withArgs('some-crn', match({ contactTypes: [...appointmentContactTypes, ...communicationContactTypes] }))
       .resolves(contacts)
 
-    const registrations = fakeRiskRegistrations()
-    riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
-
     const observed = await subject.getActivity('some-crn')
     shouldReturnViewModel(observed, BreadcrumbType.CaseActivityLog, {
       page: OffenderPage.Activity,
@@ -162,7 +155,6 @@ describe('OffenderController', () => {
         page: contacts.number,
         size: contacts.size,
       },
-      registrations,
       filters: {
         'acceptable-absence-appointments': {
           description: 'Acceptable abscences',
@@ -194,9 +186,7 @@ describe('OffenderController', () => {
     havingOffenderSummary()
 
     const contacts = fakePaginated([fakeActivityLogEntry(), fakeActivityLogEntry()])
-    const registrations = fakeRiskRegistrations()
 
-    riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
     sentenceService.getConvictionId.withArgs('some-crn').resolves(1234)
     activityService.getActivityLogPage
       .withArgs('some-crn', match({ convictionId: 1234, filter: ActivityFilter.CompliedAppointments }))
@@ -210,7 +200,6 @@ describe('OffenderController', () => {
         page: contacts.number,
         size: contacts.size,
       },
-      registrations,
       filters: {
         'acceptable-absence-appointments': {
           description: 'Acceptable abscences',
@@ -253,16 +242,12 @@ describe('OffenderController', () => {
       .withArgs(offender, personalContacts, circumstances)
       .returns({ contactDetails, personalDetails })
 
-    const registrations = fakeRiskRegistrations()
-    riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
-
     const observed = await subject.getPersonal('some-crn')
 
     shouldReturnViewModel(observed, BreadcrumbType.PersonalDetails, {
       page: OffenderPage.Personal,
       contactDetails,
       personalDetails,
-      registrations,
     })
   })
 
@@ -272,15 +257,11 @@ describe('OffenderController', () => {
     const conviction = fakeConvictionDetails()
     sentenceService.getConvictionDetails.withArgs('some-crn').resolves(conviction)
 
-    const registrations = fakeRiskRegistrations()
-    riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
-
     const observed = await subject.getSentence('some-crn')
 
     shouldReturnViewModel(observed, BreadcrumbType.CaseSentence, {
       page: OffenderPage.Sentence,
       conviction,
-      registrations,
     })
   })
 
@@ -290,15 +271,11 @@ describe('OffenderController', () => {
     const compliance = fakeComplianceDetails()
     sentenceService.getSentenceComplianceDetails.withArgs('some-crn').resolves(compliance)
 
-    const registrations = fakeRiskRegistrations()
-    riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
-
     const observed = await subject.getCompliance('some-crn')
 
     shouldReturnViewModel(observed, BreadcrumbType.Compliance, {
       page: OffenderPage.Compliance,
       compliance,
-      registrations,
     })
   })
 

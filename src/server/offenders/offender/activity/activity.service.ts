@@ -26,6 +26,7 @@ import { BreadcrumbType, LinksService } from '../../../common/links'
 import { ConfigService } from '@nestjs/config'
 import { BreachService } from '../../../community-api/breach'
 import { Mutable } from '../../../@types/mutable'
+import { GovUkUiTagColour } from '../../../util/govuk-ui'
 
 export type GetContactsOptions = Omit<
   ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
@@ -35,22 +36,22 @@ export type GetContactsOptions = Omit<
 function getOutcomeFlags(outcome?: AppointmentOutcome): ActivityLogEntryTag[] {
   switch (outcome?.complied) {
     case true:
-      return [{ name: outcome.attended ? 'complied' : 'acceptable absence', colour: 'green' }]
+      return [{ name: outcome.attended ? 'complied' : 'acceptable absence', colour: GovUkUiTagColour.Green }]
     case false:
-      return [{ name: outcome.attended ? 'failed to comply' : 'unacceptable absence', colour: 'red' }]
+      return [{ name: outcome.attended ? 'failed to comply' : 'unacceptable absence', colour: GovUkUiTagColour.Red }]
     default:
       return []
   }
 }
 
 function getAppointmentFlags(contact: ContactSummary | AppointmentDetail): ActivityLogEntryTag[] {
-  const tags = []
+  const tags: ActivityLogEntryTag[] = []
   if (contact.sensitive) {
-    tags.push({ name: 'sensitive', colour: 'grey' })
+    tags.push({ name: 'sensitive', colour: GovUkUiTagColour.Grey })
   }
 
   if (contact.rarActivity) {
-    tags.push({ name: 'rar', colour: 'purple' })
+    tags.push({ name: 'rar', colour: GovUkUiTagColour.Purple })
   }
 
   return tags

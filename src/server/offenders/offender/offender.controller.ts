@@ -19,7 +19,7 @@ import { getDisplayName } from '../../util'
 import { SentenceService } from './sentence'
 import { ScheduleService } from './schedule'
 import { ActivityFilter, ActivityService, FilterLinks, GetContactsOptions } from './activity'
-import { RiskRegistrations, RiskService } from './risk'
+import { RiskService } from './risk'
 import { PersonalService } from './personal'
 import { Breadcrumb, BreadcrumbType, LinksService, ResolveBreadcrumbOptions } from '../../common/links'
 import { ConfigService } from '@nestjs/config'
@@ -83,12 +83,12 @@ export class OffenderController {
         this.personalService.getPersonalCircumstances(crn),
       ])
     return {
-      ...this.getBase(OffenderPage.Overview, offender, registrations),
-      page: OffenderPage.Overview,
+      ...this.getBase(OffenderPage.Overview, offender),
       ...this.personalService.getPersonalDetails(offender, personalContacts, personalCircumstances),
       conviction: conviction && { ...conviction, rar: conviction.requirements.find(x => x.isRar)?.name },
       appointmentSummary,
       risks,
+      registrations,
     }
   }
 
@@ -100,14 +100,12 @@ export class OffenderController {
     title: 'Schedule',
   })
   async getSchedule(@Param('crn') crn: string): Promise<OffenderScheduleViewModel> {
-    const [offender, appointments, registrations] = await Promise.all([
+    const [offender, appointments] = await Promise.all([
       this.offenderService.getOffenderSummary(crn),
       this.scheduleService.getRecentAppointments(crn),
-      this.riskService.getRiskRegistrations(crn),
     ])
     return {
-      ...this.getBase(OffenderPage.Schedule, offender, registrations),
-      page: OffenderPage.Schedule,
+      ...this.getBase(OffenderPage.Schedule, offender),
       appointments,
       appointmentBookingEnabled:
         this.config.get<ServerConfig>('server').features[FeatureFlags.EnableAppointmentBooking],
@@ -148,16 +146,14 @@ export class OffenderController {
     title: 'Personal details',
   })
   async getPersonal(@Param('crn') crn: string): Promise<OffenderPersonalViewModel> {
-    const [offender, registrations, personalContacts, personalCircumstances] = await Promise.all([
+    const [offender, personalContacts, personalCircumstances] = await Promise.all([
       this.offenderService.getOffenderDetail(crn),
-      this.riskService.getRiskRegistrations(crn),
       this.personalService.getPersonalContacts(crn),
       this.personalService.getPersonalCircumstances(crn),
     ])
     return {
-      ...this.getBase(OffenderPage.Personal, offender, registrations),
+      ...this.getBase(OffenderPage.Personal, offender),
       ...this.personalService.getPersonalDetails(offender, personalContacts, personalCircumstances),
-      page: OffenderPage.Personal,
     }
   }
 
@@ -169,14 +165,12 @@ export class OffenderController {
     title: 'Sentence',
   })
   async getSentence(@Param('crn') crn: string): Promise<OffenderSentenceViewModel> {
-    const [offender, conviction, registrations] = await Promise.all([
+    const [offender, conviction] = await Promise.all([
       this.offenderService.getOffenderSummary(crn),
       this.sentenceService.getConvictionDetails(crn),
-      this.riskService.getRiskRegistrations(crn),
     ])
     return {
-      ...this.getBase(OffenderPage.Sentence, offender, registrations),
-      page: OffenderPage.Sentence,
+      ...this.getBase(OffenderPage.Sentence, offender),
       conviction,
     }
   }
@@ -189,14 +183,12 @@ export class OffenderController {
     title: 'Compliance',
   })
   async getCompliance(@Param('crn') crn: string): Promise<OffenderComplianceViewModel> {
-    const [offender, compliance, registrations] = await Promise.all([
+    const [offender, compliance] = await Promise.all([
       this.offenderService.getOffenderSummary(crn),
       this.sentenceService.getSentenceComplianceDetails(crn),
-      this.riskService.getRiskRegistrations(crn),
     ])
     return {
-      ...this.getBase(OffenderPage.Compliance, offender, registrations),
-      page: OffenderPage.Compliance,
+      ...this.getBase(OffenderPage.Compliance, offender),
       compliance,
     }
   }
@@ -215,17 +207,13 @@ export class OffenderController {
       this.riskService.getRisks(crn),
     ])
     return {
-      ...this.getBase(OffenderPage.Risk, offender, registrations),
-      page: OffenderPage.Risk,
+      ...this.getBase(OffenderPage.Risk, offender),
       risks,
+      registrations,
     }
   }
 
-  private getBase(
-    page: OffenderPage,
-    offender: OffenderDetailSummary,
-    registrations: RiskRegistrations,
-  ): OffenderViewModelBase {
+  private getBase<Page extends OffenderPage>(page: Page, offender: OffenderDetailSummary): OffenderViewModelBase<Page> {
     const crn = offender.otherIds.crn
     const breadcrumbOptions: ResolveBreadcrumbOptions = { crn, offenderName: getDisplayName(offender) }
     return {
@@ -236,7 +224,6 @@ export class OffenderController {
       },
       displayName: getDisplayName(offender, { preferredName: true }),
       shortName: getDisplayName(offender, { middleNames: false, preferredName: false }),
-      registrations,
       breadcrumbs: this.linksService.resolveAll(getBreadcrumbType(page), breadcrumbOptions),
       links: {
         ...Object.values(OffenderPage).reduce(
@@ -256,13 +243,12 @@ export class OffenderController {
   }
 
   private async activityPageCommon(crn: string, options: GetContactsOptions): Promise<OffenderActivityViewModel> {
-    const [offender, contacts, registrations] = await Promise.all([
+    const [offender, contacts] = await Promise.all([
       this.offenderService.getOffenderSummary(crn),
       this.activityService.getActivityLogPage(crn, options),
-      this.riskService.getRiskRegistrations(crn),
     ])
     return {
-      ...this.getBase(OffenderPage.Activity, offender, registrations),
+      ...this.getBase(OffenderPage.Activity, offender),
       page: OffenderPage.Activity,
       contacts: contacts.content,
       pagination: {

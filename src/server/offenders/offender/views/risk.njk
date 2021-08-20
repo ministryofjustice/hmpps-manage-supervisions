@@ -37,7 +37,7 @@
                         key: { text: "Overall" },
                         value: { html: govukTag({
                             text: risks.community.level.text + ' risk of serious harm',
-                            classes: risks.community.level.class
+                            classes: risks.community.level.colour | tagClassName
                         }) if risks.community.level else 'No overall risk' }
                     },
                     {

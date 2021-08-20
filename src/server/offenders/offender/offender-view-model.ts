@@ -28,8 +28,8 @@ export interface OffenderLinks extends OffenderPageLinks {
   viewInactiveRegistrations: string
 }
 
-export interface OffenderViewModelBase extends ViewModel {
-  page: OffenderPage
+export interface OffenderViewModelBase<Page extends OffenderPage> extends ViewModel {
+  page: Page
   ids: {
     crn: string
     pnc?: string
@@ -37,24 +37,23 @@ export interface OffenderViewModelBase extends ViewModel {
   displayName: string
   shortName: string
   links: OffenderLinks
-  registrations: RiskRegistrations
 }
 
-export interface OffenderOverviewViewModel extends OffenderViewModelBase, GetPersonalDetailsResult {
-  page: OffenderPage.Overview
+export interface OffenderOverviewViewModel
+  extends OffenderViewModelBase<OffenderPage.Overview>,
+    GetPersonalDetailsResult {
   conviction?: ConvictionDetails & { rar?: string }
   appointmentSummary: AppointmentSummary
   risks: Risks
+  registrations: RiskRegistrations
 }
 
-export interface OffenderScheduleViewModel extends OffenderViewModelBase {
-  page: OffenderPage.Schedule
+export interface OffenderScheduleViewModel extends OffenderViewModelBase<OffenderPage.Schedule> {
   appointments: RecentAppointments
   appointmentBookingEnabled: boolean
 }
 
-export interface OffenderActivityViewModel extends OffenderViewModelBase {
-  page: OffenderPage.Activity
+export interface OffenderActivityViewModel extends OffenderViewModelBase<OffenderPage.Activity> {
   contacts: ActivityLogEntry[]
   pagination: {
     page?: number
@@ -65,23 +64,21 @@ export interface OffenderActivityViewModel extends OffenderViewModelBase {
   title: string
 }
 
-export interface OffenderPersonalViewModel extends OffenderViewModelBase, GetPersonalDetailsResult {
-  page: OffenderPage.Personal
-}
+export interface OffenderPersonalViewModel
+  extends OffenderViewModelBase<OffenderPage.Personal>,
+    GetPersonalDetailsResult {}
 
-export interface OffenderSentenceViewModel extends OffenderViewModelBase {
-  page: OffenderPage.Sentence
+export interface OffenderSentenceViewModel extends OffenderViewModelBase<OffenderPage.Sentence> {
   conviction?: ConvictionDetails
 }
 
-export interface OffenderComplianceViewModel extends OffenderViewModelBase {
-  page: OffenderPage.Compliance
+export interface OffenderComplianceViewModel extends OffenderViewModelBase<OffenderPage.Compliance> {
   compliance: ComplianceDetails
 }
 
-export interface OffenderRiskViewModel extends OffenderViewModelBase {
-  page: OffenderPage.Risk
+export interface OffenderRiskViewModel extends OffenderViewModelBase<OffenderPage.Risk> {
   risks: Risks
+  registrations: RiskRegistrations
 }
 
 export type OffenderViewModel =

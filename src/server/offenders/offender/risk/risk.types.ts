@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon'
+import { GovUkUiTagColour } from '../../../util/govuk-ui'
 
 export interface Risks {
   community: {
@@ -30,7 +31,7 @@ export interface RoshRisk {
 }
 
 export interface RiskLevelMeta {
-  class: string
+  colour: GovUkUiTagColour
   text: string
   index: number
 }
@@ -42,7 +43,6 @@ export interface RiskRegistrations {
 
 export interface RegistrationFlag {
   text: string
-  class: string
   notes?: string
   reviewDue?: DateTime
   link: string

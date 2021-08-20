@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 import { ContactTypeCategory } from '../../../config'
 import { ViewModel } from '../../../common'
 import { AppointmentRequirementDetail } from '../../../community-api/client'
+import { GovUkUiTagColour } from '../../../util/govuk-ui'
 
 export interface ActivityLogEntryLinks {
   view: string
@@ -10,7 +11,7 @@ export interface ActivityLogEntryLinks {
 
 export interface ActivityLogEntryTag {
   name: string
-  colour: 'red' | 'green' | 'purple' | 'grey'
+  colour: GovUkUiTagColour
 }
 
 export interface ActivityLogEntryBase<Links extends ActivityLogEntryLinks = ActivityLogEntryLinks> {
