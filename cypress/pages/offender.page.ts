@@ -1,5 +1,5 @@
 import { PageBase } from './page'
-import { SummaryList } from './components/summary-list'
+import { SummaryList, SummaryListCallback } from './components/summary-list'
 import { Table, TableCallback } from './components/Table'
 
 export type TABS = 'overview' | 'schedule' | 'activity' | 'personal' | 'sentence' | 'compliance' | 'risk'
@@ -21,36 +21,24 @@ export class OffenderPage extends PageBase {
 
   get overview() {
     return {
-      get mainOffence() {
-        return cy.get('[data-qa="offender/overview/main-offence"]')
+      schedule(callback: SummaryListCallback) {
+        SummaryList.selectFromCard('Schedule', callback)
       },
 
-      get additionalOffences() {
-        return cy.get('[data-qa="offender/overview/additional-offence"]')
+      personalDetails(callback: SummaryListCallback) {
+        SummaryList.selectFromCard('Personal details', callback)
       },
 
-      get sentence() {
-        return cy.get('[data-qa="offender/overview/sentence"]')
+      risk(callback: SummaryListCallback) {
+        SummaryList.selectFromCard('Risk', callback)
       },
 
-      progress(title: string) {
-        return cy.get(`dl[data-qa="offender/overview/progress"] dt`).contains(title).siblings('dd')
+      sentence(callback: SummaryListCallback) {
+        SummaryList.selectFromCard('Sentence', callback)
       },
 
-      get previousOrders() {
-        return cy.get('[data-qa="offender/overview/probation-history"] [data-qa="previous-orders"]')
-      },
-
-      get nextAppointment() {
-        return cy.get('[data-qa="offender/overview/next-appointment"]')
-      },
-
-      get appointmentAttendance() {
-        return cy.get('[data-qa="offender/overview/appointment-attendance"]')
-      },
-
-      get roshRisksSection() {
-        return cy.get('[data-qa="offender/overview/rosh-risks-section"]')
+      activityAndCompliance(callback: SummaryListCallback) {
+        SummaryList.selectFromCard('Activity and compliance', callback)
       },
     }
   }

@@ -202,6 +202,7 @@ describe('PersonalService', () => {
         sex: 'Male',
         genderIdentity: 'Prefer to self-describe',
         selfDescribedGender: 'Jedi',
+        genderSummary: 'Prefer to self-describe: Jedi',
         sexualOrientation: 'Bisexual',
       },
     } as GetPersonalDetailsResult)

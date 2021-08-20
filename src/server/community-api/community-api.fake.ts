@@ -142,7 +142,7 @@ export const fakeOffenderDetail = fake<OffenderDetail>((options, partial = {}) =
       fakePhoneNumber({ type: PhoneNumberType.Mobile }),
       fakePhoneNumber({ type: PhoneNumberType.Telephone }),
     ],
-    emailAddresses: partial.contactDetails?.emailAddresses || [faker.internet.email()],
+    emailAddresses: [faker.internet.email()],
   },
   offenderProfile: {
     offenderLanguages: {
@@ -155,7 +155,7 @@ export const fakeOffenderDetail = fake<OffenderDetail>((options, partial = {}) =
     sexualOrientation: 'Bisexual',
     religion: 'Christian',
   },
-  offenderAliases: partial.offenderAliases?.map(p => fakeOffenderAlias(p)) || [fakeOffenderAlias()],
+  offenderAliases: partial.offenderAliases?.map(fakeOffenderAlias) || [fakeOffenderAlias()],
   offenderManagers: [{ team: { code: faker.datatype.uuid() } }],
 }))
 

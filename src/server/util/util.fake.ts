@@ -1,4 +1,4 @@
-import { merge } from 'lodash'
+import { cloneDeep, merge, mergeWith } from 'lodash'
 import { ClassConstructor, ClassTransformOptions, plainToClass } from 'class-transformer'
 import { Settings } from 'luxon'
 import * as faker from 'faker'
@@ -12,14 +12,23 @@ export type FakeFn<Faked, Options = any> = (
   options?: Options,
 ) => Faked
 
-function mergePartials<Faked>(partials: DeepPartial<Faked>[]): DeepPartial<Faked> | null {
-  switch (partials.length) {
+/**
+ * The lodash merge function is too safe for merging partials, where we want all properties,
+ * including arrays to be strictly overridden.
+ */
+function mergePartials<T>(...items: T[]): T | null {
+  const truthyItems = items.filter(x => x)
+  switch (truthyItems.length) {
     case 0:
-      return null
+      return {} as T
     case 1:
-      return partials[0]
+      return truthyItems[0]
     default:
-      return merge(partials[0], ...partials.slice(1))
+      return mergeWith({} as T, ...truthyItems, (x, y) => {
+        if (Array.isArray(x)) {
+          return y || x
+        }
+      })
   }
 }
 
@@ -27,8 +36,17 @@ export function fake<Faked, Options = any>(
   factory: (options?: Options, partial?: DeepPartial<Faked>) => Faked,
 ): FakeFn<Faked, Options> {
   return (partialOrPartials, options) => {
-    const partial = Array.isArray(partialOrPartials) ? mergePartials(partialOrPartials) : partialOrPartials
-    return merge(factory(options || ({} as any), partial || {}), partial)
+    // passing the fake function by function reference in an array map will assign the array index to options
+    if (typeof options !== 'object') {
+      options = {} as any
+    }
+    const partial: DeepPartial<Faked> = Array.isArray(partialOrPartials)
+      ? mergePartials(...partialOrPartials)
+      : partialOrPartials
+      ? cloneDeep(partialOrPartials)
+      : {}
+    const fake = factory(options, partial)
+    return merge(fake, partial as Faked)
   }
 }
 

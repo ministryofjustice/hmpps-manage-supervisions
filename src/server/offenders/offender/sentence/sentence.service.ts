@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { Conviction, Sentence } from '../../../community-api/client'
 import { maxBy } from 'lodash'
 import { DateTime, DurationUnit } from 'luxon'
-import { getElapsed, quantity } from '../../../util'
+import { getElapsed, quantity, QuantityOptions } from '../../../util'
 import {
   ComplianceDetails,
   CompliancePeriod,
@@ -123,18 +123,23 @@ export class SentenceService {
       )
     }
 
-    function getAppointmentQuantity(filter: ActivityFilter, name: string, plural = true): ComplianceQuantity {
+    function getAppointmentQuantity(
+      filter: ActivityFilter,
+      name: string,
+      options: QuantityOptions = {},
+    ): ComplianceQuantity {
       const value = appointmentCounts[filter]
       if (value === 0) {
-        return { name: 'None' }
+        return { name: 'None', value }
       }
       return {
-        name: quantity(value, name, { plural }),
+        name: quantity(value, name, options),
+        value,
         link: `/offender/${crn}/activity/${filter}`,
       }
     }
 
-    function getStatus(): ComplianceDetails['current']['status'] {
+    function getCurrentStatus(): ComplianceDetails['current']['status'] {
       const value = currentSummary.inBreach
         ? ComplianceStatus.InBreach
         : appointmentCounts[ActivityFilter.FailedToComplyAppointments] >= current.sentence.failureToComplyLimit
@@ -165,8 +170,9 @@ export class SentenceService {
           value === ComplianceStatus.InBreach
             ? 'Breach in progress'
             : `${quantity(appointmentCounts[ActivityFilter.FailedToComplyAppointments], 'failure', {
-                alternativeZero: 'No',
+                zero: 'No',
               })} to comply ${compliancePeriod}`,
+        breachSuggested: value === ComplianceStatus.PendingBreach && !currentSummary.inBreach,
       }
     }
 
@@ -177,7 +183,10 @@ export class SentenceService {
             period: compliancePeriod,
             appointments: {
               total: getAppointmentQuantity(ActivityFilter.Appointments, 'appointment'),
-              complied: getAppointmentQuantity(ActivityFilter.CompliedAppointments, 'appointment', false),
+              complied: getAppointmentQuantity(ActivityFilter.CompliedAppointments, 'complied', {
+                plural: '',
+                zero: 'None',
+              }),
               acceptableAbsences: getAppointmentQuantity(
                 ActivityFilter.AcceptableAbsenceAppointments,
                 'acceptable absence',
@@ -187,12 +196,15 @@ export class SentenceService {
                 'unacceptable absence',
               ),
             },
-            status: getStatus(),
+            status: getCurrentStatus(),
             requirement: requirements.find(r => r.isRar)?.name,
           }
         : null,
-      previous: previousSummaries.filter(x => x),
-      previousFrom: from,
+      previous: {
+        convictions: previousSummaries.filter(x => x),
+        dateFrom: from,
+        totalBreaches: previousSummaries.reduce((agg, x) => agg + x.previousBreaches.length, 0),
+      },
     }
   }
 

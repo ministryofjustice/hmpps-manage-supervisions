@@ -13,14 +13,7 @@ export interface RecentAppointments {
   past: AppointmentListViewModel[]
 }
 
-export interface AppointmentSummary {
-  next: {
-    date: DateTime
-    name: string
-  } | null
-  attendance: {
-    complied: number
-    acceptableAbsence: number
-    failureToComply: number
-  }
+export interface NextAppointmentSummary {
+  date: DateTime
+  name: string
 }

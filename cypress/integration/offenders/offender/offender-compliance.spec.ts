@@ -138,7 +138,7 @@ context('ViewOffenderCompliance', () => {
         })
         .shouldRenderRequirement({
           total: '1 appointment',
-          complied: '1 appointment',
+          complied: '1 complied',
           ftc: 'None',
           absences: 'None',
         })
@@ -187,7 +187,7 @@ context('ViewOffenderCompliance', () => {
       .shouldRenderSentence({ breaches: 'None' })
       .shouldRenderRequirement({
         total: '6 appointments',
-        complied: '1 appointment',
+        complied: '1 complied',
         ftc: '2 unacceptable absences',
         absences: '3 acceptable absences',
       })
@@ -226,7 +226,7 @@ context('ViewOffenderCompliance', () => {
       .shouldRenderSentence({ breaches: 'None', breachesLabel: 'Previous breaches' })
       .shouldRenderRequirement({
         total: '6 appointments',
-        complied: '1 appointment',
+        complied: '1 complied',
         ftc: '2 unacceptable absences',
         absences: '3 acceptable absences',
       })
@@ -260,7 +260,7 @@ context('ViewOffenderCompliance', () => {
       .shouldRenderSentence({ breaches: 'Breach proven Resolved 3 December 2020' })
       .shouldRenderRequirement({
         total: '6 appointments',
-        complied: '1 appointment',
+        complied: '1 complied',
         ftc: '2 unacceptable absences',
         absences: '3 acceptable absences',
         sinceLastBreach: true,

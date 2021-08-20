@@ -72,21 +72,20 @@ export class OffenderController {
     title: options => options.offenderName,
   })
   async getOverview(@Param('crn') crn: string): Promise<OffenderOverviewViewModel> {
-    const [offender, conviction, appointmentSummary, risks, registrations, personalContacts, personalCircumstances] =
-      await Promise.all([
-        this.offenderService.getOffenderDetail(crn),
-        this.sentenceService.getConvictionDetails(crn),
-        this.scheduleService.getAppointmentSummary(crn),
-        this.riskService.getRisks(crn),
-        this.riskService.getRiskRegistrations(crn),
-        this.personalService.getPersonalContacts(crn),
-        this.personalService.getPersonalCircumstances(crn),
-      ])
+    const [offender, compliance, nextAppointment, risks, registrations, personalCircumstances] = await Promise.all([
+      this.offenderService.getOffenderDetail(crn),
+      this.sentenceService.getSentenceComplianceDetails(crn),
+      this.scheduleService.getNextAppointment(crn),
+      this.riskService.getRisks(crn),
+      this.riskService.getRiskRegistrations(crn),
+      this.personalService.getPersonalCircumstances(crn),
+    ])
     return {
       ...this.getBase(OffenderPage.Overview, offender),
-      ...this.personalService.getPersonalDetails(offender, personalContacts, personalCircumstances),
-      conviction: conviction && { ...conviction, rar: conviction.requirements.find(x => x.isRar)?.name },
-      appointmentSummary,
+      // We are not rendering personal contacts on the overview page so provide an empty array instead
+      ...this.personalService.getPersonalDetails(offender, [], personalCircumstances),
+      compliance,
+      nextAppointment,
       risks,
       registrations,
     }

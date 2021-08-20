@@ -1,6 +1,6 @@
 import { ActivityFilter, ActivityLogEntry } from './activity'
 import { ComplianceDetails, ConvictionDetails } from './sentence'
-import { AppointmentSummary, RecentAppointments } from './schedule'
+import { NextAppointmentSummary, RecentAppointments } from './schedule'
 import { RiskRegistrations, Risks } from './risk'
 import { GetPersonalDetailsResult } from './personal'
 import { ViewModel } from '../../common'
@@ -42,8 +42,8 @@ export interface OffenderViewModelBase<Page extends OffenderPage> extends ViewMo
 export interface OffenderOverviewViewModel
   extends OffenderViewModelBase<OffenderPage.Overview>,
     GetPersonalDetailsResult {
-  conviction?: ConvictionDetails & { rar?: string }
-  appointmentSummary: AppointmentSummary
+  compliance: ComplianceDetails
+  nextAppointment?: NextAppointmentSummary
   risks: Risks
   registrations: RiskRegistrations
 }

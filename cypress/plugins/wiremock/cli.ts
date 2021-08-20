@@ -52,6 +52,12 @@ const { argv } = yargs
     default: true,
     group: 'risk',
   })
+  .option('registrations', {
+    type: 'boolean',
+    description: 'stub the registrations',
+    default: true,
+    group: 'risk',
+  })
 
 type SeedOptions = ReferenceDataSeedOptions & OffenderSeedOptions & ContactSeedOptions
 
@@ -98,6 +104,10 @@ async function seed(args: CamelCased<typeof argv>) {
 
   if (args.rosh === false) {
     options.risks = null
+  }
+
+  if (args.registrations === false) {
+    options.registrations = []
   }
 
   const modules = [reset, referenceDataSeed(options), offenderSeed(options), contactsSeed(options)]

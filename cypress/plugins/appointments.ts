@@ -1,6 +1,7 @@
 import { AppointmentDetail } from '../../src/server/community-api/client'
 import { SeedFn } from './wiremock'
 import { fakeAppointmentDetail } from '../../src/server/community-api/community-api.fake'
+import { DateTime } from 'luxon'
 
 export const APPOINTMENTS: DeepPartial<AppointmentDetail>[] = [
   {
@@ -49,7 +50,15 @@ export function appointments(
 ): SeedFn {
   return context => {
     const appointments = partials.map(p => fakeAppointmentDetail(p))
-    context.client.community.get(`/secure/offenders/crn/${crn}/appointments`).returns(appointments)
+    context.client.community.get(`/secure/offenders/crn/${crn}/appointments`).priority(2).returns(appointments)
+
+    // HACK: any api request with a 'from' date is assumed to be from now
+    context.client.community
+      .get(`/secure/offenders/crn/${crn}/appointments`)
+      .queryMatches({ from: '.+' })
+      .priority(1)
+      .returns(appointments.filter(x => DateTime.fromISO(x.appointmentStart) >= DateTime.now()))
+
     context.client.community.post(`/secure/offenders/crn/${crn}/sentence/${convictionId}/appointments`).returns({
       appointmentId: 1,
     })

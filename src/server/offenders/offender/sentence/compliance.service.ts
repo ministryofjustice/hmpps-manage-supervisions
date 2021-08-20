@@ -41,7 +41,7 @@ export class ComplianceService {
       progress: elapsed?.elapsed,
       startDate: DateTime.fromISO(conviction.sentence.startDate),
       endDate: conviction.sentence.terminationDate && DateTime.fromISO(conviction.sentence.terminationDate),
-      length: quantity(conviction.sentence.originalLength, conviction.sentence.originalLengthUnits),
+      length: quantity(conviction.sentence.originalLength, conviction.sentence.originalLengthUnits.toLowerCase()),
       mainOffence: getOffenceName(conviction.offences.find(x => x.mainOffence)),
       terminationReason: conviction.sentence.terminationReason,
       // in theory there should never be a case where these two sources of inBreach do not agree but you never know

@@ -1,4 +1,9 @@
-import { trimEnd } from 'lodash'
+export interface QuantityOptions {
+  plural?: string
+  zero?: string
+  emitPlural?: boolean
+  overridePlural?: string
+}
 
 /**
  * Creates a very naive pluralisation of the specified value & units.
@@ -6,16 +11,13 @@ import { trimEnd } from 'lodash'
 export function quantity(
   value: number,
   units: string,
-  { plural = true, alternativeZero }: { plural?: boolean; alternativeZero?: string } = {},
+  { plural = 's', zero = '0', emitPlural = true, overridePlural }: QuantityOptions = {},
 ) {
-  const singular = trimEnd(units, 's').toLowerCase()
-
-  switch (value) {
-    case 0:
-      return `${alternativeZero || '0'} ${plural ? singular + 's' : singular}`
-    case 1:
-      return `${value} ${singular}`
-    default:
-      return `${value} ${plural ? singular + 's' : singular}`
+  const singular = units.toLowerCase().endsWith(plural) ? units.substr(0, units.length - plural.length) : units
+  if (value === 1) {
+    return `${value} ${singular}`
   }
+
+  const pluralValue = overridePlural || (emitPlural ? singular + plural : singular)
+  return value === 0 ? `${zero} ${pluralValue}` : `${value} ${pluralValue}`
 }

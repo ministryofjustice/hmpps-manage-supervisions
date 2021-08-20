@@ -41,10 +41,10 @@
         {% set otherAddresses %}
             <ul class="govuk-list">
                 {% if contactDetails.otherAddresses.current %}
-                    <li>{{ contactDetails.otherAddresses.current | quantity('other current address', 'other current addresses') }}</li>
+                    <li>{{ contactDetails.otherAddresses.current | quantity('other current address', { plural: 'es' }) }}</li>
                 {% endif %}
                 {% if contactDetails.otherAddresses.previous %}
-                    <li>{{ contactDetails.otherAddresses.previous | quantity('previous address', 'previous addresses') }}</li>
+                    <li>{{ contactDetails.otherAddresses.previous | quantity('previous address', { plural: 'es' }) }}</li>
                 {% endif %}
                 {% if not contactDetails.otherAddresses.current and not contactDetails.otherAddresses.previous %}
                     <li>No other addresses</li>

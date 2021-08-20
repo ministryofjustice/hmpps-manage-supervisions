@@ -131,6 +131,8 @@ describe('RiskService', () => {
             notes: { current: null, previous: null },
             value: null,
           },
+          current: true,
+          previous: true,
         },
       } as Risks)
       expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn' })
@@ -162,6 +164,8 @@ describe('RiskService', () => {
           custody: { notes: { current: null, previous: null }, value: null },
           harm: { notes: { current: null, previous: null }, value: null },
           vulnerability: { notes: { current: null, previous: null }, value: null },
+          current: false,
+          previous: false,
         },
       } as Risks)
     })

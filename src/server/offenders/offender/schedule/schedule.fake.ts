@@ -1,7 +1,7 @@
 import { fake } from '../../../util/util.fake'
 import { fakeAppointmentDetail, FakeAppointmentDetailOptions } from '../../../community-api/community-api.fake'
 import * as faker from 'faker'
-import { AppointmentListViewModel, AppointmentSummary, RecentAppointments } from './schedule.types'
+import { AppointmentListViewModel, NextAppointmentSummary, RecentAppointments } from './schedule.types'
 import { DateTime } from 'luxon'
 
 export const fakeAppointmentListViewModel = fake<AppointmentListViewModel, FakeAppointmentDetailOptions>(options => {
@@ -21,14 +21,7 @@ export const fakeRecentAppointments = fake<RecentAppointments>(() => ({
   future: [fakeAppointmentListViewModel({}, { when: 'future' })],
 }))
 
-export const fakeAppointmentSummary = fake<AppointmentSummary>(() => ({
-  next: {
-    date: DateTime.fromJSDate(faker.date.future()),
-    name: faker.company.bs(),
-  },
-  attendance: {
-    complied: faker.datatype.number(),
-    failureToComply: faker.datatype.number(),
-    acceptableAbsence: faker.datatype.number(),
-  },
+export const fakeNextAppointmentSummary = fake<NextAppointmentSummary>(() => ({
+  date: DateTime.fromJSDate(faker.date.future()),
+  name: faker.company.bs(),
 }))

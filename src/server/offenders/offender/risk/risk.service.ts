@@ -63,6 +63,7 @@ export class RiskService {
         natureOfRisk: summary?.natureOfRisk,
       },
       self: {
+        ...getSummaryRisks(riskToSelf),
         harm: flattenRisks({ selfHarm: 'self-harm', suicide: 'suicide' }, riskToSelf),
         custody: flattenRisks({ hostelSetting: 'in a hostel', custody: 'in custody' }, riskToSelf, 'about coping'),
         vulnerability: flattenRisks({ vulnerability: 'a vulnerability' }, riskToSelf),
@@ -98,6 +99,22 @@ export class RiskService {
       inactive: filtered['false']?.length || 0,
     }
   }
+}
+
+function getSummaryRisks(riskToSelf: RoshRiskToSelfDto): { current: boolean; previous: boolean } {
+  return Object.values(riskToSelf || {})
+    .filter(x => x)
+    .map(({ current, previous }) => ({
+      current: current === RiskDtoCurrent.Yes,
+      previous: previous === RiskDtoPrevious.Yes,
+    }))
+    .reduce(
+      (x, y) => ({
+        current: x.current || y.current,
+        previous: x.previous || y.previous,
+      }),
+      { current: false, previous: false },
+    )
 }
 
 function flattenRisks(
