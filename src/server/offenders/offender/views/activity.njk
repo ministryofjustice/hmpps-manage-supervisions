@@ -49,7 +49,7 @@
                     </span>
                         <br>
                         <a href="{{ contact.links.view }}">
-                            {{ contact.type | capitalize + ' – ' + contact.name }}
+                            {% if contact.type == 'communication' %} {{ contact.name }} {% else %} {{ contact.type | capitalize + ' – ' + contact.name }} {% endif %}
                         </a>
                     </h3>
 
