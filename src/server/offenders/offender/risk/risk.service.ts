@@ -13,6 +13,7 @@ import {
   RegistrationFlag,
   RiskLevel,
   RiskLevelMeta,
+  RiskRegistrationDetails,
   RiskRegistrations,
   Risks,
   RoshRisk,
@@ -76,7 +77,7 @@ export class RiskService {
     } = await this.community.risks.getOffenderRegistrationsByCrnUsingGET({ crn })
 
     if (!registrations || registrations.length === 0) {
-      return { active: [], inactive: 0 }
+      return { active: [], inactive: [] }
     }
 
     const { ignoredRegistrationTypes } = this.config.get<RiskConfig>('risk')
@@ -92,10 +93,46 @@ export class RiskService {
             text: r.type.description,
             notes: r.notes,
             reviewDue: r.nextReviewDate && DateTime.fromISO(r.nextReviewDate),
-            link: '#TODO',
+            link: `risk/${r.registrationId}`,
           }))
           .sort((a, b) => a.text.localeCompare(b.text)) || [],
-      inactive: filtered['false']?.length || 0,
+      inactive:
+        filtered['false']
+          ?.map<RegistrationFlag>(r => ({
+            text: r.type.description,
+            notes: r.deregisteringNotes,
+            endDate: r.endDate,
+            link: `removed-risk/${r.registrationId}`,
+          }))
+          .sort((a, b) => a.text.localeCompare(b.text)) || [],
+    }
+  }
+
+  async getRiskRegistrationDetails(crn: string, riskId: number): Promise<RiskRegistrationDetails> {
+    const {
+      data: { registrations },
+    } = await this.community.risks.getOffenderRegistrationsByCrnUsingGET({ crn })
+    const registration = registrations.find(r => r.registrationId == riskId)
+
+    return {
+      riskDescription: registration.type.description,
+      notes: registration.notes,
+      reviewDue: registration.nextReviewDate && DateTime.fromISO(registration.nextReviewDate),
+      reviewed: null,
+      reviewedBy: null,
+      added: DateTime.fromISO(registration.startDate),
+      addedBy: `${registration.registeringOfficer.forenames} ${registration.registeringOfficer.surname}`,
+      removed: registration.endDate && DateTime.fromISO(registration.endDate),
+      removedBy:
+        registration.deregisteringOfficer &&
+        `${registration.registeringOfficer.forenames} ${registration.registeringOfficer.surname}`,
+      removedNotes: registration.endDate && registration.deregisteringNotes,
+      typeInfo: {
+        purpose: '',
+        suggestedReviewFrequency: '',
+        termination: '',
+        furtherInformation: '',
+      },
     }
   }
 }

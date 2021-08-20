@@ -21,7 +21,7 @@ export const fakeRegistrationFlag = fake<RegistrationFlag>(() => ({
 
 export const fakeRiskRegistrations = fake<RiskRegistrations>(() => ({
   active: [fakeRegistrationFlag()],
-  inactive: faker.datatype.number(),
+  inactive: [fakeRegistrationFlag()],
 }))
 
 const fakeRiskLevelMeta = fake<RiskLevelMeta>(() => ({

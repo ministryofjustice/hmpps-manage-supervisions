@@ -237,7 +237,7 @@ export class OffenderController {
         disabilities: this.linksService.getUrl(BreadcrumbType.PersonalDisabilities, breadcrumbOptions),
         toDelius: `/offender/${crn}/to-delius`,
         toOASys: '#TODO',
-        viewInactiveRegistrations: '#TODO',
+        viewInactiveRegistrations: this.linksService.getUrl(BreadcrumbType.RemovedRisksList, breadcrumbOptions),
       },
     }
   }

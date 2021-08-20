@@ -38,7 +38,7 @@ export interface RiskLevelMeta {
 
 export interface RiskRegistrations {
   active: RegistrationFlag[]
-  inactive: number
+  inactive: RegistrationFlag[]
 }
 
 export interface RegistrationFlag {
@@ -51,4 +51,27 @@ export interface RegistrationFlag {
 export interface FlatRiskToSelf {
   value: string
   notes: { current?: string; previous?: string }
+}
+
+export interface RemovedRisksListViewModel {}
+
+export interface RiskDetailsViewModel {}
+
+export interface RiskRegistrationDetails {
+  riskDescription: string
+  notes: string
+  reviewDue?: DateTime
+  reviewed?: DateTime
+  reviewedBy: string
+  added: DateTime
+  addedBy: string
+  removed?: DateTime
+  removedBy?: string
+  removedNotes?: string
+  typeInfo: {
+    purpose: string
+    suggestedReviewFrequency: string
+    termination: string
+    furtherInformation: string
+  }
 }
