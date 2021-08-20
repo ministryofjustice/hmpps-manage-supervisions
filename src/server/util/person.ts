@@ -16,17 +16,18 @@ export interface NameLike {
   preferredName?: string
 }
 
-export interface PreferredNameLike extends NameLike {
-  preferredName?: string
-}
+export type GetDisplayNameOptions = Partial<Record<keyof NameLike, boolean>>
 
-export interface GetDisplayNameOptions {
-  preferredName?: boolean
-}
-
-export function getDisplayName(nameLike: NameLike | PreferredNameLike, options = { preferredName: false }): string {
-  const names = [nameLike.firstName, ...(nameLike.middleNames || []), nameLike.surname]
-  if (options.preferredName && nameLike.preferredName) {
+export function getDisplayName(
+  nameLike: NameLike,
+  { firstName = true, middleNames = true, surname = true, preferredName = false }: GetDisplayNameOptions = {},
+): string {
+  const names = [
+    firstName && nameLike.firstName,
+    ...((middleNames && nameLike.middleNames) || []),
+    surname && nameLike.surname,
+  ]
+  if (preferredName && nameLike.preferredName) {
     names.push(`(${nameLike.preferredName})`)
   }
   return names.filter(x => x).join(' ')
