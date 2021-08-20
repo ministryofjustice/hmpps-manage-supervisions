@@ -12,7 +12,7 @@ context('ViewOffenderPersonalDetails', () => {
       fixture
         .whenViewingOffender()
         .whenClickingSubNavTab('risk')
-        .shouldDisplayCommonHeader({ registrations: false })
+        .shouldDisplayCommonHeader()
         .shouldRenderOffenderTab('risk', page => {
           page.noRisksWarning.contains('There is no OASys risk assessment for Liz Haggis')
           page.noActiveRegistrations.contains('There are no current risk flags. Add risk flags in Delius.')

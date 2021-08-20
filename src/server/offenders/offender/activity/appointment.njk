@@ -11,7 +11,7 @@
         {% for tag in appointment.tags %}
             {{ govukTag({
                 text: tag.name,
-                classes: "govuk-tag--" + tag.colour,
+                classes: tag.colour | tagClassName,
                 attributes: { 'data-qa': 'tag' }
             }) }}
         {% endfor %}

@@ -14,6 +14,7 @@ import { fakeRegistration } from '../../../community-api/community-api.fake'
 import { FakeConfigModule } from '../../../config/config.fake'
 import { HttpStatus } from '@nestjs/common'
 import { DateTime } from 'luxon'
+import { GovUkUiTagColour } from '../../../util/govuk-ui'
 
 const IGNORED_REGISTRATION = 'some-ignored-registration-type'
 
@@ -89,23 +90,27 @@ describe('RiskService', () => {
 
       expect(observed).toEqual({
         community: {
-          level: { class: 'app-tag--dark-red', index: 3, text: 'Very high' },
+          level: { colour: GovUkUiTagColour.DarkRed, index: 3, text: 'Very high' },
           riskLevels: { HIGH: ['Public'], LOW: ['Known Adult'], VERY_HIGH: ['Children', 'Staff'] },
           risks: [
             {
               level: 'VERY_HIGH',
-              meta: { class: 'app-tag--dark-red', index: 3, text: 'Very high' },
+              meta: { colour: GovUkUiTagColour.DarkRed, index: 3, text: 'Very high' },
               riskTo: 'Children',
             },
-            { level: 'VERY_HIGH', meta: { class: 'app-tag--dark-red', index: 3, text: 'Very high' }, riskTo: 'Staff' },
+            {
+              level: 'VERY_HIGH',
+              meta: { colour: GovUkUiTagColour.DarkRed, index: 3, text: 'Very high' },
+              riskTo: 'Staff',
+            },
             {
               level: 'HIGH',
-              meta: { class: 'govuk-tag--red', index: 2, text: 'High' },
+              meta: { colour: GovUkUiTagColour.Red, index: 2, text: 'High' },
               riskTo: 'Public',
             },
             {
               level: 'LOW',
-              meta: { class: 'govuk-tag--green', index: 0, text: 'Low' },
+              meta: { colour: GovUkUiTagColour.Green, index: 0, text: 'Low' },
               riskTo: 'Known Adult',
             },
           ],
@@ -186,10 +191,9 @@ describe('RiskService', () => {
 
       expect(observed).toEqual({
         active: [
-          { text: 'Alpha', class: 'govuk-tag--orange', notes: null, link: '#TODO', reviewDue: null },
+          { text: 'Alpha', notes: null, link: '#TODO', reviewDue: null },
           {
             text: 'Beta',
-            class: 'govuk-tag--grey',
             notes: 'Some notes',
             link: '#TODO',
             reviewDue: DateTime.fromObject({ day: 2, month: 3, year: 2021 }),
