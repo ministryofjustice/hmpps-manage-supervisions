@@ -1,0 +1,78 @@
+{
+  "request": {
+    "method": "GET",
+    "headers": {},
+    "urlPath": "/community-api/secure/offenders/crn/X009923/registrations/79100"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "registrationId": 79100,
+      "offenderId": 55836,
+      "active": true,
+      "startDate": "2021-07-02",
+      "endDate": null,
+      "register": {
+        "code": "e6vgo",
+        "description": "Alerts"
+      },
+      "riskColour": "Amber",
+      "type": {
+        "code": "IIOM",
+        "description": "Integrated Offender Management"
+      },
+      "nextReviewDate": "2021-11-19",
+      "reviewPeriodMonths": 12,
+      "registeringTeam": {
+        "code": "u2599",
+        "description": "seize 24/365 blockchains"
+      },
+      "registeringOfficer": {
+        "code": "0bk8s",
+        "forenames": "Shanny",
+        "surname": "Stoltenberg",
+        "unallocated": false
+      },
+      "registeringProbationArea": {
+        "code": "2hv7u",
+        "description": "00242 Jenkins Squares"
+      },
+      "warnUser": false,
+      "numberOfPreviousDeregistrations": 0,
+      "notes": "Maiores nobis animi placeat id et.",
+      "registrationReviews": [
+        {
+          "reviewDate": "2021-11-19",
+          "completed": false,
+          "reviewingOfficer": {
+            "code": "ABC123",
+            "forenames": "Brian",
+            "surname": "Peashoots"
+          },
+          "reviewingTeam": {
+            "code": "N07UAT",
+            "description": "Unallocated Team"
+          }
+        },
+        {
+          "reviewDate": "2021-08-23",
+          "reviewDateDue": "2021-11-19",
+          "notes": "Well bad",
+          "completed": true,
+          "reviewingOfficer": {
+            "code": "ABC123",
+            "forenames": "Brian",
+            "surname": "Peashoots"
+          },
+          "reviewingTeam": {
+            "code": "N07UAT",
+            "description": "Unallocated Team"
+          }
+        }
+      ]
+    }
+  }
+}

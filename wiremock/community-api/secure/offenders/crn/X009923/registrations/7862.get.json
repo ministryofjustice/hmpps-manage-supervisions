@@ -1,0 +1,78 @@
+{
+  "request": {
+    "method": "GET",
+    "headers": {},
+    "urlPath": "/community-api/secure/offenders/crn/X009923/registrations/7862"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "registrationId": 7862,
+      "offenderId": 95616,
+      "active": true,
+      "startDate": "2021-07-02",
+      "endDate": null,
+      "register": {
+        "code": "ne3ag",
+        "description": "Alerts"
+      },
+      "riskColour": "Amber",
+      "type": {
+        "code": "STRG",
+        "description": "Street Gangs"
+      },
+      "nextReviewDate": "2021-11-19",
+      "reviewPeriodMonths": 3,
+      "registeringTeam": {
+        "code": "eoysp",
+        "description": "e-enable B2C action-items"
+      },
+      "registeringOfficer": {
+        "code": "2vyxe",
+        "forenames": "King",
+        "surname": "Prosacco",
+        "unallocated": false
+      },
+      "registeringProbationArea": {
+        "code": "ahxog",
+        "description": "114 Tamia Inlet"
+      },
+      "warnUser": false,
+      "numberOfPreviousDeregistrations": 0,
+      "notes": "Vero quo consequuntur ut non.",
+      "registrationReviews": [
+        {
+          "reviewDate": "2021-11-19",
+          "completed": false,
+          "reviewingOfficer": {
+            "code": "ABC123",
+            "forenames": "Brian",
+            "surname": "Peashoots"
+          },
+          "reviewingTeam": {
+            "code": "N07UAT",
+            "description": "Unallocated Team"
+          }
+        },
+        {
+          "reviewDate": "2021-08-23",
+          "reviewDateDue": "2021-11-19",
+          "notes": "Well bad",
+          "completed": true,
+          "reviewingOfficer": {
+            "code": "ABC123",
+            "forenames": "Brian",
+            "surname": "Peashoots"
+          },
+          "reviewingTeam": {
+            "code": "N07UAT",
+            "description": "Unallocated Team"
+          }
+        }
+      ]
+    }
+  }
+}

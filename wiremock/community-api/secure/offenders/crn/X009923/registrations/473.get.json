@@ -1,0 +1,78 @@
+{
+  "request": {
+    "method": "GET",
+    "headers": {},
+    "urlPath": "/community-api/secure/offenders/crn/X009923/registrations/473"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "registrationId": 473,
+      "offenderId": 44184,
+      "active": true,
+      "startDate": "2021-07-02",
+      "endDate": null,
+      "register": {
+        "code": "icu7q",
+        "description": "Alerts"
+      },
+      "riskColour": "Amber",
+      "type": {
+        "code": "UNK3",
+        "description": "Cuckooing – Potential Victim"
+      },
+      "nextReviewDate": "2021-11-19",
+      "reviewPeriodMonths": 6,
+      "registeringTeam": {
+        "code": "qi930",
+        "description": "seize clicks-and-mortar networks"
+      },
+      "registeringOfficer": {
+        "code": "ygbb3",
+        "forenames": "Rowland",
+        "surname": "Heaney",
+        "unallocated": false
+      },
+      "registeringProbationArea": {
+        "code": "bt1mg",
+        "description": "638 Raynor Knoll"
+      },
+      "warnUser": false,
+      "numberOfPreviousDeregistrations": 0,
+      "notes": "Quam iusto id harum est sint ut pariatur itaque.",
+      "registrationReviews": [
+        {
+          "reviewDate": "2021-11-19",
+          "completed": false,
+          "reviewingOfficer": {
+            "code": "ABC123",
+            "forenames": "Brian",
+            "surname": "Peashoots"
+          },
+          "reviewingTeam": {
+            "code": "N07UAT",
+            "description": "Unallocated Team"
+          }
+        },
+        {
+          "reviewDate": "2021-08-23",
+          "reviewDateDue": "2021-11-19",
+          "notes": "Well bad",
+          "completed": true,
+          "reviewingOfficer": {
+            "code": "ABC123",
+            "forenames": "Brian",
+            "surname": "Peashoots"
+          },
+          "reviewingTeam": {
+            "code": "N07UAT",
+            "description": "Unallocated Team"
+          }
+        }
+      ]
+    }
+  }
+}

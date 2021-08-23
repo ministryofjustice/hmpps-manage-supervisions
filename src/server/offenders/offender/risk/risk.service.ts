@@ -24,6 +24,7 @@ import { toList } from '../../../util'
 import { SanitisedAxiosError } from '../../../common/rest'
 import { DateTime } from 'luxon'
 import { GovUkUiTagColour } from '../../../util/govuk-ui'
+import { riskReferenceData } from './registration-reference-data'
 
 @Injectable()
 export class RiskService {
@@ -108,18 +109,22 @@ export class RiskService {
     }
   }
 
-  async getRiskRegistrationDetails(crn: string, riskId: number): Promise<RiskRegistrationDetails> {
-    const {
-      data: { registrations },
-    } = await this.community.risks.getOffenderRegistrationsByCrnUsingGET({ crn })
-    const registration = registrations.find(r => r.registrationId == riskId)
+  async getRiskRegistrationDetails(crn: string, registrationId: number): Promise<RiskRegistrationDetails> {
+    const { data: registration } = await this.community.risks.getOffenderRegistrationDetailsByCrnUsingGET({
+      crn,
+      registrationId,
+    })
+
+    const lastReview = registration?.registrationReviews
+      ?.sort((a, b) => (DateTime.fromISO(a.reviewDate) > DateTime.fromISO(b.reviewDate) ? 1 : -1))
+      .find(r => r.completed == true)
 
     return {
       riskDescription: registration.type.description,
       notes: registration.notes,
       reviewDue: registration.nextReviewDate && DateTime.fromISO(registration.nextReviewDate),
-      reviewed: null,
-      reviewedBy: null,
+      reviewed: lastReview ? DateTime.fromISO(lastReview.reviewDate) : null,
+      reviewedBy: lastReview ? `${lastReview.reviewingOfficer.forenames} ${lastReview.reviewingOfficer.surname}` : null,
       added: DateTime.fromISO(registration.startDate),
       addedBy: `${registration.registeringOfficer.forenames} ${registration.registeringOfficer.surname}`,
       removed: registration.endDate && DateTime.fromISO(registration.endDate),
@@ -127,12 +132,7 @@ export class RiskService {
         registration.deregisteringOfficer &&
         `${registration.registeringOfficer.forenames} ${registration.registeringOfficer.surname}`,
       removedNotes: registration.endDate && registration.deregisteringNotes,
-      typeInfo: {
-        purpose: '',
-        suggestedReviewFrequency: '',
-        termination: '',
-        furtherInformation: '',
-      },
+      typeInfo: riskReferenceData[registration.type.code],
     }
   }
 }

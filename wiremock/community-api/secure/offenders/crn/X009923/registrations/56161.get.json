@@ -1,0 +1,54 @@
+{
+  "request": {
+    "method": "GET",
+    "headers": {},
+    "urlPath": "/community-api/secure/offenders/crn/X009923/registrations/56161"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "registrationId": 56161,
+      "offenderId": 49403,
+      "active": false,
+      "startDate": "2021-03-17",
+      "endDate": "2021-07-22",
+      "register": {
+        "code": "8v8az",
+        "description": "Alerts"
+      },
+      "riskColour": "Amber",
+      "type": {
+        "code": "RVAD",
+        "description": "Safeguarding – Adult at Risk"
+      },
+      "nextReviewDate": "2022-03-04",
+      "reviewPeriodMonths": 3,
+      "registeringTeam": {
+        "code": "76jqv",
+        "description": "synergize frictionless content"
+      },
+      "registeringOfficer": {
+        "code": "0t1kt",
+        "forenames": "Stanton",
+        "surname": "Russel",
+        "unallocated": false
+      },
+      "registeringProbationArea": {
+        "code": "1r23d",
+        "description": "488 Erica Ridge"
+      },
+      "warnUser": false,
+      "numberOfPreviousDeregistrations": 0,
+      "notes": "Ut sed delectus.",
+      "deregisteringNotes": "No longer a risk",
+      "deregisteringOfficer": {
+        "code": "ABC123",
+        "forenames": "Brian",
+        "surname": "Peashoots"
+      }
+    }
+  }
+}

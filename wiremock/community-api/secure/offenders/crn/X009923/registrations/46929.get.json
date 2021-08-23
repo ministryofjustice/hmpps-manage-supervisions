@@ -1,0 +1,75 @@
+{
+  "request": {
+    "method": "GET",
+    "headers": {},
+    "urlPath": "/community-api/secure/offenders/crn/X009923/registrations/46929"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "registrationId": 46929,
+      "offenderId": 77219,
+      "active": false,
+      "startDate": "2020-11-14",
+      "endDate": "2021-08-10",
+      "register": {
+        "code": "raoz1",
+        "description": "Alerts"
+      },
+      "riskColour": "White",
+      "type": {
+        "code": "REG26",
+        "description": "Organised Crime"
+      },
+      "nextReviewDate": "2022-07-25",
+      "reviewPeriodMonths": 6,
+      "registeringTeam": {
+        "code": "3kqgb",
+        "description": "unleash bleeding-edge architectures"
+      },
+      "registeringOfficer": {
+        "code": "goqxt",
+        "forenames": "Doyle",
+        "surname": "Shields",
+        "unallocated": false
+      },
+      "registeringProbationArea": {
+        "code": "goimb",
+        "description": "37080 Nader Orchard"
+      },
+      "warnUser": false,
+      "numberOfPreviousDeregistrations": 0,
+      "notes": "Rem beatae voluptas deleniti.",
+      "deregisteringNotes": "No longer a risk",
+      "deregisteringOfficer": {
+        "code": "ABC123",
+        "forenames": "Brian",
+        "surname": "Peashoots"
+      },
+      "registrationReviews": [
+        {
+          "reviewDate": "2021-11-19",
+          "completed": false
+        },
+        {
+          "reviewDate": "2021-08-23",
+          "reviewDateDue": "2021-11-19",
+          "notes": "A review was performed",
+          "completed": true,
+          "reviewingOfficer": {
+            "code": "ABC123",
+            "forenames": "Brian",
+            "surname": "Peashoots"
+          },
+          "reviewingTeam": {
+            "code": "N07UAT",
+            "description": "Unallocated Team"
+          }
+        }
+      ]
+    }
+  }
+}

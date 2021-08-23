@@ -1,0 +1,78 @@
+{
+  "request": {
+    "method": "GET",
+    "headers": {},
+    "urlPath": "/community-api/secure/offenders/crn/X009923/registrations/87894"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "registrationId": 87894,
+      "offenderId": 55884,
+      "active": true,
+      "startDate": "2021-07-02",
+      "endDate": null,
+      "register": {
+        "code": "fo9dv",
+        "description": "Alerts"
+      },
+      "riskColour": "Amber",
+      "type": {
+        "code": "AV2S",
+        "description": "Risk to Staff"
+      },
+      "nextReviewDate": "2021-11-19",
+      "reviewPeriodMonths": 3,
+      "registeringTeam": {
+        "code": "ddx05",
+        "description": "synergize extensible synergies"
+      },
+      "registeringOfficer": {
+        "code": "5p3rp",
+        "forenames": "Cielo",
+        "surname": "Bogan",
+        "unallocated": false
+      },
+      "registeringProbationArea": {
+        "code": "qsh07",
+        "description": "5917 Torphy Pine"
+      },
+      "warnUser": false,
+      "numberOfPreviousDeregistrations": 0,
+      "notes": "Blanditiis eum laudantium qui.",
+      "registrationReviews": [
+        {
+          "reviewDate": "2021-11-19",
+          "completed": false,
+          "reviewingOfficer": {
+            "code": "ABC123",
+            "forenames": "Brian",
+            "surname": "Peashoots"
+          },
+          "reviewingTeam": {
+            "code": "N07UAT",
+            "description": "Unallocated Team"
+          }
+        },
+        {
+          "reviewDate": "2021-08-23",
+          "reviewDateDue": "2021-11-19",
+          "notes": "Well bad",
+          "completed": true,
+          "reviewingOfficer": {
+            "code": "ABC123",
+            "forenames": "Brian",
+            "surname": "Peashoots"
+          },
+          "reviewingTeam": {
+            "code": "N07UAT",
+            "description": "Unallocated Team"
+          }
+        }
+      ]
+    }
+  }
+}

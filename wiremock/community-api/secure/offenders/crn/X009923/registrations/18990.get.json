@@ -1,0 +1,78 @@
+{
+  "request": {
+    "method": "GET",
+    "headers": {},
+    "urlPath": "/community-api/secure/offenders/crn/X009923/registrations/18990"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "registrationId": 18990,
+      "offenderId": 7701,
+      "active": true,
+      "startDate": "2021-07-02",
+      "endDate": null,
+      "register": {
+        "code": "4cwyf",
+        "description": "Alerts"
+      },
+      "riskColour": "Amber",
+      "type": {
+        "code": "IKII",
+        "description": "Keep IICSA"
+      },
+      "nextReviewDate": "2021-11-19",
+      "reviewPeriodMonths": 12,
+      "registeringTeam": {
+        "code": "8f379",
+        "description": "seize B2B schemas"
+      },
+      "registeringOfficer": {
+        "code": "uvjrz",
+        "forenames": "Omari",
+        "surname": "West",
+        "unallocated": false
+      },
+      "registeringProbationArea": {
+        "code": "rbs33",
+        "description": "093 Gulgowski Lodge"
+      },
+      "warnUser": false,
+      "numberOfPreviousDeregistrations": 0,
+      "notes": "Soluta beatae ducimus officia repudiandae et a aut quidem.",
+      "registrationReviews": [
+        {
+          "reviewDate": "2021-11-19",
+          "completed": false,
+          "reviewingOfficer": {
+            "code": "ABC123",
+            "forenames": "Brian",
+            "surname": "Peashoots"
+          },
+          "reviewingTeam": {
+            "code": "N07UAT",
+            "description": "Unallocated Team"
+          }
+        },
+        {
+          "reviewDate": "2021-08-23",
+          "reviewDateDue": "2021-11-19",
+          "notes": "Well bad",
+          "completed": true,
+          "reviewingOfficer": {
+            "code": "ABC123",
+            "forenames": "Brian",
+            "surname": "Peashoots"
+          },
+          "reviewingTeam": {
+            "code": "N07UAT",
+            "description": "Unallocated Team"
+          }
+        }
+      ]
+    }
+  }
+}

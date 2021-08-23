@@ -35,15 +35,7 @@
 
 {% call appSummaryCard({
   titleText: "Before it was removed" if removed else "About this flag",
-  classes: 'govuk-!-margin-bottom-8 app-summary-card--large-title',
-  actions: {
-    items: [
-      {
-        href: "#",
-        text: "Remove this flag on Delius"
-      }
-    ]
-  } if not removed
+  classes: 'govuk-!-margin-bottom-8 app-summary-card--large-title'
 }) -%}
 {{ govukSummaryList({
     rows: [
@@ -53,15 +45,6 @@
         },
         value: {
           text: notes if notes else 'No notes'
-        },
-        actions: {
-          items: [
-            {
-              href: "#",
-              text: "Change",
-              visuallyHiddenText: "notes"
-            }
-          ]
         }
       },
       {
@@ -70,31 +53,15 @@
         },
         value: {
           text: reviewDue | shortDate if reviewDue else 'No review due'
-        },
-        actions: {
-          items: [
-            {
-              href: "#",
-              text: "Review risk flag"
-            }
-          ]
         }
-      } if not removed,
+      },
       {
         key: {
           text: "Most recent review"
         },
         value: {
           text: reviewed | shortDate + " by " + reviewedBy if reviewed else 'Not reviewed yet'
-        },
-        actions: {
-          items: [
-            {
-              href: "#",
-              text: "View review"
-            }
-          ]
-        } if mostRecentReviewDate
+        }
       },
       {
         key: {
@@ -108,37 +75,28 @@
   }) }}
 {%- endcall %}
 
+{% if typeInfo %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <h2 class="govuk-heading-l">Guidance using this risk flag</h2>
     <h3 class="govuk-heading-m">Purpose of use</h3>
 
-    <p>To identify offenders convicted under the Sexual Offences Act 2003 and therefore subject to the notification period and requirements of the Sex Offender Register.</p>
+    <p>{{typeInfo.purpose|safe}}</p>
 
     <h3 class="govuk-heading-m">Suggested review frequency</h3>
 
-    <p>Every 3 months</p>
+    {% if typeInfo.suggestedReviewFrequency %}
+    <p>Every {{typeInfo.suggestedReviewFrequency}} months</p>
+    {% endif %}
 
     <h3 class="govuk-heading-m">Termination</h3>
 
-    <p>Remove at termination, except for life sentences.</p>
+    <p>{{typeInfo.termination|safe}}</p>
 
     <h3 class="govuk-heading-m">Further information</h3>
 
-    <p>Notification Periods for offenders sentenced under the Sexual Offences Act 2003:</p>
-    <ul class="govuk-list govuk-list--bullet">
-      <li>Imprisonment for a fixed period of 30 months or more, Imprisonment for an indefinite period, imprisonment for public protection, or admission to hospital under restriction order, or subject to an Order for Lifelong Restriction: Indefinitely </li>
-      <li>Imprisonment for more than 6 months but less than 30 months: 10 years</li>
-      <li>Imprisonment for 6 months or less, or admission to hospital without restriction order: 7 years</li>
-      <li>Caution: 2 years</li>
-      <li>Conditional discharge or (in Scotland) a probation order: Period of discharge or probation</li>
-      <li>Any other: 5 years</li>
-      <li>Finite notification periods are halved if the person is under 18 when convicted or cautioned.</li>
-    </ul>
-
-    <p>If an offender is on the register for an indefinite period they can apply to the police area managing them to come off the register 15 years from their initial notification (if made upon release from prison) or first registration upon release from custody (in case they registered upon conviction).</p>
-
-    <p>(Also extended licences will impact on this as well and will render people to be placed on the register indefinitely – stated case is R v Wiles.)
+    <p>{{typeInfo.furtherInformation|safe}}</p>
   </div>
 </div>
+{% endif %}
 {% endblock %}
