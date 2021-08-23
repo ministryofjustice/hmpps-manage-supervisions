@@ -178,17 +178,17 @@ context('ViewOffenderActivity', () => {
           id: 6,
           date: 'Friday 4 September 2020',
           time: '11am',
-          name: 'Phone call from Offender',
-          notes: 'Phone call from Brian to double check when his next appointment was.',
+          name: 'Phone call from Liz Danger Haggis',
+          notes: 'Phone call from Liz to double check when his next appointment was.',
         })
 
         .shouldRenderActivity({
           id: 7,
           date: 'Friday 4 September 2020',
           time: '1pm',
-          name: 'Email/Text to Offender',
+          name: 'Email or text message to Liz Danger Haggis',
           notes:
-            'Hi Brian - it was good to speak today. To confirm, your next probation appointment is by telephone on 7th April 2021 at 10:00.',
+            'Hi Liz - it was good to speak today. To confirm, your next probation appointment is by telephone on 7th April 2021 at 10:00.',
         })
 
         .shouldRenderActivity({
@@ -205,6 +205,14 @@ context('ViewOffenderActivity', () => {
           time: '2pm',
           name: 'System generated unknown contact',
           notes: 'Unknown system generated contact',
+        })
+
+        .shouldRenderActivity({
+          id: 11,
+          date: 'Friday 4 September 2020',
+          time: '2pm',
+          name: 'CPS pack requested',
+          notes: 'CPS request',
         })
     })
 
@@ -239,20 +247,40 @@ context('ViewOffenderActivity', () => {
           page.outcome('Description').contains('Some outcome description')
         })
     })
-    it('displays communication detail ', () => {
+    it('displays phone call communication detail ', () => {
       fixture
         .whenViewingOffender()
         .whenClickingSubNavTab('activity')
         .whenClickingActivityEntry(6)
 
-        .shouldRenderCommunicationPage('Phone call from Offender', page => {
+        .shouldRenderCommunicationPage('Phone call from Liz Danger Haggis', page => {
+          page.detail('From').contains('Liz Danger Haggis')
+          page.detailShouldNotExist('To')
           page.detail('Date').contains('4 September 2020')
           page.detail('Time').contains('11am')
-          page.detail('Details').contains('Phone call from Brian to double check when his next appointment was.')
+          page.detail('Details').contains('Phone call from Liz to double check when his next appointment was.')
           page.getLastUpdated().contains('Last updated by Andy Smith on Friday 4 September 2020 at 11:20am')
         })
     })
+    it('displays email/text communication detail ', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('activity')
+        .whenClickingActivityEntry(7)
 
+        .shouldRenderCommunicationPage('Email or text message to Liz Danger Haggis', page => {
+          page.detail('To').contains('Liz Danger Haggis')
+          page.detailShouldNotExist('From')
+          page.detail('Date').contains('4 September 2020')
+          page.detail('Time').contains('1pm')
+          page
+            .detail('Details')
+            .contains(
+              'Hi Liz - it was good to speak today. To confirm, your next probation appointment is by telephone on 7th April 2021 at 10:00',
+            )
+          page.getLastUpdated().contains('Last updated by John Smith on Friday 4 September 2020 at 2:20pm')
+        })
+    })
     it('displays activity log filtered to display failure to complies', () => {
       fixture
         .whenViewingOffender()

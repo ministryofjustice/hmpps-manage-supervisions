@@ -76,14 +76,125 @@ export const CONTACT_DEFAULTS: WellKnownContactTypeConfig = {
     [WellKnownAppointmentType.PhoneCall]: { name: 'Phone call', codes: { nonRar: 'COPT' } },
   },
   communication: {
-    [WellKnownCommunicationType.EmailTextToOffender]: { name: 'Email/Text to Offender', code: 'CMOB' },
-    [WellKnownCommunicationType.EmailTextFromOffender]: { name: 'Email/Text from Offender', code: 'CMOA' },
-    [WellKnownCommunicationType.EmailTextToOther]: { name: 'Email/Text to Other', code: 'CM3B' },
-    [WellKnownCommunicationType.EmailTextFromOther]: { name: 'Email/Text from Other', code: 'CM3A' },
-    [WellKnownCommunicationType.PhoneCallToOffender]: { name: 'Phone call to Offender', code: 'CTOB' },
-    [WellKnownCommunicationType.PhoneCallFromOffender]: { name: 'Phone call from Offender', code: 'CTOA' },
-    [WellKnownCommunicationType.PhoneCallToOther]: { name: 'Phone call to Other', code: 'CT3B' },
-    [WellKnownCommunicationType.PhoneCallFromOther]: { name: 'Phone call from Other', code: 'CT3A' },
+    [WellKnownCommunicationType.EmailTextToOffender]: {
+      name: 'Email/Text to Offender',
+      code: 'CMOB',
+      to: '{}',
+      description: 'Email or text message to {}',
+    },
+    [WellKnownCommunicationType.EmailTextFromOffender]: {
+      name: 'Email/Text from Offender',
+      code: 'CMOA',
+      from: '{}',
+      description: 'Email or text message from {}',
+    },
+    [WellKnownCommunicationType.EmailTextToOther]: {
+      name: 'Email/Text to Other',
+      code: 'CM3B',
+      description: 'Email or text message from a third party',
+    },
+    [WellKnownCommunicationType.EmailTextFromOther]: {
+      name: 'Email/Text from Other',
+      code: 'CM3A',
+      description: 'Email or text message to a third party',
+    },
+    [WellKnownCommunicationType.PhoneCallToOffender]: {
+      name: 'Phone call to Offender',
+      code: 'CTOB',
+      to: '{}',
+      description: 'Phone call to {}',
+    },
+    [WellKnownCommunicationType.PhoneCallFromOffender]: {
+      name: 'Phone call from Offender',
+      code: 'CTOA',
+      from: '{}',
+      description: 'Phone call from {}',
+    },
+    [WellKnownCommunicationType.PhoneCallToOther]: {
+      name: 'Phone call to Other',
+      code: 'CT3B',
+      description: 'Phone call to a third party',
+    },
+    [WellKnownCommunicationType.PhoneCallFromOther]: {
+      name: 'Phone call from Other',
+      code: 'CT3A',
+      description: 'Phone call from a third party',
+    },
+    [WellKnownCommunicationType.CpsPackageRequested]: {
+      name: 'CPS Package Request',
+      code: 'CMRQ',
+      description: 'CPS pack requested',
+    },
+    [WellKnownCommunicationType.InformationFromThirdParty]: {
+      name: 'Information - from 3rd Party',
+      code: 'CI3A',
+      description: 'Information from a third party',
+    },
+    [WellKnownCommunicationType.InformationFromOffender]: {
+      name: 'Information - from Offender',
+      code: 'CIOA',
+      from: '{}',
+      description: 'Information from {}',
+    },
+    [WellKnownCommunicationType.InformationFromExternalAgency]: {
+      name: 'Information - from External Agency',
+      code: 'CIEA',
+      description: 'Information from a third party',
+    },
+    [WellKnownCommunicationType.InformationOther]: {
+      name: 'Information - Other',
+      code: 'CIZZ',
+      description: 'Information from a third party',
+    },
+    [WellKnownCommunicationType.InformationToThirdParty]: {
+      name: 'Information - to 3rd Party',
+      code: 'CI3B',
+      description: 'Information sent to a third party',
+    },
+    [WellKnownCommunicationType.InformationToExternalAgency]: {
+      name: 'Information - to External Agency',
+      code: 'CIEB',
+      description: 'Information sent to a third party',
+    },
+    [WellKnownCommunicationType.InformationToOffender]: {
+      name: 'Information - to Offender',
+      code: 'CIOB',
+      to: '{}',
+      description: 'Information sent to {}',
+    },
+    [WellKnownCommunicationType.InformationDocumentsRequested]: {
+      name: 'Information / Documents Requested',
+      code: 'C325',
+      from: '{}',
+      description: 'Information requested from {}',
+    },
+    [WellKnownCommunicationType.InternalCommunications]: {
+      name: 'Internal Communications',
+      code: 'C326',
+      description: 'Communication with staff',
+    },
+    [WellKnownCommunicationType.LetterFaxFromOffender]: {
+      name: 'Letter/Fax from Offender',
+      code: 'CLOA',
+      from: '{}',
+      description: 'Letter from {}',
+    },
+    [WellKnownCommunicationType.LetterFaxToOffender]: {
+      name: 'Letter/Fax to Offender',
+      code: 'CLOB',
+      to: '{}',
+      description: 'Letter to {}',
+    },
+    [WellKnownCommunicationType.LetterFaxFromOther]: {
+      name: 'Letter/Fax from Other',
+      code: 'CL3A',
+      description: 'Letter from a third party',
+    },
+    [WellKnownCommunicationType.LetterFaxToOther]: {
+      name: 'Letter/Fax to Other',
+      code: 'CL3B',
+      description: 'Letter to a third party',
+    },
   },
   warningLetter: {
     [WellKnownWarningLetterType.First]: 'AWLI',
@@ -144,6 +255,9 @@ export function configFactory(): Config {
         [type]: {
           name: string(`${key}_NAME`, fallback(defaults.name)).trim(),
           code: string(`${key}_CODE`, fallback(defaults.code)).toUpperCase().trim(),
+          from: string(`${key}_FROM`, fallback(defaults.from))?.trim(),
+          to: string(`${key}_CODE`, fallback(defaults.to))?.trim(),
+          description: string(`${key}_DESCRIPTION`, fallback(defaults.description))?.trim(),
         } as WellKnownContactTypeMeta,
       }
     })

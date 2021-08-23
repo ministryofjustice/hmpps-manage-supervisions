@@ -243,10 +243,9 @@ export class OffenderController {
   }
 
   private async activityPageCommon(crn: string, options: GetContactsOptions): Promise<OffenderActivityViewModel> {
-    const [offender, contacts] = await Promise.all([
-      this.offenderService.getOffenderSummary(crn),
-      this.activityService.getActivityLogPage(crn, options),
-    ])
+    const offender = await this.offenderService.getOffenderSummary(crn)
+    const displayName = getDisplayName(offender)
+    const [contacts] = await Promise.all([this.activityService.getActivityLogPage(crn, displayName, options)])
     return {
       ...this.getBase(OffenderPage.Activity, offender),
       page: OffenderPage.Activity,

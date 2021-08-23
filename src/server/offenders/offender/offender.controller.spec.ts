@@ -31,6 +31,7 @@ import { ConfigService } from '@nestjs/config'
 import { FakeConfigModule } from '../../config/config.fake'
 import { ContactTypesService } from '../../community-api'
 import { FeatureFlags } from '../../config'
+import { getDisplayName } from '../../util'
 
 describe('OffenderController', () => {
   let subject: OffenderController
@@ -133,7 +134,8 @@ describe('OffenderController', () => {
   })
 
   it('gets activity', async () => {
-    havingOffenderSummary()
+    const offender = havingOffenderSummary()
+    const displayName = getDisplayName(offender)
 
     const appointmentContactTypes = [fakeAppointmentType().contactType, fakeAppointmentType().contactType]
     const communicationContactTypes = [fakeAppointmentType().contactType, fakeAppointmentType().contactType]
@@ -144,7 +146,11 @@ describe('OffenderController', () => {
     const contacts = fakePaginated([fakeActivityLogEntry(), fakeActivityLogEntry()])
 
     activityService.getActivityLogPage
-      .withArgs('some-crn', match({ contactTypes: [...appointmentContactTypes, ...communicationContactTypes] }))
+      .withArgs(
+        'some-crn',
+        displayName,
+        match({ contactTypes: [...appointmentContactTypes, ...communicationContactTypes] }),
+      )
       .resolves(contacts)
 
     const observed = await subject.getActivity('some-crn')
@@ -183,13 +189,13 @@ describe('OffenderController', () => {
   })
 
   it('gets filtered activity list', async () => {
-    havingOffenderSummary()
-
+    const offender = havingOffenderSummary()
+    const displayName = getDisplayName(offender)
     const contacts = fakePaginated([fakeActivityLogEntry(), fakeActivityLogEntry()])
 
     sentenceService.getConvictionId.withArgs('some-crn').resolves(1234)
     activityService.getActivityLogPage
-      .withArgs('some-crn', match({ convictionId: 1234, filter: ActivityFilter.CompliedAppointments }))
+      .withArgs('some-crn', displayName, match({ convictionId: 1234, filter: ActivityFilter.CompliedAppointments }))
       .resolves(contacts)
 
     const observed = await subject.getActivityFiltered('some-crn', ActivityFilter.CompliedAppointments)

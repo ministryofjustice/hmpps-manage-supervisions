@@ -44,6 +44,8 @@ export interface CommunicationActivityLogEntry extends ActivityLogEntryBase {
   type: ContactTypeCategory.Communication
   lastUpdatedDateTime: DateTime
   lastUpdatedBy: string
+  from?: string
+  to?: string
 }
 
 export interface UnknownActivityLogEntry extends ActivityLogEntryBase<null> {

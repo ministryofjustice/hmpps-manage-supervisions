@@ -6,11 +6,12 @@ import {
   ContactSummary,
 } from '../../../community-api/client'
 import {
+  CommunicationMetaResult,
   CommunityApiService,
-  Paginated,
+  ContactMappingService,
   GetMetaResult,
   isAppointment,
-  ContactMappingService,
+  Paginated,
 } from '../../../community-api'
 import {
   ActivityFilter,
@@ -67,7 +68,11 @@ export class ActivityService {
     private readonly breach: BreachService,
   ) {}
 
-  async getActivityLogPage(crn: string, options: GetContactsOptions = {}): Promise<Paginated<ActivityLogEntry>> {
+  async getActivityLogPage(
+    crn: string,
+    offenderName: string,
+    options: GetContactsOptions = {},
+  ): Promise<Paginated<ActivityLogEntry>> {
     const resolvedOptions = await this.constructContactFilter(crn, options)
     const { data } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET(resolvedOptions)
 
@@ -78,7 +83,9 @@ export class ActivityService {
       number: data.number,
       size: data.size,
       totalElements: data.totalElements,
-      content: await Promise.all((data.content || []).map(contact => this.getActivityLogEntry(crn, contact))),
+      content: await Promise.all(
+        (data.content || []).map(contact => this.getActivityLogEntry(crn, contact, offenderName)),
+      ),
     }
   }
 
@@ -111,17 +118,25 @@ export class ActivityService {
     return this.getAppointmentActivityLogEntry(crn, appointment, meta)
   }
 
-  async getCommunicationContact(crn: string, contactId: number): Promise<CommunicationActivityLogEntry> {
+  async getCommunicationContact(
+    crn: string,
+    contactId: number,
+    offenderName: string,
+  ): Promise<CommunicationActivityLogEntry> {
     const { data: contact } = await this.community.contactAndAttendance.getOffenderContactSummaryByCrnUsingGET({
       crn,
       contactId,
     })
     const meta = await this.contacts.getTypeMeta(contact)
     const base = ActivityService.getActivityLogEntryBase(contact)
-    return ActivityService.getCommunicationActivityLogEntry(crn, contact, meta, base)
+    return ActivityService.getCommunicationActivityLogEntry(crn, contact, meta, base, offenderName)
   }
 
-  private async getActivityLogEntry(crn: string, contact: ContactSummary): Promise<ActivityLogEntry> {
+  private async getActivityLogEntry(
+    crn: string,
+    contact: ContactSummary,
+    offenderName: string,
+  ): Promise<ActivityLogEntry> {
     const meta = await this.contacts.getTypeMeta(contact)
 
     if (isAppointment(meta)) {
@@ -133,7 +148,7 @@ export class ActivityService {
 
     if (meta.type === ContactTypeCategory.Communication) {
       // is a communication type (either known, or in the CAPI Communication category)
-      return ActivityService.getCommunicationActivityLogEntry(crn, contact, meta, base)
+      return ActivityService.getCommunicationActivityLogEntry(crn, contact, meta, base, offenderName)
     }
 
     // is unknown contact
@@ -206,12 +221,15 @@ export class ActivityService {
     contact: ContactSummary,
     meta: GetMetaResult,
     base: Pick<ActivityLogEntryBase, 'id' | 'start' | 'notes' | 'sensitive'>,
+    offenderName: string,
   ): CommunicationActivityLogEntry {
     return {
       ...base,
       type: ContactTypeCategory.Communication,
       category: 'Other communication',
-      name: meta.name,
+      name: (meta as CommunicationMetaResult).value.description
+        ? (meta as CommunicationMetaResult).value.description.replace('{}', offenderName)
+        : meta.name,
       typeName: meta.value.name,
       tags: [],
       links: {
@@ -220,6 +238,8 @@ export class ActivityService {
       },
       lastUpdatedDateTime: DateTime.fromISO(contact.lastUpdatedDateTime),
       lastUpdatedBy: `${contact.lastUpdatedByUser.forenames} ${contact.lastUpdatedByUser.surname}`,
+      from: (meta as CommunicationMetaResult).value?.from?.replace('{}', offenderName),
+      to: (meta as CommunicationMetaResult).value?.to?.replace('{}', offenderName),
     }
   }
 

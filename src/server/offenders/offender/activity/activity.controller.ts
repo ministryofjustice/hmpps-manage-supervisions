@@ -52,11 +52,9 @@ export class ActivityController {
     @Param('crn') crn: string,
     @Param('id', ParseIntPipe) id: number,
   ): Promise<CommunicationViewModel> {
-    const [offender, contact] = await Promise.all([
-      this.offender.getOffenderSummary(crn),
-      this.activity.getCommunicationContact(crn, id),
-    ])
+    const offender = await this.offender.getOffenderSummary(crn)
     const displayName = getDisplayName(offender)
+    const contact = await this.activity.getCommunicationContact(crn, id, displayName)
     return {
       displayName,
       contact,

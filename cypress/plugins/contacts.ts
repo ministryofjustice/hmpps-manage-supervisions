@@ -68,7 +68,7 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     type: { code: 'CTOA', description: 'Phone Contact from Offender', appointment: false },
     contactStart: '2020-09-04T11:00:00+01:00',
     contactEnd: '2020-09-04T00:00:00+01:00',
-    notes: 'Phone call from Brian to double check when his next appointment was.',
+    notes: 'Phone call from Liz to double check when his next appointment was.',
     outcome: null,
     lastUpdatedDateTime: '2020-09-04T11:20:23+01:00',
     lastUpdatedByUser: { forenames: `Andy`, surname: `Smith` },
@@ -79,7 +79,7 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     contactStart: '2020-09-04T13:00:00+01:00',
     contactEnd: '2020-09-04T00:00:00+01:00',
     notes:
-      'Hi Brian - it was good to speak today. To confirm, your next probation appointment is by telephone on 7th April 2021 at 10:00.',
+      'Hi Liz - it was good to speak today. To confirm, your next probation appointment is by telephone on 7th April 2021 at 10:00.',
     outcome: null,
     lastUpdatedDateTime: '2020-09-04T14:20:23+01:00',
     lastUpdatedByUser: { forenames: `John`, surname: `Smith` },
@@ -122,6 +122,20 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     contactStart: '2019-05-05T00:00:00+01:00',
     contactEnd: '2019-05-05T00:00:00+01:00',
     outcome: null,
+  },
+  {
+    contactId: 11,
+    type: {
+      code: 'CMRQ',
+      description: 'CPS Package Request',
+      appointment: false,
+    },
+    contactStart: '2020-09-04T14:00:00+01:00',
+    contactEnd: '2020-09-04T00:00:00+01:00',
+    outcome: null,
+    notes: 'CPS request',
+    lastUpdatedDateTime: '2020-09-04T15:20:23+01:00',
+    lastUpdatedByUser: { forenames: `John`, surname: `Rover` },
   },
 ]
 

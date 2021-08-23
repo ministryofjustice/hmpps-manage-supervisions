@@ -115,11 +115,28 @@ export enum WellKnownCommunicationType {
   PhoneCallFromOffender = 'phone-call-from-offender',
   PhoneCallToOther = 'phone-call-to-other',
   PhoneCallFromOther = 'phone-call-from-other',
+  CpsPackageRequested = 'cps-package-requested',
+  InformationFromThirdParty = 'information-from-third-party',
+  InformationToThirdParty = 'information-to-third-party',
+  InformationFromOffender = 'information-from-offender',
+  InformationFromExternalAgency = 'information-from-external-agency',
+  InformationToExternalAgency = 'information-to-external-agency',
+  InformationToOffender = 'information-to-offender',
+  InformationOther = 'information-from-other',
+  InformationDocumentsRequested = 'information-documents-requested',
+  InternalCommunications = 'internal-communications',
+  LetterFaxFromOffender = 'letter-fax-from offender',
+  LetterFaxToOther = 'letter-fax-to-other',
+  LetterFaxFromOther = 'letter-fax-from-other',
+  LetterFaxToOffender = 'letter-fax-from-offender',
 }
 
 export interface WellKnownContactTypeMeta {
   name: string
   code: string
+  from?: string
+  to?: string
+  description?: string
 }
 
 export interface WellKnownBreachEndContactTypeMeta extends WellKnownContactTypeMeta {
