@@ -63,7 +63,7 @@ export interface CommunicationViewModel extends ViewModel {
   contact: CommunicationActivityLogEntry
 }
 
-export enum ActivityFilter {
+export enum ActivityComplianceFilter {
   Appointments = 'appointments',
   CompliedAppointments = 'complied-appointments',
   FailedToComplyAppointments = 'failed-to-comply-appointments',
@@ -72,14 +72,17 @@ export enum ActivityFilter {
 }
 
 export const FilterLinks: { [key: string]: ActivityFilterMeta } = {
-  [ActivityFilter.Appointments]: { name: 'Appointments', description: 'Appointments' },
-  [ActivityFilter.CompliedAppointments]: { name: 'Complied', description: 'Complied appointments' },
-  [ActivityFilter.FailedToComplyAppointments]: {
+  [ActivityComplianceFilter.Appointments]: { name: 'Appointments', description: 'Appointments' },
+  [ActivityComplianceFilter.CompliedAppointments]: { name: 'Complied', description: 'Complied appointments' },
+  [ActivityComplianceFilter.FailedToComplyAppointments]: {
     name: 'Failures to comply',
     description: 'Failures to comply within 12 months',
   },
-  [ActivityFilter.AcceptableAbsenceAppointments]: { name: 'Acceptable absences', description: 'Acceptable abscences' },
-  [ActivityFilter.WarningLetters]: { name: 'Warning letters', description: 'Warning letters' },
+  [ActivityComplianceFilter.AcceptableAbsenceAppointments]: {
+    name: 'Acceptable absences',
+    description: 'Acceptable abscences',
+  },
+  [ActivityComplianceFilter.WarningLetters]: { name: 'Warning letters', description: 'Warning letters' },
 }
 
 export interface ActivityFilterMeta {
