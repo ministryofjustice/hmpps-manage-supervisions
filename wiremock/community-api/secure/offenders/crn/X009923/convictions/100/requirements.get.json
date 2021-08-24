@@ -18,7 +18,7 @@
           "active": false,
           "startDate": "2018-08-01",
           "expectedStartDate": "2019-04-03",
-          "expectedEndDate": "2021-10-20",
+          "expectedEndDate": "2022-04-21",
           "requirementNotes": "Some inactive unpaid work requirement",
           "requirementTypeMainCategory": {
             "code": "W",
@@ -35,7 +35,7 @@
           }
         },
         {
-          "requirementId": 10449,
+          "requirementId": 70813,
           "length": 18,
           "lengthUnit": "Hours",
           "active": true,
@@ -54,13 +54,13 @@
           "createdDatetime": "2019-04-08T14:48:17"
         },
         {
-          "requirementId": 30341,
+          "requirementId": 15106,
           "length": 3,
           "lengthUnit": "Hours",
           "active": true,
           "startDate": "2018-08-01",
           "expectedStartDate": "2019-04-03",
-          "expectedEndDate": "2022-01-24",
+          "expectedEndDate": "2021-10-25",
           "requirementNotes": "3 ADD HOURS",
           "requirementTypeMainCategory": {
             "code": "W",
@@ -78,7 +78,7 @@
           "lengthUnit": "Days",
           "active": true,
           "startDate": "2018-08-01",
-          "expectedStartDate": "2020-10-29",
+          "expectedStartDate": "2020-10-11",
           "expectedEndDate": "2021-11-07",
           "requirementNotes": null,
           "requirementTypeMainCategory": {
@@ -86,8 +86,8 @@
             "description": "RAR category"
           },
           "requirementTypeSubCategory": {
-            "code": "o8y05",
-            "description": "Wooden"
+            "code": "icpvc",
+            "description": "Plastic"
           },
           "commencementDate": "2018-08-01",
           "createdDatetime": "2019-04-08T13:59:45",
@@ -99,7 +99,7 @@
           "lengthUnit": "Days",
           "active": true,
           "startDate": "2018-09-01",
-          "expectedStartDate": "2021-04-28",
+          "expectedStartDate": "2020-10-20",
           "expectedEndDate": null,
           "requirementNotes": null,
           "requirementTypeMainCategory": {
@@ -107,8 +107,8 @@
             "description": "RAR category"
           },
           "requirementTypeSubCategory": {
-            "code": "q99v4",
-            "description": "Steel"
+            "code": "0xxoh",
+            "description": "Cotton"
           },
           "commencementDate": "2018-08-01",
           "createdDatetime": "2019-04-08T13:59:45",
@@ -116,13 +116,13 @@
           "restrictive": false
         },
         {
-          "requirementId": 67932,
+          "requirementId": 8907,
           "length": 7,
           "lengthUnit": "Hours",
           "active": true,
           "startDate": "2018-08-01",
           "expectedStartDate": "2019-04-01",
-          "expectedEndDate": "2021-09-13",
+          "expectedEndDate": "2022-04-17",
           "requirementNotes": null,
           "requirementTypeMainCategory": {
             "code": "W",

@@ -1,0 +1,48 @@
+{
+  "request": {
+    "method": "GET",
+    "headers": {},
+    "urlPath": "/community-api/secure/offenders/crn/X009923/registrations/68067"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "registrationId": 68067,
+      "offenderId": 71452,
+      "active": true,
+      "startDate": "2021-05-19",
+      "endDate": null,
+      "register": {
+        "code": "lx3lp",
+        "description": "Alerts"
+      },
+      "riskColour": "White",
+      "type": {
+        "code": "REST",
+        "description": "Restraining Order"
+      },
+      "nextReviewDate": "2021-10-05",
+      "reviewPeriodMonths": 3,
+      "registeringTeam": {
+        "code": "5m0jk",
+        "description": "benchmark bleeding-edge interfaces"
+      },
+      "registeringOfficer": {
+        "code": "n13oj",
+        "forenames": "Ophelia",
+        "surname": "Kulas",
+        "unallocated": false
+      },
+      "registeringProbationArea": {
+        "code": "jm6k7",
+        "description": "606 Lelia Dam"
+      },
+      "warnUser": false,
+      "numberOfPreviousDeregistrations": 0,
+      "notes": "Harassment of ex-wife"
+    }
+  }
+}

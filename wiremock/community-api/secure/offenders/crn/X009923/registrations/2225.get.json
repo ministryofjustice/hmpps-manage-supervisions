@@ -1,0 +1,78 @@
+{
+  "request": {
+    "method": "GET",
+    "headers": {},
+    "urlPath": "/community-api/secure/offenders/crn/X009923/registrations/2225"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "registrationId": 2225,
+      "offenderId": 46604,
+      "active": true,
+      "startDate": "2021-07-02",
+      "endDate": null,
+      "register": {
+        "code": "23uh6",
+        "description": "Alerts"
+      },
+      "riskColour": "Amber",
+      "type": {
+        "code": "IKMF",
+        "description": "Record to be Retained"
+      },
+      "nextReviewDate": "2021-11-19",
+      "reviewPeriodMonths": 6,
+      "registeringTeam": {
+        "code": "ll68l",
+        "description": "leverage integrated supply-chains"
+      },
+      "registeringOfficer": {
+        "code": "k9ivf",
+        "forenames": "Jay",
+        "surname": "Kohler",
+        "unallocated": false
+      },
+      "registeringProbationArea": {
+        "code": "lwsx4",
+        "description": "610 Pouros Stravenue"
+      },
+      "warnUser": false,
+      "numberOfPreviousDeregistrations": 0,
+      "notes": "Aut non nesciunt laboriosam omnis iure adipisci deserunt dolorum consectetur.",
+      "registrationReviews": [
+        {
+          "reviewDate": "2021-11-19",
+          "completed": false,
+          "reviewingOfficer": {
+            "code": "ABC123",
+            "forenames": "Brian",
+            "surname": "Peashoots"
+          },
+          "reviewingTeam": {
+            "code": "N07UAT",
+            "description": "Unallocated Team"
+          }
+        },
+        {
+          "reviewDate": "2021-08-23",
+          "reviewDateDue": "2021-11-19",
+          "notes": "Well bad",
+          "completed": true,
+          "reviewingOfficer": {
+            "code": "ABC123",
+            "forenames": "Brian",
+            "surname": "Peashoots"
+          },
+          "reviewingTeam": {
+            "code": "N07UAT",
+            "description": "Unallocated Team"
+          }
+        }
+      ]
+    }
+  }
+}

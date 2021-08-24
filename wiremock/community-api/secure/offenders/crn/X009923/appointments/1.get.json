@@ -15,14 +15,14 @@
       "appointmentEnd": "2200-01-02T14:00:00",
       "notes": "Some home visit appointment\n\nWith a new line!",
       "officeLocation": {
-        "code": "742036f5-78f6-4105-98e4-c021010d1a07",
-        "buildingName": "Casandra",
-        "buildingNumber": "690",
-        "streetName": "Jeremy Ramp",
-        "townCity": "Wandastad",
-        "county": "Avon",
-        "postcode": "68385",
-        "description": "941 Kariane Springs"
+        "code": "60254dc9-a444-4646-911e-f83906f2de2d",
+        "buildingName": "Clint",
+        "buildingNumber": "325",
+        "streetName": "Hickle Path",
+        "townCity": "Fisherborough",
+        "county": "Borders",
+        "postcode": "89457",
+        "description": "24172 Ferry Key"
       },
       "outcome": null,
       "sensitive": true,
@@ -30,18 +30,18 @@
         "contactType": "CHVS",
         "description": "Home Visit to Case (NS)",
         "orderTypes": ["CJA", "CJA"],
-        "requiresLocation": "REQUIRED"
+        "requiresLocation": "OPTIONAL"
       },
       "provider": {
-        "code": "2409f2b4-43c2-456d-8916-08ce16d2e8f5",
-        "description": "facilitate enterprise initiatives"
+        "code": "ad3b1469-392a-453b-a5cc-26e4254245bf",
+        "description": "syndicate value-added web services"
       },
       "team": {
-        "code": "9b0eb3c4-f651-4b65-9485-fb2b91f4f7d8",
-        "description": "synergize collaborative solutions"
+        "code": "6785d31c-161b-48df-81af-fa21c33982c2",
+        "description": "architect global convergence"
       },
       "staff": {
-        "code": "31e286a3-edc7-4e9c-bd61-06b3cccb6d23",
+        "code": "c217ccf7-3f27-4369-aeff-9ed7e3c6a51c",
         "forenames": "Catherine",
         "surname": "Ellis",
         "unallocated": false
@@ -49,7 +49,7 @@
       "rarActivity": true,
       "requirement": {
         "isRar": true,
-        "requirementId": 49062,
+        "requirementId": 33212,
         "isActive": true
       }
     }

@@ -41,15 +41,21 @@ const templateRegistration: DeepPartial<Registration> = {
 }
 
 export const REGISTRATIONS: DeepPartial<Registration>[] = Object.entries(riskReferenceData)
+  .filter(([code]) => !['RMRH', 'REG26', 'RVAD'].includes(code))
   .map(([code, meta]) => {
     return { ...templateRegistration, type: { code, description: meta.description } }
   })
   .concat([
-    // {
-    //   active: true,
-    //   type: { code: 'RMRH', description: 'High RoSH' },
-    //   notes: 'This registration is on the ignore list so will be excluded from the ui',
-    // },
+    {
+      active: true,
+      type: { code: 'REST', description: 'Restraining Order' },
+      notes: 'Harassment of ex-wife',
+    },
+    {
+      active: true,
+      type: { code: 'RMRH', description: 'High RoSH' },
+      notes: 'This registration is on the ignore list so will be excluded from the ui',
+    },
     {
       active: false,
       type: { code: 'REG26', description: 'Organised Crime' },

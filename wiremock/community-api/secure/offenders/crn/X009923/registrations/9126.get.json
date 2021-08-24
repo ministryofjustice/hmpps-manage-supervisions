@@ -1,0 +1,75 @@
+{
+  "request": {
+    "method": "GET",
+    "headers": {},
+    "urlPath": "/community-api/secure/offenders/crn/X009923/registrations/9126"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "registrationId": 9126,
+      "offenderId": 37480,
+      "active": false,
+      "startDate": "2020-09-21",
+      "endDate": "2020-11-07",
+      "register": {
+        "code": "o4yc0",
+        "description": "Alerts"
+      },
+      "riskColour": "Green",
+      "type": {
+        "code": "REG26",
+        "description": "Organised Crime"
+      },
+      "nextReviewDate": "2022-02-20",
+      "reviewPeriodMonths": 6,
+      "registeringTeam": {
+        "code": "dwgap",
+        "description": "embrace frictionless platforms"
+      },
+      "registeringOfficer": {
+        "code": "kg03e",
+        "forenames": "Brando",
+        "surname": "Ratke",
+        "unallocated": false
+      },
+      "registeringProbationArea": {
+        "code": "swf3x",
+        "description": "910 Esther Ville"
+      },
+      "warnUser": false,
+      "numberOfPreviousDeregistrations": 0,
+      "notes": "Quo magnam reprehenderit atque laudantium.",
+      "deregisteringNotes": "No longer a risk",
+      "deregisteringOfficer": {
+        "code": "ABC123",
+        "forenames": "Brian",
+        "surname": "Peashoots"
+      },
+      "registrationReviews": [
+        {
+          "reviewDate": "2021-11-19",
+          "completed": false
+        },
+        {
+          "reviewDate": "2021-08-23",
+          "reviewDateDue": "2021-11-19",
+          "notes": "A review was performed",
+          "completed": true,
+          "reviewingOfficer": {
+            "code": "ABC123",
+            "forenames": "Brian",
+            "surname": "Peashoots"
+          },
+          "reviewingTeam": {
+            "code": "N07UAT",
+            "description": "Unallocated Team"
+          }
+        }
+      ]
+    }
+  }
+}

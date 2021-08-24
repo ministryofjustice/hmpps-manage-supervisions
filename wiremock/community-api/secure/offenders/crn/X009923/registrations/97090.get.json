@@ -1,0 +1,54 @@
+{
+  "request": {
+    "method": "GET",
+    "headers": {},
+    "urlPath": "/community-api/secure/offenders/crn/X009923/registrations/97090"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "registrationId": 97090,
+      "offenderId": 50906,
+      "active": false,
+      "startDate": "2021-03-18",
+      "endDate": "2021-07-23",
+      "register": {
+        "code": "ncfqg",
+        "description": "Alerts"
+      },
+      "riskColour": "Green",
+      "type": {
+        "code": "RVAD",
+        "description": "Safeguarding – Adult at Risk"
+      },
+      "nextReviewDate": "2022-02-24",
+      "reviewPeriodMonths": 12,
+      "registeringTeam": {
+        "code": "n3skq",
+        "description": "embrace compelling interfaces"
+      },
+      "registeringOfficer": {
+        "code": "c1i3v",
+        "forenames": "Myrtis",
+        "surname": "Stracke",
+        "unallocated": false
+      },
+      "registeringProbationArea": {
+        "code": "et4hu",
+        "description": "4831 Gilbert Lakes"
+      },
+      "warnUser": false,
+      "numberOfPreviousDeregistrations": 0,
+      "notes": "Veritatis quasi praesentium maxime quos excepturi velit.",
+      "deregisteringNotes": "No longer a risk",
+      "deregisteringOfficer": {
+        "code": "ABC123",
+        "forenames": "Brian",
+        "surname": "Peashoots"
+      }
+    }
+  }
+}
