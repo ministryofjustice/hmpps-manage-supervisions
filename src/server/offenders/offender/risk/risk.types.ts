@@ -11,6 +11,8 @@ export interface Risks {
     riskImminence?: string
   }
   self: {
+    current: boolean
+    previous: boolean
     harm: FlatRiskToSelf
     custody: FlatRiskToSelf
     vulnerability: FlatRiskToSelf

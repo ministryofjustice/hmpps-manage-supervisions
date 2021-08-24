@@ -59,6 +59,7 @@ export interface PersonalDetailsViewModel {
   sex?: string
   genderIdentity?: string
   selfDescribedGender?: string
+  genderSummary?: string
   sexualOrientation?: string
 }
 

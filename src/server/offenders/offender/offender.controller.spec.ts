@@ -22,7 +22,7 @@ import { ActivityFilter, ActivityService } from './activity'
 import { RiskService } from './risk'
 import { fakeComplianceDetails, fakeConvictionDetails, fakeConvictionRequirement } from './sentence/sentence.fake'
 import { fakeActivityLogEntry } from './activity/activity.fake'
-import { fakeAppointmentSummary, fakeRecentAppointments } from './schedule/schedule.fake'
+import { fakeNextAppointmentSummary, fakeRecentAppointments } from './schedule/schedule.fake'
 import { fakeBreadcrumbs, fakeBreadcrumbUrl, MockLinksModule } from '../../common/links/links.mock'
 import { PersonalService } from './personal'
 import { BreadcrumbType, ResolveBreadcrumbOptions } from '../../common/links'
@@ -81,16 +81,13 @@ describe('OffenderController', () => {
   it('gets overview', async () => {
     const offender = havingOffender()
 
-    const personalContacts = [fakePersonalContactDetail()]
-    personalService.getPersonalContacts.withArgs('some-crn').resolves(personalContacts)
-
     const circumstances = [fakePersonalCircumstanceDetail()]
     personalService.getPersonalCircumstances.withArgs('some-crn').resolves(circumstances)
 
     const contactDetails = fakeContactDetailsViewModel()
     const personalDetails = fakePersonalDetailsViewModel()
     personalService.getPersonalDetails
-      .withArgs(offender, personalContacts, circumstances)
+      .withArgs(offender, [], circumstances)
       .returns({ contactDetails, personalDetails })
 
     const conviction = fakeConvictionDetails({
@@ -98,8 +95,8 @@ describe('OffenderController', () => {
     })
     sentenceService.getConvictionDetails.withArgs('some-crn').resolves(conviction)
 
-    const appointmentSummary = fakeAppointmentSummary()
-    scheduleService.getAppointmentSummary.withArgs('some-crn').resolves(appointmentSummary)
+    const nextAppointment = fakeNextAppointmentSummary()
+    scheduleService.getNextAppointment.withArgs('some-crn').resolves(nextAppointment)
 
     const registrations = fakeRiskRegistrations()
     riskService.getRiskRegistrations.withArgs('some-crn').resolves(registrations)
@@ -107,15 +104,18 @@ describe('OffenderController', () => {
     const risks = fakeRisks()
     riskService.getRisks.withArgs('some-crn').resolves(risks)
 
+    const compliance = fakeComplianceDetails()
+    sentenceService.getSentenceComplianceDetails.withArgs('some-crn').resolves(compliance)
+
     const observed = await subject.getOverview('some-crn')
     shouldReturnViewModel(observed, BreadcrumbType.Case, {
       page: OffenderPage.Overview,
-      conviction: { ...conviction, rar: 'Some RAR requirement' },
       contactDetails,
       personalDetails,
-      appointmentSummary,
+      nextAppointment,
       registrations,
       risks,
+      compliance,
     })
   })
 

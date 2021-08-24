@@ -48,7 +48,7 @@ const fakeFlatRiskToSelf = fake<FlatRiskToSelf>(() => ({
 export const fakeRisks = fake<Risks>((options, partial = {}) => ({
   community: {
     level: fakeRiskLevelMeta(),
-    risks: partial.community?.risks?.map(x => fakeRoshRisk(x)) || [fakeRoshRisk(), fakeRoshRisk()],
+    risks: partial.community?.risks?.map(fakeRoshRisk) || [fakeRoshRisk(), fakeRoshRisk()],
     riskLevels: {
       [RiskLevel.VeryHigh]: fakeRandomArray(fakeRiskSubject),
       [RiskLevel.High]: fakeRandomArray(fakeRiskSubject),
@@ -60,6 +60,8 @@ export const fakeRisks = fake<Risks>((options, partial = {}) => ({
     whoIsAtRisk: faker.lorem.sentence(),
   },
   self: {
+    current: faker.datatype.boolean(),
+    previous: faker.datatype.boolean(),
     harm: fakeFlatRiskToSelf(),
     custody: fakeFlatRiskToSelf(),
     vulnerability: fakeFlatRiskToSelf(),

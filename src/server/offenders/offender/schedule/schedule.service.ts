@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { sortBy } from 'lodash'
+import { sortBy, minBy } from 'lodash'
 import { CommunityApiService, ContactMappingService } from '../../../community-api'
-import { AppointmentListViewModel, AppointmentSummary, RecentAppointments } from './schedule.types'
+import { AppointmentListViewModel, NextAppointmentSummary, RecentAppointments } from './schedule.types'
 
 export const MAX_RECENT_APPOINTMENTS = 20
 
@@ -35,39 +35,21 @@ export class ScheduleService {
     return result
   }
 
-  async getAppointmentSummary(crn: string): Promise<AppointmentSummary> {
-    const { data } = await this.community.appointment.getOffenderAppointmentsByCrnUsingGET({ crn })
-    const now = DateTime.now()
-    return await data.reduce(
-      async (aggregate, apt) => {
-        const agg = await aggregate
-        const date = DateTime.fromISO(apt.appointmentStart)
-        if (date > now) {
-          // future appointment, consider it for the next appointment
-          if (!agg.next || date < agg.next.date) {
-            agg.next = { date, name: (await this.contacts.getTypeMeta(apt)).name }
-          }
-          return agg
-        }
+  async getNextAppointment(crn: string): Promise<NextAppointmentSummary | null> {
+    const { data: appointments } = await this.community.appointment.getOffenderAppointmentsByCrnUsingGET({
+      crn,
+      from: DateTime.now().toISODate(),
+    })
 
-        // past appointment, check it's compliance
-        if (apt.outcome) {
-          if (apt.outcome.complied) {
-            if (apt.outcome.attended) {
-              agg.attendance.complied++
-            } else {
-              agg.attendance.acceptableAbsence++
-            }
-          } else {
-            agg.attendance.failureToComply++
-          }
-        }
-        return agg
-      },
-      Promise.resolve({
-        next: null,
-        attendance: { acceptableAbsence: 0, complied: 0, failureToComply: 0 },
-      } as AppointmentSummary),
+    if (!appointments?.length) {
+      return null
+    }
+
+    const nextAppointment = minBy(
+      appointments.map(x => ({ ...x, date: DateTime.fromISO(x.appointmentStart) })),
+      x => x.appointmentStart,
     )
+    const meta = await this.contacts.getTypeMeta(nextAppointment)
+    return { date: nextAppointment.date, name: meta.name }
   }
 }

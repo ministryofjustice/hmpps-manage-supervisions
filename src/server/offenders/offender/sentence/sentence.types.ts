@@ -120,6 +120,7 @@ export enum ComplianceStatusAlertLevel {
 
 export interface ComplianceQuantity {
   name: string
+  value: number
   link?: string
 }
 
@@ -140,11 +141,15 @@ export interface CurrentComplianceConvictionSummary extends ComplianceConviction
     value: ComplianceStatus
     alertLevel: ComplianceStatusAlertLevel
     description: string
+    breachSuggested: boolean
   }
 }
 
 export interface ComplianceDetails {
   current?: CurrentComplianceConvictionSummary
-  previous: ComplianceConvictionSummary[]
-  previousFrom: DateTime
+  previous: {
+    convictions: ComplianceConvictionSummary[]
+    dateFrom: DateTime
+    totalBreaches: number
+  }
 }

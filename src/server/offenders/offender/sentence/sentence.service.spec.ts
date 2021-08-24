@@ -219,18 +219,22 @@ describe('SentenceService', () => {
           appointments: {
             acceptableAbsences: {
               name: '3 acceptable absences',
+              value: 3,
               link: '/offender/some-crn/activity/acceptable-absence-appointments',
             },
             complied: {
-              name: '1 appointment',
+              name: '1 complied',
+              value: 1,
               link: '/offender/some-crn/activity/complied-appointments',
             },
             failureToComply: {
               name: '2 unacceptable absences',
+              value: 2,
               link: '/offender/some-crn/activity/failed-to-comply-appointments',
             },
             total: {
               name: '6 appointments',
+              value: 6,
               link: '/offender/some-crn/activity/appointments',
             },
           },
@@ -239,10 +243,14 @@ describe('SentenceService', () => {
             alertLevel: ComplianceStatusAlertLevel.Danger,
             description: 'Breach in progress',
             value: 'in-breach',
+            breachSuggested: false,
           },
         },
-        previous: [previousSummary],
-        previousFrom: DateTime.now().minus({ years: 2 }).set({ day: 1, hour: 0, minute: 0, second: 0, millisecond: 0 }),
+        previous: {
+          convictions: [previousSummary],
+          dateFrom: DateTime.now().minus({ years: 2 }).set({ day: 1, hour: 0, minute: 0, second: 0, millisecond: 0 }),
+          totalBreaches: 1,
+        },
       } as ComplianceDetails)
     })
 
@@ -265,6 +273,7 @@ describe('SentenceService', () => {
           alertLevel: ComplianceStatusAlertLevel.Warning,
           description: '2 failures to comply within 12 months',
           value: 'failure-to-comply',
+          breachSuggested: false,
         },
       } as Pick<CurrentComplianceConvictionSummary, 'period' | 'status'>)
     })
@@ -288,6 +297,7 @@ describe('SentenceService', () => {
           alertLevel: ComplianceStatusAlertLevel.Danger,
           description: '2 failures to comply within 12 months',
           value: 'pending-breach',
+          breachSuggested: true,
         },
       } as Pick<CurrentComplianceConvictionSummary, 'period' | 'status'>)
     })
@@ -311,6 +321,7 @@ describe('SentenceService', () => {
           alertLevel: ComplianceStatusAlertLevel.Success,
           description: 'No failures to comply within 12 months',
           value: 'clean',
+          breachSuggested: false,
         },
       } as Pick<CurrentComplianceConvictionSummary, 'period' | 'status'>)
     })
@@ -337,6 +348,7 @@ describe('SentenceService', () => {
           alertLevel: ComplianceStatusAlertLevel.Warning,
           description: 'No failures to comply since last breach',
           value: 'previous-breach',
+          breachSuggested: false,
         },
       } as Pick<CurrentComplianceConvictionSummary, 'period' | 'status'>)
     })

@@ -229,6 +229,9 @@ export class PersonalService {
         sex: offender.gender,
         genderIdentity,
         selfDescribedGender,
+        genderSummary: selfDescribedGender
+          ? `Prefer to self-describe: ${selfDescribedGender}`
+          : genderIdentity || offender.gender,
         sexualOrientation,
       },
     }

@@ -35,7 +35,7 @@
 
         <div class="app-card app-card--{{ compliance.current.status.alertLevel }} govuk-!-margin-bottom-0 govuk-!-padding-3 govuk-!-font-weight-bold" data-qa='offender/compliance/current-status'>
             {{ compliance.current.status.description }}
-            {% if compliance.current.status.value === 'pending-breach' and not compliance.current.inBreach %}
+            {% if compliance.current.status.breachSuggested %}
                 – <a href='#TODO'>Start a breach</a>
             {% endif %}
         </div>
@@ -76,7 +76,7 @@
                     },
                     {
                         key: { text: "Previous breaches" if compliance.current.status.value === 'in-breach' else "Breaches" },
-                        value: { html: previousBreaches if previousBreaches else 'None' }
+                        value: { html: previousBreaches or 'None' }
                     }
                 ]
             }) }}
@@ -146,11 +146,11 @@
     {% endif %}
 
     <h2 class="govuk-heading-m govuk-!-font-size-27 govuk-!-margin-bottom-5" data-qa='offender/compliance/previous-orders-title'>
-        Previous orders ({{ compliance.previousFrom | monthDate }} to present)
+        Previous orders ({{ compliance.previous.dateFrom | monthDate }} to present)
     </h2>
 
-    {% if compliance.previous.length > 0 %}
-        {% for previous in compliance.previous %}
+    {% if compliance.previous.convictions.length > 0 %}
+        {% for previous in compliance.previous.convictions %}
             {% if previous.allBreaches.length %}
                 {% set breaches %}
                     <ul class='govuk-list'>
@@ -181,7 +181,7 @@
                     },
                     {
                         key: { text: "Breaches" },
-                        value: { html: breaches if breaches else 'None' }
+                        value: { html: breaches or 'None' }
                     }
                 ]
             }) }}

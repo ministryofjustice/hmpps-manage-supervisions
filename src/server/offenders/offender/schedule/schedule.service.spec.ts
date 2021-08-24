@@ -5,7 +5,7 @@ import { CommunityApiService, ContactMappingService } from '../../../community-a
 import { orderBy, sortBy } from 'lodash'
 import { fakeAppointmentDetail } from '../../../community-api/community-api.fake'
 import { fakeOkResponse } from '../../../common/rest/rest.fake'
-import { AppointmentListViewModel, AppointmentSummary, RecentAppointments } from './schedule.types'
+import { AppointmentListViewModel, NextAppointmentSummary, RecentAppointments } from './schedule.types'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../../community-api/community-api.mock'
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { DateTime } from 'luxon'
@@ -69,36 +69,22 @@ describe('ScheduleService', () => {
   })
 
   it('gets appointment summary', async () => {
-    const appointments = [
-      fakeAppointmentDetail({}, { when: 'future' }),
-      fakeAppointmentDetail({ outcome: { complied: false } }),
-      fakeAppointmentDetail({ outcome: { complied: true, attended: false } }),
-      fakeAppointmentDetail({ outcome: { complied: true, attended: true } }),
-    ]
+    const nextAppointment = fakeAppointmentDetail({ appointmentStart: '2100-10-03T12:30:00' })
 
-    for (const apt of appointments) {
-      contactMapping.getTypeMeta.withArgs(apt).resolves({
-        type: ContactTypeCategory.Appointment,
-        value: { name: 'Some appointment', codes: { nonRar: 'SOME_CODE' } },
-        name: 'some-appointment-type',
-      })
-    }
+    contactMapping.getTypeMeta.resolves({
+      type: ContactTypeCategory.Appointment,
+      value: { name: 'Some appointment', codes: { nonRar: 'SOME_CODE' } },
+      name: 'some-appointment-type',
+    })
 
-    const stub = community.appointment.getOffenderAppointmentsByCrnUsingGET.resolves(fakeOkResponse(appointments))
-    const observed = await subject.getAppointmentSummary('some-crn')
+    const stub = community.appointment.getOffenderAppointmentsByCrnUsingGET.resolves(fakeOkResponse([nextAppointment]))
+    const observed = await subject.getNextAppointment('some-crn')
 
     expect(observed).toEqual({
-      next: {
-        name: 'some-appointment-type',
-        date: DateTime.fromISO(appointments[0].appointmentStart),
-      },
-      attendance: {
-        acceptableAbsence: 1,
-        failureToComply: 1,
-        complied: 1,
-      },
-    } as AppointmentSummary)
+      name: 'some-appointment-type',
+      date: DateTime.fromObject({ year: 2100, month: 10, day: 3, hour: 12, minute: 30 }),
+    } as NextAppointmentSummary)
 
-    expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn' })
+    expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn', from: DateTime.now().toISODate() })
   })
 })

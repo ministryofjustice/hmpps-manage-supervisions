@@ -119,8 +119,10 @@ export const fakeComplianceConvictionSummary = fake<ComplianceConvictionSummary>
 })
 
 function fakeComplianceQuantity(): ComplianceQuantity {
+  const value = faker.datatype.number({ min: 2, max: 10 })
   return {
-    name: `${faker.datatype.number({ min: 2, max: 10 })} ${faker.commerce.product()}s`,
+    name: `${value} ${faker.commerce.product()}s`,
+    value,
     link: faker.internet.url(),
   }
 }
@@ -139,9 +141,13 @@ export const fakeComplianceDetails = fake<ComplianceDetails>(() => ({
       value: faker.random.arrayElement(Object.values(ComplianceStatus)),
       description: faker.company.bs(),
       alertLevel: faker.random.arrayElement(Object.values(ComplianceStatusAlertLevel)),
+      breachSuggested: faker.datatype.boolean(),
     },
     requirement: faker.company.bs(),
   },
-  previous: [fakeComplianceConvictionSummary()],
-  previousFrom: DateTime.fromJSDate(faker.date.past()),
+  previous: {
+    convictions: [fakeComplianceConvictionSummary()],
+    dateFrom: DateTime.fromJSDate(faker.date.past()),
+    totalBreaches: faker.datatype.number(),
+  },
 }))

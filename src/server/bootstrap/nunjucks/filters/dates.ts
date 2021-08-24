@@ -87,3 +87,12 @@ export class ExpectedDate implements NunjucksFilter {
     return expected ? `${date} (expected)` : date
   }
 }
+
+export class LongDateTime implements NunjucksFilter {
+  filter(value: RawDate): string {
+    if (!value) {
+      return ''
+    }
+    return `${LongDate.apply(value)} at ${Time.apply(value)}`
+  }
+}

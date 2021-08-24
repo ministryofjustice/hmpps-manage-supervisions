@@ -104,7 +104,7 @@ export class RequirementService {
 
   private getRequirementDetail(req: Requirement): ConvictionRequirementDetail {
     return {
-      length: quantity(req.length, req.lengthUnit),
+      length: quantity(req.length, req.lengthUnit.toLowerCase()),
       notes: req.requirementNotes,
       startDate: getPotentiallyExpectedDateTime(req.startDate, req.expectedStartDate),
       endDate: getPotentiallyExpectedDateTime(req.terminationDate, req.expectedEndDate),
