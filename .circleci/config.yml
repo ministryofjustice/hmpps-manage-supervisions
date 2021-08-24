@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  hmpps: ministryofjustice/hmpps@3.10
+  hmpps: ministryofjustice/hmpps@3.11
   cypress: cypress-io/cypress@1
 
 executors:
@@ -136,7 +136,7 @@ workflows:
   security:
     triggers:
       - schedule:
-          cron: "0 7 * * 1-5"
+          cron: "7 6 * * 1-5"
           filters:
             branches:
               only:
