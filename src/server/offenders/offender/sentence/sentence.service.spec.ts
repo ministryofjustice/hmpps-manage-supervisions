@@ -19,7 +19,7 @@ import { RequirementService } from './requirement.service'
 import { fakeComplianceConvictionSummary, fakeConvictionRequirement } from './sentence.fake'
 import { Conviction } from '../../../community-api/client'
 import { ComplianceService } from './compliance.service'
-import { ActivityFilter, ActivityService } from '../activity'
+import { ActivityComplianceFilter, ActivityService } from '../activity'
 import { BreachService } from '../../../community-api/breach'
 import { fakeBreachSummary } from '../../../community-api/breach/breach.fake'
 
@@ -178,9 +178,14 @@ describe('SentenceService', () => {
       return summary
     }
 
-    function havingAppointmentCounts(counts: Partial<Record<ActivityFilter, number>>, from: DateTime | null = null) {
+    function havingAppointmentCounts(
+      counts: Partial<Record<ActivityComplianceFilter, number>>,
+      from: DateTime | null = null,
+    ) {
       for (const [filter, count] of Object.entries(counts)) {
-        activityService.getActivityLogCount.withArgs('some-crn', 100, filter as ActivityFilter, from).resolves(count)
+        activityService.getActivityLogComplianceCount
+          .withArgs('some-crn', 100, filter as ActivityComplianceFilter, from)
+          .resolves(count)
       }
     }
 
@@ -202,10 +207,10 @@ describe('SentenceService', () => {
       const previousSummary = havingComplianceSummary(previousConviction)
       havingAppointmentCounts(
         {
-          [ActivityFilter.Appointments]: 6,
-          [ActivityFilter.CompliedAppointments]: 1,
-          [ActivityFilter.FailedToComplyAppointments]: 2,
-          [ActivityFilter.AcceptableAbsenceAppointments]: 3,
+          [ActivityComplianceFilter.Appointments]: 6,
+          [ActivityComplianceFilter.CompliedAppointments]: 1,
+          [ActivityComplianceFilter.FailedToComplyAppointments]: 2,
+          [ActivityComplianceFilter.AcceptableAbsenceAppointments]: 3,
         },
         currentSummary.lastRecentBreachEnd,
       )
@@ -259,10 +264,10 @@ describe('SentenceService', () => {
       havingRequirements(100)
       havingComplianceSummary(conviction, { inBreach: false, activeBreach: null, lastRecentBreachEnd: null })
       havingAppointmentCounts({
-        [ActivityFilter.Appointments]: 6,
-        [ActivityFilter.CompliedAppointments]: 1,
-        [ActivityFilter.FailedToComplyAppointments]: 2,
-        [ActivityFilter.AcceptableAbsenceAppointments]: 3,
+        [ActivityComplianceFilter.Appointments]: 6,
+        [ActivityComplianceFilter.CompliedAppointments]: 1,
+        [ActivityComplianceFilter.FailedToComplyAppointments]: 2,
+        [ActivityComplianceFilter.AcceptableAbsenceAppointments]: 3,
       })
 
       const observed = await subject.getSentenceComplianceDetails('some-crn')
@@ -283,10 +288,10 @@ describe('SentenceService', () => {
       havingRequirements(100)
       havingComplianceSummary(conviction, { inBreach: false, lastRecentBreachEnd: null })
       havingAppointmentCounts({
-        [ActivityFilter.Appointments]: 6,
-        [ActivityFilter.CompliedAppointments]: 1,
-        [ActivityFilter.FailedToComplyAppointments]: 2,
-        [ActivityFilter.AcceptableAbsenceAppointments]: 3,
+        [ActivityComplianceFilter.Appointments]: 6,
+        [ActivityComplianceFilter.CompliedAppointments]: 1,
+        [ActivityComplianceFilter.FailedToComplyAppointments]: 2,
+        [ActivityComplianceFilter.AcceptableAbsenceAppointments]: 3,
       })
 
       const observed = await subject.getSentenceComplianceDetails('some-crn')
@@ -307,10 +312,10 @@ describe('SentenceService', () => {
       havingRequirements(100)
       havingComplianceSummary(conviction, { inBreach: false, activeBreach: null, lastRecentBreachEnd: null })
       havingAppointmentCounts({
-        [ActivityFilter.Appointments]: 6,
-        [ActivityFilter.CompliedAppointments]: 1,
-        [ActivityFilter.FailedToComplyAppointments]: 0,
-        [ActivityFilter.AcceptableAbsenceAppointments]: 3,
+        [ActivityComplianceFilter.Appointments]: 6,
+        [ActivityComplianceFilter.CompliedAppointments]: 1,
+        [ActivityComplianceFilter.FailedToComplyAppointments]: 0,
+        [ActivityComplianceFilter.AcceptableAbsenceAppointments]: 3,
       })
 
       const observed = await subject.getSentenceComplianceDetails('some-crn')
@@ -332,10 +337,10 @@ describe('SentenceService', () => {
       const current = havingComplianceSummary(conviction, { inBreach: false, activeBreach: null })
       havingAppointmentCounts(
         {
-          [ActivityFilter.Appointments]: 6,
-          [ActivityFilter.CompliedAppointments]: 1,
-          [ActivityFilter.FailedToComplyAppointments]: 0,
-          [ActivityFilter.AcceptableAbsenceAppointments]: 3,
+          [ActivityComplianceFilter.Appointments]: 6,
+          [ActivityComplianceFilter.CompliedAppointments]: 1,
+          [ActivityComplianceFilter.FailedToComplyAppointments]: 0,
+          [ActivityComplianceFilter.AcceptableAbsenceAppointments]: 3,
         },
         current.lastRecentBreachEnd,
       )

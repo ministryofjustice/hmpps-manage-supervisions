@@ -14,7 +14,7 @@ import {
   Paginated,
 } from '../../../community-api'
 import {
-  ActivityFilter,
+  ActivityComplianceFilter,
   ActivityLogEntry,
   ActivityLogEntryBase,
   ActivityLogEntryTag,
@@ -32,7 +32,7 @@ import { GovUkUiTagColour } from '../../../util/govuk-ui'
 export type GetContactsOptions = Omit<
   ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
   'crn' | 'contactDateTo'
-> & { filter?: ActivityFilter }
+> & { complianceFilter?: ActivityComplianceFilter }
 
 function getOutcomeFlags(outcome?: AppointmentOutcome): ActivityLogEntryTag[] {
   switch (outcome?.complied) {
@@ -74,30 +74,28 @@ export class ActivityService {
     options: GetContactsOptions = {},
   ): Promise<Paginated<ActivityLogEntry>> {
     const resolvedOptions = await this.constructContactFilter(crn, options)
-    const { data } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET(resolvedOptions)
+    const {
+      data: { totalPages, first, last, number, size, totalElements, content: contacts = [] },
+    } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET(resolvedOptions)
 
-    return {
-      totalPages: data.totalPages,
-      first: data.first,
-      last: data.last,
-      number: data.number,
-      size: data.size,
-      totalElements: data.totalElements,
-      content: await Promise.all(
-        (data.content || []).map(contact => this.getActivityLogEntry(crn, contact, offenderName)),
-      ),
-    }
+    const content = await Promise.all(contacts.map(contact => this.getActivityLogEntry(crn, contact, offenderName)))
+    return { totalPages, first, last, number, size, totalElements, content }
   }
 
-  async getActivityLogCount(crn: string, convictionId: number, filter: ActivityFilter, from: DateTime | null) {
+  async getActivityLogComplianceCount(
+    crn: string,
+    convictionId: number,
+    filter: ActivityComplianceFilter,
+    from: DateTime | null,
+  ) {
     // to get the appointment counts here we're using the totalElements property of the list api
     // but requesting a single item on a single page and discarding the result.
     const resolvedOptions = await this.constructContactFilter(crn, {
       convictionId,
-      filter,
+      complianceFilter: filter,
       // we need to be careful to preserve a null contactDateFrom from a null lastRecentBreachEnd here
       // as it has a special meaning: 'I already checked the last breach end date, dont check again'
-      contactDateFrom: from === null ? null : from?.toISODate(),
+      contactDateFrom: from?.toISODate(),
       pageSize: 1,
     })
     const { data } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET(resolvedOptions)
@@ -256,7 +254,7 @@ export class ActivityService {
 
   private async constructContactFilter(
     crn: string,
-    { filter, ...options }: GetContactsOptions,
+    { complianceFilter, ...options }: GetContactsOptions,
   ): Promise<ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest> {
     const defaultFilters: Mutable<ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest> = {
       crn,
@@ -264,33 +262,36 @@ export class ActivityService {
       ...options,
     }
 
-    // first attempt to get default 'contact from date' from last breach
-    // this is short circuited contactDateFrom is null so client can specify not wanting to check last breach
-    if (defaultFilters.contactDateFrom === undefined && defaultFilters.convictionId) {
-      const breaches = await this.breach.getBreaches(crn, defaultFilters.convictionId, { includeOutcome: false })
-      if (breaches?.lastRecentBreachEnd) {
-        defaultFilters.contactDateFrom = breaches.lastRecentBreachEnd.toISODate()
+    // any compliance filter implies that the log is filtered by the latter of the last breach end or the last 12 months
+    if (complianceFilter && !defaultFilters.contactDateFrom) {
+      // so first attempt to get default 'contact from date' from last breach
+      // this is short circuited when contactDateFrom is null so client can specify not wanting to check last breach
+      if (defaultFilters.contactDateFrom !== null && defaultFilters.convictionId) {
+        const breaches = await this.breach.getBreaches(crn, defaultFilters.convictionId, { includeOutcome: false })
+        if (breaches?.lastRecentBreachEnd) {
+          defaultFilters.contactDateFrom = breaches.lastRecentBreachEnd.toISODate()
+        }
       }
-    }
 
-    // otherwise fallback to the last 12 months
-    // regardless of provided contactDateFrom being null, we default it to the last 12 months here
-    if (!defaultFilters.contactDateFrom) {
-      defaultFilters.contactDateFrom = DateTime.now().minus({ years: 1 }).toISODate()
+      // otherwise fallback to the last 12 months
+      // regardless of provided contactDateFrom being null, we default it to the last 12 months here
+      if (!defaultFilters.contactDateFrom) {
+        defaultFilters.contactDateFrom = DateTime.now().minus({ years: 1 }).toISODate()
+      }
     }
 
     const defaultAppointmentFilters = { ...defaultFilters, appointmentsOnly: true, nationalStandard: true }
 
-    switch (filter) {
-      case ActivityFilter.Appointments:
+    switch (complianceFilter) {
+      case ActivityComplianceFilter.Appointments:
         return defaultAppointmentFilters
-      case ActivityFilter.CompliedAppointments:
+      case ActivityComplianceFilter.CompliedAppointments:
         return { ...defaultAppointmentFilters, complied: true, attended: true }
-      case ActivityFilter.AcceptableAbsenceAppointments:
+      case ActivityComplianceFilter.AcceptableAbsenceAppointments:
         return { ...defaultAppointmentFilters, complied: true, attended: false }
-      case ActivityFilter.FailedToComplyAppointments:
+      case ActivityComplianceFilter.FailedToComplyAppointments:
         return { ...defaultAppointmentFilters, complied: false }
-      case ActivityFilter.WarningLetters:
+      case ActivityComplianceFilter.WarningLetters:
         const contactTypes = Object.values(
           this.config.get<WellKnownContactTypeConfig>('contacts')[ContactTypeCategory.WarningLetter],
         )

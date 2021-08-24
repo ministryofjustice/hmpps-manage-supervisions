@@ -18,7 +18,7 @@ import { OffenderService } from './offender.service'
 import { getDisplayName } from '../../util'
 import { SentenceService } from './sentence'
 import { ScheduleService } from './schedule'
-import { ActivityFilter, ActivityService, FilterLinks, GetContactsOptions } from './activity'
+import { ActivityComplianceFilter, ActivityService, FilterLinks, GetContactsOptions } from './activity'
 import { RiskService } from './risk'
 import { PersonalService } from './personal'
 import { Breadcrumb, BreadcrumbType, LinksService, ResolveBreadcrumbOptions } from '../../common/links'
@@ -131,10 +131,9 @@ export class OffenderController {
   @Render('offenders/offender/views/activity')
   async getActivityFiltered(
     @Param('crn') crn: string,
-    @Param('filter') filter: ActivityFilter,
+    @Param('filter') complianceFilter: ActivityComplianceFilter,
   ): Promise<OffenderActivityViewModel> {
-    const convictionId = await this.sentenceService.getConvictionId(crn)
-    return this.activityPageCommon(crn, { convictionId, filter })
+    return this.activityPageCommon(crn, { complianceFilter })
   }
 
   @Get(OffenderPage.Personal)
@@ -242,9 +241,12 @@ export class OffenderController {
   }
 
   private async activityPageCommon(crn: string, options: GetContactsOptions): Promise<OffenderActivityViewModel> {
-    const offender = await this.offenderService.getOffenderSummary(crn)
+    const [offender, convictionId] = await Promise.all([
+      this.offenderService.getOffenderSummary(crn),
+      this.sentenceService.getConvictionId(crn),
+    ])
     const displayName = getDisplayName(offender)
-    const [contacts] = await Promise.all([this.activityService.getActivityLogPage(crn, displayName, options)])
+    const contacts = await this.activityService.getActivityLogPage(crn, displayName, { ...options, convictionId })
     return {
       ...this.getBase(OffenderPage.Activity, offender),
       page: OffenderPage.Activity,
@@ -254,8 +256,8 @@ export class OffenderController {
         size: contacts.size,
       },
       filters: FilterLinks,
-      currentFilter: options.filter,
-      title: options.filter ? FilterLinks[options.filter].description : null,
+      currentFilter: options.complianceFilter,
+      title: options.complianceFilter ? FilterLinks[options.complianceFilter].description : null,
     }
   }
 }

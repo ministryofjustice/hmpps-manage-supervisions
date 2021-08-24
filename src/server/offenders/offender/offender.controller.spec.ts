@@ -18,7 +18,7 @@ import {
 } from './personal/personal.fake'
 import { SentenceService } from './sentence'
 import { ScheduleService } from './schedule'
-import { ActivityFilter, ActivityService } from './activity'
+import { ActivityComplianceFilter, ActivityService, GetContactsOptions } from './activity'
 import { RiskService } from './risk'
 import { fakeComplianceDetails, fakeConvictionDetails, fakeConvictionRequirement } from './sentence/sentence.fake'
 import { fakeActivityLogEntry } from './activity/activity.fake'
@@ -145,11 +145,12 @@ describe('OffenderController', () => {
 
     const contacts = fakePaginated([fakeActivityLogEntry(), fakeActivityLogEntry()])
 
+    sentenceService.getConvictionId.withArgs('some-crn').resolves(1234)
     activityService.getActivityLogPage
       .withArgs(
         'some-crn',
         displayName,
-        match({ contactTypes: [...appointmentContactTypes, ...communicationContactTypes] }),
+        match({ contactTypes: [...appointmentContactTypes, ...communicationContactTypes], convictionId: 1234 }),
       )
       .resolves(contacts)
 
@@ -195,10 +196,17 @@ describe('OffenderController', () => {
 
     sentenceService.getConvictionId.withArgs('some-crn').resolves(1234)
     activityService.getActivityLogPage
-      .withArgs('some-crn', displayName, match({ convictionId: 1234, filter: ActivityFilter.CompliedAppointments }))
+      .withArgs(
+        'some-crn',
+        displayName,
+        match({
+          convictionId: 1234,
+          complianceFilter: ActivityComplianceFilter.CompliedAppointments,
+        } as GetContactsOptions),
+      )
       .resolves(contacts)
 
-    const observed = await subject.getActivityFiltered('some-crn', ActivityFilter.CompliedAppointments)
+    const observed = await subject.getActivityFiltered('some-crn', ActivityComplianceFilter.CompliedAppointments)
     shouldReturnViewModel(observed, BreadcrumbType.CaseActivityLog, {
       page: OffenderPage.Activity,
       contacts: contacts.content,
@@ -229,7 +237,7 @@ describe('OffenderController', () => {
         },
       },
       title: 'Complied appointments',
-      currentFilter: ActivityFilter.CompliedAppointments,
+      currentFilter: ActivityComplianceFilter.CompliedAppointments,
     })
   })
 

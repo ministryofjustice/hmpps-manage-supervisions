@@ -17,7 +17,7 @@ import { ContactTypeCategory } from '../../../config'
 import { fakeAppointmentDetail, fakeContactSummary, fakePaginated } from '../../../community-api/community-api.fake'
 import { fakeOkResponse } from '../../../common/rest/rest.fake'
 import {
-  ActivityFilter,
+  ActivityComplianceFilter,
   ActivityLogEntry,
   AppointmentActivityLogEntry,
   CommunicationActivityLogEntry,
@@ -117,7 +117,7 @@ describe('ActivityService', () => {
     } as AppointmentActivityLogEntry)
   })
 
-  describe('activity log filters', () => {
+  describe('activity log compliance filters', () => {
     let stub: ReturnType<typeof havingContacts>
 
     function havingContacts() {
@@ -147,45 +147,59 @@ describe('ActivityService', () => {
       stub = havingContacts()
     })
 
+    it('does not apply any date from filters when not filtering for compliance', async () => {
+      await subject.getActivityLogPage('some-crn', 'some offender', {})
+      shouldHaveFilteredContacts({ contactDateFrom: undefined })
+    })
+
     it('gets unfiltered contacts & falls back to last 12 months when no breach', async () => {
       havingLastBreachEnd(null)
-      await subject.getActivityLogPage('some-crn', 'some offender', { convictionId: 1 })
-      shouldHaveFilteredContacts({ convictionId: 1 })
+      await subject.getActivityLogPage('some-crn', 'some offender', {
+        convictionId: 1,
+        complianceFilter: ActivityComplianceFilter.Appointments,
+      })
+      shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true, convictionId: 1 })
     })
 
     it('filters appointments', async () => {
-      await subject.getActivityLogPage('some-crn', 'some offender', { filter: ActivityFilter.Appointments })
+      await subject.getActivityLogPage('some-crn', 'some offender', {
+        complianceFilter: ActivityComplianceFilter.Appointments,
+      })
       shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true })
     })
 
     it('filters complied appointments', async () => {
-      await subject.getActivityLogPage('some-crn', 'some offender', { filter: ActivityFilter.CompliedAppointments })
+      await subject.getActivityLogPage('some-crn', 'some offender', {
+        complianceFilter: ActivityComplianceFilter.CompliedAppointments,
+      })
       shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true, attended: true, complied: true })
     })
 
     it('filters acceptable absence appointments', async () => {
       await subject.getActivityLogPage('some-crn', 'some offender', {
-        filter: ActivityFilter.AcceptableAbsenceAppointments,
+        complianceFilter: ActivityComplianceFilter.AcceptableAbsenceAppointments,
       })
       shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true, attended: false, complied: true })
     })
 
     it('filters failed to comply appointments', async () => {
       await subject.getActivityLogPage('some-crn', 'some offender', {
-        filter: ActivityFilter.FailedToComplyAppointments,
+        complianceFilter: ActivityComplianceFilter.FailedToComplyAppointments,
       })
       shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true, complied: false })
     })
 
     it('filters warning letter contacts', async () => {
-      await subject.getActivityLogPage('some-crn', 'some offender', { filter: ActivityFilter.WarningLetters })
+      await subject.getActivityLogPage('some-crn', 'some offender', {
+        complianceFilter: ActivityComplianceFilter.WarningLetters,
+      })
       shouldHaveFilteredContacts({ contactTypes: ['AWLI', 'AWL2', 'AWLF', 'AWLS', 'C040', 'CLBR', 'CBRC', 'CLOB'] })
     })
 
     it('filters appointments from last breach end', async () => {
       havingLastBreachEnd(DateTime.fromObject({ year: 2018, month: 5, day: 6 }))
       await subject.getActivityLogPage('some-crn', 'some offender', {
-        filter: ActivityFilter.Appointments,
+        complianceFilter: ActivityComplianceFilter.Appointments,
         convictionId: 1,
       })
       shouldHaveFilteredContacts({
@@ -199,7 +213,7 @@ describe('ActivityService', () => {
     it('filters appointments from specified date', async () => {
       havingLastBreachEnd(DateTime.fromObject({ year: 2018, month: 5, day: 6 }))
       await subject.getActivityLogPage('some-crn', 'some offender', {
-        filter: ActivityFilter.Appointments,
+        complianceFilter: ActivityComplianceFilter.Appointments,
         convictionId: 1,
         contactDateFrom: '2018-04-05',
       })

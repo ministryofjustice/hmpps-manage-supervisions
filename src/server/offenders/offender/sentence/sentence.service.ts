@@ -16,7 +16,7 @@ import { RequirementService } from './requirement.service'
 import { CommunityApiService } from '../../../community-api'
 import { getOffenceName, getSentenceName } from './util'
 import { ComplianceService } from './compliance.service'
-import { ActivityFilter, ActivityService } from '../activity'
+import { ActivityComplianceFilter, ActivityService } from '../activity'
 import { BreachService } from '../../../community-api/breach'
 
 @Injectable()
@@ -101,10 +101,10 @@ export class SentenceService {
 
     let compliancePeriod = CompliancePeriod.Last12Months
     const appointmentCounts = {
-      [ActivityFilter.Appointments]: 0,
-      [ActivityFilter.CompliedAppointments]: 0,
-      [ActivityFilter.FailedToComplyAppointments]: 0,
-      [ActivityFilter.AcceptableAbsenceAppointments]: 0,
+      [ActivityComplianceFilter.Appointments]: 0,
+      [ActivityComplianceFilter.CompliedAppointments]: 0,
+      [ActivityComplianceFilter.FailedToComplyAppointments]: 0,
+      [ActivityComplianceFilter.AcceptableAbsenceAppointments]: 0,
     }
     if (currentSummary) {
       if (currentSummary.lastRecentBreachEnd) {
@@ -112,8 +112,8 @@ export class SentenceService {
       }
 
       await Promise.all(
-        Object.keys(appointmentCounts).map(async (filter: ActivityFilter) => {
-          appointmentCounts[filter] = await this.activity.getActivityLogCount(
+        Object.keys(appointmentCounts).map(async (filter: ActivityComplianceFilter) => {
+          appointmentCounts[filter] = await this.activity.getActivityLogComplianceCount(
             crn,
             current.convictionId,
             filter,
@@ -124,7 +124,7 @@ export class SentenceService {
     }
 
     function getAppointmentQuantity(
-      filter: ActivityFilter,
+      filter: ActivityComplianceFilter,
       name: string,
       options: QuantityOptions = {},
     ): ComplianceQuantity {
@@ -142,9 +142,10 @@ export class SentenceService {
     function getCurrentStatus(): ComplianceDetails['current']['status'] {
       const value = currentSummary.inBreach
         ? ComplianceStatus.InBreach
-        : appointmentCounts[ActivityFilter.FailedToComplyAppointments] >= current.sentence.failureToComplyLimit
+        : appointmentCounts[ActivityComplianceFilter.FailedToComplyAppointments] >=
+          current.sentence.failureToComplyLimit
         ? ComplianceStatus.PendingBreach
-        : appointmentCounts[ActivityFilter.FailedToComplyAppointments] > 0
+        : appointmentCounts[ActivityComplianceFilter.FailedToComplyAppointments] > 0
         ? ComplianceStatus.FailureToComply
         : compliancePeriod === CompliancePeriod.SinceLastBreach
         ? ComplianceStatus.PreviousBreach
@@ -169,7 +170,7 @@ export class SentenceService {
         description:
           value === ComplianceStatus.InBreach
             ? 'Breach in progress'
-            : `${quantity(appointmentCounts[ActivityFilter.FailedToComplyAppointments], 'failure', {
+            : `${quantity(appointmentCounts[ActivityComplianceFilter.FailedToComplyAppointments], 'failure', {
                 zero: 'No',
               })} to comply ${compliancePeriod}`,
         breachSuggested: value === ComplianceStatus.PendingBreach && !currentSummary.inBreach,
@@ -182,17 +183,17 @@ export class SentenceService {
             ...currentSummary,
             period: compliancePeriod,
             appointments: {
-              total: getAppointmentQuantity(ActivityFilter.Appointments, 'appointment'),
-              complied: getAppointmentQuantity(ActivityFilter.CompliedAppointments, 'complied', {
+              total: getAppointmentQuantity(ActivityComplianceFilter.Appointments, 'appointment'),
+              complied: getAppointmentQuantity(ActivityComplianceFilter.CompliedAppointments, 'complied', {
                 plural: '',
                 zero: 'None',
               }),
               acceptableAbsences: getAppointmentQuantity(
-                ActivityFilter.AcceptableAbsenceAppointments,
+                ActivityComplianceFilter.AcceptableAbsenceAppointments,
                 'acceptable absence',
               ),
               failureToComply: getAppointmentQuantity(
-                ActivityFilter.FailedToComplyAppointments,
+                ActivityComplianceFilter.FailedToComplyAppointments,
                 'unacceptable absence',
               ),
             },

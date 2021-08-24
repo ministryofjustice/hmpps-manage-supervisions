@@ -1,4 +1,4 @@
-import { ActivityFilter, ActivityLogEntry } from './activity'
+import { ActivityComplianceFilter, ActivityLogEntry } from './activity'
 import { ComplianceDetails, ConvictionDetails } from './sentence'
 import { NextAppointmentSummary, RecentAppointments } from './schedule'
 import { RiskRegistrations, Risks } from './risk'
@@ -60,7 +60,7 @@ export interface OffenderActivityViewModel extends OffenderViewModelBase<Offende
     size?: number
   }
   filters: {}
-  currentFilter?: ActivityFilter
+  currentFilter?: ActivityComplianceFilter
   title: string
 }
 
