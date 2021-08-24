@@ -171,6 +171,7 @@ describe('RiskService', () => {
     it('gets active risk registrations', async () => {
       const registrations = [
         fakeRegistration({
+          registrationId: 44878,
           active: true,
           type: { description: 'Beta' },
           riskColour: 'White',
@@ -178,6 +179,7 @@ describe('RiskService', () => {
           nextReviewDate: '2021-03-02',
         }),
         fakeRegistration({
+          registrationId: 44879,
           active: true,
           type: { description: 'Alpha' },
           riskColour: 'Amber',
@@ -191,33 +193,68 @@ describe('RiskService', () => {
 
       expect(observed).toEqual({
         active: [
-          { text: 'Alpha', notes: null, link: '#TODO', reviewDue: null },
+          { text: 'Alpha', notes: null, link: 'risk/44879', reviewDue: null },
           {
             text: 'Beta',
             notes: 'Some notes',
-            link: '#TODO',
+            link: 'risk/44878',
             reviewDue: DateTime.fromObject({ day: 2, month: 3, year: 2021 }),
           },
         ],
-        inactive: 0,
+        inactive: [],
       } as RiskRegistrations)
       expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn' })
     })
 
     it('counts inactive risk registrations', async () => {
-      const registrations = [fakeRegistration({ active: false }), fakeRegistration({ active: false })]
+      const registrations = [
+        fakeRegistration({
+          registrationId: 1234,
+          active: false,
+          type: { description: 'Beta' },
+          riskColour: 'White',
+          deregisteringNotes: 'Some notes',
+          endDate: '2021-03-02',
+          nextReviewDate: null,
+        }),
+        fakeRegistration({
+          registrationId: 1235,
+          active: false,
+          type: { description: 'Alpha' },
+          riskColour: 'Amber',
+          deregisteringNotes: null,
+          endDate: '2021-07-01',
+          nextReviewDate: null,
+        }),
+      ]
 
       community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({ registrations }))
       const observed = await subject.getRiskRegistrations('some-crn')
 
-      expect(observed).toEqual({ active: [], inactive: 2 } as RiskRegistrations)
+      expect(observed).toEqual({
+        active: [],
+        inactive: [
+          {
+            text: 'Alpha',
+            notes: null,
+            link: 'removed-risk/1235',
+            endDate: DateTime.fromObject({ day: 1, month: 7, year: 2021 }),
+          },
+          {
+            text: 'Beta',
+            notes: 'Some notes',
+            link: 'removed-risk/1234',
+            endDate: DateTime.fromObject({ day: 2, month: 3, year: 2021 }),
+          },
+        ],
+      } as RiskRegistrations)
     })
 
     it('handles empty risk registrations', async () => {
       community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({}))
       const observed = await subject.getRiskRegistrations('some-crn')
 
-      expect(observed).toEqual({ active: [], inactive: 0 } as RiskRegistrations)
+      expect(observed).toEqual({ active: [], inactive: [] } as RiskRegistrations)
     })
 
     it('filters excluded registrations ', async () => {
@@ -226,7 +263,7 @@ describe('RiskService', () => {
       community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({ registrations }))
       const observed = await subject.getRiskRegistrations('some-crn')
 
-      expect(observed).toEqual({ active: [], inactive: 0 } as RiskRegistrations)
+      expect(observed).toEqual({ active: [], inactive: [] } as RiskRegistrations)
     })
   })
 })

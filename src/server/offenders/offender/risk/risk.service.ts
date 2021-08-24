@@ -102,7 +102,7 @@ export class RiskService {
           ?.map<RegistrationFlag>(r => ({
             text: r.type.description,
             notes: r.deregisteringNotes,
-            endDate: r.endDate,
+            endDate: r.endDate && DateTime.fromISO(r.endDate),
             link: `removed-risk/${r.registrationId}`,
           }))
           .sort((a, b) => a.text.localeCompare(b.text)) || [],

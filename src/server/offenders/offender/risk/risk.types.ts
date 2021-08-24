@@ -46,6 +46,7 @@ export interface RegistrationFlag {
   text: string
   notes?: string
   reviewDue?: DateTime
+  endDate?: DateTime
   link: string
 }
 
