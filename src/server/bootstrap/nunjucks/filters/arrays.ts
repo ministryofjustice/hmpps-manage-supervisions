@@ -3,7 +3,7 @@ import { NunjucksFilter } from './types'
 
 export class ConcatArrays implements NunjucksFilter {
   filter(...arrays: any[][]): any[] {
-    return arrays.reduce((agg, x) => [...agg, ...x], [])
+    return arrays.filter(x => x?.length > 0).reduce((agg, x) => [...agg, ...x], [])
   }
 }
 
