@@ -1,5 +1,8 @@
 import {
   AllRoshRiskDto,
+  AssessmentNeedDto,
+  AssessmentNeedDtoSeverity,
+  AssessmentNeedsDto,
   OtherRoshRisksDtoBreachOfTrust,
   OtherRoshRisksDtoControlIssuesDisruptiveBehaviour,
   OtherRoshRisksDtoEscapeOrAbscond,
@@ -11,7 +14,10 @@ import {
 } from './client'
 import { fake, fakeEnum, fakeRandomArray } from '../util/util.fake'
 import * as faker from 'faker'
+import { startCase, groupBy } from 'lodash'
 import { toList } from '../util'
+
+import { NeedsAssessmentSection } from './well-known'
 
 const fakeRiskDto = fake<RiskDto>((options, partial = {}) => {
   const current = partial.current || fakeEnum(RiskDtoCurrent)
@@ -63,3 +69,35 @@ export const fakeAllRoshRiskDto = fake<AllRoshRiskDto>((options, partial = {}) =
     riskInCustody: partial.summary?.riskInCustody || fakeRiskLevels(),
   },
 }))
+
+export const fakeAssessmentNeedDto = fake<AssessmentNeedDto>(
+  (options, { severity = fakeEnum(AssessmentNeedDtoSeverity), section = fakeEnum(NeedsAssessmentSection) } = {}) => ({
+    section,
+    name: startCase(section.toLowerCase()),
+    overThreshold: faker.datatype.boolean(),
+    riskOfHarm: faker.datatype.boolean(),
+    riskOfReoffending: faker.datatype.boolean(),
+    flaggedAsNeed: faker.datatype.boolean(),
+    identifiedAsNeed: faker.datatype.boolean(),
+    severity,
+    needScore:
+      severity === AssessmentNeedDtoSeverity.NoNeed
+        ? undefined
+        : faker.datatype.number(
+            severity === AssessmentNeedDtoSeverity.Standard ? { min: 1, max: 5 } : { min: 6, max: 10 },
+          ),
+  }),
+)
+
+export const fakeAssessmentNeedsDto = fake<AssessmentNeedsDto>((options, partial = {}) => {
+  const partialNeeds = groupBy(partial.identifiedNeeds || [], x => x.section)
+
+  return {
+    assessedOn: faker.date.past().toISOString(),
+    identifiedNeeds: Object.values(NeedsAssessmentSection).map(section =>
+      fakeAssessmentNeedDto(partialNeeds[section]?.find(x => x) || { section }),
+    ),
+    notIdentifiedNeeds: [],
+    unansweredNeeds: [],
+  }
+})
