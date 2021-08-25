@@ -12,28 +12,28 @@
     "jsonBody": {
       "riskToSelf": {
         "suicide": {
-          "risk": "NO",
+          "risk": "DK",
           "previous": "NO",
           "previousConcernsText": null,
           "current": "YES",
           "currentConcernsText": null
         },
         "selfHarm": {
-          "risk": "NO",
+          "risk": "DK",
           "previous": "YES",
           "previousConcernsText": null,
           "current": "YES",
           "currentConcernsText": null
         },
         "custody": {
-          "risk": "YES",
+          "risk": "DK",
           "previous": "YES",
           "previousConcernsText": "Soluta tempore nemo et velit est perspiciatis.\n\nNeque error aut est nemo quasi. Et labore impedit omnis numquam id et eaque facere itaque. Ipsam et atque eos tempora possimus.",
           "current": "NO",
           "currentConcernsText": null
         },
         "hostelSetting": {
-          "risk": "DK",
+          "risk": "NO",
           "previous": "YES",
           "previousConcernsText": null,
           "current": "NO",
@@ -48,13 +48,13 @@
         }
       },
       "otherRisks": {
-        "escapeOrAbscond": "DK",
-        "controlIssuesDisruptiveBehaviour": "DK",
+        "escapeOrAbscond": "YES",
+        "controlIssuesDisruptiveBehaviour": "NO",
         "breachOfTrust": "DK",
-        "riskToOtherPrisoners": "NO"
+        "riskToOtherPrisoners": "YES"
       },
       "summary": {
-        "whoIsAtRisk": "Known Adult and Public",
+        "whoIsAtRisk": "Someone at risk",
         "natureOfRisk": "Some nature of risk",
         "riskImminence": "Some risk imminence",
         "riskIncreaseFactors": "Some risk increase factors",
@@ -65,9 +65,10 @@
           "LOW": ["Known Adult"]
         },
         "riskInCustody": {
-          "VERY_HIGH": ["Staff", "Public"],
-          "HIGH": ["Prisoners", "Children"],
-          "LOW": ["Children"]
+          "VERY_HIGH": ["Staff", "Public", "Public"],
+          "HIGH": ["Prisoners", "Public"],
+          "MEDIUM": ["Prisoners", "Public", "Known Adult"],
+          "LOW": ["Staff"]
         }
       }
     }

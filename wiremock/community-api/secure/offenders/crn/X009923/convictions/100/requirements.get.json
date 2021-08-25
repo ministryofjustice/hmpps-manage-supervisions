@@ -18,7 +18,7 @@
           "active": false,
           "startDate": "2018-08-01",
           "expectedStartDate": "2019-04-03",
-          "expectedEndDate": "2021-08-18",
+          "expectedEndDate": "2021-12-27",
           "requirementNotes": "Some inactive unpaid work requirement",
           "requirementTypeMainCategory": {
             "code": "W",
@@ -35,7 +35,7 @@
           }
         },
         {
-          "requirementId": 31022,
+          "requirementId": 46901,
           "length": 18,
           "lengthUnit": "Hours",
           "active": true,
@@ -54,13 +54,13 @@
           "createdDatetime": "2019-04-08T14:48:17"
         },
         {
-          "requirementId": 2391,
+          "requirementId": 59111,
           "length": 3,
           "lengthUnit": "Hours",
           "active": true,
           "startDate": "2018-08-01",
           "expectedStartDate": "2019-04-03",
-          "expectedEndDate": "2022-02-01",
+          "expectedEndDate": "2022-02-17",
           "requirementNotes": "3 ADD HOURS",
           "requirementTypeMainCategory": {
             "code": "W",
@@ -78,7 +78,7 @@
           "lengthUnit": "Days",
           "active": true,
           "startDate": "2018-08-01",
-          "expectedStartDate": "2020-08-30",
+          "expectedStartDate": "2021-01-26",
           "expectedEndDate": "2021-11-07",
           "requirementNotes": null,
           "requirementTypeMainCategory": {
@@ -86,7 +86,7 @@
             "description": "RAR category"
           },
           "requirementTypeSubCategory": {
-            "code": "6h6by",
+            "code": "bx9d8",
             "description": "Cotton"
           },
           "commencementDate": "2018-08-01",
@@ -99,7 +99,7 @@
           "lengthUnit": "Days",
           "active": true,
           "startDate": "2018-09-01",
-          "expectedStartDate": "2020-11-02",
+          "expectedStartDate": "2021-07-04",
           "expectedEndDate": null,
           "requirementNotes": null,
           "requirementTypeMainCategory": {
@@ -107,8 +107,8 @@
             "description": "RAR category"
           },
           "requirementTypeSubCategory": {
-            "code": "pknai",
-            "description": "Concrete"
+            "code": "9z12l",
+            "description": "Wooden"
           },
           "commencementDate": "2018-08-01",
           "createdDatetime": "2019-04-08T13:59:45",
@@ -116,13 +116,13 @@
           "restrictive": false
         },
         {
-          "requirementId": 47860,
+          "requirementId": 28386,
           "length": 7,
           "lengthUnit": "Hours",
           "active": true,
           "startDate": "2018-08-01",
           "expectedStartDate": "2019-04-01",
-          "expectedEndDate": "2021-10-17",
+          "expectedEndDate": "2022-03-30",
           "requirementNotes": null,
           "requirementTypeMainCategory": {
             "code": "W",

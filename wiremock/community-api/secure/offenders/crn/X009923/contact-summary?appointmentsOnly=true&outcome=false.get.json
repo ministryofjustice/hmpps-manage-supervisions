@@ -1,0 +1,77 @@
+{
+  "request": {
+    "method": "GET",
+    "headers": {},
+    "urlPath": "/community-api/secure/offenders/crn/X009923/contact-summary",
+    "queryParameters": {
+      "appointmentsOnly": {
+        "equalTo": "true"
+      },
+      "outcome": {
+        "equalTo": "false"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "content": [
+        {
+          "contactId": 5,
+          "contactStart": "2020-09-02T11:00:00+01:00",
+          "contactEnd": "2020-09-02T13:00:00+01:00",
+          "notes": "Some unknown appointment",
+          "officeLocation": {
+            "code": "d4f59cb8-35e9-4f62-ab2d-eb7ceb06e25e",
+            "buildingName": "Reid",
+            "buildingNumber": "546",
+            "streetName": "Ibrahim Course",
+            "townCity": "New Rowena",
+            "county": "Buckinghamshire",
+            "postcode": "56731-9691",
+            "description": "42412 Laila Common"
+          },
+          "outcome": null,
+          "sensitive": false,
+          "type": {
+            "code": "NOT_WELL_KNOWN",
+            "description": "Not a well known appointment",
+            "shortDescription": "drive user-centric models",
+            "appointment": true
+          },
+          "provider": {
+            "code": "4b189696-63bc-4f53-a094-4e5a182cc499",
+            "description": "facilitate intuitive interfaces"
+          },
+          "team": {
+            "code": "458425d4-8637-4325-b728-af1a027ba1c2",
+            "description": "integrate collaborative channels"
+          },
+          "staff": {
+            "code": "e1fffe55-9f20-4cb6-b06f-bed278ccdb03",
+            "forenames": "Robert",
+            "surname": "Ohagan",
+            "unallocated": false
+          },
+          "lastUpdatedDateTime": "2021-08-25T09:51:19.974+01:00",
+          "lastUpdatedByUser": {
+            "forenames": "Fred",
+            "surname": "Swaniawski"
+          }
+        }
+      ],
+      "number": 0,
+      "size": 1,
+      "numberOfElements": 1,
+      "totalPages": 1,
+      "totalElements": 1,
+      "first": true,
+      "last": false,
+      "empty": false
+    }
+  },
+  "priority": 4
+}

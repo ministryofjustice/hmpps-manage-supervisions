@@ -1,0 +1,65 @@
+{
+  "request": {
+    "method": "GET",
+    "headers": {},
+    "urlPath": "/community-api/secure/offenders/crn/X009923/appointments",
+    "queryParameters": {
+      "from": {
+        "matches": ".+"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": [
+      {
+        "appointmentId": 1,
+        "appointmentStart": "2200-01-02T13:30:00",
+        "appointmentEnd": "2200-01-02T14:00:00",
+        "notes": "Some home visit appointment\n\nWith a new line!",
+        "officeLocation": {
+          "code": "031c359c-ec84-47b4-a0f3-31ee4b73665d",
+          "buildingName": "Willis",
+          "buildingNumber": "781",
+          "streetName": "Schmidt Grove",
+          "townCity": "Port Phyllisburgh",
+          "county": "Cambridgeshire",
+          "postcode": "95870-8703",
+          "description": "902 Verda Crossroad"
+        },
+        "outcome": null,
+        "sensitive": true,
+        "type": {
+          "contactType": "CHVS",
+          "description": "Home Visit to Case (NS)",
+          "orderTypes": ["CJA", "CJA"],
+          "requiresLocation": "REQUIRED"
+        },
+        "provider": {
+          "code": "d91eb1d1-ad2e-4873-85d7-d6142f3cdc33",
+          "description": "embrace customized action-items"
+        },
+        "team": {
+          "code": "f53063f9-1c45-4caf-97fa-f9c91c2f25da",
+          "description": "expedite web-enabled metrics"
+        },
+        "staff": {
+          "code": "a5986a03-2b42-4a3b-9314-c562ab1f6c81",
+          "forenames": "Catherine",
+          "surname": "Ellis",
+          "unallocated": false
+        },
+        "rarActivity": true,
+        "requirement": {
+          "isRar": true,
+          "requirementId": 68927,
+          "isActive": true
+        }
+      }
+    ]
+  },
+  "priority": 1
+}

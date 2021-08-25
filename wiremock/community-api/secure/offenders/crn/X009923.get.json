@@ -42,9 +42,9 @@
         },
         "disabilities": [
           {
-            "disabilityId": 14660,
+            "disabilityId": 93736,
             "disabilityType": {
-              "code": "7G9",
+              "code": "S2X",
               "description": "Learning Difficulties"
             },
             "startDate": "2021-02-01",
@@ -60,9 +60,9 @@
             ]
           },
           {
-            "disabilityId": 91771,
+            "disabilityId": 27431,
             "disabilityType": {
-              "code": "RIS",
+              "code": "9TR",
               "description": "Speech Impairment"
             },
             "startDate": "2021-03-01",
@@ -70,9 +70,9 @@
             "provisions": null
           },
           {
-            "disabilityId": 64545,
+            "disabilityId": 92997,
             "disabilityType": {
-              "code": "U3U",
+              "code": "5A6",
               "description": "Dyslexia"
             },
             "startDate": "2020-04-01",
