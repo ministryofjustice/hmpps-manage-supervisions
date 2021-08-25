@@ -285,6 +285,8 @@ export class ActivityService {
     switch (complianceFilter) {
       case ActivityComplianceFilter.Appointments:
         return defaultAppointmentFilters
+      case ActivityComplianceFilter.WithoutOutcome:
+        return { ...defaultAppointmentFilters, outcome: false }
       case ActivityComplianceFilter.CompliedAppointments:
         return { ...defaultAppointmentFilters, complied: true, attended: true }
       case ActivityComplianceFilter.AcceptableAbsenceAppointments:

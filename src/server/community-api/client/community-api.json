@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "description": "<h2>REST service for accessing community probation information</h2><p>This service provides endpoints for accessing data primary sourced from National Delius about people that are of interest to HM Probation Service.</p><p>There is cross-over with the <b>prison-api</b> though suspects on remand will not be surfaced by this API unless that have previously been on probation.</p><div>This service is secured by <b>OAuth2</b> with tokens supplied by HMPPS Auth. Most read-only endpoints require the <b>ROLE_COMMUNITY</b> to access, but check each endpoint where this differs.<p>This service can be accessed in a number environments. For each environment a different set of OAuth2 credentials from HMPPS Auth are required</p><ul><li>Development: <b>https://community-api.dev.probation.service.justice.gov.uk</b></li><li>Test: <b>https://community-api.test.probation.service.justice.gov.uk</b></li><li>Pre-production: <b>https://community-api.pre-prod.delius.probation.hmpps.dsd.io</b></li><li>Production: <b>https://community-api.probation.service.justice.gov.uk</b></li></ul><div>",
-    "version": "2021-08-23.6057.707150c",
+    "version": "2021-08-24",
     "title": "Community API Documentation",
     "termsOfService": "https://gateway.nomis-api.service.justice.gov.uk/auth/terms",
     "contact": { "name": "HMPPS Digital Studio", "email": "dps-hmpps@digital.justice.gov.uk" },
@@ -11,7 +11,7 @@
       "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
     }
   },
-  "host": "community-api-secure.test.delius.probation.hmpps.dsd.io",
+  "host": "localhost:8080",
   "basePath": "/",
   "tags": [
     { "name": "-- Popular core APIs --", "description": "Endpoints that are most often used by clients" },
@@ -46,7 +46,6 @@
       "name": "Sentence requirements and breach",
       "description": "Offender sentence requires and breaches of those requirements"
     },
-    { "name": "Smoke test", "description": "Smoke Test Helper Resource" },
     {
       "name": "Staff",
       "description": "Staff related endpoints. Staff are typically offender managers and maybe users of Delius"
@@ -836,6 +835,7 @@
             "required": false,
             "type": "boolean"
           },
+          { "name": "outcome", "in": "query", "description": "outcome", "required": false, "type": "boolean" },
           {
             "name": "page",
             "in": "query",
@@ -3724,51 +3724,6 @@
         }
       }
     },
-    "/secure/smoketest/offenders/crn/{crn}/custody/reset": {
-      "post": {
-        "tags": ["Smoke test"],
-        "summary": "Resets custody data to the state before a Delius offender record has been matched to a NOMIS record",
-        "description": "Only used for smoke tests, not production ready",
-        "operationId": "resetCustodySmokeTestDataUsingPOST",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "parameters": [{ "name": "crn", "in": "path", "description": "crn", "required": true, "type": "string" }],
-        "responses": {
-          "200": { "description": "OK" },
-          "401": { "description": "JWT supplied invalid or absent" },
-          "403": { "description": "Requires role ROLE_SMOKE_TEST" },
-          "404": {
-            "description": "Either the requested offender was not found or no active custodial sentences were found"
-          }
-        }
-      }
-    },
-    "/secure/smoketest/offenders/crn/{crn}/details": {
-      "post": {
-        "tags": ["Smoke test"],
-        "summary": "Updates the specified offenders details",
-        "description": "Only used for smoke tests, not production ready",
-        "operationId": "updateOffenderDetailsUsingPOST",
-        "consumes": ["application/json"],
-        "produces": ["application/json"],
-        "parameters": [
-          { "name": "crn", "in": "path", "description": "crn", "required": true, "type": "string" },
-          {
-            "in": "body",
-            "name": "offenderDetails",
-            "description": "offenderDetails",
-            "required": true,
-            "schema": { "$ref": "#/definitions/UpdateOffenderDetails" }
-          }
-        ],
-        "responses": {
-          "200": { "description": "OK" },
-          "401": { "description": "JWT supplied invalid or absent" },
-          "403": { "description": "Requires role ROLE_SMOKE_TEST" },
-          "404": { "description": "The requested offender was not found" }
-        }
-      }
-    },
     "/secure/staff/list": {
       "post": {
         "tags": ["Staff"],
@@ -4485,6 +4440,7 @@
         "appointment": { "type": "boolean" },
         "code": { "type": "string" },
         "description": { "type": "string" },
+        "nsi": { "type": "boolean" },
         "shortDescription": { "type": "string" }
       },
       "title": "ContactType"
@@ -6319,14 +6275,6 @@
         }
       },
       "title": "UpdateCustodyBookingNumber"
-    },
-    "UpdateOffenderDetails": {
-      "type": "object",
-      "properties": {
-        "firstName": { "type": "string", "example": "John" },
-        "surname": { "type": "string", "example": "Smith" }
-      },
-      "title": "UpdateOffenderDetails"
     },
     "UpdateOffenderNomsNumber": {
       "type": "object",

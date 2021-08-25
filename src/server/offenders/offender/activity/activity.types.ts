@@ -65,6 +65,7 @@ export interface CommunicationViewModel extends ViewModel {
 
 export enum ActivityComplianceFilter {
   Appointments = 'appointments',
+  WithoutOutcome = 'without-an-outcome',
   CompliedAppointments = 'complied-appointments',
   FailedToComplyAppointments = 'failed-to-comply-appointments',
   AcceptableAbsenceAppointments = 'acceptable-absence-appointments',
@@ -73,6 +74,10 @@ export enum ActivityComplianceFilter {
 
 export const FilterLinks: { [key: string]: ActivityFilterMeta } = {
   [ActivityComplianceFilter.Appointments]: { name: 'Appointments', description: 'Appointments' },
+  [ActivityComplianceFilter.WithoutOutcome]: {
+    name: 'Without an outcome',
+    description: 'Appointments without an outcome',
+  },
   [ActivityComplianceFilter.CompliedAppointments]: { name: 'Complied', description: 'Complied appointments' },
   [ActivityComplianceFilter.FailedToComplyAppointments]: {
     name: 'Failures to comply',

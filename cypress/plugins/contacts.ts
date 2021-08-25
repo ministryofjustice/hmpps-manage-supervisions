@@ -181,6 +181,12 @@ export function contacts(crn: string, partials: DeepPartial<ContactSummary>[] = 
     // ftc appointments only
     all({ appointmentsOnly: true, complied: false }, c => c.type.appointment && c.outcome?.complied === false)
 
+    // appointments without an outcome only
+    all(
+      { appointmentsOnly: true, outcome: false },
+      c => c.type.appointment && (c.outcome === null || c.outcome === undefined),
+    )
+
     // appointments only
     all({ appointmentsOnly: true }, c => c.type.appointment)
 
