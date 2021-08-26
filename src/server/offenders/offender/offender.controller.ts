@@ -82,8 +82,8 @@ export class OffenderController {
     ])
     return {
       ...this.getBase(OffenderPage.Overview, offender),
-      // We are not rendering personal contacts on the overview page so provide an empty array instead
-      ...this.personalService.getPersonalDetails(offender, [], personalCircumstances),
+      // We are not rendering personal contacts or needs on the overview page so provide an empty array instead
+      ...this.personalService.getPersonalDetails(offender, [], personalCircumstances, []),
       compliance,
       nextAppointment,
       risks,
@@ -144,14 +144,15 @@ export class OffenderController {
     title: 'Personal details',
   })
   async getPersonal(@Param('crn') crn: string): Promise<OffenderPersonalViewModel> {
-    const [offender, personalContacts, personalCircumstances] = await Promise.all([
+    const [offender, personalContacts, personalCircumstances, criminogenicNeeds] = await Promise.all([
       this.offenderService.getOffenderDetail(crn),
       this.personalService.getPersonalContacts(crn),
       this.personalService.getPersonalCircumstances(crn),
+      this.riskService.getNeeds(crn),
     ])
     return {
       ...this.getBase(OffenderPage.Personal, offender),
-      ...this.personalService.getPersonalDetails(offender, personalContacts, personalCircumstances),
+      ...this.personalService.getPersonalDetails(offender, personalContacts, personalCircumstances, criminogenicNeeds),
     }
   }
 

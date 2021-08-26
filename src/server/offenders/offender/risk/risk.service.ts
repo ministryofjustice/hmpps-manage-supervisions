@@ -2,13 +2,14 @@ import { Injectable } from '@nestjs/common'
 import { groupBy, orderBy } from 'lodash'
 import { CommunityApiService } from '../../../community-api'
 import {
-  AssessRisksAndNeedsApiService,
+  AssessmentNeedDtoSeverity,
   RiskDto,
   RiskDtoCurrent,
   RiskDtoPrevious,
   RoshRiskToSelfDto,
-} from '../../../assess-risks-and-needs-api'
+} from '../../../assess-risks-and-needs-api/client'
 import {
+  CriminogenicNeed,
   FlatRiskToSelf,
   RiskRegistration,
   RiskLevel,
@@ -25,6 +26,7 @@ import { SanitisedAxiosError } from '../../../common/rest'
 import { DateTime } from 'luxon'
 import { GovUkUiTagColour } from '../../../util/govuk-ui'
 import { riskReferenceData } from './registration-reference-data'
+import { AssessRisksAndNeedsApiService } from '../../../assess-risks-and-needs-api'
 
 @Injectable()
 export class RiskService {
@@ -136,6 +138,27 @@ export class RiskService {
       typeInfo: riskReferenceData[registration.type.code],
       link: `${registration.active ? 'risk' : 'removed-risk'}/${registration.registrationId}`,
     }
+  }
+
+  async getNeeds(crn: string): Promise<CriminogenicNeed[]> {
+    const needs = await SanitisedAxiosError.catchNotFound(() =>
+      this.assessRisksAndNeeds.needs.getCriminogenicNeedsByCrn({ crn }),
+    )
+
+    if (!needs) {
+      return []
+    }
+
+    const date = DateTime.fromISO(needs.assessedOn)
+    return orderBy(
+      needs.identifiedNeeds
+        .filter(x => x.severity !== AssessmentNeedDtoSeverity.NoNeed)
+        .map(x => ({
+          name: x.name,
+          date,
+        })),
+      x => x.name,
+    )
   }
 }
 

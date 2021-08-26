@@ -1,4 +1,4 @@
-import { AllRoshRiskDto, RiskDtoCurrent, RiskDtoPrevious } from '../../src/server/assess-risks-and-needs-api'
+import { AllRoshRiskDto, RiskDtoCurrent, RiskDtoPrevious } from '../../src/server/assess-risks-and-needs-api/client'
 import { SeedFn } from './wiremock'
 import { fakeAllRoshRiskDto } from '../../src/server/assess-risks-and-needs-api/assess-risks-and-needs-api.fake'
 

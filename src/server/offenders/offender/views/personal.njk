@@ -11,9 +11,6 @@
                 {{ govukDetails({
                     summaryText: "View address details",
                     classes: 'govuk-!-margin-top-2 govuk-!-margin-bottom-0',
-                    attributes: {
-                        'data-qa': 'offender/personal-details/address-details'
-                    },
                     html: govukSummaryList({
                         rows: [
                             {
@@ -65,9 +62,6 @@
         {% endif %}
 
         {{ govukSummaryList({
-            attributes: {
-                'data-qa': 'offender/personal-details/contact'
-            },
             rows: [
                 {
                     key: { text: 'Mobile number' if contactDetails.phoneNumbers.other else 'Phone number' },
@@ -99,9 +93,6 @@
 
     {% call appSummaryCard({ titleText: 'Personal details', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
         {{ govukSummaryList({
-            attributes: {
-                'data-qa': 'offender/personal-details/personal'
-            },
             rows: [
                 {
                     key: { text: "Name" },
@@ -146,6 +137,15 @@
                     }
                 },
                 {
+                    key: { text: 'Criminogenic needs' },
+                    value: {
+                        html: join(personalDetails.criminogenicNeeds, {
+                                linkText: 'View sentence plan in OASys',
+                                link: links.toOASys
+                            }) if personalDetails.criminogenicNeeds.length > 0 else 'None'
+                    }
+                },
+                {
                     key: { text: "PNC" },
                     value: { text: ids.pnc }
                 } if ids.pnc,
@@ -159,9 +159,6 @@
 
     {% call appSummaryCard({ titleText: 'Equality monitoring', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
         {{ govukSummaryList({
-            attributes: {
-                'data-qa': 'offender/personal-details/equality'
-            },
             rows: [
                 {
                     key: { text: "Religion or belief" },

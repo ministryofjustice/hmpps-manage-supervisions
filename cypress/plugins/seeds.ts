@@ -15,7 +15,7 @@ import {
 import { appointmentTypes } from './appointment-types'
 import { staff } from './staff'
 import { get, set } from 'lodash'
-import { AllRoshRiskDto, AssessmentNeedsDto } from '../../src/server/assess-risks-and-needs-api'
+import { AllRoshRiskDto, AssessmentNeedsDto } from '../../src/server/assess-risks-and-needs-api/client'
 import { CRN, offender } from './offender'
 import { ACTIVE_CONVICTION_ID, convictions, PREVIOUS_CONVICTION_IDS } from './convictions'
 import { personalContacts } from './personal-contacts'

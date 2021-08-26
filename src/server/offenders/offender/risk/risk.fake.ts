@@ -7,6 +7,7 @@ import {
   RiskLevel,
   RiskRegistrations,
   RiskRegistrationDetails,
+  CriminogenicNeed,
 } from './risk.types'
 import { fake, fakeEnum, fakeRandomArray } from '../../../util/util.fake'
 import * as faker from 'faker'
@@ -83,4 +84,9 @@ export const fakeRisks = fake<Risks>((options, partial = {}) => ({
     custody: fakeFlatRiskToSelf(),
     vulnerability: fakeFlatRiskToSelf(),
   },
+}))
+
+export const fakeCriminogenicNeed = fake<CriminogenicNeed>(() => ({
+  name: faker.company.bs(),
+  date: DateTime.fromJSDate(faker.date.past()),
 }))

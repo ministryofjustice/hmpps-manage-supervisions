@@ -17,6 +17,7 @@ import { fakePersonalCircumstanceDetail, fakePersonalContactDetail } from './per
 import { fakeBreadcrumbUrl, MockLinksModule } from '../../../common/links/links.mock'
 import { BreadcrumbType } from '../../../common/links'
 import { CommunityApiService, WellKnownAddressTypes } from '../../../community-api'
+import { fakeCriminogenicNeed } from '../risk/risk.fake'
 
 describe('PersonalService', () => {
   let subject: PersonalService
@@ -172,8 +173,9 @@ describe('PersonalService', () => {
         { name: 'Some expired circumstance', endDate: DateTime.fromJSDate(faker.date.past()) },
       ),
     ]
+    const needs = [fakeCriminogenicNeed({ name: 'Some criminogenic need' })]
 
-    const observed = subject.getPersonalDetails(offender, personalContacts, personalCircumstances)
+    const observed = subject.getPersonalDetails(offender, personalContacts, personalCircumstances, needs)
     expect(observed).toEqual({
       contactDetails: {
         address: expectedMainAddress,
@@ -198,6 +200,7 @@ describe('PersonalService', () => {
         preferredLanguage: 'English (interpreter required)',
         currentCircumstances: ['Relationship: Married / Civil partnership'],
         disabilities: ['Some disability: None', 'Some other disability: Some provision'],
+        criminogenicNeeds: ['Some criminogenic need'],
         religion: 'Christian',
         sex: 'Male',
         genderIdentity: 'Prefer to self-describe',
@@ -218,7 +221,7 @@ describe('PersonalService', () => {
         personalCircumstances: [],
       }),
     )
-    const observed = subject.getPersonalDetails(offender, [], [])
+    const observed = subject.getPersonalDetails(offender, [], [], [])
     expect(observed.contactDetails.address).toBeFalsy()
   })
 

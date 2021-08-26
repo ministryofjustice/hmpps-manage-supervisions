@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing'
-import { AssessRisksAndNeedsApiService, RiskDtoCurrent, RiskDtoPrevious } from '../../../assess-risks-and-needs-api'
+import { AssessmentNeedDtoSeverity, RiskDtoCurrent, RiskDtoPrevious } from '../../../assess-risks-and-needs-api/client'
 import { fakeOkResponse, fakeRestError } from '../../../common/rest/rest.fake'
-import { RiskRegistrationDetails, RiskRegistrations, Risks } from './risk.types'
+import { RiskRegistrationDetails, CriminogenicNeed, RiskRegistrations, Risks } from './risk.types'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../../community-api/community-api.mock'
 import { RiskService } from './risk.service'
 import {
@@ -9,12 +9,16 @@ import {
   MockAssessRisksAndNeedsApiService,
 } from '../../../assess-risks-and-needs-api/assess-risks-and-needs-api.mock'
 import { CommunityApiService } from '../../../community-api'
-import { fakeAllRoshRiskDto } from '../../../assess-risks-and-needs-api/assess-risks-and-needs-api.fake'
+import {
+  fakeAllRoshRiskDto,
+  fakeAssessmentNeedsDto,
+} from '../../../assess-risks-and-needs-api/assess-risks-and-needs-api.fake'
 import { fakeRegistration } from '../../../community-api/community-api.fake'
 import { FakeConfigModule } from '../../../config/config.fake'
 import { HttpStatus } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { GovUkUiTagColour } from '../../../util/govuk-ui'
+import { AssessRisksAndNeedsApiService, NeedsAssessmentSection } from '../../../assess-risks-and-needs-api'
 
 const IGNORED_REGISTRATION = 'some-ignored-registration-type'
 
@@ -308,6 +312,57 @@ describe('RiskService', () => {
           termination: "Don't remove at termination.",
         },
       } as RiskRegistrationDetails)
+    })
+  })
+
+  describe('getting needs', () => {
+    it('handles missing offender', async () => {
+      arn.needs.getCriminogenicNeedsByCrn.withArgs({ crn: 'some-crn' }).throws(fakeRestError(HttpStatus.NOT_FOUND))
+      const observed = await subject.getNeeds('some-crn')
+      expect(observed).toEqual([])
+    })
+
+    it('handles empty data', async () => {
+      arn.needs.getCriminogenicNeedsByCrn.withArgs({ crn: 'some-crn' }).resolves(
+        fakeOkResponse({
+          identifiedNeeds: [],
+          unansweredNeeds: [],
+          notIdentifiedNeeds: [],
+          assessedOn: '2021-02-03',
+        }),
+      )
+      const observed = await subject.getNeeds('some-crn')
+      expect(observed).toEqual([])
+    })
+
+    it('gets identified needs', async () => {
+      const needs = fakeAssessmentNeedsDto({
+        identifiedNeeds: [
+          {
+            section: NeedsAssessmentSection.EducationTrainingAndEmployability,
+            severity: AssessmentNeedDtoSeverity.Standard,
+            name: 'Education',
+          },
+          {
+            section: NeedsAssessmentSection.FinancialManagementAndIncome,
+            severity: AssessmentNeedDtoSeverity.Severe,
+            name: 'Financial',
+          },
+          {
+            section: NeedsAssessmentSection.Accommodation,
+            severity: AssessmentNeedDtoSeverity.NoNeed,
+          },
+        ],
+        assessedOn: '2021-02-03',
+      })
+      arn.needs.getCriminogenicNeedsByCrn.withArgs({ crn: 'some-crn' }).resolves(fakeOkResponse(needs))
+      const observed = await subject.getNeeds('some-crn')
+      expect(observed).toEqual(
+        ['Education', 'Financial'].map<CriminogenicNeed>(name => ({
+          name,
+          date: DateTime.fromObject({ year: 2021, month: 2, day: 3 }),
+        })),
+      )
     })
   })
 })

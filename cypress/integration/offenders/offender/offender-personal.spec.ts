@@ -10,25 +10,29 @@ import { OFFENDER_ID } from '../../../plugins/offender'
 class Fixture extends ViewOffenderFixture {
   whenClickingViewAllAddresses(): this {
     return this.shouldRenderOffenderTab('personal', page => {
-      page.tableValue('contact', 'Other addresses').contains('View all addresses').click()
+      page.contactDetails(card => card.value('Other addresses').contains('View all addresses').click())
     })
   }
 
   whenClickingViewAllDisabilities() {
     return this.shouldRenderOffenderTab('personal', page => {
-      page.tableValue('personal', 'Disabilities and adjustments').contains('View details and notes').click()
+      page.personalDetails(card =>
+        card.value('Disabilities and adjustments').contains('View details and notes').click(),
+      )
     })
   }
 
   whenClickingViewAllPersonalCircumstances() {
     return this.shouldRenderOffenderTab('personal', page => {
-      page.tableValue('personal', 'Current circumstances').contains('View details and previous circumstances').click()
+      page.personalDetails(card =>
+        card.value('Current circumstances').contains('View details and previous circumstances').click(),
+      )
     })
   }
 
   whenClickingViewPersonalContact(name: string) {
     return this.shouldRenderOffenderTab('personal', page => {
-      page.tableValue('contact', 'Personal contacts').contains(name).click()
+      page.contactDetails(card => card.value('Personal contacts').contains(name).click())
     })
   }
 
@@ -192,43 +196,45 @@ context('ViewOffenderPersonalDetails', () => {
       .whenClickingSubNavTab('personal')
       .shouldDisplayCommonHeader()
       .shouldRenderOffenderTab('personal', page => {
-        page.tableValue('contact', 'Mobile number').contains('07734 111992')
-        page.tableValue('contact', 'Telephone number').contains('01234 111222')
-        page.tableValue('contact', 'Email address').contains('example2@example2.com example@example.com')
-        page.tableValue('contact', 'Main address').contains('1 High Street Sheffield South Yorkshire S10 1AG')
+        page.contactDetails(card => {
+          card.value('Mobile number').contains('07734 111992')
+          card.value('Telephone number').contains('01234 111222')
+          card.value('Email address').contains('example2@example2.com example@example.com')
 
-        page.viewMainAddressDetails.should('not.have.attr', 'open')
-        page.viewMainAddressDetails.contains('View address details').click()
-        page.viewMainAddressDetails.should('have.attr', 'open')
-        page.mainAddressDetails('Address telephone').contains('0123456789')
-        page.mainAddressDetails('Type of address').contains('Approved Premises (verified)')
-        page.mainAddressDetails('Start date').contains('16 July 2015')
-        page.mainAddressDetails('Notes').contains('Sleeping on sofa')
+          card.value('Main address').contains('1 High Street Sheffield South Yorkshire S10 1AG')
+          card.detailsList('Main address', 'View address details', list => {
+            list.value('Address telephone').contains('0123456789')
+            list.value('Type of address').contains('Approved Premises (verified)')
+            list.value('Start date').contains('16 July 2015')
+            list.value('Notes').contains('Sleeping on sofa')
+          })
 
-        page.tableValue('contact', 'Other addresses').contains('1 other current address 1 previous address')
-        page.tableValue('contact', 'Personal contacts').contains('Next of Kin: Pippa Wade – Wife')
-        page.tableValue('contact', 'Personal contacts').contains('Family member: Jonathon Bacon – Father')
+          card.value('Other addresses').contains('1 other current address 1 previous address')
+          card.value('Personal contacts').contains('Next of Kin: Pippa Wade – Wife')
+          card.value('Personal contacts').contains('Family member: Jonathon Bacon – Father')
+        })
 
-        page.tableValue('personal', 'Name').contains('Liz Danger Haggis')
-        page.tableValue('personal', 'Date of birth').contains('10 June 1980')
-        page.tableValue('personal', 'Preferred name/Known as').contains('Bob')
-        page.tableValue('personal', 'Aliases').contains('Dylan Meyer Romario Montgomery')
-        page.tableValue('personal', 'Previous name').contains('Scotland')
-        page.tableValue('personal', 'Preferred language').contains('Bengali (interpreter required)')
-        page
-          .tableValue('personal', 'Current circumstances')
-          .contains('Employment: Temporary/casual work (30 or more hours per week)')
-        page
-          .tableValue('personal', 'Disabilities and adjustments')
-          .contains('Learning Difficulties: Other Speech Impairment: None')
-        page.tableValue('personal', 'CRN').contains(fixture.crn)
-        page.tableValue('personal', 'PNC').contains('2012/123400000F')
+        page.personalDetails(card => {
+          card.value('Name').contains('Liz Danger Haggis')
+          card.value('Date of birth').contains('10 June 1980')
+          card.value('Preferred name/Known as').contains('Bob')
+          card.value('Aliases').contains('Dylan Meyer Romario Montgomery')
+          card.value('Previous name').contains('Scotland')
+          card.value('Preferred language').contains('Bengali (interpreter required)')
+          card.value('Current circumstances').contains('Employment: Temporary/casual work (30 or more hours per week)')
+          card.value('Disabilities and adjustments').contains('Learning Difficulties: Other Speech Impairment: None')
+          card.value('Criminogenic needs').contains('Accommodation Alcohol Misuse Drug Misuse')
+          card.value('CRN').contains(fixture.crn)
+          card.value('PNC').contains('2012/123400000F')
+        })
 
-        page.tableValue('equality', 'Religion or belief').contains('Christian')
-        page.tableValue('equality', 'Sex').contains('Female')
-        page.tableValue('equality', 'Gender identity').contains('Prefer to self-describe')
-        page.tableValue('equality', 'Self-described gender').contains('Jedi')
-        page.tableValue('equality', 'Sexual orientation').contains('Bisexual')
+        page.equalityMonitoring(card => {
+          card.value('Religion or belief').contains('Christian')
+          card.value('Sex').contains('Female')
+          card.value('Gender identity').contains('Prefer to self-describe')
+          card.value('Self-described gender').contains('Jedi')
+          card.value('Sexual orientation').contains('Bisexual')
+        })
       })
   })
 
