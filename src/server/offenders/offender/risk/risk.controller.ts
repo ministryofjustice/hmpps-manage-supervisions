@@ -1,10 +1,11 @@
 import { Controller, Get, Param, ParseIntPipe, Render } from '@nestjs/common'
 import { Breadcrumb, BreadcrumbType, LinksService, ResolveBreadcrumbOptions } from '../../../common/links'
 import { RiskService } from './risk.service'
-import { RemovedRisksListViewModel, RiskDetailsViewModel } from './risk.types'
+import { RemovedRisksListViewModel, RiskDetailsViewModel, RiskViewModel } from './risk.types'
 import { getDisplayName } from '../../../util'
 import { OffenderDetailSummary } from '../../../community-api/client'
 import { OffenderService } from '../offender.service'
+import { RedirectResponse } from '../../../common'
 
 @Controller('offender/:crn(\\w+)/risk')
 export class RiskController {
@@ -42,16 +43,21 @@ export class RiskController {
   async getRemovedRiskDetails(
     @Param('crn') crn: string,
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<RiskDetailsViewModel> {
+  ): Promise<RiskDetailsViewModel | RedirectResponse> {
     const [offender, registration] = await Promise.all([
       this.offender.getOffenderSummary(crn),
       this.risk.getRiskRegistrationDetails(crn, id),
     ])
+
+    if (!registration.removed) {
+      return RedirectResponse.found(registration.link)
+    }
+
     return {
       ...this.getViewModel(crn, offender, BreadcrumbType.RemovedRiskDetails, {
-        entityName: registration.riskDescription,
+        entityName: registration.text,
       }),
-      ...registration,
+      registration,
     }
   }
 
@@ -65,16 +71,21 @@ export class RiskController {
   async getRiskDetails(
     @Param('crn') crn: string,
     @Param('id', ParseIntPipe) riskId: number,
-  ): Promise<RiskDetailsViewModel> {
+  ): Promise<RiskDetailsViewModel | RedirectResponse> {
     const [offender, registration] = await Promise.all([
       this.offender.getOffenderSummary(crn),
       this.risk.getRiskRegistrationDetails(crn, riskId),
     ])
+
+    if (registration.removed) {
+      return RedirectResponse.found(registration.link)
+    }
+
     return {
-      ...this.getViewModel(crn, offender, BreadcrumbType.RemovedRiskDetails, {
-        entityName: registration.riskDescription,
+      ...this.getViewModel(crn, offender, BreadcrumbType.RiskDetails, {
+        entityName: registration.text,
       }),
-      ...registration,
+      registration,
     }
   }
 
@@ -83,7 +94,7 @@ export class RiskController {
     offender: OffenderDetailSummary,
     breadcrumbType: BreadcrumbType,
     partial: Partial<ResolveBreadcrumbOptions> = {},
-  ): RiskDetailsViewModel {
+  ): RiskViewModel {
     const displayName = getDisplayName(offender)
     return {
       displayName,

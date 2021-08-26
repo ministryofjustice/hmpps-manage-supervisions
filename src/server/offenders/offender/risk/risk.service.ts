@@ -10,7 +10,7 @@ import {
 } from '../../../assess-risks-and-needs-api'
 import {
   FlatRiskToSelf,
-  RegistrationFlag,
+  RiskRegistration,
   RiskLevel,
   RiskLevelMeta,
   RiskRegistrationDetails,
@@ -90,7 +90,7 @@ export class RiskService {
     return {
       active:
         filtered['true']
-          ?.map<RegistrationFlag>(r => ({
+          ?.map<RiskRegistration>(r => ({
             text: r.type.description,
             notes: r.notes,
             reviewDue: r.nextReviewDate && DateTime.fromISO(r.nextReviewDate),
@@ -99,10 +99,10 @@ export class RiskService {
           .sort((a, b) => a.text.localeCompare(b.text)) || [],
       inactive:
         filtered['false']
-          ?.map<RegistrationFlag>(r => ({
+          ?.map<RiskRegistration>(r => ({
             text: r.type.description,
             notes: r.deregisteringNotes,
-            endDate: r.endDate && DateTime.fromISO(r.endDate),
+            removed: r.endDate && DateTime.fromISO(r.endDate),
             link: `removed-risk/${r.registrationId}`,
           }))
           .sort((a, b) => a.text.localeCompare(b.text)) || [],
@@ -120,7 +120,7 @@ export class RiskService {
       .find(r => r.completed == true)
 
     return {
-      riskDescription: registration.type.description,
+      text: registration.type.description,
       notes: registration.notes,
       reviewDue: registration.nextReviewDate && DateTime.fromISO(registration.nextReviewDate),
       reviewed: lastReview ? DateTime.fromISO(lastReview.reviewDate) : null,
@@ -130,9 +130,10 @@ export class RiskService {
       removed: registration.endDate && DateTime.fromISO(registration.endDate),
       removedBy:
         registration.deregisteringOfficer &&
-        `${registration.registeringOfficer.forenames} ${registration.registeringOfficer.surname}`,
+        `${registration.deregisteringOfficer.forenames} ${registration.deregisteringOfficer.surname}`,
       removedNotes: registration.endDate && registration.deregisteringNotes,
       typeInfo: riskReferenceData[registration.type.code],
+      link: `${registration.active ? 'risk' : 'removed-risk'}/${registration.registrationId}`,
     }
   }
 }

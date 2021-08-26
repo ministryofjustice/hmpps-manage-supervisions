@@ -42,9 +42,9 @@
         },
         "disabilities": [
           {
-            "disabilityId": 56762,
+            "disabilityId": 65679,
             "disabilityType": {
-              "code": "T2O",
+              "code": "C2W",
               "description": "Learning Difficulties"
             },
             "startDate": "2021-02-01",
@@ -60,9 +60,9 @@
             ]
           },
           {
-            "disabilityId": 53727,
+            "disabilityId": 62927,
             "disabilityType": {
-              "code": "NUF",
+              "code": "LAK",
               "description": "Speech Impairment"
             },
             "startDate": "2021-03-01",
@@ -70,9 +70,9 @@
             "provisions": null
           },
           {
-            "disabilityId": 43318,
+            "disabilityId": 25996,
             "disabilityType": {
-              "code": "AX1",
+              "code": "7NT",
               "description": "Dyslexia"
             },
             "startDate": "2020-04-01",

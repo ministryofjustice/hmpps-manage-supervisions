@@ -1,22 +1,39 @@
 import {
   FlatRiskToSelf,
   RiskLevelMeta,
-  RegistrationFlag,
+  RiskRegistration,
   Risks,
   RoshRisk,
   RiskLevel,
   RiskRegistrations,
+  RiskRegistrationDetails,
 } from './risk.types'
 import { fake, fakeEnum, fakeRandomArray } from '../../../util/util.fake'
 import * as faker from 'faker'
 import { DateTime } from 'luxon'
 import { GovUkUiTagColour } from '../../../util/govuk-ui'
 
-export const fakeRegistrationFlag = fake<RegistrationFlag>(() => ({
+export const fakeRegistrationFlag = fake<RiskRegistration>(() => ({
   text: faker.lorem.sentence(),
   notes: faker.lorem.sentence(),
   link: faker.internet.url(),
   reviewDue: DateTime.fromJSDate(faker.date.past()).set({ hour: 0, minute: 0, second: 0, millisecond: 0 }),
+}))
+
+export const fakeRegistrationDetails = fake<RiskRegistrationDetails>(() => ({
+  text: faker.lorem.sentence(),
+  notes: faker.lorem.sentence(),
+  link: faker.internet.url(),
+  reviewDue: DateTime.fromJSDate(faker.date.past()).set({ hour: 0, minute: 0, second: 0, millisecond: 0 }),
+  added: DateTime.fromJSDate(faker.date.past()).set({ hour: 0, minute: 0, second: 0, millisecond: 0 }),
+  addedBy: faker.name.findName(),
+  typeInfo: {
+    description: faker.lorem.sentence(),
+    purpose: faker.lorem.sentence(),
+    furtherInformation: faker.lorem.sentence(),
+    suggestedReviewFrequency: faker.datatype.number(),
+    termination: faker.lorem.sentence(),
+  },
 }))
 
 export const fakeRiskRegistrations = fake<RiskRegistrations>(() => ({

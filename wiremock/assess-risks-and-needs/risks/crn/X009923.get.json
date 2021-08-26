@@ -26,21 +26,21 @@
           "currentConcernsText": null
         },
         "custody": {
-          "risk": "DK",
+          "risk": "YES",
           "previous": "YES",
           "previousConcernsText": "Soluta tempore nemo et velit est perspiciatis.\n\nNeque error aut est nemo quasi. Et labore impedit omnis numquam id et eaque facere itaque. Ipsam et atque eos tempora possimus.",
           "current": "NO",
           "currentConcernsText": null
         },
         "hostelSetting": {
-          "risk": "DK",
+          "risk": "YES",
           "previous": "YES",
           "previousConcernsText": null,
           "current": "NO",
           "currentConcernsText": null
         },
         "vulnerability": {
-          "risk": "YES",
+          "risk": "DK",
           "previous": "NO",
           "previousConcernsText": null,
           "current": "NO",
@@ -48,9 +48,9 @@
         }
       },
       "otherRisks": {
-        "escapeOrAbscond": "YES",
-        "controlIssuesDisruptiveBehaviour": "YES",
-        "breachOfTrust": "NO",
+        "escapeOrAbscond": "NO",
+        "controlIssuesDisruptiveBehaviour": "DK",
+        "breachOfTrust": "DK",
         "riskToOtherPrisoners": "DK"
       },
       "summary": {
@@ -65,10 +65,10 @@
           "LOW": ["Known Adult"]
         },
         "riskInCustody": {
-          "VERY_HIGH": ["Children", "Known Adult"],
-          "HIGH": ["Prisoners", "Known Adult"],
-          "MEDIUM": ["Public", "Public", "Public"],
-          "LOW": ["Prisoners"]
+          "VERY_HIGH": ["Public"],
+          "HIGH": ["Public", "Children", "Prisoners"],
+          "MEDIUM": ["Staff"],
+          "LOW": ["Public"]
         }
       }
     }

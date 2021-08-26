@@ -41,15 +41,43 @@ const templateRegistration: DeepPartial<Registration> = {
 }
 
 export const REGISTRATIONS: DeepPartial<Registration>[] = Object.entries(riskReferenceData)
-  .filter(([code]) => !['RMRH', 'REG26', 'RVAD'].includes(code))
+  .filter(([code]) => !['ALAN', 'RMRH', 'REG26', 'RVAD'].includes(code))
   .map(([code, meta]) => {
     return { ...templateRegistration, type: { code, description: meta.description } }
   })
   .concat([
     {
       active: true,
-      type: { code: 'REST', description: 'Restraining Order' },
-      notes: 'Harassment of ex-wife',
+      type: { code: 'ALAN', description: 'Alert Notice' },
+      notes: 'Major alert about this offender',
+      nextReviewDate: '2022-01-02',
+      startDate: '2020-05-14',
+      registeringOfficer: {
+        code: 'ABC999',
+        forenames: 'Yolanda',
+        surname: 'Gubbins',
+      },
+      registrationReviews: [
+        {
+          reviewDate: '2022-01-02',
+          completed: false,
+        },
+        {
+          reviewDate: '2021-08-23',
+          reviewDateDue: '2022-01-02',
+          notes: 'Registration still relevant',
+          completed: true,
+          reviewingOfficer: {
+            code: 'ABC562',
+            forenames: 'Cindy',
+            surname: 'Legford',
+          },
+          reviewingTeam: {
+            code: 'N07UAT',
+            description: 'Unallocated Team',
+          },
+        },
+      ],
     },
     {
       active: true,
@@ -59,7 +87,16 @@ export const REGISTRATIONS: DeepPartial<Registration>[] = Object.entries(riskRef
     {
       active: false,
       type: { code: 'REG26', description: 'Organised Crime' },
+      startDate: '2020-05-06',
+      endDate: '2021-07-19',
+      nextReviewDate: '2022-01-02',
+      notes: 'Deals in stolen weapons',
       deregisteringNotes: 'No longer a risk',
+      registeringOfficer: {
+        code: 'ZXU221',
+        forenames: 'Wamberto',
+        surname: 'Grundy',
+      },
       deregisteringOfficer: {
         code: 'ABC123',
         forenames: 'Brian',
@@ -90,7 +127,8 @@ export const REGISTRATIONS: DeepPartial<Registration>[] = Object.entries(riskRef
     {
       active: false,
       type: { code: 'RVAD', description: 'Safeguarding – Adult at Risk' },
-      deregisteringNotes: 'No longer a risk',
+      deregisteringNotes: 'Replaced with another registration',
+      endDate: '2021-01-05',
       deregisteringOfficer: {
         code: 'ABC123',
         forenames: 'Brian',

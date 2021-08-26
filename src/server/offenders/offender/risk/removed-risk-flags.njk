@@ -3,7 +3,7 @@
 {% block content %}
 <h1 class="govuk-heading-xl">Removed risk flags</h1>
 {% if removedRisks.length > 0 %}
-  <table class="govuk-table">
+  <table class="govuk-table" data-qa="offender-risk/removed-registrations">
     <thead class="govuk-table__head">
       <tr class="govuk-table__row">
         <th class="govuk-table__header" style="width: 30%">Flag</th>
@@ -16,7 +16,7 @@
       <tr class="govuk-table__row">
         <td class="govuk-table__cell"><a href="{{risk.link}}">{{ risk.text }}</a></td>
         <td class="govuk-table__cell">{{ risk.notes or 'No notes given' }}</td>
-        <td class="govuk-table__cell">{{ risk.endDate | shortDate }}</td>
+        <td class="govuk-table__cell">{{ risk.removed | shortDate }}</td>
       </tr>
       {% endfor %}
     </tbody>

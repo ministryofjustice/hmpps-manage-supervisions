@@ -3,9 +3,9 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
 {% block content %}
-<h1 class="govuk-heading-xl"><span class="govuk-caption-xl">{{ 'Removed risk flag' if removed else 'Risk flag' }}</span> {{ riskDescription }}</h1>
+<h1 class="govuk-heading-xl"><span class="govuk-caption-xl">{{ 'Removed risk flag' if registration.removed else 'Risk flag' }}</span> {{ registration.text }}</h1>
 
-{% if removed %}
+{% if registration.removed %}
 {% call appSummaryCard({
     titleText: "Flag removed",
     classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title'
@@ -17,24 +17,24 @@
           text: "Date removed"
         },
         value: {
-          text: removed | shortDate + " by " + removedBy
+          text: registration.removed | shortDate + " by " + registration.removedBy
         }
-      } if removed,
+      },
       {
         key: {
           text: "Why it was removed"
         },
         value: {
-          text: removedNotes if removedNotes else 'No notes given'
+          text: registration.removedNotes if registration.removedNotes else 'No notes given'
         }
-      } if removed
+      }
     ]
   }) }}
 {%- endcall %}
 {% endif %}
 
 {% call appSummaryCard({
-  titleText: "Before it was removed" if removed else "About this flag",
+  titleText: "Before it was removed" if registration.removed else "About this flag",
   classes: 'govuk-!-margin-bottom-8 app-summary-card--large-title'
 }) -%}
 {{ govukSummaryList({
@@ -44,7 +44,7 @@
           text: "Notes"
         },
         value: {
-          text: notes if notes else 'No notes'
+          text: registration.notes if registration.notes else 'No notes'
         }
       },
       {
@@ -52,7 +52,7 @@
           text: "Next review"
         },
         value: {
-          text: reviewDue | shortDate if reviewDue else 'No review due'
+          text: registration.reviewDue | shortDate if registration.reviewDue else 'No review due'
         }
       },
       {
@@ -60,7 +60,7 @@
           text: "Most recent review"
         },
         value: {
-          text: reviewed | shortDate + " by " + reviewedBy if reviewed else 'Not reviewed yet'
+          text: registration.reviewed | shortDate + " by " + registration.reviewedBy if registration.reviewed else 'Not reviewed yet'
         }
       },
       {
@@ -68,34 +68,34 @@
           text: "Date added"
         },
         value: {
-          text: added | shortDate + " by " + addedBy
+          text: registration.added | shortDate + " by " + registration.addedBy
         }
       }
     ]
   }) }}
 {%- endcall %}
 
-{% if typeInfo %}
+{% if registration.typeInfo %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <h2 class="govuk-heading-l">Guidance using this risk flag</h2>
     <h3 class="govuk-heading-m">Purpose of use</h3>
 
-    <p>{{typeInfo.purpose|safe}}</p>
+    <p data-qa="offender-risk-detail/purpose">{{registration.typeInfo.purpose|safe}}</p>
 
     <h3 class="govuk-heading-m">Suggested review frequency</h3>
 
-    {% if typeInfo.suggestedReviewFrequency %}
-    <p>Every {{typeInfo.suggestedReviewFrequency}} months</p>
+    {% if registration.typeInfo.suggestedReviewFrequency %}
+    <p data-qa="offender-risk-detail/frequency">Every {{registration.typeInfo.suggestedReviewFrequency}} months</p>
     {% endif %}
 
     <h3 class="govuk-heading-m">Termination</h3>
 
-    <p>{{typeInfo.termination|safe}}</p>
+    <p data-qa="offender-risk-detail/termination">{{registration.typeInfo.termination|safe}}</p>
 
     <h3 class="govuk-heading-m">Further information</h3>
 
-    <p>{{typeInfo.furtherInformation|safe}}</p>
+    <p data-qa="offender-risk-detail/further-info">{{registration.typeInfo.furtherInformation|safe}}</p>
   </div>
 </div>
 {% endif %}

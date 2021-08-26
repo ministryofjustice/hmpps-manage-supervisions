@@ -38,15 +38,15 @@ export interface RiskLevelMeta {
 }
 
 export interface RiskRegistrations {
-  active: RegistrationFlag[]
-  inactive: RegistrationFlag[]
+  active: RiskRegistration[]
+  inactive: RiskRegistration[]
 }
 
-export interface RegistrationFlag {
+export interface RiskRegistration {
   text: string
   notes?: string
   reviewDue?: DateTime
-  endDate?: DateTime
+  removed?: DateTime
   link: string
 }
 
@@ -55,24 +55,24 @@ export interface FlatRiskToSelf {
   notes: { current?: string; previous?: string }
 }
 
-export interface RemovedRisksListViewModel extends RiskDetailsViewModel {
-  removedRisks: RegistrationFlag[]
+export interface RemovedRisksListViewModel extends RiskViewModel {
+  removedRisks: RiskRegistration[]
 }
 
-export interface RiskDetailsViewModel {
+export interface RiskDetailsViewModel extends RiskViewModel {
+  registration: RiskRegistrationDetails
+}
+
+export interface RiskViewModel {
   displayName: string
   breadcrumbs: BreadcrumbValue[]
 }
 
-export interface RiskRegistrationDetails {
-  riskDescription: string
-  notes: string
-  reviewDue?: DateTime
+export interface RiskRegistrationDetails extends RiskRegistration {
   reviewed?: DateTime
-  reviewedBy: string
+  reviewedBy?: string
   added: DateTime
   addedBy: string
-  removed?: DateTime
   removedBy?: string
   removedNotes?: string
   typeInfo?: RiskTypeInformation

@@ -15,14 +15,14 @@
       "appointmentEnd": "2200-01-02T14:00:00",
       "notes": "Some home visit appointment\n\nWith a new line!",
       "officeLocation": {
-        "code": "60254dc9-a444-4646-911e-f83906f2de2d",
-        "buildingName": "Clint",
-        "buildingNumber": "325",
-        "streetName": "Hickle Path",
-        "townCity": "Fisherborough",
-        "county": "Borders",
-        "postcode": "89457",
-        "description": "24172 Ferry Key"
+        "code": "082c57e6-8df0-4ab9-941b-a0193ff5a782",
+        "buildingName": "Raphael",
+        "buildingNumber": "189",
+        "streetName": "Reid Ways",
+        "townCity": "Melbourne",
+        "county": "Avon",
+        "postcode": "05713",
+        "description": "194 Julio Streets"
       },
       "outcome": null,
       "sensitive": true,
@@ -30,18 +30,18 @@
         "contactType": "CHVS",
         "description": "Home Visit to Case (NS)",
         "orderTypes": ["CJA", "CJA"],
-        "requiresLocation": "OPTIONAL"
+        "requiresLocation": "NOT_REQUIRED"
       },
       "provider": {
-        "code": "ad3b1469-392a-453b-a5cc-26e4254245bf",
-        "description": "syndicate value-added web services"
+        "code": "e0bd2151-1b92-4c56-afbf-c5bad3ee6121",
+        "description": "brand open-source initiatives"
       },
       "team": {
-        "code": "6785d31c-161b-48df-81af-fa21c33982c2",
-        "description": "architect global convergence"
+        "code": "dad11cb6-f22a-43eb-b3eb-3cb9d829310f",
+        "description": "productize robust supply-chains"
       },
       "staff": {
-        "code": "c217ccf7-3f27-4369-aeff-9ed7e3c6a51c",
+        "code": "dd26778c-e3fa-41d6-9a58-0c0528eaa0ba",
         "forenames": "Catherine",
         "surname": "Ellis",
         "unallocated": false
@@ -49,7 +49,7 @@
       "rarActivity": true,
       "requirement": {
         "isRar": true,
-        "requirementId": 33212,
+        "requirementId": 24912,
         "isActive": true
       }
     }
