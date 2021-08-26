@@ -55,6 +55,7 @@ export interface PersonalDetailsViewModel {
   preferredLanguage?: string
   currentCircumstances: string[]
   disabilities: string[]
+  criminogenicNeeds: string[]
   religion?: string
   sex?: string
   genderIdentity?: string

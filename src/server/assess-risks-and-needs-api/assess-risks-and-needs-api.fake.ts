@@ -14,7 +14,7 @@ import {
 } from './client'
 import { fake, fakeEnum, fakeRandomArray } from '../util/util.fake'
 import * as faker from 'faker'
-import { startCase, groupBy } from 'lodash'
+import { startCase } from 'lodash'
 import { toList } from '../util'
 
 import { NeedsAssessmentSection } from './well-known'
@@ -89,14 +89,12 @@ export const fakeAssessmentNeedDto = fake<AssessmentNeedDto>(
   }),
 )
 
-export const fakeAssessmentNeedsDto = fake<AssessmentNeedsDto>((options, partial = {}) => {
-  const partialNeeds = groupBy(partial.identifiedNeeds || [], x => x.section)
-
+export const fakeAssessmentNeedsDto = fake<AssessmentNeedsDto>((options, { identifiedNeeds } = {}) => {
   return {
     assessedOn: faker.date.past().toISOString(),
-    identifiedNeeds: Object.values(NeedsAssessmentSection).map(section =>
-      fakeAssessmentNeedDto(partialNeeds[section]?.find(x => x) || { section }),
-    ),
+    identifiedNeeds:
+      identifiedNeeds?.map(fakeAssessmentNeedDto) ||
+      Object.values(NeedsAssessmentSection).map<DeepPartial<AssessmentNeedDto>>(section => ({ section })),
     notIdentifiedNeeds: [],
     unansweredNeeds: [],
   }

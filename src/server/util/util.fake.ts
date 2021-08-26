@@ -55,7 +55,11 @@ export function fakeClass<Faked, Options = ClassTransformOptions>(
   factory: (options?: Options) => DeepNonFunctionPartial<Faked>,
   defaultOptions?: ClassTransformOptions,
 ): FakeFn<Faked> {
-  return (partial, options) => plainToClass(cls, merge(factory(options), partial), { ...options, ...defaultOptions })
+  return (partial, options) =>
+    plainToClass(cls, merge(factory(options), partial), {
+      ...options,
+      ...defaultOptions,
+    })
 }
 
 export function fakeEnum<Enum>(cls: Enum): Enum[keyof Enum] {

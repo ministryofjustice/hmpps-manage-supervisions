@@ -79,6 +79,7 @@ export const fakePersonalDetailsViewModel = fake<PersonalDetailsViewModel>(() =>
     'Accommodation: Friends/Family (settled)',
   ],
   disabilities: ['Mental Illness: Flex refreshment breaks', 'Visual Impairment: Colour/visibility marking'],
+  criminogenicNeeds: ['Thinking and behaviour', 'Attitudes'],
   religion: 'Christian',
   sex: 'Male',
   genderIdentity: 'Prefer to self-describe',

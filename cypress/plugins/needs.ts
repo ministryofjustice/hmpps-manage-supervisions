@@ -1,23 +1,20 @@
-import {
-  AssessmentNeedDtoSeverity,
-  AssessmentNeedsDto,
-  NeedsAssessmentSection,
-} from '../../src/server/assess-risks-and-needs-api'
+import { AssessmentNeedDtoSeverity, AssessmentNeedsDto } from '../../src/server/assess-risks-and-needs-api/client'
 import { fakeAssessmentNeedsDto } from '../../src/server/assess-risks-and-needs-api/assess-risks-and-needs-api.fake'
 import { SeedFn } from './wiremock'
+import { NeedsAssessmentSection } from '../../src/server/assess-risks-and-needs-api'
 
 export const NEEDS: DeepPartial<AssessmentNeedsDto> = {
   identifiedNeeds: [
     { section: NeedsAssessmentSection.Accommodation, severity: AssessmentNeedDtoSeverity.Severe },
-    { section: NeedsAssessmentSection.EducationTrainingAndEmployability, severity: AssessmentNeedDtoSeverity.Severe },
-    { section: NeedsAssessmentSection.FinancialManagementAndIncome, severity: AssessmentNeedDtoSeverity.Severe },
-    { section: NeedsAssessmentSection.Relationships, severity: AssessmentNeedDtoSeverity.Severe },
-    { section: NeedsAssessmentSection.LifestyleAndAssociates, severity: AssessmentNeedDtoSeverity.Severe },
-    { section: NeedsAssessmentSection.DrugMisuse, severity: AssessmentNeedDtoSeverity.Severe },
-    { section: NeedsAssessmentSection.AlcoholMisuse, severity: AssessmentNeedDtoSeverity.Severe },
-    { section: NeedsAssessmentSection.EmotionalWellBeing, severity: AssessmentNeedDtoSeverity.Severe },
-    { section: NeedsAssessmentSection.ThinkingAndBehaviour, severity: AssessmentNeedDtoSeverity.Severe },
-    { section: NeedsAssessmentSection.Attitudes, severity: AssessmentNeedDtoSeverity.Severe },
+    { section: NeedsAssessmentSection.EducationTrainingAndEmployability, severity: AssessmentNeedDtoSeverity.NoNeed },
+    { section: NeedsAssessmentSection.FinancialManagementAndIncome, severity: AssessmentNeedDtoSeverity.NoNeed },
+    { section: NeedsAssessmentSection.Relationships, severity: AssessmentNeedDtoSeverity.NoNeed },
+    { section: NeedsAssessmentSection.LifestyleAndAssociates, severity: AssessmentNeedDtoSeverity.NoNeed },
+    { section: NeedsAssessmentSection.DrugMisuse, severity: AssessmentNeedDtoSeverity.Standard },
+    { section: NeedsAssessmentSection.AlcoholMisuse, severity: AssessmentNeedDtoSeverity.Standard },
+    { section: NeedsAssessmentSection.EmotionalWellBeing, severity: AssessmentNeedDtoSeverity.NoNeed },
+    { section: NeedsAssessmentSection.ThinkingAndBehaviour, severity: AssessmentNeedDtoSeverity.NoNeed },
+    { section: NeedsAssessmentSection.Attitudes, severity: AssessmentNeedDtoSeverity.NoNeed },
   ],
 }
 

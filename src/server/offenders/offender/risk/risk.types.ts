@@ -92,3 +92,8 @@ export interface RiskTypeInformation {
 export interface RiskReferenceData {
   [key: string]: RiskTypeInformation
 }
+
+export interface CriminogenicNeed {
+  date: DateTime
+  name: string
+}

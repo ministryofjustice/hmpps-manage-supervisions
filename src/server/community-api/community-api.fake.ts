@@ -142,7 +142,7 @@ export const fakeOffenderDetail = fake<OffenderDetail>((options, partial = {}) =
       fakePhoneNumber({ type: PhoneNumberType.Mobile }),
       fakePhoneNumber({ type: PhoneNumberType.Telephone }),
     ],
-    emailAddresses: [faker.internet.email()],
+    emailAddresses: partial.contactDetails?.emailAddresses || [faker.internet.email()],
   },
   offenderProfile: {
     offenderLanguages: {

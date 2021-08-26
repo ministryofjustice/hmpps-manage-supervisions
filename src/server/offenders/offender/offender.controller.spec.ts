@@ -26,7 +26,7 @@ import { fakeNextAppointmentSummary, fakeRecentAppointments } from './schedule/s
 import { fakeBreadcrumbs, fakeBreadcrumbUrl, MockLinksModule } from '../../common/links/links.mock'
 import { PersonalService } from './personal'
 import { BreadcrumbType, ResolveBreadcrumbOptions } from '../../common/links'
-import { fakeRiskRegistrations, fakeRisks } from './risk/risk.fake'
+import { fakeCriminogenicNeed, fakeRiskRegistrations, fakeRisks } from './risk/risk.fake'
 import { ConfigService } from '@nestjs/config'
 import { FakeConfigModule } from '../../config/config.fake'
 import { ContactTypesService } from '../../community-api'
@@ -87,7 +87,7 @@ describe('OffenderController', () => {
     const contactDetails = fakeContactDetailsViewModel()
     const personalDetails = fakePersonalDetailsViewModel()
     personalService.getPersonalDetails
-      .withArgs(offender, [], circumstances)
+      .withArgs(offender, [], circumstances, [])
       .returns({ contactDetails, personalDetails })
 
     const conviction = fakeConvictionDetails({
@@ -250,10 +250,13 @@ describe('OffenderController', () => {
     const circumstances = [fakePersonalCircumstanceDetail()]
     personalService.getPersonalCircumstances.withArgs('some-crn').resolves(circumstances)
 
+    const needs = [fakeCriminogenicNeed()]
+    riskService.getNeeds.withArgs('some-crn').resolves(needs)
+
     const contactDetails = fakeContactDetailsViewModel()
     const personalDetails = fakePersonalDetailsViewModel()
     personalService.getPersonalDetails
-      .withArgs(offender, personalContacts, circumstances)
+      .withArgs(offender, personalContacts, circumstances, needs)
       .returns({ contactDetails, personalDetails })
 
     const observed = await subject.getPersonal('some-crn')
