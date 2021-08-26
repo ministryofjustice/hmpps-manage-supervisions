@@ -18,7 +18,7 @@
           "active": false,
           "startDate": "2018-08-01",
           "expectedStartDate": "2019-04-03",
-          "expectedEndDate": "2022-04-14",
+          "expectedEndDate": "2021-08-18",
           "requirementNotes": "Some inactive unpaid work requirement",
           "requirementTypeMainCategory": {
             "code": "W",
@@ -35,7 +35,7 @@
           }
         },
         {
-          "requirementId": 78272,
+          "requirementId": 31022,
           "length": 18,
           "lengthUnit": "Hours",
           "active": true,
@@ -54,13 +54,13 @@
           "createdDatetime": "2019-04-08T14:48:17"
         },
         {
-          "requirementId": 38268,
+          "requirementId": 2391,
           "length": 3,
           "lengthUnit": "Hours",
           "active": true,
           "startDate": "2018-08-01",
           "expectedStartDate": "2019-04-03",
-          "expectedEndDate": "2021-11-15",
+          "expectedEndDate": "2022-02-01",
           "requirementNotes": "3 ADD HOURS",
           "requirementTypeMainCategory": {
             "code": "W",
@@ -78,7 +78,7 @@
           "lengthUnit": "Days",
           "active": true,
           "startDate": "2018-08-01",
-          "expectedStartDate": "2021-01-15",
+          "expectedStartDate": "2020-08-30",
           "expectedEndDate": "2021-11-07",
           "requirementNotes": null,
           "requirementTypeMainCategory": {
@@ -86,8 +86,8 @@
             "description": "RAR category"
           },
           "requirementTypeSubCategory": {
-            "code": "9spym",
-            "description": "Rubber"
+            "code": "6h6by",
+            "description": "Cotton"
           },
           "commencementDate": "2018-08-01",
           "createdDatetime": "2019-04-08T13:59:45",
@@ -99,7 +99,7 @@
           "lengthUnit": "Days",
           "active": true,
           "startDate": "2018-09-01",
-          "expectedStartDate": "2021-07-18",
+          "expectedStartDate": "2020-11-02",
           "expectedEndDate": null,
           "requirementNotes": null,
           "requirementTypeMainCategory": {
@@ -107,7 +107,7 @@
             "description": "RAR category"
           },
           "requirementTypeSubCategory": {
-            "code": "wuf77",
+            "code": "pknai",
             "description": "Concrete"
           },
           "commencementDate": "2018-08-01",
@@ -116,13 +116,13 @@
           "restrictive": false
         },
         {
-          "requirementId": 27252,
+          "requirementId": 47860,
           "length": 7,
           "lengthUnit": "Hours",
           "active": true,
           "startDate": "2018-08-01",
           "expectedStartDate": "2019-04-01",
-          "expectedEndDate": "2022-04-19",
+          "expectedEndDate": "2021-10-17",
           "requirementNotes": null,
           "requirementTypeMainCategory": {
             "code": "W",

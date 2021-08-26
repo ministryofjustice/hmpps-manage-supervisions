@@ -12,14 +12,14 @@
     "jsonBody": {
       "riskToSelf": {
         "suicide": {
-          "risk": "YES",
+          "risk": "NO",
           "previous": "NO",
           "previousConcernsText": null,
           "current": "YES",
           "currentConcernsText": null
         },
         "selfHarm": {
-          "risk": "YES",
+          "risk": "NO",
           "previous": "YES",
           "previousConcernsText": null,
           "current": "YES",
@@ -33,14 +33,14 @@
           "currentConcernsText": null
         },
         "hostelSetting": {
-          "risk": "YES",
+          "risk": "DK",
           "previous": "YES",
           "previousConcernsText": null,
           "current": "NO",
           "currentConcernsText": null
         },
         "vulnerability": {
-          "risk": "DK",
+          "risk": "YES",
           "previous": "NO",
           "previousConcernsText": null,
           "current": "NO",
@@ -48,13 +48,13 @@
         }
       },
       "otherRisks": {
-        "escapeOrAbscond": "NO",
+        "escapeOrAbscond": "DK",
         "controlIssuesDisruptiveBehaviour": "DK",
         "breachOfTrust": "DK",
-        "riskToOtherPrisoners": "DK"
+        "riskToOtherPrisoners": "NO"
       },
       "summary": {
-        "whoIsAtRisk": "Someone at risk",
+        "whoIsAtRisk": "Known Adult and Public",
         "natureOfRisk": "Some nature of risk",
         "riskImminence": "Some risk imminence",
         "riskIncreaseFactors": "Some risk increase factors",
@@ -65,10 +65,9 @@
           "LOW": ["Known Adult"]
         },
         "riskInCustody": {
-          "VERY_HIGH": ["Public"],
-          "HIGH": ["Public", "Children", "Prisoners"],
-          "MEDIUM": ["Staff"],
-          "LOW": ["Public"]
+          "VERY_HIGH": ["Staff", "Public"],
+          "HIGH": ["Prisoners", "Children"],
+          "LOW": ["Children"]
         }
       }
     }
