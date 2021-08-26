@@ -14,6 +14,9 @@ export enum BreadcrumbType {
   NewAppointment,
   Appointment,
   OtherCommunication,
+  RemovedRisksList,
+  RiskDetails,
+  RemovedRiskDetails,
 }
 
 export interface ResolveBreadcrumbOptions {

@@ -149,9 +149,9 @@
             }) }}
         {% endif %}
 
-        {% if registrations.inactive > 0 %}
+        {% if registrations.inactive.length > 0 %}
             <p class="govuk-!-margin-bottom-0" data-qa='offender/risk/view-inactive-registrations'>
-                <a href="{{ links.viewInactiveRegistrations }}">View removed risk flags ({{ registrations.inactive }})</a>
+                <a href="{{ links.viewInactiveRegistrations }}">View removed risk flags ({{ registrations.inactive.length }})</a>
             </p>
         {% endif %}
     {%- endcall %}

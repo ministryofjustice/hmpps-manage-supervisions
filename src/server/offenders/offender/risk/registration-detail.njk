@@ -1,0 +1,135 @@
+{% extends "partials/layout.njk" %}
+{% from 'components/summary-card.njk' import appSummaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% block content %}
+<h1 class="govuk-heading-xl"><span class="govuk-caption-xl">{{ 'Removed risk flag' if registration.removed else 'Risk flag' }}</span> {{ registration.text }}</h1>
+
+{% if registration.removed %}
+{% call appSummaryCard({
+    titleText: "Flag removed",
+    classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title'
+}) -%}
+  {{ govukSummaryList({
+    rows: [
+      {
+        key: {
+          text: "Date removed"
+        },
+        value: {
+          text: registration.removed | shortDate + " by " + registration.removedBy
+        }
+      },
+      {
+        key: {
+          text: "Why it was removed"
+        },
+        value: {
+          text: registration.removedNotes if registration.removedNotes else 'No notes given'
+        }
+      }
+    ]
+  }) }}
+{%- endcall %}
+{% endif %}
+
+{% call appSummaryCard({
+  titleText: "Before it was removed" if registration.removed else "About this flag",
+  classes: 'govuk-!-margin-bottom-8 app-summary-card--large-title',
+  actions: {
+    items: [
+      {
+        href: exitUrl,
+        text: "Remove this flag on Delius"
+      }
+    ]
+  } if not registration.removed
+}) -%}
+{{ govukSummaryList({
+    rows: [
+      {
+        key: {
+          text: "Notes"
+        },
+        value: {
+          text: registration.notes if registration.notes else 'No notes'
+        },
+        actions: {
+          items: [
+            {
+              href: exitUrl,
+              text: "Change",
+              visuallyHiddenText: "notes"
+            }
+          ]
+        }
+      },
+      {
+        key: {
+          text: "Next review"
+        },
+        value: {
+          text: registration.reviewDue | shortDate if registration.reviewDue else 'No review due'
+        },
+        actions: {
+          items: [
+            {
+              href: exitUrl,
+              text: "Review risk flag"
+            }
+          ]
+        }
+      } if not registration.removed,
+      {
+        key: {
+          text: "Most recent review"
+        },
+        value: {
+          text: registration.reviewed | shortDate + " by " + registration.reviewedBy if registration.reviewed else 'Not reviewed yet'
+        },
+        actions: {
+          items: [
+            {
+              href: exitUrl,
+              text: "View review"
+            }
+          ]
+        } if registration.reviewed
+      },
+      {
+        key: {
+          text: "Date added"
+        },
+        value: {
+          text: registration.added | shortDate + " by " + registration.addedBy
+        }
+      }
+    ]
+  }) }}
+{%- endcall %}
+
+{% if registration.typeInfo %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h2 class="govuk-heading-l">Guidance using this risk flag</h2>
+    <h3 class="govuk-heading-m">Purpose of use</h3>
+
+    <p data-qa="offender-risk-detail/purpose">{{registration.typeInfo.purpose|safe}}</p>
+
+    <h3 class="govuk-heading-m">Suggested review frequency</h3>
+
+    {% if registration.typeInfo.suggestedReviewFrequency %}
+    <p data-qa="offender-risk-detail/frequency">Every {{registration.typeInfo.suggestedReviewFrequency}} months</p>
+    {% endif %}
+
+    <h3 class="govuk-heading-m">Termination</h3>
+
+    <p data-qa="offender-risk-detail/termination">{{registration.typeInfo.termination|safe}}</p>
+
+    <h3 class="govuk-heading-m">Further information</h3>
+
+    <p data-qa="offender-risk-detail/further-info">{{registration.typeInfo.furtherInformation|safe}}</p>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

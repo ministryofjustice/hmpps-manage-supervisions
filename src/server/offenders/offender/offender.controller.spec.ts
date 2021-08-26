@@ -364,7 +364,7 @@ describe('OffenderController', () => {
         risk: fakeBreadcrumbUrl(BreadcrumbType.CaseRisk, breadcrumbOptions),
         toDelius: '/offender/some-crn/to-delius',
         toOASys: '#TODO',
-        viewInactiveRegistrations: '#TODO',
+        viewInactiveRegistrations: fakeBreadcrumbUrl(BreadcrumbType.RemovedRisksList, breadcrumbOptions),
       },
       ...expected,
     } as OffenderViewModel)

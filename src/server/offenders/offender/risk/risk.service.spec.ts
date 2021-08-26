@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing'
 import { AssessRisksAndNeedsApiService, RiskDtoCurrent, RiskDtoPrevious } from '../../../assess-risks-and-needs-api'
 import { fakeOkResponse, fakeRestError } from '../../../common/rest/rest.fake'
-import { RiskRegistrations, Risks } from './risk.types'
+import { RiskRegistrationDetails, RiskRegistrations, Risks } from './risk.types'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../../community-api/community-api.mock'
 import { RiskService } from './risk.service'
 import {
@@ -175,6 +175,7 @@ describe('RiskService', () => {
     it('gets active risk registrations', async () => {
       const registrations = [
         fakeRegistration({
+          registrationId: 44878,
           active: true,
           type: { description: 'Beta' },
           riskColour: 'White',
@@ -182,6 +183,7 @@ describe('RiskService', () => {
           nextReviewDate: '2021-03-02',
         }),
         fakeRegistration({
+          registrationId: 44879,
           active: true,
           type: { description: 'Alpha' },
           riskColour: 'Amber',
@@ -195,33 +197,68 @@ describe('RiskService', () => {
 
       expect(observed).toEqual({
         active: [
-          { text: 'Alpha', notes: null, link: '#TODO', reviewDue: null },
+          { text: 'Alpha', notes: null, link: 'risk/44879', reviewDue: null },
           {
             text: 'Beta',
             notes: 'Some notes',
-            link: '#TODO',
+            link: 'risk/44878',
             reviewDue: DateTime.fromObject({ day: 2, month: 3, year: 2021 }),
           },
         ],
-        inactive: 0,
+        inactive: [],
       } as RiskRegistrations)
       expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn' })
     })
 
     it('counts inactive risk registrations', async () => {
-      const registrations = [fakeRegistration({ active: false }), fakeRegistration({ active: false })]
+      const registrations = [
+        fakeRegistration({
+          registrationId: 1234,
+          active: false,
+          type: { description: 'Beta' },
+          riskColour: 'White',
+          deregisteringNotes: 'Some notes',
+          endDate: '2021-03-02',
+          nextReviewDate: null,
+        }),
+        fakeRegistration({
+          registrationId: 1235,
+          active: false,
+          type: { description: 'Alpha' },
+          riskColour: 'Amber',
+          deregisteringNotes: null,
+          endDate: '2021-07-01',
+          nextReviewDate: null,
+        }),
+      ]
 
       community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({ registrations }))
       const observed = await subject.getRiskRegistrations('some-crn')
 
-      expect(observed).toEqual({ active: [], inactive: 2 } as RiskRegistrations)
+      expect(observed).toEqual({
+        active: [],
+        inactive: [
+          {
+            text: 'Alpha',
+            notes: null,
+            link: 'removed-risk/1235',
+            removed: DateTime.fromObject({ day: 1, month: 7, year: 2021 }),
+          },
+          {
+            text: 'Beta',
+            notes: 'Some notes',
+            link: 'removed-risk/1234',
+            removed: DateTime.fromObject({ day: 2, month: 3, year: 2021 }),
+          },
+        ],
+      } as RiskRegistrations)
     })
 
     it('handles empty risk registrations', async () => {
       community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({}))
       const observed = await subject.getRiskRegistrations('some-crn')
 
-      expect(observed).toEqual({ active: [], inactive: 0 } as RiskRegistrations)
+      expect(observed).toEqual({ active: [], inactive: [] } as RiskRegistrations)
     })
 
     it('filters excluded registrations ', async () => {
@@ -230,7 +267,47 @@ describe('RiskService', () => {
       community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({ registrations }))
       const observed = await subject.getRiskRegistrations('some-crn')
 
-      expect(observed).toEqual({ active: [], inactive: 0 } as RiskRegistrations)
+      expect(observed).toEqual({ active: [], inactive: [] } as RiskRegistrations)
+    })
+  })
+
+  describe('getting risk registration details', () => {
+    it('gets risk details', async () => {
+      const registration = fakeRegistration({
+        registrationId: 44878,
+        startDate: '2020-05-16',
+        registeringOfficer: { code: 'ABC123', forenames: 'Paul', surname: 'Dryburgh' },
+        active: true,
+        type: { code: 'ALAN', description: 'Alert Notice' },
+        riskColour: 'White',
+        notes: 'Some notes',
+        nextReviewDate: '2021-03-02',
+      })
+      community.risks.getOffenderRegistrationDetailsByCrnUsingGET.resolves(fakeOkResponse(registration))
+
+      const observed = await subject.getRiskRegistrationDetails('some-crn', 1234)
+
+      expect(observed).toEqual({
+        added: DateTime.fromObject({ day: 16, month: 5, year: 2020 }),
+        addedBy: 'Paul Dryburgh',
+        link: 'risk/44878',
+        notes: 'Some notes',
+        text: 'Alert Notice',
+        removed: null,
+        removedBy: undefined,
+        removedNotes: null,
+        reviewDue: DateTime.fromObject({ day: 2, month: 3, year: 2021 }),
+        reviewed: null,
+        reviewedBy: null,
+        typeInfo: {
+          description: 'Alert Notice',
+          furtherInformation:
+            'Should only be used when a national alert notice has been issued. <br>Prompts User Alert Notice when viewing the Offender Record.',
+          purpose: 'To distribute priority information/warning/alerts relating to an offender.',
+          suggestedReviewFrequency: 6,
+          termination: "Don't remove at termination.",
+        },
+      } as RiskRegistrationDetails)
     })
   })
 })

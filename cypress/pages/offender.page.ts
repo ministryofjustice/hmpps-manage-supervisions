@@ -232,6 +232,10 @@ export class OffenderPage extends PageBase {
       get noActiveRegistrations() {
         return cy.get('[data-qa="offender/risk/no-active-registrations"]')
       },
+
+      whenClickingRiskRegistration(registrationName: string) {
+        return cy.get('[data-qa="offender/risk/registrations"]').children().contains(registrationName).click()
+      },
     }
   }
 }

@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon'
+import { BreadcrumbValue } from '../../../../server/common'
 import { GovUkUiTagColour } from '../../../util/govuk-ui'
 
 export interface Risks {
@@ -39,18 +40,55 @@ export interface RiskLevelMeta {
 }
 
 export interface RiskRegistrations {
-  active: RegistrationFlag[]
-  inactive: number
+  active: RiskRegistration[]
+  inactive: RiskRegistration[]
 }
 
-export interface RegistrationFlag {
+export interface RiskRegistration {
   text: string
   notes?: string
   reviewDue?: DateTime
+  removed?: DateTime
   link: string
 }
 
 export interface FlatRiskToSelf {
   value: string
   notes: { current?: string; previous?: string }
+}
+
+export interface RemovedRisksListViewModel extends RiskViewModel {
+  removedRisks: RiskRegistration[]
+}
+
+export interface RiskDetailsViewModel extends RiskViewModel {
+  registration: RiskRegistrationDetails
+  exitUrl: string
+}
+
+export interface RiskViewModel {
+  displayName: string
+  breadcrumbs: BreadcrumbValue[]
+}
+
+export interface RiskRegistrationDetails extends RiskRegistration {
+  reviewed?: DateTime
+  reviewedBy?: string
+  added: DateTime
+  addedBy: string
+  removedBy?: string
+  removedNotes?: string
+  typeInfo?: RiskTypeInformation
+}
+
+export interface RiskTypeInformation {
+  description: string
+  purpose: string
+  suggestedReviewFrequency: number
+  termination: string
+  furtherInformation: string
+}
+
+export interface RiskReferenceData {
+  [key: string]: RiskTypeInformation
 }
