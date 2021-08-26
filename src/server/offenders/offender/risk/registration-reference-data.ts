@@ -1,7 +1,19 @@
 import { RiskReferenceData } from './risk.types'
 
+/*
+  Registration reference data. The descriptions here aren't shown to users, they are just to make this file easier to use.
+*/
 export const riskReferenceData: RiskReferenceData = {
+  // Alert notice has 2 active codes
   ALAN: {
+    description: 'Alert Notice',
+    suggestedReviewFrequency: 6,
+    purpose: 'To distribute priority information/warning/alerts relating to an offender.',
+    furtherInformation:
+      'Should only be used when a national alert notice has been issued. <br>Prompts User Alert Notice when viewing the Offender Record.',
+    termination: "Don't remove at termination.",
+  },
+  ALERT: {
     description: 'Alert Notice',
     suggestedReviewFrequency: 6,
     purpose: 'To distribute priority information/warning/alerts relating to an offender.',
@@ -336,7 +348,7 @@ export const riskReferenceData: RiskReferenceData = {
       'Improved efficiency: reduced time inputting ROH category into PCMS/OASYS separately. <br>Improved record keeping/data quality: PCMS is updated following completion of OASYS assessment.<br>Prompts User Alert Notice when viewing the Offender Record.',
     termination: 'Remove at termination.',
   },
-  VISOR: {
+  AVIS: {
     description: 'ViSOR',
     suggestedReviewFrequency: 6,
     purpose: 'Highlights offenders where a ViSOR record exists.',
@@ -352,8 +364,8 @@ export const riskReferenceData: RiskReferenceData = {
       'Registration will prompt the offender manager to make contact with the VLO at key stages of the sentence. <br>Will highlight, monitor and record the need for additional licence conditions/disqualifications/restrictions to ensure protection of an identifiable victim(s).<br>Will clarify which cases fall under the VLO scope and what support/contact, if any, is being offered to ensure appropriate risk management/victim protection. ',
     termination: 'Remove at termination, except for Life Sentences',
   },
-  UNK6: {
-    description: 'Vulnerable ',
+  RVLN: {
+    description: 'Vulnerable',
     suggestedReviewFrequency: 0,
     purpose:
       'Use to denote a person has current vulnerability issues when applying the E3 Tiering Framework.  Vulnerable is identified by a ‘yes’ answer to current risk in section R8 of OASYS Full RoSH Analysis.',
@@ -399,7 +411,7 @@ export const riskReferenceData: RiskReferenceData = {
       'Can be used to monitor SGO activity, provide external partners with accurate risk information and assist local offices to coordinate UPW projects, Court appearances and planned office visits to reduce risk of conflict. ',
     termination: 'Remove at termination.',
   },
-  UNK1: {
+  MSP: {
     description: 'Modern Day Slavery – Perpetrator',
     suggestedReviewFrequency: 6,
     purpose:
@@ -408,7 +420,7 @@ export const riskReferenceData: RiskReferenceData = {
       'Modern day slavery encompasses slavery, servitude, forced and compulsory labour and human trafficking. Traffickers and slave drivers coerce, deceive and force individuals against their will into a life of abuse, servitude and inhumane treatment. A large number of active organised crime groups are involved in modern slavery. But it is also committed by individual opportunistic perpetrators. Victims are often pressured into debt-bondage and are likely to be fearful of those who exploit them, who will often threaten and abuse victims and their families. All of these factors make it very difficult for victims to escape.',
     termination: 'Remove at termination.',
   },
-  UNK2: {
+  MSV: {
     description: 'Modern Day Slavery – Victim',
     suggestedReviewFrequency: 6,
     purpose: 'To denote an offender where there are concerns of being the victim of modern day slavery.',
@@ -424,7 +436,7 @@ export const riskReferenceData: RiskReferenceData = {
       'This register should be used to denote where an offender has been identified as an “adult at risk”. “Adult at risk” is defined as an adult who has care and support needs, is experiencing, or at risk of, abuse or neglect; and as a result of those care and support needs is unable to protect themselves from the risk, or experience, of abuse or neglect. Previously known as Vulnerable Adult',
     termination: 'Remove at termination – ALT register can be added',
   },
-  UNK3: {
+  CUCK: {
     description: 'Cuckooing – Potential Victim',
     suggestedReviewFrequency: 3,
     purpose:
@@ -433,7 +445,7 @@ export const riskReferenceData: RiskReferenceData = {
       'Cuckooing is a form of crime where people, i.e. drug dealers who takes over a vulnerable persons home and uses the property to facilitate exploitation. ',
     termination: 'Remove at termination.',
   },
-  UNK4: {
+  SPO: {
     description: 'Stalking Protection Order',
     suggestedReviewFrequency: 3,
     purpose: 'To identify any risk associated with stalking to another person',
@@ -450,7 +462,7 @@ export const riskReferenceData: RiskReferenceData = {
       'Refer to UPW Operating Manual for full details. <br>Note - this register will be made inactive when a Suspend solution within the UPW Functionality will be delivered. Due to be made inactive January 2021 due to SR20 in NDelius will support this via the UPW Details screen',
     termination: 'Remove at termination – De-register on resumption of work or at termination of the related event.',
   },
-  UNK5: {
+  DORIS: {
     description: 'DoRIS',
     suggestedReviewFrequency: 0,
     purpose:

@@ -58,6 +58,7 @@ export class RiskController {
         entityName: registration.text,
       }),
       registration,
+      exitUrl: `/offender/${offender.otherIds.crn}/to-delius`,
     }
   }
 
@@ -86,6 +87,7 @@ export class RiskController {
         entityName: registration.text,
       }),
       registration,
+      exitUrl: `/offender/${offender.otherIds.crn}/to-delius`,
     }
   }
 

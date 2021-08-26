@@ -35,7 +35,15 @@
 
 {% call appSummaryCard({
   titleText: "Before it was removed" if registration.removed else "About this flag",
-  classes: 'govuk-!-margin-bottom-8 app-summary-card--large-title'
+  classes: 'govuk-!-margin-bottom-8 app-summary-card--large-title',
+  actions: {
+    items: [
+      {
+        href: exitUrl,
+        text: "Remove this flag on Delius"
+      }
+    ]
+  } if not registration.removed
 }) -%}
 {{ govukSummaryList({
     rows: [
@@ -45,6 +53,15 @@
         },
         value: {
           text: registration.notes if registration.notes else 'No notes'
+        },
+        actions: {
+          items: [
+            {
+              href: exitUrl,
+              text: "Change",
+              visuallyHiddenText: "notes"
+            }
+          ]
         }
       },
       {
@@ -53,15 +70,31 @@
         },
         value: {
           text: registration.reviewDue | shortDate if registration.reviewDue else 'No review due'
+        },
+        actions: {
+          items: [
+            {
+              href: exitUrl,
+              text: "Review risk flag"
+            }
+          ]
         }
-      },
+      } if not registration.removed,
       {
         key: {
           text: "Most recent review"
         },
         value: {
           text: registration.reviewed | shortDate + " by " + registration.reviewedBy if registration.reviewed else 'Not reviewed yet'
-        }
+        },
+        actions: {
+          items: [
+            {
+              href: exitUrl,
+              text: "View review"
+            }
+          ]
+        } if registration.reviewed
       },
       {
         key: {

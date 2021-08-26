@@ -61,6 +61,7 @@ export interface RemovedRisksListViewModel extends RiskViewModel {
 
 export interface RiskDetailsViewModel extends RiskViewModel {
   registration: RiskRegistrationDetails
+  exitUrl: string
 }
 
 export interface RiskViewModel {

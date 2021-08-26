@@ -143,7 +143,6 @@ context('ViewOffenderPersonalDetails', () => {
         .shouldRenderRiskDetails('Organised Crime', page => {
           page.beforeItWasRemoved(card => {
             card.value('Notes').contains('Deals in stolen weapons')
-            card.value('Next review').contains('2 January 2022')
             card.value('Most recent review').contains('23 August 2021 by Brian Peashoots')
             card.value('Date added').contains('6 May 2020 by Wamberto Grundy')
           })

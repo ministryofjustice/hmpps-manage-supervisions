@@ -78,6 +78,7 @@ describe('RiskController', () => {
         entityName: details.text,
       }),
       registration: details,
+      exitUrl: '/offender/some-crn/to-delius',
     } as RiskDetailsViewModel)
   })
 
@@ -117,6 +118,7 @@ describe('RiskController', () => {
         entityName: details.text,
       }),
       registration: details,
+      exitUrl: '/offender/some-crn/to-delius',
     } as RiskDetailsViewModel)
   })
 
