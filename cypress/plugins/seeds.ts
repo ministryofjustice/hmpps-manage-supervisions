@@ -15,7 +15,7 @@ import {
 import { appointmentTypes } from './appointment-types'
 import { staff } from './staff'
 import { get, set } from 'lodash'
-import { AllRoshRiskDto } from '../../src/server/assess-risks-and-needs-api'
+import { AllRoshRiskDto, AssessmentNeedsDto } from '../../src/server/assess-risks-and-needs-api'
 import { CRN, offender } from './offender'
 import { ACTIVE_CONVICTION_ID, convictions, PREVIOUS_CONVICTION_IDS } from './convictions'
 import { personalContacts } from './personal-contacts'
@@ -28,6 +28,7 @@ import { contacts } from './contacts'
 import { contactTypes } from './contact-types'
 import { nsis } from './nsis'
 import * as faker from 'faker'
+import { needs } from './needs'
 
 /**
  * Resets the wiremock server, this should always be the first seed module loaded.
@@ -77,6 +78,7 @@ export interface OffenderSeedOptions {
   personalCircumstances?: DeepPartial<PersonalCircumstance>[]
   registrations?: DeepPartial<Registration>[]
   risks?: DeepPartial<AllRoshRiskDto>
+  needs?: DeepPartial<AssessmentNeedsDto>
   convictions?: { active: ConvictionSeedOptions | null; previous?: ConvictionSeedOptions[] }
 }
 
@@ -122,6 +124,7 @@ export function offenderSeed(options: OffenderSeedOptions = {}) {
     personalCircumstances(crn, options.personalCircumstances),
     registrations(crn, options.registrations),
     risks(crn, options.risks),
+    needs(crn, options.needs),
     convictions(
       crn,
       active === null ? null : active?.conviction,

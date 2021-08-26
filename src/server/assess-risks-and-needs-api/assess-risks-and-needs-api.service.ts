@@ -3,7 +3,7 @@ import { REQUEST } from '@nestjs/core'
 import { AxiosInstance } from 'axios'
 import { Request } from 'express'
 import { BaseAPI } from './client/base'
-import { Configuration, RisksControllerApi } from './client'
+import { AssessmentNeedsControllerApi, Configuration, RisksControllerApi } from './client'
 import { AuthenticationMethod, RestService } from '../common'
 
 type ApiConstructor<Api> = {
@@ -20,6 +20,10 @@ export class AssessRisksAndNeedsApiService {
 
   get risk() {
     return this.api(RisksControllerApi)
+  }
+
+  get needs() {
+    return this.api(AssessmentNeedsControllerApi)
   }
 
   private api<Api extends BaseAPI>(type: ApiConstructor<Api>): Api {

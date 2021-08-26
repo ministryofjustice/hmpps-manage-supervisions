@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing'
 import { AssessRisksAndNeedsApiService } from './assess-risks-and-needs-api.service'
 import { fakeUser } from '../security/user/user.fake'
 import { REQUEST } from '@nestjs/core'
-import { fakeAllRoshRiskDto } from './assess-risks-and-needs-api.fake'
+import { fakeAllRoshRiskDto, fakeAssessmentNeedsDto } from './assess-risks-and-needs-api.fake'
 import { Logger } from '@nestjs/common'
 import { MockRestModule } from '../common/rest/rest.mock'
 import { AuthenticationMethod } from '../common'
@@ -38,5 +38,12 @@ describe('AssessRisksAndNeedsApiService', () => {
       crn: 'X12345',
     })
     expect(observed.data).toEqual(risks)
+  })
+
+  it('calls needs api', async () => {
+    const needs = fakeAssessmentNeedsDto()
+    client.onGet('/needs/crn/some-crn').reply(200, needs)
+    const observed = await subject.needs.getCriminogenicNeedsByCrn({ crn: 'some-crn' })
+    expect(observed.data).toEqual(needs)
   })
 })

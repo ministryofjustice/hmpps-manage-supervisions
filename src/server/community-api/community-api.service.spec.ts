@@ -35,8 +35,4 @@ describe('CommunityApiService', () => {
     const observed = await subject.appointment.getAllAppointmentTypesUsingGET()
     expect(observed.data).toEqual(appointmentTypes)
   })
-
-  it('calls risk registration api', async () => {
-    client.onGet('/secure/offenders/crn/:crn/registrations').reply(200)
-  })
 })
