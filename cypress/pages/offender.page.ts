@@ -117,18 +117,6 @@ export class OffenderPage extends PageBase {
 
   get personal() {
     return {
-      // tableValue(table: 'contact' | 'personal' | 'equality', title: string) {
-      //   return cy.get(`dl[data-qa="offender/personal-details/${table}"] dt`).contains(title).siblings('dd')
-      // },
-      //
-      // get viewMainAddressDetails() {
-      //   return cy.get('[data-qa="offender/personal-details/address-details"]')
-      // },
-      //
-      // mainAddressDetails(title: string) {
-      //   return cy.get('[data-qa="offender/personal-details/address-details"] dl dt').contains(title).siblings('dd')
-      // },
-
       contactDetails(callback: SummaryListCallback) {
         return SummaryList.selectFromCard('Contact details', callback)
       },
