@@ -16,6 +16,12 @@ class Fixture extends ViewOffenderFixture {
     })
   }
 
+  whenClickingWithoutAnOutcomeFilter() {
+    return this.shouldRenderOffenderTab('activity', page => {
+      page.filterLink('without-an-outcome').click()
+    })
+  }
+
   shouldRenderActivity({
     id,
     date,
@@ -66,7 +72,9 @@ class Fixture extends ViewOffenderFixture {
       page.entry(id).title.should('not.exist')
     })
   }
-
+  shouldNotRenderActivities(ids: number[]) {
+    return ids.map(id => this.shouldNotRenderActivity({ id: id }))
+  }
   shouldRenderAppointmentPage(title: string, assert: (page: OffenderActivityAppointmentPage) => void) {
     const page = new OffenderActivityAppointmentPage()
     page.pageTitle.contains(title)
@@ -126,7 +134,10 @@ context('ViewOffenderActivity', () => {
           time: '12pm to 1pm',
           name: 'Home visit with Catherine Ellis',
           notes: 'Some home visit appointment With a new line!',
-          tags: [{ colour: 'green', text: 'complied' }],
+          tags: [
+            { colour: 'grey', text: 'national standard(ns)' },
+            { colour: 'green', text: 'complied' },
+          ],
         })
 
         .shouldRenderActivity({
@@ -310,6 +321,22 @@ context('ViewOffenderActivity', () => {
         .shouldNotRenderActivity({
           id: 1, // a complied attended activity not returned by Wiremocked CAPI when the FTC filters are applied
         })
+    })
+
+    it('displays activity log filtered by appointments without an outcome', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('activity')
+        .whenClickingWithoutAnOutcomeFilter()
+        .shouldRenderActivity({
+          id: 5,
+          date: 'Wednesday 2 September 2020',
+          time: '11am to 1pm',
+          name: 'Not a well known appointment with Robert Ohagan',
+          notes: 'Some unknown appointment',
+          havingLongNotes: false,
+        })
+        .shouldNotRenderActivities([1, 2, 3, 4])
     })
   })
 })

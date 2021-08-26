@@ -36,7 +36,8 @@
         "code": "CHVS",
         "description": "Home Visit to Case (NS)",
         "shortDescription": "iterate granular vortals",
-        "appointment": true
+        "appointment": true,
+        "nationalStandard": true
       },
       "provider": {
         "code": "74dc7cb9-7275-44b3-bbdc-6601f227ac56",

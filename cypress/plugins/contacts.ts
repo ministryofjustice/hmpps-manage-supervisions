@@ -13,7 +13,7 @@ Cras congue vitae odio eu rutrum. Donec in dictum massa. Vivamus at placerat neq
 export const CONTACTS: DeepPartial<ContactSummary>[] = [
   {
     contactId: 1,
-    type: { code: 'CHVS', description: 'Home Visit to Case (NS)', appointment: true },
+    type: { code: 'CHVS', description: 'Home Visit to Case (NS)', appointment: true, nationalStandard: true },
     contactStart: '2020-09-04T12:00:00+01:00',
     contactEnd: '2020-09-04T13:00:00+01:00',
     notes: 'Some home visit appointment\n\nWith a new line!',

@@ -36,7 +36,8 @@
           "contactType": "CHVS",
           "description": "Home Visit to Case (NS)",
           "orderTypes": ["CJA", "CJA"],
-          "requiresLocation": "REQUIRED"
+          "requiresLocation": "REQUIRED",
+          "nationalStandard": true
         },
         "provider": {
           "code": "d91eb1d1-ad2e-4873-85d7-d6142f3cdc33",

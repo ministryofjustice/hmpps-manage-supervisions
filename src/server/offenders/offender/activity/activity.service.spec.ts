@@ -14,7 +14,12 @@ import {
   Paginated,
 } from '../../../community-api'
 import { ContactTypeCategory } from '../../../config'
-import { fakeAppointmentDetail, fakeContactSummary, fakePaginated } from '../../../community-api/community-api.fake'
+import {
+  fakeAppointmentDetail,
+  fakeContactSummary,
+  fakeContactType,
+  fakePaginated,
+} from '../../../community-api/community-api.fake'
 import { fakeOkResponse } from '../../../common/rest/rest.fake'
 import {
   ActivityComplianceFilter,
@@ -228,9 +233,14 @@ describe('ActivityService', () => {
 
   describe('activity log page', () => {
     function havingContacts(
-      ...partials: (DeepPartial<ContactSummary> & { notes: string; type: ContactTypeCategory | null; meta?: any })[]
+      ...partials: (DeepPartial<ContactSummary> & {
+        notes: string
+        type: ContactTypeCategory | null
+        meta?: any
+        nationalStandard?: boolean
+      })[]
     ) {
-      const contacts = partials.map(({ type, meta, ...partial }, i) => {
+      const contacts = partials.map(({ type, meta, nationalStandard = false, ...partial }, i) => {
         const contact = fakeContactSummary([
           {
             contactStart: '2018-01-01T12:00:00',
@@ -242,6 +252,7 @@ describe('ActivityService', () => {
               attended: true,
               description: 'Some outcome',
             },
+            type: fakeContactType({ nationalStandard }),
             lastUpdatedByUser: { forenames: 'Some', surname: 'User' },
             lastUpdatedDateTime: '2018-04-01T12:00:00',
           },
@@ -413,6 +424,25 @@ describe('ActivityService', () => {
         notes: 'well known, acceptable absence appointment',
         outcome: { attended: false, complied: true },
         tags: [{ colour: GovUkUiTagColour.Green, name: 'acceptable absence' }],
+      })
+    })
+
+    it('gets a national standard appointment', async () => {
+      havingContacts({
+        type: ContactTypeCategory.Appointment,
+        notes: 'Some NSI appointment',
+        outcome: { complied: true, attended: true },
+        nationalStandard: true,
+      })
+
+      const observed = await subject.getActivityLogPage('some-crn', 'some-offender')
+
+      shouldReturnAppointment(observed, {
+        notes: 'Some NSI appointment',
+        tags: [
+          { colour: GovUkUiTagColour.Grey, name: 'national standard(ns)' },
+          { colour: GovUkUiTagColour.Green, name: 'complied' },
+        ],
       })
     })
 
