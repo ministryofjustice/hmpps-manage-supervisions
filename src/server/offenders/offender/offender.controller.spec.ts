@@ -376,6 +376,7 @@ describe('OffenderController', () => {
         toDelius: '/offender/some-crn/to-delius',
         toOASys: '#TODO',
         viewInactiveRegistrations: fakeBreadcrumbUrl(BreadcrumbType.RemovedRisksList, breadcrumbOptions),
+        previousConvictions: fakeBreadcrumbUrl(BreadcrumbType.CasePreviousConvictions, breadcrumbOptions),
       },
       ...expected,
     } as OffenderViewModel)

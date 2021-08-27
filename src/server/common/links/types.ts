@@ -7,6 +7,7 @@ export enum BreadcrumbType {
   PersonalCircumstances,
   PersonalContact,
   CaseSentence,
+  CasePreviousConvictions,
   Compliance,
   CaseActivityLog,
   CaseSchedule,

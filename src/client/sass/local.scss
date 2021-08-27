@@ -16,3 +16,9 @@ $widths: ("15pc": 15%, "30pc": 30%, "55pc": 55%);
     width: $width !important;
   }
 }
+
+table.app-table--cell-vertical-align-bottom {
+  td {
+    vertical-align: bottom;
+  }
+}

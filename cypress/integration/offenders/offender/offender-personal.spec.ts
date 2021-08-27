@@ -3,7 +3,6 @@ import { ADDRESS, OffenderAddressesPage } from '../../../pages/offender-addresse
 import { OffenderDisabilitiesPage } from '../../../pages/offender-disabilities.page'
 import { OffenderPersonalCircumstancesPage } from '../../../pages/offender-personal-circumstances.page'
 import { OffenderPersonalContactPage } from '../../../pages/offender-personal-contact.page'
-import { DeliusExitPage } from '../../../pages/delius-exit.page'
 import { ACTIVE_CONVICTION_ID } from '../../../plugins/convictions'
 import { OFFENDER_ID } from '../../../plugins/offender'
 
@@ -138,13 +137,6 @@ class Fixture extends ViewOffenderFixture {
 
   shouldDisplayPersonalContact(name: string, assert: (page: OffenderPersonalContactPage) => void) {
     const page = new OffenderPersonalContactPage()
-    page.pageTitle.contains(name)
-    assert(page)
-    return this
-  }
-
-  shouldDisplayDeliusExitPage(name: string, assert: (page: DeliusExitPage) => void) {
-    const page = new DeliusExitPage()
     page.pageTitle.contains(name)
     assert(page)
     return this
@@ -329,7 +321,7 @@ context('ViewOffenderPersonalDetails', () => {
         page.value('Notes').contains('Divorced')
       })
       .whenClickingChangeContactDetails('Pippa Wade – Wife')
-      .shouldDisplayDeliusExitPage('Use National Delius to make these changes', page => {
+      .shouldDisplayDeliusExitPage(page => {
         page.deliusExitButton
           .should('have.attr', 'href')
           .and(

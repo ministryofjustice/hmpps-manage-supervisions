@@ -1,7 +1,17 @@
 import { ViewOffenderFixture } from './view-offender.fixture'
+import { OffenderPreviousOrdersPage } from '../../../pages/offender-previous-orders.page'
+
+class Fixture extends ViewOffenderFixture {
+  shouldRenderPreviousOrdersPage(callback: (page: OffenderPreviousOrdersPage) => void) {
+    const page = new OffenderPreviousOrdersPage()
+    page.pageTitle.contains('Previous orders')
+    callback(page)
+    return this
+  }
+}
 
 context('ViewOffenderSentence', () => {
-  const fixture = new ViewOffenderFixture()
+  const fixture = new Fixture()
 
   describe('no active conviction', () => {
     before(() => {
@@ -101,6 +111,25 @@ context('ViewOffenderSentence', () => {
             card.value('Previous breaches').contains('1 previous breach')
           })
         })
+    })
+
+    it('displays previous convictions details', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('sentence')
+        .shouldRenderOffenderTab('sentence', page => {
+          page.probationHistory(card => {
+            card.value('Previous orders').contains('Previous orders (1)').click()
+          })
+        })
+        .shouldRenderPreviousOrdersPage(page => {
+          page.previousOrdersTable(table => {
+            table.cell(0, 1).contains('Ended on 1 December 2020')
+            table.cell(0, 0).contains('Assault on Police Officer (2 counts)')
+            table.cell(0, 0).contains('24 month Community Order').click()
+          })
+        })
+        .shouldDisplayDeliusExitPage()
     })
   })
 })

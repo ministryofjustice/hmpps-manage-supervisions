@@ -11,6 +11,7 @@ import {
   ComplianceStatusAlertLevel,
   ConvictionDetails,
   ConvictionRequirement,
+  PreviousConvictionSummary,
 } from './sentence.types'
 import { RequirementService } from './requirement.service'
 import { CommunityApiService } from '../../../community-api'
@@ -30,7 +31,7 @@ export class SentenceService {
   ) {}
 
   async getConvictionDetails(crn: string): Promise<ConvictionDetails | null> {
-    const { requirements, current, previous } = await this.getConvictions(crn)
+    const { requirements, current, previous } = await this.getConvictionsAndRequirements(crn)
 
     const breachesResult = await Promise.all(previous.map(x => this.breach.getBreaches(crn, x.convictionId)))
 
@@ -46,7 +47,6 @@ export class SentenceService {
         ? {
             count: previous.length,
             lastEnded: DateTime.fromISO(maxBy(previous, x => x.convictionDate).convictionDate),
-            link: `/offenders/${crn}/previous-convictions`,
           }
         : null,
       previousBreaches: {
@@ -92,7 +92,7 @@ export class SentenceService {
 
   async getSentenceComplianceDetails(crn: string): Promise<ComplianceDetails> {
     const from = DateTime.now().minus({ years: 2 }).set({ day: 1, hour: 0, minute: 0, second: 0, millisecond: 0 })
-    const { requirements, current, previous } = await this.getConvictions(crn, from)
+    const { requirements, current, previous } = await this.getConvictionsAndRequirements(crn, from)
 
     const [currentSummary, ...previousSummaries] = await Promise.all([
       this.compliance.convictionSummary(crn, current),
@@ -209,6 +209,16 @@ export class SentenceService {
     }
   }
 
+  async getPreviousConvictions(crn: string): Promise<PreviousConvictionSummary[]> {
+    const { previous } = await this.getConvictions(crn)
+    // TODO: when PreviousConvictionSummary gets more complex (eg includes breaches) then switch to mutating the result of ComplianceService::convictionSummary
+    return previous.map(c => ({
+      name: getSentenceName(c.sentence),
+      endDate: DateTime.fromISO(c.sentence.terminationDate),
+      mainOffence: getOffenceName(c.offences.find(x => x.mainOffence)),
+    }))
+  }
+
   private static getLatestConviction(convictions: Conviction[]): Conviction {
     // TODO we are assuming only a single active conviction per offender at this time
     // TODO so in the case where we have multiple then just take the latest
@@ -221,7 +231,7 @@ export class SentenceService {
   private async getConvictions(
     crn: string,
     from?: DateTime,
-  ): Promise<{ current?: Conviction; previous: Conviction[]; requirements: ConvictionRequirement[] }> {
+  ): Promise<{ current?: Conviction; previous: Conviction[] }> {
     const { data: convictions } = await this.community.offender.getConvictionsForOffenderByCrnUsingGET({ crn })
 
     const current = SentenceService.getLatestConviction(convictions)
@@ -230,11 +240,17 @@ export class SentenceService {
         !c.active && (!from || (c.sentence?.terminationDate && DateTime.fromISO(c.sentence.terminationDate) >= from)),
     )
 
+    return { current, previous }
+  }
+
+  private async getConvictionsAndRequirements(
+    crn: string,
+    from?: DateTime,
+  ): Promise<{ current?: Conviction; previous: Conviction[]; requirements: ConvictionRequirement[] }> {
+    const { current, previous } = await this.getConvictions(crn, from)
+
     if (!current) {
-      return {
-        previous,
-        requirements: [],
-      }
+      return { previous, requirements: [] }
     }
 
     const requirements = await this.requirements.getConvictionRequirements({
