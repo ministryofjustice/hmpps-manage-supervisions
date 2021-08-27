@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import { PotentiallyExpectedDateTime } from '../../../util'
 import { BreachSummary } from '../../../community-api/breach'
+import { ViewModel } from '../../../common'
 
 export interface ConvictionOffence {
   id: string
@@ -152,4 +153,8 @@ export interface ComplianceDetails {
     dateFrom: DateTime
     totalBreaches: number
   }
+}
+
+export interface OffencesViewModel extends ViewModel {
+  displayName: string
 }

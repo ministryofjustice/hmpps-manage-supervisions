@@ -16,10 +16,18 @@ import { RequirementService } from './offender/sentence/requirement.service'
 import { ContactTypesService } from '../community-api'
 import { ComplianceService } from './offender/sentence/compliance.service'
 import { RiskController } from './offender/risk/risk.controller'
+import { SentenceController } from './offender/sentence/sentence.controller'
 
 @Module({
   imports: [CommonModule, CommunityApiModule, AssessRisksAndNeedsApiModule],
-  controllers: [OffenderController, PersonalController, DeliusExitController, ActivityController, RiskController],
+  controllers: [
+    OffenderController,
+    PersonalController,
+    DeliusExitController,
+    ActivityController,
+    RiskController,
+    SentenceController,
+  ],
   providers: [
     OffenderService,
     SentenceService,
