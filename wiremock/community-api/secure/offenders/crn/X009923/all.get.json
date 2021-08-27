@@ -55,8 +55,8 @@
               "code": "M",
               "description": "Main"
             },
-            "lastUpdatedDatetime": "2021-02-03T02:03:36.088Z",
-            "createdDatetime": "2021-07-04T08:23:16.119Z",
+            "lastUpdatedDatetime": "2021-05-11T11:26:46.633Z",
+            "createdDatetime": "2021-07-22T15:54:23.011Z",
             "noFixedAbode": true,
             "to": "2015-07-16",
             "type": {
@@ -81,7 +81,7 @@
             "postcode": "B16 8TP",
             "noFixedAbode": false,
             "telephoneNumber": null,
-            "latestAssessmentDate": "2020-10-06T17:27:56.947Z",
+            "latestAssessmentDate": "2020-10-18T22:49:41.278Z",
             "type": null,
             "typeVerified": false
           }
@@ -105,9 +105,9 @@
         },
         "disabilities": [
           {
-            "disabilityId": 93736,
+            "disabilityId": 27561,
             "disabilityType": {
-              "code": "S2X",
+              "code": "3P8",
               "description": "Learning Difficulties"
             },
             "startDate": "2021-02-01",
@@ -123,9 +123,9 @@
             ]
           },
           {
-            "disabilityId": 27431,
+            "disabilityId": 69697,
             "disabilityType": {
-              "code": "9TR",
+              "code": "56M",
               "description": "Speech Impairment"
             },
             "startDate": "2021-03-01",
@@ -133,9 +133,9 @@
             "provisions": null
           },
           {
-            "disabilityId": 92997,
+            "disabilityId": 26657,
             "disabilityType": {
-              "code": "5A6",
+              "code": "CLB",
               "description": "Dyslexia"
             },
             "startDate": "2020-04-01",

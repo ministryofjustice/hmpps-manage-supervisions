@@ -18,7 +18,7 @@
           "active": false,
           "startDate": "2018-08-01",
           "expectedStartDate": "2019-04-03",
-          "expectedEndDate": "2021-12-27",
+          "expectedEndDate": "2022-08-18",
           "requirementNotes": "Some inactive unpaid work requirement",
           "requirementTypeMainCategory": {
             "code": "W",
@@ -35,7 +35,7 @@
           }
         },
         {
-          "requirementId": 46901,
+          "requirementId": 63543,
           "length": 18,
           "lengthUnit": "Hours",
           "active": true,
@@ -54,13 +54,13 @@
           "createdDatetime": "2019-04-08T14:48:17"
         },
         {
-          "requirementId": 59111,
+          "requirementId": 89252,
           "length": 3,
           "lengthUnit": "Hours",
           "active": true,
           "startDate": "2018-08-01",
           "expectedStartDate": "2019-04-03",
-          "expectedEndDate": "2022-02-17",
+          "expectedEndDate": "2021-11-12",
           "requirementNotes": "3 ADD HOURS",
           "requirementTypeMainCategory": {
             "code": "W",
@@ -78,7 +78,7 @@
           "lengthUnit": "Days",
           "active": true,
           "startDate": "2018-08-01",
-          "expectedStartDate": "2021-01-26",
+          "expectedStartDate": "2021-01-29",
           "expectedEndDate": "2021-11-07",
           "requirementNotes": null,
           "requirementTypeMainCategory": {
@@ -86,8 +86,8 @@
             "description": "RAR category"
           },
           "requirementTypeSubCategory": {
-            "code": "bx9d8",
-            "description": "Cotton"
+            "code": "jgli2",
+            "description": "Frozen"
           },
           "commencementDate": "2018-08-01",
           "createdDatetime": "2019-04-08T13:59:45",
@@ -99,7 +99,7 @@
           "lengthUnit": "Days",
           "active": true,
           "startDate": "2018-09-01",
-          "expectedStartDate": "2021-07-04",
+          "expectedStartDate": "2021-04-29",
           "expectedEndDate": null,
           "requirementNotes": null,
           "requirementTypeMainCategory": {
@@ -107,8 +107,8 @@
             "description": "RAR category"
           },
           "requirementTypeSubCategory": {
-            "code": "9z12l",
-            "description": "Wooden"
+            "code": "ln14u",
+            "description": "Rubber"
           },
           "commencementDate": "2018-08-01",
           "createdDatetime": "2019-04-08T13:59:45",
@@ -116,13 +116,13 @@
           "restrictive": false
         },
         {
-          "requirementId": 28386,
+          "requirementId": 58042,
           "length": 7,
           "lengthUnit": "Hours",
           "active": true,
           "startDate": "2018-08-01",
           "expectedStartDate": "2019-04-01",
-          "expectedEndDate": "2022-03-30",
+          "expectedEndDate": "2022-07-21",
           "requirementNotes": null,
           "requirementTypeMainCategory": {
             "code": "W",

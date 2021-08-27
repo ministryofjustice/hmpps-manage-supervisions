@@ -12,35 +12,35 @@
     "jsonBody": {
       "riskToSelf": {
         "suicide": {
-          "risk": "DK",
+          "risk": "NO",
           "previous": "NO",
           "previousConcernsText": null,
           "current": "YES",
           "currentConcernsText": null
         },
         "selfHarm": {
-          "risk": "DK",
+          "risk": "NO",
           "previous": "YES",
           "previousConcernsText": null,
           "current": "YES",
           "currentConcernsText": null
         },
         "custody": {
-          "risk": "DK",
+          "risk": "NO",
           "previous": "YES",
           "previousConcernsText": "Soluta tempore nemo et velit est perspiciatis.\n\nNeque error aut est nemo quasi. Et labore impedit omnis numquam id et eaque facere itaque. Ipsam et atque eos tempora possimus.",
           "current": "NO",
           "currentConcernsText": null
         },
         "hostelSetting": {
-          "risk": "NO",
+          "risk": "YES",
           "previous": "YES",
           "previousConcernsText": null,
           "current": "NO",
           "currentConcernsText": null
         },
         "vulnerability": {
-          "risk": "YES",
+          "risk": "DK",
           "previous": "NO",
           "previousConcernsText": null,
           "current": "NO",
@@ -48,10 +48,10 @@
         }
       },
       "otherRisks": {
-        "escapeOrAbscond": "YES",
-        "controlIssuesDisruptiveBehaviour": "NO",
-        "breachOfTrust": "DK",
-        "riskToOtherPrisoners": "YES"
+        "escapeOrAbscond": "DK",
+        "controlIssuesDisruptiveBehaviour": "DK",
+        "breachOfTrust": "NO",
+        "riskToOtherPrisoners": "DK"
       },
       "summary": {
         "whoIsAtRisk": "Someone at risk",
@@ -65,9 +65,9 @@
           "LOW": ["Known Adult"]
         },
         "riskInCustody": {
-          "VERY_HIGH": ["Staff", "Public", "Public"],
-          "HIGH": ["Prisoners", "Public"],
-          "MEDIUM": ["Prisoners", "Public", "Known Adult"],
+          "VERY_HIGH": ["Prisoners"],
+          "HIGH": ["Known Adult", "Known Adult", "Prisoners"],
+          "MEDIUM": ["Staff"],
           "LOW": ["Staff"]
         }
       }
