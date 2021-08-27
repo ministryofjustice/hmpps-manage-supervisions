@@ -1,0 +1,69 @@
+{
+  "request": {
+    "method": "GET",
+    "headers": {},
+    "urlPath": "/community-api/secure/offenders/crn/X009923/registrations/63297"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "registrationId": 63297,
+      "offenderId": 20949,
+      "active": true,
+      "startDate": "2020-05-14",
+      "endDate": null,
+      "register": {
+        "code": "k1g9z",
+        "description": "Alerts"
+      },
+      "riskColour": "Red",
+      "type": {
+        "code": "ALERT",
+        "description": "Alert Notice"
+      },
+      "nextReviewDate": "2022-01-02",
+      "reviewPeriodMonths": 6,
+      "registeringTeam": {
+        "code": "t8y4x",
+        "description": "embrace e-business mindshare"
+      },
+      "registeringOfficer": {
+        "code": "ABC999",
+        "forenames": "Yolanda",
+        "surname": "Gubbins",
+        "unallocated": false
+      },
+      "registeringProbationArea": {
+        "code": "p6j9l",
+        "description": "3091 Funk Port"
+      },
+      "warnUser": false,
+      "numberOfPreviousDeregistrations": 0,
+      "notes": "Major alert about this offender",
+      "registrationReviews": [
+        {
+          "reviewDate": "2022-01-02",
+          "completed": false
+        },
+        {
+          "reviewDate": "2021-08-23",
+          "reviewDateDue": "2022-01-02",
+          "notes": "Registration still relevant",
+          "completed": true,
+          "reviewingOfficer": {
+            "code": "ABC562",
+            "forenames": "Cindy",
+            "surname": "Legford"
+          },
+          "reviewingTeam": {
+            "code": "N07UAT",
+            "description": "Unallocated Team"
+          }
+        }
+      ]
+    }
+  }
+}

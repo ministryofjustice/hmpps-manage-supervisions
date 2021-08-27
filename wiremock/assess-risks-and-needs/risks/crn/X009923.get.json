@@ -26,21 +26,21 @@
           "currentConcernsText": null
         },
         "custody": {
-          "risk": "YES",
+          "risk": "NO",
           "previous": "YES",
           "previousConcernsText": "Soluta tempore nemo et velit est perspiciatis.\n\nNeque error aut est nemo quasi. Et labore impedit omnis numquam id et eaque facere itaque. Ipsam et atque eos tempora possimus.",
           "current": "NO",
           "currentConcernsText": null
         },
         "hostelSetting": {
-          "risk": "DK",
+          "risk": "YES",
           "previous": "YES",
           "previousConcernsText": null,
           "current": "NO",
           "currentConcernsText": null
         },
         "vulnerability": {
-          "risk": "YES",
+          "risk": "DK",
           "previous": "NO",
           "previousConcernsText": null,
           "current": "NO",
@@ -50,11 +50,11 @@
       "otherRisks": {
         "escapeOrAbscond": "DK",
         "controlIssuesDisruptiveBehaviour": "DK",
-        "breachOfTrust": "DK",
-        "riskToOtherPrisoners": "NO"
+        "breachOfTrust": "NO",
+        "riskToOtherPrisoners": "DK"
       },
       "summary": {
-        "whoIsAtRisk": "Known Adult and Public",
+        "whoIsAtRisk": "Someone at risk",
         "natureOfRisk": "Some nature of risk",
         "riskImminence": "Some risk imminence",
         "riskIncreaseFactors": "Some risk increase factors",
@@ -65,9 +65,10 @@
           "LOW": ["Known Adult"]
         },
         "riskInCustody": {
-          "VERY_HIGH": ["Staff", "Public"],
-          "HIGH": ["Prisoners", "Children"],
-          "LOW": ["Children"]
+          "VERY_HIGH": ["Prisoners"],
+          "HIGH": ["Known Adult", "Known Adult", "Prisoners"],
+          "MEDIUM": ["Staff"],
+          "LOW": ["Staff"]
         }
       }
     }

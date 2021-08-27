@@ -1,0 +1,48 @@
+{
+  "request": {
+    "method": "GET",
+    "headers": {},
+    "urlPath": "/community-api/secure/offenders/crn/X009923/registrations/62107"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "registrationId": 62107,
+      "offenderId": 56898,
+      "active": true,
+      "startDate": "2021-07-09",
+      "endDate": null,
+      "register": {
+        "code": "rm6ma",
+        "description": "Alerts"
+      },
+      "riskColour": "White",
+      "type": {
+        "code": "RMRH",
+        "description": "High RoSH"
+      },
+      "nextReviewDate": "2022-08-14",
+      "reviewPeriodMonths": 3,
+      "registeringTeam": {
+        "code": "00y4p",
+        "description": "reinvent dot-com vortals"
+      },
+      "registeringOfficer": {
+        "code": "gai4j",
+        "forenames": "Dwight",
+        "surname": "Rutherford",
+        "unallocated": false
+      },
+      "registeringProbationArea": {
+        "code": "tnuoy",
+        "description": "22388 Giles Loop"
+      },
+      "warnUser": false,
+      "numberOfPreviousDeregistrations": 0,
+      "notes": "This registration is on the ignore list so will be excluded from the ui"
+    }
+  }
+}

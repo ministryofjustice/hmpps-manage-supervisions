@@ -1,0 +1,75 @@
+{
+  "request": {
+    "method": "GET",
+    "headers": {},
+    "urlPath": "/community-api/secure/offenders/crn/X009923/registrations/68750"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "registrationId": 68750,
+      "offenderId": 69389,
+      "active": false,
+      "startDate": "2020-05-06",
+      "endDate": "2021-07-19",
+      "register": {
+        "code": "baj63",
+        "description": "Alerts"
+      },
+      "riskColour": "Red",
+      "type": {
+        "code": "REG26",
+        "description": "Organised Crime"
+      },
+      "nextReviewDate": "2022-01-02",
+      "reviewPeriodMonths": 6,
+      "registeringTeam": {
+        "code": "hnery",
+        "description": "empower plug-and-play communities"
+      },
+      "registeringOfficer": {
+        "code": "ZXU221",
+        "forenames": "Wamberto",
+        "surname": "Grundy",
+        "unallocated": false
+      },
+      "registeringProbationArea": {
+        "code": "aqkuf",
+        "description": "042 Waino Mountains"
+      },
+      "warnUser": false,
+      "numberOfPreviousDeregistrations": 0,
+      "notes": "Deals in stolen weapons",
+      "deregisteringNotes": "No longer a risk",
+      "deregisteringOfficer": {
+        "code": "ABC123",
+        "forenames": "Brian",
+        "surname": "Peashoots"
+      },
+      "registrationReviews": [
+        {
+          "reviewDate": "2021-11-19",
+          "completed": false
+        },
+        {
+          "reviewDate": "2021-08-23",
+          "reviewDateDue": "2021-11-19",
+          "notes": "A review was performed",
+          "completed": true,
+          "reviewingOfficer": {
+            "code": "ABC123",
+            "forenames": "Brian",
+            "surname": "Peashoots"
+          },
+          "reviewingTeam": {
+            "code": "N07UAT",
+            "description": "Unallocated Team"
+          }
+        }
+      ]
+    }
+  }
+}

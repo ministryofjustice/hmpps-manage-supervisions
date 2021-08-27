@@ -47,6 +47,11 @@ function getOutcomeFlags(outcome?: AppointmentOutcome): ActivityLogEntryTag[] {
 
 function getAppointmentFlags(contact: ContactSummary | AppointmentDetail): ActivityLogEntryTag[] {
   const tags: ActivityLogEntryTag[] = []
+
+  if (contact.type.nationalStandard) {
+    tags.push({ name: 'national standard (ns)', colour: GovUkUiTagColour.Grey })
+  }
+
   if (contact.sensitive) {
     tags.push({ name: 'sensitive', colour: GovUkUiTagColour.Grey })
   }
@@ -285,6 +290,8 @@ export class ActivityService {
     switch (complianceFilter) {
       case ActivityComplianceFilter.Appointments:
         return defaultAppointmentFilters
+      case ActivityComplianceFilter.WithoutOutcome:
+        return { ...defaultAppointmentFilters, outcome: false }
       case ActivityComplianceFilter.CompliedAppointments:
         return { ...defaultAppointmentFilters, complied: true, attended: true }
       case ActivityComplianceFilter.AcceptableAbsenceAppointments:

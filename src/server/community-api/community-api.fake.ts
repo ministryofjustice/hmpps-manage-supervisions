@@ -314,6 +314,7 @@ export const fakeContactType = fake<ContactType>(() => ({
   description: faker.company.bs(),
   shortDescription: faker.company.bs(),
   appointment: faker.datatype.boolean(),
+  nationalStandard: false,
 }))
 
 export const fakeContactSummary = fake<ContactSummary, { when?: 'past' | 'recent' | 'soon' | 'future' }>(

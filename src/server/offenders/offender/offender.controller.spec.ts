@@ -171,6 +171,10 @@ describe('OffenderController', () => {
           description: 'Appointments',
           name: 'Appointments',
         },
+        'without-an-outcome': {
+          description: 'Appointments without an outcome',
+          name: 'Without an outcome',
+        },
         'complied-appointments': {
           description: 'Complied appointments',
           name: 'Complied',
@@ -222,6 +226,10 @@ describe('OffenderController', () => {
         appointments: {
           description: 'Appointments',
           name: 'Appointments',
+        },
+        'without-an-outcome': {
+          description: 'Appointments without an outcome',
+          name: 'Without an outcome',
         },
         'complied-appointments': {
           description: 'Complied appointments',

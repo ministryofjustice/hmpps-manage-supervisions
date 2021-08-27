@@ -1,0 +1,78 @@
+{
+  "request": {
+    "method": "GET",
+    "headers": {},
+    "urlPath": "/community-api/secure/offenders/crn/X009923/contact-summary",
+    "queryParameters": {
+      "appointmentsOnly": {
+        "equalTo": "true"
+      },
+      "outcome": {
+        "equalTo": "false"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8"
+    },
+    "jsonBody": {
+      "content": [
+        {
+          "contactId": 5,
+          "contactStart": "2020-09-02T11:00:00+01:00",
+          "contactEnd": "2020-09-02T13:00:00+01:00",
+          "notes": "Some unknown appointment",
+          "officeLocation": {
+            "code": "2f542ccf-5acb-4f2b-bf61-3e8dfb22f451",
+            "buildingName": "Dasia",
+            "buildingNumber": "43",
+            "streetName": "Gloria Estate",
+            "townCity": "Richmond",
+            "county": "Buckinghamshire",
+            "postcode": "66175",
+            "description": "211 Cummerata Avenue"
+          },
+          "outcome": null,
+          "sensitive": false,
+          "type": {
+            "code": "NOT_WELL_KNOWN",
+            "description": "Not a well known appointment",
+            "shortDescription": "incentivize extensible eyeballs",
+            "appointment": true,
+            "nationalStandard": false
+          },
+          "provider": {
+            "code": "d7aa3d75-8b77-4a4a-9510-2d424f02abf7",
+            "description": "evolve virtual synergies"
+          },
+          "team": {
+            "code": "e3bbff4f-d07d-4dbe-86d4-9a2e19745519",
+            "description": "exploit granular ROI"
+          },
+          "staff": {
+            "code": "811744b6-814d-4f23-ad1a-c26626b3467d",
+            "forenames": "Robert",
+            "surname": "Ohagan",
+            "unallocated": false
+          },
+          "lastUpdatedDateTime": "2021-08-26T04:29:52.814+01:00",
+          "lastUpdatedByUser": {
+            "forenames": "Ophelia",
+            "surname": "Grant"
+          }
+        }
+      ],
+      "number": 0,
+      "size": 1,
+      "numberOfElements": 1,
+      "totalPages": 1,
+      "totalElements": 1,
+      "first": true,
+      "last": false,
+      "empty": false
+    }
+  },
+  "priority": 4
+}
