@@ -49,7 +49,7 @@ function getAppointmentFlags(contact: ContactSummary | AppointmentDetail): Activ
   const tags: ActivityLogEntryTag[] = []
 
   if (contact.type.nationalStandard) {
-    tags.push({ name: 'national standard(ns)', colour: GovUkUiTagColour.Grey })
+    tags.push({ name: 'national standard (ns)', colour: GovUkUiTagColour.Grey })
   }
 
   if (contact.sensitive) {

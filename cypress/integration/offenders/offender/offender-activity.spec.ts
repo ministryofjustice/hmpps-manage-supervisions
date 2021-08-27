@@ -135,7 +135,7 @@ context('ViewOffenderActivity', () => {
           name: 'Home visit with Catherine Ellis',
           notes: 'Some home visit appointment With a new line!',
           tags: [
-            { colour: 'grey', text: 'national standard(ns)' },
+            { colour: 'grey', text: 'national standard (ns)' },
             { colour: 'green', text: 'complied' },
           ],
         })
