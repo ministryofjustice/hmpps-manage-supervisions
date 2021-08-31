@@ -190,6 +190,14 @@ export function contacts(crn: string, partials: DeepPartial<ContactSummary>[] = 
     // appointments only
     all({ appointmentsOnly: true }, c => c.type.appointment)
 
+    // include filter - appointments and currently defined comms categories
+    const commsTypeList = ['CT3A', 'CT3B', 'CTOA', 'CTOB', 'CM3A', 'CMOA', 'CMOB', 'NOT_WELL_KNOWN_COMMUNICATION']
+
+    all(
+      { include: ['APPOINTMENTS', ...commsTypeList.map(t => `TYPE_${t}`)] },
+      c => c.type.appointment || commsTypeList.indexOf(c.type.code) > 0,
+    )
+
     // all contacts with no filter
     all()
 
