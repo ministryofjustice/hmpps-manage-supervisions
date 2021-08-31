@@ -23,21 +23,10 @@ function getUrl({ url, urlPath, urlPattern, urlPathPattern, queryParameters }: W
     .join('')
 }
 
-function getMappingName(
-  mapping: Pick<WireMock.StubMapping, 'name' | 'request' | 'response'>,
-  filename = false,
-): string {
-  if (mapping.name) {
-    return mapping.name
-  }
-
-  const name = [getUrl(mapping.request)]
-
-  if (filename) {
-    return [...name, '.', mapping.request.method.toLowerCase(), '.json'].join('')
-  }
-
-  return [mapping.request.method, ...name, '=>', (mapping.response as any).status].join(' ')
+function getMappingName(mapping: Pick<WireMock.StubMapping, 'name' | 'request' | 'response'>): string {
+  return (
+    mapping.name || [mapping.request.method, getUrl(mapping.request), '=>', (mapping.response as any).status].join(' ')
+  )
 }
 
 type Mutation = (context: Omit<FluentWiremockContext, 'mutate'>) => void
@@ -160,12 +149,9 @@ class WiremockApiHelper {
 
     if (this.writeMappings) {
       await rm(path.join(wiremockPath, '**', '*'))
-      for (const mapping of this.mappings) {
-        const name = path.resolve(wiremockPath, ...getMappingName(mapping, true).split('/'))
-        const json = JSON.stringify(mapping, null, 2)
-        await fs.promises.mkdir(path.dirname(name), { recursive: true })
-        await fs.promises.writeFile(name, json, { encoding: 'utf8' })
-      }
+      const name = path.resolve(wiremockPath, 'mappings.json')
+      const json = JSON.stringify({ mappings: this.mappings })
+      await fs.promises.writeFile(name, json, { encoding: 'utf8' })
     } else {
       if (this.reset) {
         // call reset even if we're setting deleteAllNotInImport to reset request log
