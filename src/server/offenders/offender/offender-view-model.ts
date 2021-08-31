@@ -27,6 +27,7 @@ export interface OffenderLinks extends OffenderPageLinks {
   toOASys: string
   viewInactiveRegistrations: string
   previousConvictions: string
+  startBreach: string
 }
 
 export interface OffenderViewModelBase<Page extends OffenderPage> extends ViewModel {

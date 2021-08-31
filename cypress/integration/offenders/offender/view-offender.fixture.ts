@@ -7,7 +7,7 @@ export class ViewOffenderFixture {
   page = new OffenderPage()
 
   whenViewingOffender(): this {
-    cy.viewOffender(this.crn)
+    cy.viewOffender({ crn: this.crn })
     return this
   }
 
@@ -22,16 +22,21 @@ export class ViewOffenderFixture {
     return this
   }
 
-  shouldRenderOffenderTab<TAB extends TABS>(tab: TAB, assert: (page: OffenderPage[TAB]) => void): this {
+  shouldRenderOffenderTab<TAB extends TABS>(tab: TAB, assert?: (page: OffenderPage[TAB]) => void): this {
     this.page.currentTab.should('eq', tab)
-    assert(this.page[tab])
+    assert && assert(this.page[tab])
     return this
   }
 
   shouldDisplayDeliusExitPage(assert?: (page: DeliusExitPage) => void) {
     const page = new DeliusExitPage()
-    page.pageTitle.contains('Use National Delius to make these changes')
+    page.pageTitle.contains('Continue on National Delius')
     assert && assert(page)
+    return this
+  }
+
+  shouldDisplayPageWithTitle(title: string) {
+    this.page.pageTitle.contains(title)
     return this
   }
 }

@@ -29,7 +29,7 @@ import {
   UnknownActivityLogEntry,
 } from './activity.types'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../../community-api/community-api.mock'
-import { fakeBreadcrumbUrl, MockLinksModule } from '../../../common/links/links.mock'
+import { MockLinksModule } from '../../../common/links/links.mock'
 import { BreadcrumbType } from '../../../common/links'
 import { merge } from 'lodash'
 import { FakeConfigModule } from '../../../config/config.fake'
@@ -91,6 +91,7 @@ describe('ActivityService', () => {
 
     const observed = await subject.getAppointment('some-crn', 123)
 
+    const links = MockLinksModule.of({ crn: 'some-crn', id: 91747 })
     expect(observed).toEqual({
       id: 91747,
       category: 'Future appointment',
@@ -108,9 +109,9 @@ describe('ActivityService', () => {
       type: 'appointment',
       typeName: 'Some appointment',
       links: {
-        addNotes: '/offender/some-crn/appointment/91747/add-notes',
+        addNotes: links.url(BreadcrumbType.ExitToDelius),
         recordMissingAttendance: null,
-        view: fakeBreadcrumbUrl(BreadcrumbType.Appointment, { crn: 'some-crn', id: 91747 }),
+        view: links.url(BreadcrumbType.Appointment),
       },
       requirement: {
         requirementId: 84512,
@@ -275,6 +276,7 @@ describe('ActivityService', () => {
       observed: Paginated<ActivityLogEntry>,
       expected: DeepPartial<AppointmentActivityLogEntry>,
     ) {
+      const links = MockLinksModule.of({ crn: 'some-crn', id: 1 })
       expect(observed.content).toEqual([
         merge(
           {
@@ -284,9 +286,9 @@ describe('ActivityService', () => {
             start: DateTime.fromObject({ year: 2018, month: 1, day: 1, hour: 12 }),
             end: DateTime.fromObject({ year: 2018, month: 1, day: 1, hour: 13 }),
             links: {
-              addNotes: '/offender/some-crn/appointment/1/add-notes',
+              addNotes: links.url(BreadcrumbType.ExitToDelius),
               recordMissingAttendance: null,
-              view: fakeBreadcrumbUrl(BreadcrumbType.Appointment, { crn: 'some-crn', id: 1 }),
+              view: links.url(BreadcrumbType.Appointment),
             },
             name: `some ${expected.notes}`,
             outcome: {
@@ -309,6 +311,7 @@ describe('ActivityService', () => {
       observed: Paginated<ActivityLogEntry>,
       expected: DeepPartial<CommunicationActivityLogEntry>,
     ) {
+      const links = MockLinksModule.of({ crn: 'some-crn', id: 1 })
       expect(observed.content).toEqual([
         merge(
           {
@@ -317,8 +320,8 @@ describe('ActivityService', () => {
             category: 'Other communication',
             start: DateTime.fromObject({ year: 2018, month: 1, day: 1, hour: 12 }),
             links: {
-              addNotes: '/offender/some-crn/activity/communication/1/add-notes',
-              view: '/offender/some-crn/activity/communication/1',
+              addNotes: links.url(BreadcrumbType.ExitToDelius),
+              view: links.url(BreadcrumbType.OtherCommunication),
             },
             name: `some ${expected.notes}`,
             sensitive: false,
@@ -455,10 +458,11 @@ describe('ActivityService', () => {
 
       const observed = await subject.getActivityLogPage('some-crn', 'some offender')
 
+      const links = MockLinksModule.of({ crn: 'some-crn', id: 1 })
       shouldReturnAppointment(observed, {
         notes: 'other appointment, not recorded',
         links: {
-          recordMissingAttendance: '/offender/some-crn/appointment/1/record-outcome',
+          recordMissingAttendance: links.url(BreadcrumbType.ExitToDelius),
         },
         outcome: null,
       })
@@ -512,6 +516,7 @@ describe('ActivityService', () => {
 
     const observed = await subject.getCommunicationContact('some-crn', 111, 'some offender')
 
+    const links = MockLinksModule.of({ id: 111, crn: 'some-crn' })
     expect(observed).toEqual({
       id: 111,
       category: 'Other communication',
@@ -527,8 +532,8 @@ describe('ActivityService', () => {
       typeName: 'Some contact',
       tags: [],
       links: {
-        addNotes: '/offender/some-crn/activity/communication/111/add-notes',
-        view: '/offender/some-crn/activity/communication/111',
+        addNotes: links.url(BreadcrumbType.ExitToDelius),
+        view: links.url(BreadcrumbType.OtherCommunication),
       },
     } as CommunicationActivityLogEntry)
   })

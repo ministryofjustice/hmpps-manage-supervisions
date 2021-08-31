@@ -47,8 +47,21 @@ function resolveUrl(meta: BreadcrumbActionMeta, options: ResolveBreadcrumbOption
 type BreadcrumbActionMeta = { route: PathToken[] } & BreadcrumbMeta
 
 export interface ILinksService {
+  of(options: ResolveBreadcrumbOptions): LinksHelper
   getUrl(type: BreadcrumbType, options: ResolveBreadcrumbOptions): string
   resolveAll(type: BreadcrumbType, options: ResolveBreadcrumbOptions): BreadcrumbValue[]
+}
+
+export class LinksHelper {
+  constructor(private readonly service: ILinksService, private readonly options: ResolveBreadcrumbOptions) {}
+
+  url(type: BreadcrumbType): string {
+    return this.service.getUrl(type, this.options)
+  }
+
+  breadcrumbs(type: BreadcrumbType): BreadcrumbValue[] {
+    return this.service.resolveAll(type, this.options)
+  }
 }
 
 @Injectable()
@@ -71,6 +84,10 @@ export class LinksService implements ILinksService {
       })
       .reduce((x, y) => [...x, ...y], [])
       .reduce((agg, x) => ({ ...agg, [x.type]: x }), {})
+  }
+
+  of(options: ResolveBreadcrumbOptions): LinksHelper {
+    return new LinksHelper(this, options)
   }
 
   getUrl(type: BreadcrumbType, options: ResolveBreadcrumbOptions): string {

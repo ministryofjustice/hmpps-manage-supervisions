@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BreadcrumbValue } from '../../../../server/common'
+import { ViewModel } from '../../../common'
 import { GovUkUiTagColour } from '../../../util/govuk-ui'
 
 export interface Risks {
@@ -63,12 +63,13 @@ export interface RemovedRisksListViewModel extends RiskViewModel {
 
 export interface RiskDetailsViewModel extends RiskViewModel {
   registration: RiskRegistrationDetails
-  exitUrl: string
 }
 
-export interface RiskViewModel {
+export interface RiskViewModel extends ViewModel {
   displayName: string
-  breadcrumbs: BreadcrumbValue[]
+  links: {
+    toDelius: string
+  }
 }
 
 export interface RiskRegistrationDetails extends RiskRegistration {

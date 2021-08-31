@@ -26,16 +26,12 @@ export class SentenceController {
       this.sentence.getPreviousConvictions(crn),
     ])
     const displayName = getDisplayName(offender)
+    const links = this.links.of({ crn, offenderName: displayName })
     return {
       displayName,
-      breadcrumbs: this.links.resolveAll(BreadcrumbType.CasePreviousConvictions, {
-        crn,
-        offenderName: displayName,
-      }),
+      breadcrumbs: links.breadcrumbs(BreadcrumbType.CasePreviousConvictions),
       previousConvictions,
-      links: {
-        toDelius: `/offender/${crn}/to-delius`,
-      },
+      links: { toDelius: links.url(BreadcrumbType.ExitToDelius) },
     }
   }
 }

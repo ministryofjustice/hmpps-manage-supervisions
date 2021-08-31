@@ -28,7 +28,7 @@ class Fixture extends ViewOffenderFixture {
   }
 }
 
-context('ViewOffenderSchedule', () => {
+context('Offender schedule tab', () => {
   const fixture = new Fixture()
 
   describe('populated schedule', () => {
@@ -57,6 +57,16 @@ context('ViewOffenderSchedule', () => {
           '10am to 11am',
           'Some recent appointment',
         )
+    })
+
+    it('renders appointment detail (the content of this page is tested in the activity log)', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('schedule')
+        .shouldRenderOffenderTab('schedule', page => {
+          page.tableData('future', 0, 'appointment').contains('Home visit with Catherine Ellis').click()
+        })
+        .shouldDisplayPageWithTitle('Home visit with Catherine Ellis')
     })
   })
 

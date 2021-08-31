@@ -18,7 +18,7 @@ class Fixture extends ViewOffenderFixture {
   }
 }
 
-context('ViewOffenderPersonalDetails', () => {
+context('Offender risk tab', () => {
   const fixture = new Fixture()
 
   describe('empty risk page', () => {

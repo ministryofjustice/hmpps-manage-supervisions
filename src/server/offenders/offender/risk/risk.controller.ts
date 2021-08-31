@@ -58,7 +58,6 @@ export class RiskController {
         entityName: registration.text,
       }),
       registration,
-      exitUrl: `/offender/${offender.otherIds.crn}/to-delius`,
     }
   }
 
@@ -87,7 +86,6 @@ export class RiskController {
         entityName: registration.text,
       }),
       registration,
-      exitUrl: `/offender/${offender.otherIds.crn}/to-delius`,
     }
   }
 
@@ -98,13 +96,13 @@ export class RiskController {
     partial: Partial<ResolveBreadcrumbOptions> = {},
   ): RiskViewModel {
     const displayName = getDisplayName(offender)
+    const links = this.links.of({ crn, offenderName: displayName, ...partial })
     return {
       displayName,
-      breadcrumbs: this.links.resolveAll(breadcrumbType, {
-        crn,
-        offenderName: displayName,
-        ...partial,
-      }),
+      breadcrumbs: links.breadcrumbs(breadcrumbType),
+      links: {
+        toDelius: links.url(BreadcrumbType.ExitToDelius),
+      },
     }
   }
 }

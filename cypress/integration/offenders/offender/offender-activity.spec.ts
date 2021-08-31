@@ -29,7 +29,6 @@ class Fixture extends ViewOffenderFixture {
     name,
     notes,
     tags = [],
-    havingAttendanceMissing = false,
     havingLongNotes = false,
   }: {
     id: number
@@ -38,7 +37,6 @@ class Fixture extends ViewOffenderFixture {
     name: string
     notes: string
     tags?: { colour: string; text: string }[]
-    havingAttendanceMissing?: boolean
     havingLongNotes?: boolean
   }) {
     return this.shouldRenderOffenderTab('activity', page => {
@@ -57,13 +55,6 @@ class Fixture extends ViewOffenderFixture {
       } else {
         entry.notes.contains(notes)
       }
-
-      if (havingAttendanceMissing) {
-        entry.attendanceMissing.contains('Attendance not recorded')
-        entry.attendanceMissing
-          .get(`a[href="/offender/${this.crn}/appointment/${id}/record-outcome"]`)
-          .contains('Record attendance')
-      }
     })
   }
 
@@ -72,14 +63,17 @@ class Fixture extends ViewOffenderFixture {
       page.entry(id).title.should('not.exist')
     })
   }
+
   shouldNotRenderActivities(ids: number[]) {
     return ids.map(id => this.shouldNotRenderActivity({ id: id }))
   }
+
   shouldRenderAppointmentPage(title: string, assert: (page: OffenderActivityAppointmentPage) => void) {
     const page = new OffenderActivityAppointmentPage()
     page.pageTitle.contains(title)
     assert(page)
   }
+
   shouldRenderCommunicationPage(title: string, assert: (page: OffenderActivityCommunicationPage) => void) {
     const page = new OffenderActivityCommunicationPage()
     page.pageTitle.contains(title)
@@ -87,7 +81,7 @@ class Fixture extends ViewOffenderFixture {
   }
 }
 
-context('ViewOffenderActivity', () => {
+context('Offender activity tab', () => {
   const fixture = new Fixture()
 
   describe('empty activity log', () => {
@@ -101,8 +95,8 @@ context('ViewOffenderActivity', () => {
         .whenClickingSubNavTab('activity')
         .shouldRenderOffenderTab('activity', page => {
           page.addToLogButton.contains('Add to log').click()
-          cy.url().should('include', `/offender/${fixture.crn}/activity/new`)
         })
+        .shouldDisplayDeliusExitPage()
     })
 
     it('displays empty activity log', () => {
@@ -182,7 +176,6 @@ context('ViewOffenderActivity', () => {
           time: '11am to 1pm',
           name: 'Not a well known appointment with Robert Ohagan',
           notes: 'Some unknown appointment',
-          havingAttendanceMissing: true,
         })
 
         .shouldRenderActivity({
@@ -225,6 +218,18 @@ context('ViewOffenderActivity', () => {
           name: 'CPS pack requested',
           notes: 'CPS request',
         })
+    })
+
+    it('displays attendance missing', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('activity')
+        .shouldRenderOffenderTab('activity', page => {
+          const entry = page.entry(5)
+          entry.attendanceMissing.contains('Attendance not recorded')
+          entry.attendanceMissing.contains('Record attendance').click()
+        })
+        .shouldDisplayDeliusExitPage()
     })
 
     it('displays appointment detail without outcome', () => {

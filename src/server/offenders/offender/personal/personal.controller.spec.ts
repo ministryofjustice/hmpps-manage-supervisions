@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing'
 import { PersonalController } from './personal.controller'
-import { fakeBreadcrumbs, MockLinksModule } from '../../../common/links/links.mock'
+import { MockLinksModule } from '../../../common/links/links.mock'
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { OffenderService } from '../offender.service'
 import { PersonalService } from './personal.service'
@@ -60,13 +60,12 @@ describe('PersonalController', () => {
 
     const observed = await subject.getAddresses('some-crn')
 
+    const links = MockLinksModule.of({ crn: 'some-crn', offenderName: 'Liz Danger Haggis' })
     expect(observed).toEqual({
       ...details,
       displayName: 'Liz Danger Haggis',
-      breadcrumbs: fakeBreadcrumbs(BreadcrumbType.PersonalAddresses, {
-        crn: 'some-crn',
-        offenderName: 'Liz Danger Haggis',
-      }),
+      breadcrumbs: links.breadcrumbs(BreadcrumbType.PersonalAddresses),
+      links: { toDelius: links.url(BreadcrumbType.ExitToDelius) },
     } as PersonalAddressesViewModel)
   })
 
@@ -78,13 +77,12 @@ describe('PersonalController', () => {
 
     const observed = await subject.getDisabilities('some-crn')
 
+    const links = MockLinksModule.of({ crn: 'some-crn', offenderName: 'Liz Danger Haggis' })
     expect(observed).toEqual({
       disabilities,
       displayName: 'Liz Danger Haggis',
-      breadcrumbs: fakeBreadcrumbs(BreadcrumbType.PersonalDisabilities, {
-        crn: 'some-crn',
-        offenderName: 'Liz Danger Haggis',
-      }),
+      breadcrumbs: links.breadcrumbs(BreadcrumbType.PersonalDisabilities),
+      links: { toDelius: links.url(BreadcrumbType.ExitToDelius) },
     } as PersonalDisabilitiesViewModel)
   })
 
@@ -97,15 +95,17 @@ describe('PersonalController', () => {
 
     const observed = await subject.getPersonalContact('some-crn', 100)
 
+    const links = MockLinksModule.of({
+      id: 100,
+      entityName: 'Some personal contact',
+      crn: 'some-crn',
+      offenderName: 'Liz Danger Haggis',
+    })
     expect(observed).toEqual({
       personalContact,
       displayName: 'Liz Danger Haggis',
-      breadcrumbs: fakeBreadcrumbs(BreadcrumbType.PersonalContact, {
-        id: 100,
-        crn: 'some-crn',
-        offenderName: 'Liz Danger Haggis',
-        entityName: 'Some personal contact',
-      }),
+      breadcrumbs: links.breadcrumbs(BreadcrumbType.PersonalContact),
+      links: { toDelius: links.url(BreadcrumbType.ExitToDelius) },
       ids: {
         crn: 'some-crn',
       },

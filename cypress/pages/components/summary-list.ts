@@ -1,3 +1,5 @@
+import { Card } from './card'
+
 export type SummaryListCallback = (card: SummaryList) => void
 
 /**
@@ -32,10 +34,10 @@ export class SummaryList {
    * Select the summary list inside a govuk card by the card title.
    */
   static selectFromCard(title: string, callback: SummaryListCallback) {
-    cy.get(`.app-summary-card > header`)
-      .contains(title)
-      .parents('.app-summary-card')
-      .find('.app-summary-card__body > dl')
-      .within(() => callback(new SummaryList()))
+    Card.selectByTitle(title, card => card.summaryList(callback))
+  }
+
+  static selectFromQa(qaName: string, callback: SummaryListCallback) {
+    cy.get(`dl[data-qa="${qaName}"]`).within(() => callback(new SummaryList()))
   }
 }

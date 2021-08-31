@@ -3,11 +3,11 @@ import { Breadcrumb, BreadcrumbType, LinksService, ResolveBreadcrumbOptions } fr
 import { PersonalService } from './personal.service'
 import { OffenderService } from '../offender.service'
 import {
-  OffenderViewModel,
   PersonalAddressesViewModel,
   PersonalCircumstancesViewModel,
   PersonalContactViewModel,
   PersonalDisabilitiesViewModel,
+  PersonalViewModel,
 } from './personal.types'
 import { getDisplayName } from '../../../util'
 import { OffenderDetailSummary } from '../../../community-api/client'
@@ -106,15 +106,13 @@ export class PersonalController {
     offender: OffenderDetailSummary,
     breadcrumbType: BreadcrumbType,
     partial: Partial<ResolveBreadcrumbOptions> = {},
-  ): OffenderViewModel {
+  ): PersonalViewModel {
     const displayName = getDisplayName(offender)
+    const links = this.links.of({ crn, offenderName: displayName, ...partial })
     return {
       displayName,
-      breadcrumbs: this.links.resolveAll(breadcrumbType, {
-        crn,
-        offenderName: displayName,
-        ...partial,
-      }),
+      breadcrumbs: links.breadcrumbs(breadcrumbType),
+      links: { toDelius: links.url(BreadcrumbType.ExitToDelius) },
     }
   }
 }

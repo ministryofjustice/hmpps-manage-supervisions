@@ -3,8 +3,6 @@ import { ADDRESS, OffenderAddressesPage } from '../../../pages/offender-addresse
 import { OffenderDisabilitiesPage } from '../../../pages/offender-disabilities.page'
 import { OffenderPersonalCircumstancesPage } from '../../../pages/offender-personal-circumstances.page'
 import { OffenderPersonalContactPage } from '../../../pages/offender-personal-contact.page'
-import { ACTIVE_CONVICTION_ID } from '../../../plugins/convictions'
-import { OFFENDER_ID } from '../../../plugins/offender'
 
 class Fixture extends ViewOffenderFixture {
   whenClickingViewAllAddresses(): this {
@@ -177,7 +175,7 @@ interface ExpectedCircumstance {
   lastUpdated: string
 }
 
-context('ViewOffenderPersonalDetails', () => {
+context('Offender personal details tab', () => {
   const fixture = new Fixture()
 
   before(() => cy.seed())
@@ -321,13 +319,6 @@ context('ViewOffenderPersonalDetails', () => {
         page.value('Notes').contains('Divorced')
       })
       .whenClickingChangeContactDetails('Pippa Wade – Wife')
-      .shouldDisplayDeliusExitPage(page => {
-        page.deliusExitButton
-          .should('have.attr', 'href')
-          .and(
-            'include',
-            `http://localhost:8082/NDelius-war/delius/JSP/deeplink.jsp?component=ContactList&offenderId=${OFFENDER_ID}&eventId=${ACTIVE_CONVICTION_ID}`,
-          )
-      })
+      .shouldDisplayDeliusExitPage()
   })
 })

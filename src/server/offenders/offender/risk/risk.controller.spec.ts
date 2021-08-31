@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing'
 import { RiskController } from './risk.controller'
-import { fakeBreadcrumbs, MockLinksModule } from '../../../common/links/links.mock'
+import { MockLinksModule } from '../../../common/links/links.mock'
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { OffenderService } from '../offender.service'
 import { RiskService } from './risk.service'
@@ -52,13 +52,14 @@ describe('RiskController', () => {
 
     const observed = await subject.getRemovedRiskFlags('some-crn')
 
+    const links = MockLinksModule.of({ crn: 'some-crn', offenderName: 'Liz Danger Haggis' })
     expect(observed).toEqual({
       displayName: 'Liz Danger Haggis',
-      breadcrumbs: fakeBreadcrumbs(BreadcrumbType.RemovedRisksList, {
-        crn: 'some-crn',
-        offenderName: 'Liz Danger Haggis',
-      }),
+      breadcrumbs: links.breadcrumbs(BreadcrumbType.RemovedRisksList),
       removedRisks: risks.inactive,
+      links: {
+        toDelius: links.url(BreadcrumbType.ExitToDelius),
+      },
     } as RemovedRisksListViewModel)
   })
 
@@ -70,15 +71,14 @@ describe('RiskController', () => {
 
     const observed = await subject.getRiskDetails('some-crn', 1234)
 
+    const links = MockLinksModule.of({ crn: 'some-crn', offenderName: 'Liz Danger Haggis', entityName: details.text })
     expect(observed).toEqual({
       displayName: 'Liz Danger Haggis',
-      breadcrumbs: fakeBreadcrumbs(BreadcrumbType.RiskDetails, {
-        crn: 'some-crn',
-        offenderName: 'Liz Danger Haggis',
-        entityName: details.text,
-      }),
+      breadcrumbs: links.breadcrumbs(BreadcrumbType.RiskDetails),
       registration: details,
-      exitUrl: '/offender/some-crn/to-delius',
+      links: {
+        toDelius: links.url(BreadcrumbType.ExitToDelius),
+      },
     } as RiskDetailsViewModel)
   })
 
@@ -110,15 +110,14 @@ describe('RiskController', () => {
 
     const observed = await subject.getRemovedRiskDetails('some-crn', 2345)
 
+    const links = MockLinksModule.of({ crn: 'some-crn', offenderName: 'Liz Danger Haggis', entityName: details.text })
     expect(observed).toEqual({
       displayName: 'Liz Danger Haggis',
-      breadcrumbs: fakeBreadcrumbs(BreadcrumbType.RemovedRiskDetails, {
-        crn: 'some-crn',
-        offenderName: 'Liz Danger Haggis',
-        entityName: details.text,
-      }),
+      breadcrumbs: links.breadcrumbs(BreadcrumbType.RemovedRiskDetails),
       registration: details,
-      exitUrl: '/offender/some-crn/to-delius',
+      links: {
+        toDelius: links.url(BreadcrumbType.ExitToDelius),
+      },
     } as RiskDetailsViewModel)
   })
 

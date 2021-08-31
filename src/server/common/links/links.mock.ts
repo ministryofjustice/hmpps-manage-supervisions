@@ -1,38 +1,57 @@
-import { ILinksService, LinksService } from './links.service'
+import { ILinksService, LinksHelper, LinksService } from './links.service'
 import { BreadcrumbType, ResolveBreadcrumbOptions } from './types'
 import { BreadcrumbValue } from '../types'
-import { Module } from '@nestjs/common'
+import { DynamicModule, Module, ModuleMetadata } from '@nestjs/common'
 
-export function fakeBreadcrumbUrl(type: BreadcrumbType, options: ResolveBreadcrumbOptions) {
-  const queryString = Object.entries(options)
-    .map(([k, v]) => `${k}=${v}`)
-    .sort()
-    .join('&')
+class MockLinksService implements ILinksService {
+  constructor(private readonly customUrls: Partial<Record<BreadcrumbType, string>> = {}) {}
 
-  return `/${BreadcrumbType[type]}?${queryString}`
-}
-
-export function fakeBreadcrumbs(type: BreadcrumbType, options: ResolveBreadcrumbOptions): BreadcrumbValue[] {
-  return [
-    {
-      href: fakeBreadcrumbUrl(type, options),
-      text: BreadcrumbType[type],
-    },
-  ]
-}
-
-export class MockLinksService implements ILinksService {
   getUrl(type: BreadcrumbType, options: ResolveBreadcrumbOptions): string {
-    return fakeBreadcrumbUrl(type, options)
+    if (type in this.customUrls) {
+      return this.customUrls[type]
+    }
+
+    const queryString = Object.entries(options)
+      .map(([k, v]) => `${k}=${v}`)
+      .sort()
+      .join('&')
+
+    return `/${BreadcrumbType[type]}?${queryString}`
   }
 
   resolveAll(type: BreadcrumbType, options: ResolveBreadcrumbOptions): BreadcrumbValue[] {
-    return fakeBreadcrumbs(type, options)
+    return [
+      {
+        href: this.getUrl(type, options),
+        text: BreadcrumbType[type],
+      },
+    ]
+  }
+
+  of(options: ResolveBreadcrumbOptions): LinksHelper {
+    return new LinksHelper(this, options)
   }
 }
 
-@Module({
-  providers: [MockLinksService, { provide: LinksService, useExisting: MockLinksService }],
-  exports: [MockLinksService, LinksService],
-})
-export class MockLinksModule {}
+function getModuleMeta(useValue: MockLinksService): ModuleMetadata {
+  return {
+    providers: [{ provide: LinksService, useValue }],
+    exports: [LinksService],
+  }
+}
+
+const INSTANCE = new MockLinksService()
+
+@Module(getModuleMeta(INSTANCE))
+export class MockLinksModule {
+  static register(customUrls: Partial<Record<BreadcrumbType, string>>): DynamicModule {
+    return {
+      module: MockLinksModule,
+      ...getModuleMeta(new MockLinksService(customUrls)),
+    }
+  }
+
+  static of(options: ResolveBreadcrumbOptions) {
+    return INSTANCE.of(options)
+  }
+}

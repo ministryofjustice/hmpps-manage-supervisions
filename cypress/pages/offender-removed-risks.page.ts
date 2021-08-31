@@ -1,4 +1,4 @@
-import { Table, TableCallback } from './components/Table'
+import { Table, TableCallback } from './components/table'
 import { PageBase } from './page'
 
 export class OffenderRemovedRisksPage extends PageBase {

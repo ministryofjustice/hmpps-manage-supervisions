@@ -3,7 +3,7 @@ import { SentenceController } from './sentence.controller'
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { OffenderService } from '../offender.service'
 import { SentenceService } from './sentence.service'
-import { fakeBreadcrumbs, MockLinksModule } from '../../../common/links/links.mock'
+import { MockLinksModule } from '../../../common/links/links.mock'
 import { fakeOffenderDetail } from '../../../community-api/community-api.fake'
 import { fakePreviousConvictionSummary } from './sentence.fake'
 import { PreviousConvictionsViewModel } from './sentence.types'
@@ -38,15 +38,13 @@ describe('SentenceController', () => {
     sentenceService.getPreviousConvictions.withArgs('some-crn').resolves(previousConvictions)
 
     const observed = await subject.getPreviousConvictions('some-crn')
+    const links = MockLinksModule.of({ crn: 'some-crn', offenderName: 'Liz Danger Haggis' })
     expect(observed).toEqual({
       previousConvictions,
       displayName: 'Liz Danger Haggis',
-      breadcrumbs: fakeBreadcrumbs(BreadcrumbType.CasePreviousConvictions, {
-        crn: 'some-crn',
-        offenderName: 'Liz Danger Haggis',
-      }),
+      breadcrumbs: links.breadcrumbs(BreadcrumbType.CasePreviousConvictions),
       links: {
-        toDelius: '/offender/some-crn/to-delius',
+        toDelius: links.url(BreadcrumbType.ExitToDelius),
       },
     } as PreviousConvictionsViewModel)
   })
