@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import { PotentiallyExpectedDateTime } from '../../../util'
 import { BreachSummary } from '../../../community-api/breach'
+import { ViewModel } from '../../../common'
 
 export interface ConvictionOffence {
   id: string
@@ -56,10 +57,23 @@ export interface AggregateConvictionRequirement extends ConvictionRequirementBas
 
 export type ConvictionRequirement = UnitConvictionRequirement | AggregateConvictionRequirement
 
+export interface PreviousConvictionSummary {
+  name: string
+  mainOffence: string
+  endDate: DateTime
+}
+
+export interface PreviousConvictionsViewModel extends ViewModel {
+  displayName: string
+  previousConvictions: PreviousConvictionSummary[]
+  links: {
+    toDelius: string
+  }
+}
+
 export interface PreviousConvictions {
   count: number
   lastEnded: DateTime
-  link: string
 }
 
 export interface AdditionalSentence {

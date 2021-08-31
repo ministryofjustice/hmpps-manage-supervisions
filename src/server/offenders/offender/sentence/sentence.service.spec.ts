@@ -13,6 +13,7 @@ import {
   ConvictionRequirement,
   ConvictionRequirementType,
   CurrentComplianceConvictionSummary,
+  PreviousConvictionSummary,
 } from './sentence.types'
 import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
 import { RequirementService } from './requirement.service'
@@ -138,7 +139,6 @@ describe('SentenceService', () => {
       previousConvictions: {
         count: 2,
         lastEnded: DateTime.fromObject({ year: 2019, month: 1, day: 2 }),
-        link: '/offenders/some-crn/previous-convictions',
       },
       previousBreaches: {
         count: 2,
@@ -356,6 +356,42 @@ describe('SentenceService', () => {
           breachSuggested: false,
         },
       } as Pick<CurrentComplianceConvictionSummary, 'period' | 'status'>)
+    })
+  })
+
+  describe('getting previous convictions', () => {
+    it('handles no previous convictions', async () => {
+      havingConvictions({ convictionId: 100, active: true })
+      const observed = await subject.getPreviousConvictions('some-crn')
+      expect(observed).toEqual([])
+    })
+
+    it('gets previous convictions', async () => {
+      havingConvictions({
+        convictionId: 100,
+        active: false,
+        sentence: {
+          sentenceType: { description: 'ORA Community Order' },
+          originalLength: 12,
+          originalLengthUnits: 'Months',
+          terminationDate: '2021-08-25',
+        },
+        offences: [
+          {
+            mainOffence: true,
+            offenceCount: 2,
+            detail: { subCategoryDescription: 'Some offence' },
+          },
+        ],
+      })
+      const observed = await subject.getPreviousConvictions('some-crn')
+      expect(observed).toEqual([
+        {
+          endDate: DateTime.fromObject({ year: 2021, month: 8, day: 25 }),
+          mainOffence: 'Some offence (2 counts)',
+          name: '12 month Community Order',
+        },
+      ] as PreviousConvictionSummary[])
     })
   })
 })

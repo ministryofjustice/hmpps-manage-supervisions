@@ -26,6 +26,7 @@ export interface OffenderLinks extends OffenderPageLinks {
   toDelius: string
   toOASys: string
   viewInactiveRegistrations: string
+  previousConvictions: string
 }
 
 export interface OffenderViewModelBase<Page extends OffenderPage> extends ViewModel {

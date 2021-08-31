@@ -160,7 +160,7 @@
 
     {% if conviction.previousConvictions %}
         {% set previousOrders %}
-            <a class="govuk-heading-s govuk-!-margin-top-0 govuk-!-margin-bottom-1" href="{{ conviction.previousConvictions.link }}">
+            <a class="govuk-heading-s govuk-!-margin-top-0 govuk-!-margin-bottom-1" href="{{ links.previousConvictions }}">
                 Previous orders ({{ conviction.previousConvictions.count }})
             </a>
             Last ended on {{ conviction.previousConvictions.lastEnded | shortDate }}

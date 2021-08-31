@@ -1,0 +1,29 @@
+{% extends "partials/layout.njk" %}
+{% set pageTitle = 'Previous orders – ' + displayName %}
+
+{% block content %}
+    <h1 class="govuk-heading-xl">Previous orders</h1>
+
+    <table class="govuk-table app-table govuk-!-margin-top-0 govuk-!-margin-bottom-3 app-table--cell-vertical-align-bottom" data-qa='offender/previous-orders'>
+        <tbody class="govuk-table__body">
+        {% for conviction in previousConvictions %}
+            <tr class="govuk-table__row">
+                <td class="govuk-table__cell">
+                    <p class="govuk-heading-s govuk-!-margin-bottom-2">
+                        <a class="govuk-link govuk-link--no-visited-state" href="{{ links.toDelius }}">
+                            {{ conviction.name }}
+                        </a>
+                    </p>
+                    <p class='govuk-body govuk-!-margin-bottom-0'>
+                        {{ conviction.mainOffence }}
+                    </p>
+                </td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">
+                    Ended on {{ conviction.endDate | shortDate }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
