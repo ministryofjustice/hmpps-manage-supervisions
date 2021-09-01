@@ -137,10 +137,8 @@ describe('OffenderController', () => {
     const offender = havingOffenderSummary()
     const displayName = getDisplayName(offender)
 
-    const appointmentContactTypes = [fakeAppointmentType().contactType, fakeAppointmentType().contactType]
     const communicationContactTypes = [fakeAppointmentType().contactType, fakeAppointmentType().contactType]
 
-    contactTypesService.getAppointmentContactTypes.resolves(appointmentContactTypes)
     contactTypesService.getCommunicationContactTypes.resolves(communicationContactTypes)
 
     const contacts = fakePaginated([fakeActivityLogEntry(), fakeActivityLogEntry()])
@@ -150,7 +148,10 @@ describe('OffenderController', () => {
       .withArgs(
         'some-crn',
         displayName,
-        match({ contactTypes: [...appointmentContactTypes, ...communicationContactTypes], convictionId: 1234 }),
+        match({
+          include: ['APPOINTMENTS', 'TYPE_' + communicationContactTypes[0], 'TYPE_' + communicationContactTypes[1]],
+          convictionId: 1234,
+        }),
       )
       .resolves(contacts)
 
