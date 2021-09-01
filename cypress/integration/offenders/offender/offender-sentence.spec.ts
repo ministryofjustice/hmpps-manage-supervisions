@@ -10,7 +10,7 @@ class Fixture extends ViewOffenderFixture {
   }
 }
 
-context('ViewOffenderSentence', () => {
+context('Offender sentence tab', () => {
   const fixture = new Fixture()
 
   describe('no active conviction', () => {
@@ -107,7 +107,7 @@ context('ViewOffenderSentence', () => {
           })
 
           page.probationHistory(card => {
-            card.value('Previous orders').contains('Previous orders (1) Last ended on 1 November 2018')
+            card.value('Previous orders').contains('1 previous order Last ended on 1 November 2018')
             card.value('Previous breaches').contains('1 previous breach')
           })
         })
@@ -119,7 +119,7 @@ context('ViewOffenderSentence', () => {
         .whenClickingSubNavTab('sentence')
         .shouldRenderOffenderTab('sentence', page => {
           page.probationHistory(card => {
-            card.value('Previous orders').contains('Previous orders (1)').click()
+            card.value('Previous orders').contains('1 previous order').click()
           })
         })
         .shouldRenderPreviousOrdersPage(page => {

@@ -17,26 +17,27 @@
             Use Delius to check and correct any problems.<br>
             <a href='{{ links.toDelius }}'>Go to Delius</a>
         {% endset %}
-        {{ govukWarningText({ html: multipleBreachWarning, iconFallbackText: "Warning" }) }}
+        {{ govukWarningText({
+            html: multipleBreachWarning,
+            iconFallbackText: "Warning",
+            attributes: { 'data-qa': 'offender/compliance/multiple-breaches' }
+        }) }}
     {% endif %}
 {% endblock %}
 
 {% block page %}
     {% if compliance.current %}
 
-        {{ govukButton({
-            text: 'Start a breach',
-            isStartButton: true,
-            href: '#TODO',
-            attributes: {
-                'data-qa': 'offender/compliance/start-breach'
-            }
-        }) }}
+        <p class="govuk-!-margin-bottom-6">
+            <a href="{{ links.startBreach }}" data-qa='offender/compliance/start-breach'>
+                Use Delius to start a breach
+            </a>
+        </p>
 
         <div class="app-card app-card--{{ compliance.current.status.alertLevel }} govuk-!-margin-bottom-0 govuk-!-padding-3 govuk-!-font-weight-bold" data-qa='offender/compliance/current-status'>
             {{ compliance.current.status.description }}
             {% if compliance.current.status.breachSuggested %}
-                – <a href='#TODO'>Start a breach</a>
+                – <a href='{{ links.startBreach }}'>Start a breach</a>
             {% endif %}
         </div>
 
@@ -45,7 +46,7 @@
                 <ul class='govuk-list'>
                 {% for breach in compliance.current.previousBreaches %}
                     <li>
-                    <a href='#TODO'>{{ breach.outcome if breach.outcome else 'Outcome unknown' }}</a>
+                    <a href='{{ links.toDelius }}'>{{ breach.outcome if breach.outcome else 'Outcome unknown' }}</a>
                     <br>
                     {% if breach.endDate %}
                         Resolved {{ breach.endDate | shortDate }}
@@ -59,7 +60,11 @@
         {% endif %}
 
         <div class='app-summary-card-deck govuk-!-margin-bottom-6'>
-            {% call appSummaryCard({ titleText: 'Sentence', classes: 'app-summary-card--large-title' }) -%}
+            {% call appSummaryCard({
+                titleText: 'Sentence',
+                classes: 'app-summary-card--large-title',
+                actions: { items: [{ href: links.sentence, text: "View sentence details" }] }
+            }) -%}
             {{ govukSummaryList({
                 rows: [
                     {
@@ -160,7 +165,11 @@
                     </ul>
                 {% endset %}
             {% endif %}
-            {% call appSummaryCard({ titleText: previous.name + (' (Ended ' + previous.endDate | shortDate + ')' if previous.endDate), classes: 'govuk-!-margin-bottom-6' }) -%}
+            {% call appSummaryCard({
+                titleText: previous.name + (' (Ended ' + previous.endDate | shortDate + ')' if previous.endDate),
+                classes: 'govuk-!-margin-bottom-6',
+                actions: { items: [{ href: links.toDelius, text: "View order" }] }
+            }) -%}
             {{ govukSummaryList({
                 rows: [
                     {
@@ -190,4 +199,8 @@
     {% else %}
         <p class='govuk-body' data-qa='offender/compliance/no-previous-convictions'>No previous orders.</p>
     {% endif %}
+
+    <p class='govuk-body'>
+        <a href="{{ links.toDelius }}" data-qa='offender/compliance/view-all-orders'>View all orders</a>
+    </p>
 {% endblock %}

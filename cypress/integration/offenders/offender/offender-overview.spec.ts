@@ -1,6 +1,6 @@
 import { ViewOffenderFixture } from './view-offender.fixture'
 
-context('ViewOffenderOverview', () => {
+context('Offender overview tab', () => {
   const fixture = new ViewOffenderFixture()
 
   it('displays offender overview', () => {

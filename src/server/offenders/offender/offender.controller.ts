@@ -21,7 +21,7 @@ import { ScheduleService } from './schedule'
 import { ActivityComplianceFilter, ActivityService, FilterLinks, GetContactsOptions } from './activity'
 import { RiskService } from './risk'
 import { PersonalService } from './personal'
-import { Breadcrumb, BreadcrumbType, LinksService, ResolveBreadcrumbOptions } from '../../common/links'
+import { Breadcrumb, BreadcrumbType, LinksService } from '../../common/links'
 import { ConfigService } from '@nestjs/config'
 import { Config, FeatureFlags, ServerConfig } from '../../config'
 
@@ -214,7 +214,7 @@ export class OffenderController {
 
   private getBase<Page extends OffenderPage>(page: Page, offender: OffenderDetailSummary): OffenderViewModelBase<Page> {
     const crn = offender.otherIds.crn
-    const breadcrumbOptions: ResolveBreadcrumbOptions = { crn, offenderName: getDisplayName(offender) }
+    const links = this.linksService.of({ crn, offenderName: getDisplayName(offender) })
     return {
       page,
       ids: {
@@ -223,21 +223,22 @@ export class OffenderController {
       },
       displayName: getDisplayName(offender, { preferredName: true }),
       shortName: getDisplayName(offender, { middleNames: false, preferredName: false }),
-      breadcrumbs: this.linksService.resolveAll(getBreadcrumbType(page), breadcrumbOptions),
+      breadcrumbs: links.breadcrumbs(getBreadcrumbType(page)),
       links: {
         ...Object.values(OffenderPage).reduce(
-          (agg, x) => ({ ...agg, [x]: this.linksService.getUrl(getBreadcrumbType(x), breadcrumbOptions) }),
+          (agg, x) => ({ ...agg, [x]: links.url(getBreadcrumbType(x)) }),
           {} as OffenderPageLinks,
         ),
-        arrangeAppointment: this.linksService.getUrl(BreadcrumbType.NewAppointment, breadcrumbOptions),
-        addActivity: `/offender/${crn}/activity/new`,
-        addressBook: this.linksService.getUrl(BreadcrumbType.PersonalAddresses, breadcrumbOptions),
-        circumstances: this.linksService.getUrl(BreadcrumbType.PersonalCircumstances, breadcrumbOptions),
-        disabilities: this.linksService.getUrl(BreadcrumbType.PersonalDisabilities, breadcrumbOptions),
-        toDelius: `/offender/${crn}/to-delius`,
+        arrangeAppointment: links.url(BreadcrumbType.NewAppointment),
+        addActivity: links.url(BreadcrumbType.ExitToDelius),
+        addressBook: links.url(BreadcrumbType.PersonalAddresses),
+        circumstances: links.url(BreadcrumbType.PersonalCircumstances),
+        disabilities: links.url(BreadcrumbType.PersonalDisabilities),
+        toDelius: links.url(BreadcrumbType.ExitToDelius),
         toOASys: '#TODO',
-        viewInactiveRegistrations: this.linksService.getUrl(BreadcrumbType.RemovedRisksList, breadcrumbOptions),
-        previousConvictions: this.linksService.getUrl(BreadcrumbType.CasePreviousConvictions, breadcrumbOptions),
+        viewInactiveRegistrations: links.url(BreadcrumbType.RemovedRisksList),
+        previousConvictions: links.url(BreadcrumbType.CasePreviousConvictions),
+        startBreach: links.url(BreadcrumbType.ExitToDelius), // TODO: redirecting to delius interstitial for now
       },
     }
   }

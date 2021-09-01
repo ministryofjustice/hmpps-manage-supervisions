@@ -10,6 +10,8 @@ import { MockCommunityApiModule, MockCommunityApiService } from '../../../commun
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { DateTime } from 'luxon'
 import { ContactTypeCategory } from '../../../config'
+import { MockLinksModule } from '../../../common/links/links.mock'
+import { BreadcrumbType } from '../../../common/links'
 
 describe('ScheduleService', () => {
   let subject: ScheduleService
@@ -21,7 +23,7 @@ describe('ScheduleService', () => {
 
     const module = await Test.createTestingModule({
       providers: [ScheduleService, { provide: ContactMappingService, useValue: contactMapping }],
-      imports: [MockCommunityApiModule.register()],
+      imports: [MockCommunityApiModule.register(), MockLinksModule],
     }).compile()
 
     subject = module.get(ScheduleService)
@@ -55,7 +57,7 @@ describe('ScheduleService', () => {
           start: DateTime.fromISO(x.appointmentStart),
           end: DateTime.fromISO(x.appointmentEnd),
           name: 'some-appointment-type',
-          link: '/offender/some-crn/appointment/12345',
+          link: MockLinksModule.of({ crn: 'some-crn', id: 12345 }).url(BreadcrumbType.Appointment),
         } as AppointmentListViewModel),
     )
     const stub = community.appointment.getOffenderAppointmentsByCrnUsingGET.resolves(fakeOkResponse(appointments))

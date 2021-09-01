@@ -1,19 +1,20 @@
 import { ViewOffenderFixture } from './view-offender.fixture'
 import { DateTime } from 'luxon'
-import { SummaryList } from '../../../pages/components/summary-list'
 import { AppointmentOutcome, ContactSummary } from '../../../../src/server/community-api/client'
 
 class Fixture extends ViewOffenderFixture {
   shouldRenderSentence({ breaches, breachesLabel = 'Breaches' }: { breaches: string; breachesLabel?: string }) {
     return this.shouldRenderOffenderTab('compliance', page => {
-      page.sentence(card => {
-        card
-          .value('Main offence')
-          .contains('Cheats at gambling or enables or assists person to cheat (Gambling Act 2005) (1 count)')
-        card.value('Order').contains('12 month Community Order (12 months elapsed)')
-        card.value('Start date').contains('17 February 2020')
-        card.value(breachesLabel).contains(breaches)
-      })
+      page.sentence(card =>
+        card.summaryList(list => {
+          list
+            .value('Main offence')
+            .contains('Cheats at gambling or enables or assists person to cheat (Gambling Act 2005) (1 count)')
+          list.value('Order').contains('12 month Community Order (12 months elapsed)')
+          list.value('Start date').contains('17 February 2020')
+          list.value(breachesLabel).contains(breaches)
+        }),
+      )
     })
   }
 
@@ -56,7 +57,7 @@ function complianceAppointments({ complied, ftc, absence }: { complied: number; 
   ]
 }
 
-context('ViewOffenderCompliance', () => {
+context('Offender compliance tab', () => {
   const fixture = new Fixture()
   const twoYearsAgo = DateTime.now().minus({ year: 2 })
 
@@ -74,7 +75,7 @@ context('ViewOffenderCompliance', () => {
       .whenClickingSubNavTab('compliance')
       .shouldDisplayCommonHeader()
       .shouldRenderOffenderTab('compliance', page => {
-        page.startBreachButton.should('not.exist')
+        page.startBreachLink.should('not.exist')
         page.noCurrentConvictionWarning.contains('Current compliance details are unavailable')
         page.noPreviousConvictionsWarning.contains('No previous orders')
       })
@@ -153,17 +154,54 @@ context('ViewOffenderCompliance', () => {
           page.previousOrdersTitle.contains(
             `Previous orders (${DateTime.now().minus({ year: 2 }).toFormat('MMMM yyyy')} to present)`,
           )
-          SummaryList.selectFromCard(
-            `24 month CJA Community Order (Ended ${previousTerminationDate.toFormat('d MMMM yyyy')})`,
-            card => {
-              card.value('Main offence').contains('Common Assault and Battery (2 counts)')
-              card.value('Status').contains('Revoked')
-              card.value('Started').contains('9 December 2018')
-              card.value('Ended').contains(previousTerminationDate.toFormat('d MMMM yyyy'))
-              card.value('Breaches').contains('Breach not proven') // this comes from the ABNP contact & overrides the status
-            },
+          page.previousOrder('24 month CJA Community Order', previousTerminationDate, card =>
+            card.summaryList(list => {
+              list.value('Main offence').contains('Common Assault and Battery (2 counts)')
+              list.value('Status').contains('Revoked')
+              list.value('Started').contains('9 December 2018')
+              list.value('Ended').contains(previousTerminationDate.toFormat('d MMMM yyyy'))
+              list.value('Breaches').contains('Breach not proven') // this comes from the ABNP contact & overrides the status
+            }),
           )
         })
+    })
+
+    it('links to sentence page from sentence card', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('compliance')
+        .shouldRenderOffenderTab('compliance', page =>
+          page.sentence(card => card.actions.contains('View sentence details').click()),
+        )
+        .shouldRenderOffenderTab('sentence')
+    })
+
+    it('links to delius interstitial from previous order', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('compliance')
+        .shouldRenderOffenderTab('compliance', page => {
+          page.previousOrder('24 month CJA Community Order', previousTerminationDate, card =>
+            card.actions.contains('View order').click(),
+          )
+        })
+        .shouldDisplayDeliusExitPage()
+    })
+
+    it('links to delius interstitial from view all orders link', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('compliance')
+        .shouldRenderOffenderTab('compliance', page => page.viewAllOrdersLink.click())
+        .shouldDisplayDeliusExitPage()
+    })
+
+    it('links to delius interstitial from start breach link', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('compliance')
+        .shouldRenderOffenderTab('compliance', page => page.startBreachLink.click())
+        .shouldDisplayDeliusExitPage()
     })
   })
 
@@ -193,6 +231,64 @@ context('ViewOffenderCompliance', () => {
       })
   })
 
+  it('displays breach pending failure to comply compliance page with link to start breach', () => {
+    cy.seed({
+      convictions: {
+        active: {
+          conviction: { inBreach: false, sentence: { failureToComplyLimit: 3 } },
+          nsis: [],
+        },
+      },
+      contacts: complianceAppointments({ complied: 0, ftc: 3, absence: 0 }),
+    })
+    fixture
+      .whenViewingOffender()
+      .whenClickingSubNavTab('compliance')
+      .shouldRenderOffenderTab('compliance', page => {
+        page.currentStatus.contains('3 failures to comply within 12 months')
+        page.currentStatus.find('a').contains('Start a breach').click()
+      })
+      .shouldDisplayDeliusExitPage()
+  })
+
+  it('displays multiple current breach warning', () => {
+    cy.seed({
+      convictions: {
+        active: {
+          conviction: { inBreach: true },
+          nsis: [
+            {
+              active: true,
+              nsiType: { code: 'BRE' },
+              actualStartDate: '2020-12-01',
+              nsiStatus: {
+                description: 'Ignored as not latest breach',
+              },
+            },
+            {
+              active: true,
+              nsiType: { code: 'BRE' },
+              actualStartDate: '2020-12-02',
+              nsiStatus: {
+                description: 'Warrant Issued',
+              },
+            },
+          ],
+        },
+      },
+    })
+
+    fixture
+      .whenViewingOffender()
+      .whenClickingSubNavTab('compliance')
+      .shouldRenderOffenderTab('compliance', page => {
+        page.currentStatus.contains('Breach in progress')
+        page.multipleBreachWarning.contains('There are multiple breach NSIs in progress on Delius')
+        page.multipleBreachWarning.find('a').contains('Go to Delius').click()
+      })
+      .shouldDisplayDeliusExitPage()
+  })
+
   it('displays in breach compliance page', () => {
     cy.seed({
       convictions: {
@@ -218,6 +314,7 @@ context('ViewOffenderCompliance', () => {
       .shouldDisplayCommonHeader()
       .shouldRenderOffenderTab('compliance', page => {
         page.currentStatus.contains('Breach in progress')
+        page.multipleBreachWarning.should('not.exist')
         page.breachDetails(card => {
           card.value('Breach started').contains('2 December 2020')
           card.value('Status').contains('Warrant Issued')

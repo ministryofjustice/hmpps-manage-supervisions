@@ -3,7 +3,7 @@ import { ActivityController } from './activity.controller'
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { OffenderService } from '../offender.service'
 import { ActivityService } from './activity.service'
-import { fakeBreadcrumbs, MockLinksModule } from '../../../common/links/links.mock'
+import { MockLinksModule } from '../../../common/links/links.mock'
 import { BreadcrumbType } from '../../../common/links'
 import { fakeOffenderDetailSummary } from '../../../community-api/community-api.fake'
 import { getDisplayName } from '../../../util'
@@ -42,21 +42,22 @@ describe('ActivityController', () => {
     activityService.getCommunicationContact.withArgs('some-crn', 111, displayName).resolves(contact)
 
     const observed = await subject.getCommunication('some-crn', 111)
+    const links = MockLinksModule.of({
+      crn: 'some-crn',
+      offenderName: displayName,
+      entityName: contact.name,
+      id: 111,
+    })
     expect(observed).toEqual({
       displayName,
-      breadcrumbs: fakeBreadcrumbs(BreadcrumbType.OtherCommunication, {
-        crn: 'some-crn',
-        offenderName: displayName,
-        entityName: contact.name,
-        id: 111,
-      }),
+      breadcrumbs: links.breadcrumbs(BreadcrumbType.OtherCommunication),
       contact,
     })
   })
 
   function havingOffenderSummary() {
     const offender = fakeOffenderDetailSummary({
-      otherIds: { crn: 'some-crn', pncNumber: 'some-prn' },
+      otherIds: { crn: 'some-crn', pncNumber: 'some-pnc' },
       firstName: 'Liz',
       middleNames: ['Danger'],
       surname: 'Haggis',

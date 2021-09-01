@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { Conviction, Sentence } from '../../../community-api/client'
 import { maxBy } from 'lodash'
 import { DateTime, DurationUnit } from 'luxon'
-import { getElapsed, quantity, QuantityOptions } from '../../../util'
+import { getElapsed, quantity, QuantityOptions, urlJoin } from '../../../util'
 import {
   ComplianceDetails,
   CompliancePeriod,
@@ -19,6 +19,7 @@ import { getOffenceName, getSentenceName } from './util'
 import { ComplianceService } from './compliance.service'
 import { ActivityComplianceFilter, ActivityService } from '../activity'
 import { BreachService } from '../../../community-api/breach'
+import { BreadcrumbType, LinksService } from '../../../common/links'
 
 @Injectable()
 export class SentenceService {
@@ -28,6 +29,7 @@ export class SentenceService {
     private readonly compliance: ComplianceService,
     private readonly activity: ActivityService,
     private readonly breach: BreachService,
+    private readonly links: LinksService,
   ) {}
 
   async getConvictionDetails(crn: string): Promise<ConvictionDetails | null> {
@@ -123,6 +125,7 @@ export class SentenceService {
       )
     }
 
+    const activityUrl = this.links.getUrl(BreadcrumbType.CaseActivityLog, { crn })
     function getAppointmentQuantity(
       filter: ActivityComplianceFilter,
       name: string,
@@ -135,7 +138,7 @@ export class SentenceService {
       return {
         name: quantity(value, name, options),
         value,
-        link: `/offender/${crn}/activity/${filter}`,
+        link: urlJoin(activityUrl, filter),
       }
     }
 

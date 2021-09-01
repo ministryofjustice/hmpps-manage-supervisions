@@ -23,6 +23,8 @@ import { ComplianceService } from './compliance.service'
 import { ActivityComplianceFilter, ActivityService } from '../activity'
 import { BreachService } from '../../../community-api/breach'
 import { fakeBreachSummary } from '../../../community-api/breach/breach.fake'
+import { MockLinksModule } from '../../../common/links/links.mock'
+import { BreadcrumbType } from '../../../common/links'
 
 describe('SentenceService', () => {
   let subject: SentenceService
@@ -45,7 +47,10 @@ describe('SentenceService', () => {
         { provide: ActivityService, useValue: activityService },
         { provide: BreachService, useValue: breachService },
       ],
-      imports: [MockCommunityApiModule.register()],
+      imports: [
+        MockCommunityApiModule.register(),
+        MockLinksModule.register({ [BreadcrumbType.CaseActivityLog]: '/case-activity-log' }),
+      ],
     }).compile()
 
     subject = module.get(SentenceService)
@@ -225,22 +230,22 @@ describe('SentenceService', () => {
             acceptableAbsences: {
               name: '3 acceptable absences',
               value: 3,
-              link: '/offender/some-crn/activity/acceptable-absence-appointments',
+              link: '/case-activity-log/acceptable-absence-appointments',
             },
             complied: {
               name: '1 complied',
               value: 1,
-              link: '/offender/some-crn/activity/complied-appointments',
+              link: '/case-activity-log/complied-appointments',
             },
             failureToComply: {
               name: '2 unacceptable absences',
               value: 2,
-              link: '/offender/some-crn/activity/failed-to-comply-appointments',
+              link: '/case-activity-log/failed-to-comply-appointments',
             },
             total: {
               name: '6 appointments',
               value: 6,
-              link: '/offender/some-crn/activity/appointments',
+              link: '/case-activity-log/appointments',
             },
           },
           period: 'since last breach',

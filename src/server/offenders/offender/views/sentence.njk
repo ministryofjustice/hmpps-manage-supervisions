@@ -30,7 +30,7 @@
                     value: {
                         html: joinList(conviction.offence.additionalOffences, {
                                 ordered: true,
-                                link: '#TODO',
+                                link: links.toDelius,
                                 linkText: 'View additional offence details'
                             }) if conviction.offence.additionalOffences.length else 'No additional offences'
                     }
@@ -160,9 +160,10 @@
 
     {% if conviction.previousConvictions %}
         {% set previousOrders %}
-            <a class="govuk-heading-s govuk-!-margin-top-0 govuk-!-margin-bottom-1" href="{{ links.previousConvictions }}">
-                Previous orders ({{ conviction.previousConvictions.count }})
+            <a href="{{ links.previousConvictions }}">
+                {{ conviction.previousConvictions.count | quantity('previous order') }}
             </a>
+            <br>
             Last ended on {{ conviction.previousConvictions.lastEnded | shortDate }}
         {% endset %}
         {% call appSummaryCard({ titleText: 'Probation history', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
