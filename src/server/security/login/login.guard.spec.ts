@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing'
 import { FakeConfigModule } from '../../config/config.fake'
 import { LoginGuard } from './login.guard'
 import { URL } from 'url'
-import { UrlService } from '../url/url.service'
+import { LoginService } from './login.service'
 import { createStubInstance } from 'sinon'
 
 describe('LoginGuard', () => {
@@ -14,12 +14,12 @@ describe('LoginGuard', () => {
   }
 
   beforeEach(async () => {
-    const urlService = createStubInstance(UrlService)
-    urlService.sanitiseRedirectUrl.withArgs(request).returns('/redirect-url')
+    const service = createStubInstance(LoginService)
+    service.sanitiseRedirectUrl.withArgs(request).returns('/redirect-url')
 
     const module = await Test.createTestingModule({
       imports: [FakeConfigModule.register({ server: { domain: new URL('http://some-domain') } })],
-      providers: [LoginGuard, { provide: UrlService, useValue: urlService }],
+      providers: [LoginGuard, { provide: LoginService, useValue: service }],
     }).compile()
 
     subject = module.get(LoginGuard)

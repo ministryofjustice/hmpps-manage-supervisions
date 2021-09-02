@@ -81,10 +81,7 @@ context('Offender risk tab', () => {
           page.noActiveRegistrations.should('not.exist')
         })
     })
-  })
 
-  describe('risk detail page', () => {
-    before(() => cy.seed())
     it('displays risk details', () => {
       fixture
         .whenViewingOffender()
@@ -107,10 +104,7 @@ context('Offender risk tab', () => {
           page.furtherInfoText.contains('Should only be used when a national alert notice has been issued')
         })
     })
-  })
 
-  describe('removed risk list page', () => {
-    before(() => cy.seed())
     it('displays removed risks list', () => {
       fixture
         .whenViewingOffender()
@@ -126,10 +120,7 @@ context('Offender risk tab', () => {
           })
         })
     })
-  })
 
-  describe('removed risk detail page', () => {
-    before(() => cy.seed())
     it('displays removed risk details', () => {
       fixture
         .whenViewingOffender()

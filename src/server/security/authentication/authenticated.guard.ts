@@ -1,7 +1,7 @@
 import { Reflector } from '@nestjs/core'
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
-import { Request } from 'express'
-import { PUBLIC_KEY } from '../meta/public.decorator'
+import { Request, Response } from 'express'
+import { PUBLIC_KEY } from './public.decorator'
 import { TokenVerificationService } from '../token-verification/token-verification.service'
 
 @Injectable()
@@ -9,10 +9,13 @@ export class AuthenticatedGuard implements CanActivate {
   constructor(private readonly reflector: Reflector, private readonly tokenVerification: TokenVerificationService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request: Request = context.switchToHttp().getRequest()
+    const host = context.switchToHttp()
+    const request = host.getRequest<Request>()
 
     const isPublic = this.reflector.getAllAndOverride<boolean>(PUBLIC_KEY, [context.getHandler(), context.getClass()])
     if (isPublic) {
+      const response = host.getResponse<Response>()
+      response.locals.isPublic = true
       return true
     }
 

@@ -3,7 +3,7 @@ import { AuthenticatedGuard } from './authenticated.guard'
 import { SinonStubbedInstance, createStubInstance, match } from 'sinon'
 import { TokenVerificationService } from '../token-verification/token-verification.service'
 import { fakeUser } from '../user/user.fake'
-import { PUBLIC_KEY } from '../meta/public.decorator'
+import { PUBLIC_KEY } from './public.decorator'
 
 const handler = 'handler'
 const cls = 'cls'
@@ -14,9 +14,11 @@ describe('AuthenticatedGuard', () => {
   let tokenVerification: SinonStubbedInstance<TokenVerificationService>
   let user: User
   let isAuthenticated: boolean
+  let locals: any
   const context: any = {
     switchToHttp: () => ({
       getRequest: () => ({ user, isAuthenticated: () => isAuthenticated }),
+      getResponse: () => ({ locals }),
     }),
     getHandler: () => handler,
     getClass: () => cls,
@@ -25,6 +27,7 @@ describe('AuthenticatedGuard', () => {
   beforeEach(async () => {
     user = fakeUser()
     isAuthenticated = true
+    locals = {}
     reflector = createStubInstance(Reflector)
     tokenVerification = createStubInstance(TokenVerificationService)
     subject = new AuthenticatedGuard(reflector as any, tokenVerification as any)
@@ -34,6 +37,7 @@ describe('AuthenticatedGuard', () => {
     reflector.getAllAndOverride.withArgs(PUBLIC_KEY, match.array.deepEquals([handler, cls])).returns(true)
     const result = await subject.canActivate(context)
     expect(result).toBe(true)
+    expect(locals.isPublic).toBe(true)
   })
 
   it('is not authenticated', async () => {

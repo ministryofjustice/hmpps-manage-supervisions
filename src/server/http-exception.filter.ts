@@ -1,7 +1,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common'
 import type { Request, Response } from 'express'
 import { SanitisedAxiosError } from './common/rest'
-import { UrlService } from './security/url/url.service'
+import { LoginService } from './security/login/login.service'
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -36,16 +36,26 @@ export class HttpExceptionFilter implements ExceptionFilter {
   }
 
   private handleHttpException(exception: HttpException, host: ArgumentsHost) {
-    const response = host.switchToHttp().getResponse<Response>()
+    const http = host.switchToHttp()
+    const request = http.getRequest<Request>()
+    const response = http.getResponse<Response>()
     const status = exception.getStatus()
     const meta: any = exception.getResponse()
 
     switch (status) {
-      case HttpStatus.FORBIDDEN: {
-        const request = host.switchToHttp().getRequest<Request>()
+      case HttpStatus.FORBIDDEN:
+        if (response.locals.authorized === false) {
+          // the authorization guard failed => display unauthorized page
+          return response.status(status).render('pages/unauthorized')
+        }
+
+        // the authentication guard failed => redirect to login
         request.logout()
-        return response.redirect(`/login?${UrlService.REDIRECT_PARAM}=${encodeURIComponent(request.originalUrl)}`)
-      }
+        return response.redirect(`/login?${LoginService.REDIRECT_PARAM}=${encodeURIComponent(request.originalUrl)}`)
+
+      case HttpStatus.UNAUTHORIZED:
+        // result of oauth failure eg invalid callback, user profile does not exist => display unauthorized page
+        return response.status(status).render('pages/unauthorized')
 
       case HttpStatus.MOVED_PERMANENTLY:
       case HttpStatus.FOUND:

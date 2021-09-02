@@ -38,7 +38,6 @@ export const fakeConfig = fake<Config>(() => ({
     https: faker.datatype.boolean(),
     domain: new URL(faker.internet.url()),
     staticResourceCacheDuration: faker.datatype.number({ min: 60, max: 6000 }),
-    debug: {},
     features: {
       [FeatureFlags.EnableAppointmentBooking]: true,
     },
@@ -60,7 +59,7 @@ export const fakeConfig = fake<Config>(() => ({
   apis: {
     hmppsAuth: {
       ...fakeApiConfig(),
-      externalUrl: faker.internet.url(),
+      externalUrl: new URL(faker.internet.url()),
       apiClientCredentials: fakeClientCredentials(),
       systemClientCredentials: fakeClientCredentials(),
       issuerPath: '/issuer',

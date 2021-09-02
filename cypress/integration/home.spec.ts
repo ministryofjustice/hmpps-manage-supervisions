@@ -4,19 +4,32 @@ context('Home', () => {
   const homePage = new HomePage()
   const authPage = new HmppsAuthPage()
 
-  before(() => {
-    cy.seed()
+  describe('authorized user', () => {
+    before(() => {
+      cy.seed()
+    })
+
+    it('can logout', () => {
+      cy.home()
+      homePage.logoutButton.click()
+      authPage.shouldHaveRedirectedToLogoutPage()
+    })
+
+    it('renders page furniture', () => {
+      cy.home()
+      homePage.pageTitle.contains('This site is under construction...')
+      homePage.headerUserName.should('contain.text', 'J. Smith')
+    })
   })
 
-  it('User can log out', () => {
-    cy.home()
-    homePage.logoutButton.click()
-    authPage.shouldHaveRedirectedToLogoutPage()
-  })
+  describe('unauthorized user', () => {
+    before(() => {
+      cy.seed({ roles: ['SOME_ROLE'] })
+    })
 
-  it('Page furniture rendered', () => {
-    cy.home()
-    homePage.pageTitle.contains('This site is under construction...')
-    homePage.headerUserName.should('contain.text', 'J. Smith')
+    it('is unauthorized', () => {
+      cy.home()
+      homePage.pageTitle.contains('Access denied')
+    })
   })
 })

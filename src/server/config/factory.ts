@@ -2,7 +2,6 @@ import { pick } from 'lodash'
 import {
   Config,
   ContactTypeCategory,
-  DebugFlags,
   FeatureFlags,
   LogLevel,
   WellKnownAppointmentType,
@@ -221,12 +220,6 @@ export const CONTACT_DEFAULTS: WellKnownContactTypeConfig = {
   ],
 }
 
-const DEBUG_DEFAULTS: Record<DebugFlags, string> = {
-  [DebugFlags.SetStaffCode]: 'CRSSTAFF1',
-  [DebugFlags.SetTeamCode]: 'N07UAT',
-  [DebugFlags.SetProviderCode]: 'N07',
-}
-
 const FEATURE_DEFAULTS: Record<FeatureFlags, boolean> = {
   [FeatureFlags.EnableAppointmentBooking]: true,
 }
@@ -294,14 +287,6 @@ export function configFactory(): Config {
       https: bool('PROTOCOL_HTTPS', fallback(isProduction())),
       domain: Object.freeze(new URL(string('INGRESS_URL', developmentOnly('http://localhost:3000')))),
       staticResourceCacheDuration: int('STATIC_RESOURCE_CACHE_DURATION', fallback(20)),
-      debug: string('DEBUG', fallback(''))
-        .split(',')
-        .map(x => x.trim().toLowerCase())
-        .reduce((agg, x) => {
-          const [k, v] = x.split(':')
-          agg[k] = v || DEBUG_DEFAULTS[k]
-          return agg
-        }, {}),
       features,
       logLevel: stringEnum(LogLevel, 'LOG_LEVEL', fallback(LogLevel.Info)),
     },
@@ -322,7 +307,7 @@ export function configFactory(): Config {
       hmppsAuth: {
         enabled: true,
         url: authUrl,
-        externalUrl: string('HMPPS_AUTH_EXTERNAL_URL', fallback(authUrl)),
+        externalUrl: new URL(string('HMPPS_AUTH_EXTERNAL_URL', fallback(authUrl))),
         timeout: int('HMPPS_AUTH_TIMEOUT', fallback(10000)),
         apiClientCredentials: {
           id: string('API_CLIENT_ID', developmentOnly('interventions')),

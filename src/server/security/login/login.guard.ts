@@ -4,11 +4,11 @@ import { Request } from 'express'
 import { ConfigService } from '@nestjs/config'
 import { ServerConfig } from '../../config'
 import { URL } from 'url'
-import { UrlService } from '../url/url.service'
+import { LoginService } from './login.service'
 
 @Injectable()
 export class LoginGuard extends AuthGuard('hmpps') {
-  constructor(private readonly config: ConfigService, private readonly url: UrlService) {
+  constructor(private readonly config: ConfigService, private readonly url: LoginService) {
     super()
   }
 
