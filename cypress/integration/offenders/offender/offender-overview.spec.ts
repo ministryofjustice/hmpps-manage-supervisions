@@ -89,7 +89,7 @@ context('Offender overview tab', () => {
 
         page.activityAndCompliance(card => {
           card.value('Compliance').contains('Breach in progress. 1 prior breach on current order')
-          card.value('Activity log').contains('2 appointments 1 complied 1 unacceptable absence')
+          card.value('Activity log').contains('2 national standard appointments 1 complied 1 unacceptable absence')
         })
       })
   })

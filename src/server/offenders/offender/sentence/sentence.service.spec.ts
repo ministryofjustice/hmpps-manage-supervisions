@@ -212,10 +212,11 @@ describe('SentenceService', () => {
       const previousSummary = havingComplianceSummary(previousConviction)
       havingAppointmentCounts(
         {
-          [ActivityComplianceFilter.Appointments]: 6,
+          [ActivityComplianceFilter.Appointments]: 7,
           [ActivityComplianceFilter.CompliedAppointments]: 1,
           [ActivityComplianceFilter.FailedToComplyAppointments]: 2,
           [ActivityComplianceFilter.AcceptableAbsenceAppointments]: 3,
+          [ActivityComplianceFilter.WithoutOutcome]: 1,
         },
         currentSummary.lastRecentBreachEnd,
       )
@@ -242,9 +243,14 @@ describe('SentenceService', () => {
               value: 2,
               link: '/case-activity-log/failed-to-comply-appointments',
             },
+            withoutAnOutcome: {
+              name: '1 without a recorded outcome',
+              value: 1,
+              link: '/case-activity-log/without-an-outcome',
+            },
             total: {
-              name: '6 appointments',
-              value: 6,
+              name: '7 national standard appointments',
+              value: 7,
               link: '/case-activity-log/appointments',
             },
           },

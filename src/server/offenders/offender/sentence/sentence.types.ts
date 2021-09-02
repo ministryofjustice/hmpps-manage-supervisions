@@ -150,6 +150,7 @@ export interface CurrentComplianceConvictionSummary extends ComplianceConviction
     complied: ComplianceQuantity
     acceptableAbsences: ComplianceQuantity
     failureToComply: ComplianceQuantity
+    withoutAnOutcome: ComplianceQuantity
   }
   status: {
     value: ComplianceStatus
