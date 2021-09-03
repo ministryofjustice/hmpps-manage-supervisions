@@ -26,6 +26,10 @@ context('Offender overview tab', () => {
           type: { code: 'ABNP', appointment: true },
           outcome: { complied: false, attended: false },
         },
+        {
+          type: { code: 'ABNP', appointment: true },
+          outcome: null,
+        },
       ],
       convictions: {
         active: {
@@ -89,7 +93,9 @@ context('Offender overview tab', () => {
 
         page.activityAndCompliance(card => {
           card.value('Compliance').contains('Breach in progress. 1 prior breach on current order')
-          card.value('Activity log').contains('2 national standard appointments 1 complied 1 unacceptable absence')
+          card
+            .value('Activity log')
+            .contains('3 national standard appointments 1 without a recorded outcome 1 complied 1 unacceptable absence')
         })
       })
   })

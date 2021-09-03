@@ -205,7 +205,6 @@ export class SentenceService {
                 'without a recorded outcome',
                 {
                   plural: '',
-                  zero: 'None',
                 },
               ),
             },
