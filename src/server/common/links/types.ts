@@ -19,6 +19,7 @@ export enum BreadcrumbType {
   RiskDetails,
   RemovedRiskDetails,
   ExitToDelius,
+  ExitToOASys,
 }
 
 export interface ResolveBreadcrumbOptions {

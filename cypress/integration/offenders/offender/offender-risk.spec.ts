@@ -30,9 +30,11 @@ context('Offender risk tab', () => {
         .whenClickingSubNavTab('risk')
         .shouldDisplayCommonHeader()
         .shouldRenderOffenderTab('risk', page => {
-          page.noRisksWarning.contains('There is no OASys risk assessment for Liz Haggis')
           page.noActiveRegistrations.contains('There are no current risk flags. Add risk flags in Delius.')
+          page.noRisksWarning.contains('There is no OASys risk assessment for Liz Haggis')
+          page.noRisksWarning.find('a').contains('View OASys').click()
         })
+        .shouldDisplayExitPage('oasys')
     })
   })
 
@@ -45,31 +47,35 @@ context('Offender risk tab', () => {
         .whenClickingSubNavTab('risk')
         .shouldDisplayCommonHeader()
         .shouldRenderOffenderTab('risk', page => {
-          page.roshCommunity(card => {
-            card.value('Overall').contains('Very high risk of serious harm')
-            card.value('Very high risk').contains('Children Staff')
-            card.value('High risk').contains('Public')
-            card.title('Medium risk').should('not.exist')
-            card.value('Low risk').contains('Known Adult')
-            card.value('Who is at risk').contains('Someone at risk')
-            card.value('Nature of risk').contains('Some nature of risk')
-            card.value('When is risk greatest').contains('Some risk imminence')
-          })
+          page.roshCommunity(card =>
+            card.summaryList(list => {
+              list.value('Overall').contains('Very high risk of serious harm')
+              list.value('Very high risk').contains('Children Staff')
+              list.value('High risk').contains('Public')
+              list.title('Medium risk').should('not.exist')
+              list.value('Low risk').contains('Known Adult')
+              list.value('Who is at risk').contains('Someone at risk')
+              list.value('Nature of risk').contains('Some nature of risk')
+              list.value('When is risk greatest').contains('Some risk imminence')
+            }),
+          )
 
-          page.roshThemselves(card => {
-            card.value('Risk of suicide or self harm').contains('There are concerns about self-harm and suicide')
-            card.details(
-              'Coping in custody or a hostel',
-              'There were concerns about coping in a hostel and in custody',
-              () => {
-                page.currentNotes.contains('No detail given')
-                page.previousNotes.contains(
-                  'Soluta tempore nemo et velit est perspiciatis. Neque error aut est nemo quasi. Et labore impedit omnis numquam id et eaque facere itaque. Ipsam et atque eos tempora possimus.',
-                )
-              },
-            )
-            card.value('Vulnerability').contains('No concerns')
-          })
+          page.roshThemselves(card =>
+            card.summaryList(list => {
+              list.value('Risk of suicide or self harm').contains('There are concerns about self-harm and suicide')
+              list.details(
+                'Coping in custody or a hostel',
+                'There were concerns about coping in a hostel and in custody',
+                () => {
+                  page.currentNotes.contains('No detail given')
+                  page.previousNotes.contains(
+                    'Soluta tempore nemo et velit est perspiciatis. Neque error aut est nemo quasi. Et labore impedit omnis numquam id et eaque facere itaque. Ipsam et atque eos tempora possimus.',
+                  )
+                },
+              )
+              list.value('Vulnerability').contains('No concerns')
+            }),
+          )
 
           page.riskFlags(table => {
             table.cell(0, 0).contains('Alert Notice')
@@ -80,6 +86,26 @@ context('Offender risk tab', () => {
           page.viewInactiveRegistrations.contains('View removed risk flags (2)')
           page.noActiveRegistrations.should('not.exist')
         })
+    })
+
+    it('links to oasys interstitial from risk to community card', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('risk')
+        .shouldRenderOffenderTab('risk', page => {
+          page.roshCommunity(card => card.actions.contains('View OASys').click())
+        })
+        .shouldDisplayExitPage('oasys')
+    })
+
+    it('links to oasys interstitial from risk to themselves card', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('risk')
+        .shouldRenderOffenderTab('risk', page => {
+          page.roshThemselves(card => card.actions.contains('View OASys').click())
+        })
+        .shouldDisplayExitPage('oasys')
     })
 
     it('displays risk details', () => {

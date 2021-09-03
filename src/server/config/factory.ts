@@ -50,6 +50,10 @@ function string(name: string, fallbackFn?: EnvironmentFallback<string>): string 
   return env(name, x => x, fallbackFn)
 }
 
+function url(name: string, fallbackFn?: EnvironmentFallback<string>) {
+  return Object.freeze(new URL(string(name, fallbackFn)))
+}
+
 function int(name: string, fallbackFn?: EnvironmentFallback<number>): number {
   return env(name, x => parseInt(x, 10), fallbackFn)
 }
@@ -285,7 +289,7 @@ export function configFactory(): Config {
       port: int('PORT', fallback(3000)),
       isProduction: isProduction(),
       https: bool('PROTOCOL_HTTPS', fallback(isProduction())),
-      domain: Object.freeze(new URL(string('INGRESS_URL', developmentOnly('http://localhost:3000')))),
+      domain: url('INGRESS_URL', developmentOnly('http://localhost:3000')),
       staticResourceCacheDuration: int('STATIC_RESOURCE_CACHE_DURATION', fallback(20)),
       features,
       logLevel: stringEnum(LogLevel, 'LOG_LEVEL', fallback(LogLevel.Info)),
@@ -301,13 +305,16 @@ export function configFactory(): Config {
       expiryMinutes: int('WEB_SESSION_TIMEOUT_IN_MINUTES', fallback(120)),
     },
     delius: {
-      baseUrl: Object.freeze(new URL(string('DELIUS_BASE_URL', developmentOnly('http://localhost:8082/delius')))),
+      baseUrl: url('DELIUS_BASE_URL', developmentOnly('http://localhost:8082/delius')),
+    },
+    oasys: {
+      baseUrl: url('OASYS_BASE_URL', developmentOnly('http://localhost:8082/oasys')),
     },
     apis: {
       hmppsAuth: {
         enabled: true,
         url: authUrl,
-        externalUrl: new URL(string('HMPPS_AUTH_EXTERNAL_URL', fallback(authUrl))),
+        externalUrl: url('HMPPS_AUTH_EXTERNAL_URL', fallback(authUrl)),
         timeout: int('HMPPS_AUTH_TIMEOUT', fallback(10000)),
         apiClientCredentials: {
           id: string('API_CLIENT_ID', developmentOnly('interventions')),

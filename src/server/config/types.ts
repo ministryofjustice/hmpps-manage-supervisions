@@ -74,6 +74,10 @@ export interface DeliusConfig {
   baseUrl: URL
 }
 
+export interface OASysConfig {
+  baseUrl: URL
+}
+
 export enum WellKnownAppointmentType {
   OfficeVisit = 'office-visit',
   HomeVisit = 'home-visit',
@@ -177,5 +181,6 @@ export interface Config {
   contacts: WellKnownContactTypeConfig
   requirements: WellKnownRequirementTypeConfig
   delius: DeliusConfig
+  oasys: OASysConfig
   risk: RiskConfig
 }

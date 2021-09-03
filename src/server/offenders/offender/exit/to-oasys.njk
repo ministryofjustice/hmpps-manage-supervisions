@@ -1,0 +1,30 @@
+{% extends "partials/layout.njk" %}
+{% set pageTitle = 'Continue on OASys' %}
+{% from './_exit.njk' import offenderExitSummary %}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl">Continue on OASys</h1>
+
+            <p>You’ll need to use OASys to:</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>make changes to data</li>
+                <li>view certain information, such as risk management plans and detailed risk information</li>
+            </ul>
+
+            <h2 class="govuk-heading-m">Go to the OASys homepage</h2>
+
+            <p data-qa='offender/to-oasys/homepage-explanation'>
+                You can use the following information to find {{ offender.shortName }} on OASys:
+            </p>
+
+            {{ offenderExitSummary(offender) }}
+
+            <p>
+                <a href="{{ links.oasysHomePage }}" target='_blank' data-qa='offender/to-oasys/homepage'>Open the OASys homepage</a><br>
+                <span class="govuk-!-font-size-16">Link opens in a new window</span>
+            </p>
+        </div>
+    </div>
+{% endblock %}

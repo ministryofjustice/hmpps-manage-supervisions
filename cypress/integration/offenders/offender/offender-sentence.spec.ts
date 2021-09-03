@@ -129,7 +129,7 @@ context('Offender sentence tab', () => {
             table.cell(0, 0).contains('24 month Community Order').click()
           })
         })
-        .shouldDisplayDeliusExitPage()
+        .shouldDisplayExitPage('delius')
     })
   })
 })

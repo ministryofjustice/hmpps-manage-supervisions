@@ -56,6 +56,9 @@ export const fakeConfig = fake<Config>(() => ({
   delius: {
     baseUrl: new URL(faker.internet.url()),
   },
+  oasys: {
+    baseUrl: new URL(faker.internet.url()),
+  },
   apis: {
     hmppsAuth: {
       ...fakeApiConfig(),
