@@ -107,6 +107,7 @@ export class SentenceService {
       [ActivityComplianceFilter.CompliedAppointments]: 0,
       [ActivityComplianceFilter.FailedToComplyAppointments]: 0,
       [ActivityComplianceFilter.AcceptableAbsenceAppointments]: 0,
+      [ActivityComplianceFilter.WithoutOutcome]: 0,
     }
     if (currentSummary) {
       if (currentSummary.lastRecentBreachEnd) {
@@ -186,7 +187,7 @@ export class SentenceService {
             ...currentSummary,
             period: compliancePeriod,
             appointments: {
-              total: getAppointmentQuantity(ActivityComplianceFilter.Appointments, 'appointment'),
+              total: getAppointmentQuantity(ActivityComplianceFilter.Appointments, 'national standard appointment'),
               complied: getAppointmentQuantity(ActivityComplianceFilter.CompliedAppointments, 'complied', {
                 plural: '',
                 zero: 'None',
@@ -198,6 +199,13 @@ export class SentenceService {
               failureToComply: getAppointmentQuantity(
                 ActivityComplianceFilter.FailedToComplyAppointments,
                 'unacceptable absence',
+              ),
+              withoutAnOutcome: getAppointmentQuantity(
+                ActivityComplianceFilter.WithoutOutcome,
+                'without a recorded outcome',
+                {
+                  plural: '',
+                },
               ),
             },
             status: getCurrentStatus(),

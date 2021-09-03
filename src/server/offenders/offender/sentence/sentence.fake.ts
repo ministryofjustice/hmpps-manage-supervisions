@@ -137,6 +137,7 @@ export const fakeComplianceDetails = fake<ComplianceDetails>(() => ({
       complied: fakeComplianceQuantity(),
       acceptableAbsences: fakeComplianceQuantity(),
       failureToComply: fakeComplianceQuantity(),
+      withoutAnOutcome: fakeComplianceQuantity(),
     },
     status: {
       value: faker.random.arrayElement(Object.values(ComplianceStatus)),

@@ -24,6 +24,7 @@ class Fixture extends ViewOffenderFixture {
     ftc: string
     absences: string
     sinceLastBreach?: boolean
+    withoutAnOutcome: string
   }) {
     return this.shouldRenderOffenderTab('compliance', page => {
       page.requirementName.contains('44 days RAR, 29 completed (2 requirements)')
@@ -35,6 +36,7 @@ class Fixture extends ViewOffenderFixture {
       page.requirement(card => {
         // TODO look at testing these links?
         card.value('Appointments').contains(options.total)
+        card.value('Without an outcome').contains(options.withoutAnOutcome)
         card.value('Complied').contains(options.complied)
         card
           .value(options.sinceLastBreach ? 'Failures to comply' : 'Failures to comply within 12 months')
@@ -45,7 +47,17 @@ class Fixture extends ViewOffenderFixture {
   }
 }
 
-function complianceAppointments({ complied, ftc, absence }: { complied: number; ftc: number; absence: number }) {
+function complianceAppointments({
+  complied,
+  ftc,
+  absence,
+  noOutcome,
+}: {
+  complied: number
+  ftc: number
+  absence: number
+  noOutcome: number
+}) {
   function withOutcome(outcome: DeepPartial<AppointmentOutcome>, n: number): DeepPartial<ContactSummary>[] {
     return [...Array(n)].map(() => ({ type: { code: 'APAT', appointment: true }, outcome }))
   }
@@ -54,6 +66,7 @@ function complianceAppointments({ complied, ftc, absence }: { complied: number; 
     ...withOutcome({ complied: true, attended: true }, complied),
     ...withOutcome({ complied: false }, ftc),
     ...withOutcome({ complied: true, attended: false }, absence),
+    ...withOutcome(null, noOutcome),
   ]
 }
 
@@ -138,7 +151,8 @@ context('Offender compliance tab', () => {
           page.currentStatus.contains('No failures to comply within 12 months')
         })
         .shouldRenderRequirement({
-          total: '1 appointment',
+          total: '1 national standard appointment',
+          withoutAnOutcome: 'None',
           complied: '1 complied',
           ftc: 'None',
           absences: 'None',
@@ -213,7 +227,7 @@ context('Offender compliance tab', () => {
           nsis: [],
         },
       },
-      contacts: complianceAppointments({ complied: 1, ftc: 2, absence: 3 }),
+      contacts: complianceAppointments({ complied: 1, ftc: 2, absence: 3, noOutcome: 1 }),
     })
     fixture
       .whenViewingOffender()
@@ -224,7 +238,8 @@ context('Offender compliance tab', () => {
       )
       .shouldRenderSentence({ breaches: 'None' })
       .shouldRenderRequirement({
-        total: '6 appointments',
+        total: '7 national standard appointments',
+        withoutAnOutcome: '1 without a recorded outcome',
         complied: '1 complied',
         ftc: '2 unacceptable absences',
         absences: '3 acceptable absences',
@@ -239,7 +254,7 @@ context('Offender compliance tab', () => {
           nsis: [],
         },
       },
-      contacts: complianceAppointments({ complied: 0, ftc: 3, absence: 0 }),
+      contacts: complianceAppointments({ complied: 0, ftc: 3, absence: 0, noOutcome: 1 }),
     })
     fixture
       .whenViewingOffender()
@@ -306,7 +321,7 @@ context('Offender compliance tab', () => {
           ],
         },
       },
-      contacts: complianceAppointments({ complied: 1, ftc: 2, absence: 3 }),
+      contacts: complianceAppointments({ complied: 1, ftc: 2, absence: 3, noOutcome: 1 }),
     })
     fixture
       .whenViewingOffender()
@@ -322,7 +337,8 @@ context('Offender compliance tab', () => {
       })
       .shouldRenderSentence({ breaches: 'None', breachesLabel: 'Previous breaches' })
       .shouldRenderRequirement({
-        total: '6 appointments',
+        total: '7 national standard appointments',
+        withoutAnOutcome: '1 without a recorded outcome',
         complied: '1 complied',
         ftc: '2 unacceptable absences',
         absences: '3 acceptable absences',
@@ -345,7 +361,7 @@ context('Offender compliance tab', () => {
           ],
         },
       },
-      contacts: complianceAppointments({ complied: 1, ftc: 2, absence: 3 }),
+      contacts: complianceAppointments({ complied: 1, ftc: 2, absence: 3, noOutcome: 1 }),
     })
     fixture
       .whenViewingOffender()
@@ -356,7 +372,8 @@ context('Offender compliance tab', () => {
       })
       .shouldRenderSentence({ breaches: 'Breach proven Resolved 3 December 2020' })
       .shouldRenderRequirement({
-        total: '6 appointments',
+        total: '7 national standard appointments',
+        withoutAnOutcome: '1 without a recorded outcome',
         complied: '1 complied',
         ftc: '2 unacceptable absences',
         absences: '3 acceptable absences',
