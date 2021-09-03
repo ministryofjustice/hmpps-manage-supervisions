@@ -1,18 +1,18 @@
 import { Test } from '@nestjs/testing'
-import { UrlService } from './url.service'
+import { LoginService } from './login.service'
 import { FakeConfigModule } from '../../config/config.fake'
 import { URL } from 'url'
 
-describe('UrlService', () => {
-  let service: UrlService
+describe('LoginService', () => {
+  let service: LoginService
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [UrlService],
+      providers: [LoginService],
       imports: [FakeConfigModule.register({ server: { domain: new URL('http://some-domain') } })],
     }).compile()
 
-    service = module.get(UrlService)
+    service = module.get(LoginService)
   })
 
   it('passes through local redirect', () => {

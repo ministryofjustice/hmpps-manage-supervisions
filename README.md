@@ -23,7 +23,7 @@ docker compose up
 This will use a stubbed API (via wiremock) & allow non-Delius user authentication.
 Navigate to `http://localhost:3000` and login with:
 
-* username: `AUTH_ADM`
+* username: `MANAGE_SUPERVISIONS`
 * password: `password123456`
 
 ### Against real dependencies

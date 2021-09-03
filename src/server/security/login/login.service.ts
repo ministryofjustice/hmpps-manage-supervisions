@@ -7,7 +7,7 @@ import { Request } from 'express'
 const DEFAULT_REDIRECT = '/'
 
 @Injectable()
-export class UrlService {
+export class LoginService {
   public static REDIRECT_PARAM = 'redirect'
 
   private readonly domain: URL
@@ -17,7 +17,7 @@ export class UrlService {
   }
 
   sanitiseRedirectUrl(request: Request): string {
-    const raw = request.query[UrlService.REDIRECT_PARAM]
+    const raw = request.query[LoginService.REDIRECT_PARAM]
     if (!raw || typeof raw !== 'string') {
       return DEFAULT_REDIRECT
     }

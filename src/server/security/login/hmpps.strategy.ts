@@ -1,14 +1,12 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PassportSerializer, PassportStrategy } from '@nestjs/passport'
 import { Strategy } from 'passport-oauth2'
-import { AuthApiConfig, DebugFlags, ServerConfig } from '../config'
-import { UserService } from './user/user.service'
-import { generateOauthClientToken } from '../common'
-import { titleCase } from '../util'
+import { AuthApiConfig, ServerConfig } from '../../config'
+import { UserService } from '../user/user.service'
+import { generateOauthClientToken } from '../../common'
+import { titleCase } from '../../util'
 import * as jwt from 'jsonwebtoken'
-
-const DELIUS_AUTH_SOURCE = 'delius'
 
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
@@ -37,12 +35,26 @@ export class HmppsStrategy extends PassportStrategy(Strategy, 'hmpps') {
     }
   }
 
+  private readonly logger = new Logger(HmppsStrategy.name)
+
   constructor(private readonly config: ConfigService, private readonly userService: UserService) {
     super(HmppsStrategy.getOAuth2Settings(config))
   }
 
+  /**
+   * Validate an oauth callback.
+   * Returning a falsey value here will result in nest throwing an UnauthorizedException.
+   * We should catch these in the global exception filter to display an access denied page.
+   * This function should never throw as that would result in a noisy unhandled exception & a dead end for the user.
+   */
   async validate(token: string, refreshToken: string): Promise<User> {
     const claims = jwt.decode(token) as Record<string, any>
+
+    if (claims.auth_source !== 'delius') {
+      this.logger.log(`user '${claims.sub}' attempted login with auth_source '${claims.auth_source}'`)
+      return null
+    }
+
     const user = {
       token,
       refreshToken,
@@ -50,31 +62,25 @@ export class HmppsStrategy extends PassportStrategy(Strategy, 'hmpps') {
       authorities: claims.authorities,
       scope: claims.scope,
     } as User
-    const profile = await this.userService.getUser(user)
 
-    return {
-      ...user,
-      ...profile,
-      displayName: titleCase(profile.name),
-      staffCode: await this.getStaffCode(user, claims.auth_source),
-    }
-  }
-
-  private async getStaffCode(user: User, authSource: string) {
-    if (authSource === DELIUS_AUTH_SOURCE) {
-      const staff = await this.userService.getStaffDetails(user)
+    try {
+      const [profile, staff] = await Promise.all([
+        this.userService.getUser(user),
+        this.userService.getStaffDetails(user),
+      ])
       if (!staff?.staffCode) {
-        throw new Error(`Delius user '${user.username}' has no staff record`)
+        this.logger.error(`delius user '${user.username}' has no staff record`)
+        return null
       }
-      return staff.staffCode
-    }
 
-    const debug = this.config.get<ServerConfig>('server').debug[DebugFlags.SetStaffCode]
-    if (debug) {
-      return debug
+      return {
+        ...user,
+        ...profile,
+        displayName: titleCase(profile.name),
+        staffCode: staff.staffCode,
+      }
+    } catch (err) {
+      this.logger.error(`cannot retrieve user profile for delius user '${user.username}'`, err)
     }
-
-    // TODO maybe we should not allow login unless delius auth is enabled
-    return null
   }
 }

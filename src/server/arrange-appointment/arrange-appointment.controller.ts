@@ -20,10 +20,9 @@ import { BodyClass } from '../common/meta/body-class.decorator'
 import { DEFAULT_GROUP } from '../util/mapping'
 import { AppointmentTypeRequiresLocation, OffenderDetail, OffenderManager } from '../community-api/client'
 import { DateTime } from 'luxon'
-import { ConfigService } from '@nestjs/config'
-import { Config, DebugFlags, ServerConfig } from '../config'
 import { isActiveDateRange } from '../util'
 import { Breadcrumb, BreadcrumbType, LinksService } from '../common/links'
+import { Role, Roles } from '../security'
 
 type RenderOrRedirect = AppointmentWizardViewModel | RedirectResponse
 
@@ -34,11 +33,11 @@ type RenderOrRedirect = AppointmentWizardViewModel | RedirectResponse
  * & AppointmentWizardStateService::nextStep when the builder model is mutated
  */
 @Controller(`/arrange-appointment/:crn(\\w+)`)
+@Roles(Role.ReadWrite)
 export class ArrangeAppointmentController {
   constructor(
     private readonly service: ArrangeAppointmentService,
     private readonly wizard: AppointmentWizardService,
-    private readonly config: ConfigService<Config>,
     private readonly links: LinksService,
   ) {}
 
@@ -577,16 +576,7 @@ export class ArrangeAppointmentController {
 
   private getOffenderManager(offender: OffenderDetail, user: User): OffenderManager {
     const offenderManager = offender.offenderManagers.find(om => om.staff.code == user.staffCode)
-
     if (!offenderManager) {
-      const debug = this.config.get<ServerConfig>('server').debug
-      if (DebugFlags.SetTeamCode in debug) {
-        return {
-          staff: { code: user.staffCode },
-          team: { code: debug[DebugFlags.SetTeamCode] },
-          probationArea: { code: debug[DebugFlags.SetProviderCode] || 'unknown-provider' } as any,
-        }
-      }
       throw new Error('Current user is not Offender Manager for this offender')
     }
     return offenderManager

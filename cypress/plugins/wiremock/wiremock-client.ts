@@ -9,10 +9,16 @@ const rm = promisify(rimraf)
 const wiremockPath = path.resolve(__dirname, '..', '..', '..', 'wiremock')
 
 function urlJoin(...tokens: string[]) {
-  const result = tokens
+  let result = tokens
     .map(x => trim(x, '/'))
     .filter(x => x)
     .join('/')
+
+  if (tokens.length > 0 && tokens[tokens.length - 1].endsWith('/')) {
+    // special case for preserving a trailing '/'
+    result += '/'
+  }
+
   return !result.startsWith('http') ? `/${result}` : result
 }
 
@@ -220,11 +226,17 @@ class FluentWiremockContext {
     return this
   }
 
-  formData(data: Record<string, string>): this {
+  formBody(data: Record<string, string>): this {
     this.header('Content-Type', 'application/x-www-form-urlencoded')
     this.mapping.request.bodyPatterns = Object.entries(data).map(([k, v]) => ({
       contains: `${k}=${encodeURIComponent(v)}`,
     }))
+    return this
+  }
+
+  jsonBody(data: any): this {
+    this.header('Content-Type', 'application/json')
+    this.mapping.request.bodyPatterns = [{ equalToJson: data }]
     return this
   }
 
@@ -242,47 +254,45 @@ class FluentWiremockContext {
     return this.query(query, 'matches')
   }
 
+  private response(response: WireMock.StubMappingResponse) {
+    this.helper.stub({ ...this.mapping, response })
+  }
+
   returns(jsonBody: any) {
-    this.helper.stub({
-      ...this.mapping,
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody,
-      },
+    this.response({
+      status: 200,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody,
     })
   }
 
   notFound() {
-    this.helper.stub({
-      ...this.mapping,
-      response: {
-        status: 404,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        jsonBody: { message: 'Not found' },
-      },
+    this.response({
+      status: 404,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: { message: 'Not found' },
     })
   }
 
   html(htmlBody: string) {
-    this.helper.stub({
-      ...this.mapping,
-      response: {
-        status: 200,
-        headers: {
-          'Content-Type': 'text/html',
-        },
-        body: htmlBody,
-      },
+    this.response({
+      status: 200,
+      headers: { 'Content-Type': 'text/html' },
+      body: htmlBody,
     })
   }
 
-  stubPing() {
-    this.get('/health/ping').returns({ status: 'UP' })
+  emptyOk() {
+    this.response({ status: 200 })
+  }
+
+  /**
+   * Stubs the service ping endpoint.
+   * @param strict Stubs the with & without a trailing '/'.
+   *               This is needed as some services explicitly call with the trailing '/' & wiremock is overly strict.
+   */
+  stubPing(strict = false) {
+    this.get(strict ? '/health/ping/' : '/health/ping').returns({ status: 'UP' })
   }
 
   resolveUrl(path: string): string {

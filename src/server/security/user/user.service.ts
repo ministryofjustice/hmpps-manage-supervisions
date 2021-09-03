@@ -23,10 +23,6 @@ export class UserProfile {
   uuid: string
 }
 
-export interface UserRole {
-  roleCode: string
-}
-
 @Injectable()
 export class UserService {
   constructor(private readonly rest: RestService) {}
@@ -35,12 +31,6 @@ export class UserService {
     const client = this.rest.build('hmppsAuth', user)
     const { data } = await client.get('/api/user/me')
     return plainToClass(UserProfile, data)
-  }
-
-  async getUserRoles(user: User): Promise<string[]> {
-    const client = this.rest.build('hmppsAuth', user)
-    const { data } = await client.get<UserRole[]>('/api/user/me/roles')
-    return data.map(r => r.roleCode).filter(r => r)
   }
 
   async getStaffDetails(user: User): Promise<StaffDetails> {

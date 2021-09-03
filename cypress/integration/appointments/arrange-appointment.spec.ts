@@ -28,7 +28,7 @@ function testCase(partial: Omit<AppointmentBookingTestCase, 'start' | 'end'>) {
   }
 }
 
-context('CreateAppointment', () => {
+context('Arrange appointment happy path & validation', () => {
   const page = new ArrangeAppointmentPage()
 
   before(() => {

@@ -1,0 +1,26 @@
+{% extends "partials/layout.njk" %}
+
+{% set pageTitle = applicationName + " - Unauthorized" %}
+
+{% block content %}
+
+    <main class="app-container">
+        <h1 class='govuk-heading-xl'>Access denied</h1>
+
+        {% if not user %}
+            {# when there is no user, the only way to see this page is if we got a bad oauth flow somehow
+               so to avoid a deadend we should allow the user to easily logout of the identity provider #}
+            <p class='govuk-body'>
+                We're having trouble logging you into this service.
+            </p>
+            <p class='govuk-body'>
+                <a href='/logout'>Sign in with your Delius account</a>
+            </p>
+        {% else %}
+            <p class='govuk-body'>
+                You do not have permission to use this service.
+            </p>
+        {% endif %}
+    </main>
+
+{% endblock %}

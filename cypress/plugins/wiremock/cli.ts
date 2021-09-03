@@ -11,7 +11,7 @@ import {
   ContactSeedOptions,
 } from '../seeds'
 import { WiremockClient } from './wiremock-client'
-import { hmppsAuthStub } from '../hmpps-auth'
+import { deliusLdap, hmppsAuthStub } from '../hmpps-auth'
 
 const { argv } = yargs
   .option('write-mappings', {
@@ -113,6 +113,8 @@ async function seed(args: CamelCased<typeof argv>) {
   const modules = [reset, referenceDataSeed(options), offenderSeed(options), contactsSeed(options)]
   if (args.hmppsAuth) {
     modules.push(hmppsAuthStub())
+  } else {
+    modules.push(deliusLdap())
   }
   await wiremocker(modules, { writeMappings: args.writeMappings })
 }

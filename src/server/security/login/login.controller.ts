@@ -1,14 +1,14 @@
 import { Controller, Get, Redirect, Req, UseGuards } from '@nestjs/common'
 import { Request } from 'express'
-import { LoginGuard } from '../guards/login.guard'
-import { Public } from '../meta/public.decorator'
-import { UrlService } from '../url/url.service'
+import { LoginGuard } from './login.guard'
+import { Public } from '../authentication/public.decorator'
+import { LoginService } from './login.service'
 import { RedirectResponse } from '../../common'
 
 @Public()
 @Controller('login')
 export class LoginController {
-  constructor(private readonly url: UrlService) {}
+  constructor(private readonly service: LoginService) {}
 
   @Get()
   @UseGuards(LoginGuard)
@@ -20,6 +20,6 @@ export class LoginController {
   @UseGuards(LoginGuard)
   @Redirect()
   public getCallback(@Req() req: Request): RedirectResponse {
-    return RedirectResponse.found(this.url.sanitiseRedirectUrl(req))
+    return RedirectResponse.found(this.service.sanitiseRedirectUrl(req))
   }
 }

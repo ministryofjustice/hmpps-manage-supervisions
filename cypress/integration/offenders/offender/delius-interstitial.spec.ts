@@ -13,6 +13,7 @@ describe('Delius interstitial', () => {
   const fixture = new Fixture()
 
   it('renders all interstitial links & content', () => {
+    cy.seed()
     fixture.whenViewingDeliusInterstitial().shouldDisplayDeliusExitPage(page => {
       page.contactLog
         .contains('Open Liz Haggis’s contact log on Delius')
