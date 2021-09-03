@@ -233,7 +233,7 @@ export class OffenderController {
         circumstances: links.url(BreadcrumbType.PersonalCircumstances),
         disabilities: links.url(BreadcrumbType.PersonalDisabilities),
         toDelius: links.url(BreadcrumbType.ExitToDelius),
-        toOASys: '#TODO',
+        toOASys: links.url(BreadcrumbType.ExitToOASys),
         viewInactiveRegistrations: links.url(BreadcrumbType.RemovedRisksList),
         previousConvictions: links.url(BreadcrumbType.CasePreviousConvictions),
         startBreach: links.url(BreadcrumbType.ExitToDelius), // TODO: redirecting to delius interstitial for now

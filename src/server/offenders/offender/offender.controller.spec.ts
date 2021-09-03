@@ -375,7 +375,7 @@ describe('OffenderController', () => {
         compliance: links.url(BreadcrumbType.Compliance),
         risk: links.url(BreadcrumbType.CaseRisk),
         toDelius: links.url(BreadcrumbType.ExitToDelius),
-        toOASys: '#TODO',
+        toOASys: links.url(BreadcrumbType.ExitToOASys),
         viewInactiveRegistrations: links.url(BreadcrumbType.RemovedRisksList),
         previousConvictions: links.url(BreadcrumbType.CasePreviousConvictions),
         startBreach: links.url(BreadcrumbType.ExitToDelius),

@@ -1,6 +1,6 @@
 import { OffenderPage, TABS } from '../../../pages/offender.page'
 import { CRN } from '../../../plugins/offender'
-import { DeliusExitPage } from '../../../pages/delius-exit.page'
+import { ExitPage, ExitPageName } from '../../../pages/exit.page'
 
 export class ViewOffenderFixture {
   crn = CRN
@@ -28,9 +28,9 @@ export class ViewOffenderFixture {
     return this
   }
 
-  shouldDisplayDeliusExitPage(assert?: (page: DeliusExitPage) => void) {
-    const page = new DeliusExitPage()
-    page.pageTitle.contains('Continue on National Delius')
+  shouldDisplayExitPage(service: ExitPageName, assert?: (page: ExitPage) => void) {
+    const page = new ExitPage()
+    page.pageTitle.contains(ExitPage.TITLES[service])
     assert && assert(page)
     return this
   }

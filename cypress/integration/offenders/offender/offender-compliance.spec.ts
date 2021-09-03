@@ -199,7 +199,7 @@ context('Offender compliance tab', () => {
             card.actions.contains('View order').click(),
           )
         })
-        .shouldDisplayDeliusExitPage()
+        .shouldDisplayExitPage('delius')
     })
 
     it('links to delius interstitial from view all orders link', () => {
@@ -207,7 +207,7 @@ context('Offender compliance tab', () => {
         .whenViewingOffender()
         .whenClickingSubNavTab('compliance')
         .shouldRenderOffenderTab('compliance', page => page.viewAllOrdersLink.click())
-        .shouldDisplayDeliusExitPage()
+        .shouldDisplayExitPage('delius')
     })
 
     it('links to delius interstitial from start breach link', () => {
@@ -215,7 +215,7 @@ context('Offender compliance tab', () => {
         .whenViewingOffender()
         .whenClickingSubNavTab('compliance')
         .shouldRenderOffenderTab('compliance', page => page.startBreachLink.click())
-        .shouldDisplayDeliusExitPage()
+        .shouldDisplayExitPage('delius')
     })
   })
 
@@ -263,7 +263,7 @@ context('Offender compliance tab', () => {
         page.currentStatus.contains('3 failures to comply within 12 months')
         page.currentStatus.find('a').contains('Start a breach').click()
       })
-      .shouldDisplayDeliusExitPage()
+      .shouldDisplayExitPage('delius')
   })
 
   it('displays multiple current breach warning', () => {
@@ -301,7 +301,7 @@ context('Offender compliance tab', () => {
         page.multipleBreachWarning.contains('There are multiple breach NSIs in progress on Delius')
         page.multipleBreachWarning.find('a').contains('Go to Delius').click()
       })
-      .shouldDisplayDeliusExitPage()
+      .shouldDisplayExitPage('delius')
   })
 
   it('displays in breach compliance page', () => {

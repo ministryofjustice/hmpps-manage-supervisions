@@ -96,7 +96,7 @@ context('Offender activity tab', () => {
         .shouldRenderOffenderTab('activity', page => {
           page.addToLogButton.contains('Add to log').click()
         })
-        .shouldDisplayDeliusExitPage()
+        .shouldDisplayExitPage('delius')
     })
 
     it('displays empty activity log', () => {
@@ -229,7 +229,7 @@ context('Offender activity tab', () => {
           entry.attendanceMissing.contains('Attendance not recorded')
           entry.attendanceMissing.contains('Record attendance').click()
         })
-        .shouldDisplayDeliusExitPage()
+        .shouldDisplayExitPage('delius')
     })
 
     it('displays appointment detail without outcome', () => {

@@ -219,12 +219,12 @@ export class OffenderPage extends PageBase {
         return cy.get('[data-qa="offender/risk/no-risk-assessment"]')
       },
 
-      roshCommunity(callback: (card: SummaryList) => void) {
-        SummaryList.selectFromCard('Risk of serious harm (ROSH) in the community', callback)
+      roshCommunity(callback: CardCallback) {
+        Card.selectByTitle('Risk of serious harm (ROSH) in the community', callback)
       },
 
-      roshThemselves(callback: (card: SummaryList) => void) {
-        SummaryList.selectFromCard('Risk of serious harm to themselves', callback)
+      roshThemselves(callback: CardCallback) {
+        Card.selectByTitle('Risk of serious harm to themselves', callback)
       },
 
       get currentNotes() {

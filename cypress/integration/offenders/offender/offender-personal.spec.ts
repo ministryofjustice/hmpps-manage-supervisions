@@ -228,6 +228,18 @@ context('Offender personal details tab', () => {
       })
   })
 
+  it('links to oasys interstitial from criminogenic needs', () => {
+    fixture
+      .whenViewingOffender()
+      .whenClickingSubNavTab('personal')
+      .shouldRenderOffenderTab('personal', page => {
+        page.personalDetails(card =>
+          card.value('Criminogenic needs').find('a').contains('View sentence plan in OASys').click(),
+        )
+      })
+      .shouldDisplayExitPage('oasys')
+  })
+
   it('displays all address details', () => {
     fixture
       .whenViewingOffender()
@@ -319,6 +331,6 @@ context('Offender personal details tab', () => {
         page.value('Notes').contains('Divorced')
       })
       .whenClickingChangeContactDetails('Pippa Wade – Wife')
-      .shouldDisplayDeliusExitPage()
+      .shouldDisplayExitPage('delius')
   })
 })
