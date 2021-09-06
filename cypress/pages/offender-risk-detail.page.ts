@@ -1,16 +1,17 @@
-import { SummaryList } from './components/summary-list'
+import { SummaryList, SummaryListCallback } from './components/summary-list'
 import { PageBase } from './page'
+import { Card, CardCallback } from './components/card'
 
 export class OffenderRiskDetailPage extends PageBase {
-  registrationDetails(callback: (card: SummaryList) => void) {
-    SummaryList.selectFromCard('About this flag', callback)
+  registrationDetails(callback: CardCallback) {
+    Card.selectByTitle('About this flag', callback)
   }
 
-  removalDetails(callback: (card: SummaryList) => void) {
+  removalDetails(callback: SummaryListCallback) {
     SummaryList.selectFromCard('Flag removed', callback)
   }
 
-  beforeItWasRemoved(callback: (card: SummaryList) => void) {
+  beforeItWasRemoved(callback: SummaryListCallback) {
     SummaryList.selectFromCard('Before it was removed', callback)
   }
 

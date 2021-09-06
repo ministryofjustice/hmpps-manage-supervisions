@@ -12,7 +12,11 @@ export class SummaryList {
   }
 
   value(title: string) {
-    return this.title(title).siblings('dd')
+    return this.title(title).siblings('dd.govuk-summary-list__value')
+  }
+
+  actions(title: string) {
+    return this.title(title).siblings('dd.govuk-summary-list__actions')
   }
 
   detailsList(title: string, name: string, callback: SummaryListCallback) {
