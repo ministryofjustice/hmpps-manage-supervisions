@@ -39,4 +39,9 @@ export class ViewOffenderFixture {
     this.page.pageTitle.contains(title)
     return this
   }
+
+  thenWhenGoingBack() {
+    cy.go('back')
+    return this
+  }
 }

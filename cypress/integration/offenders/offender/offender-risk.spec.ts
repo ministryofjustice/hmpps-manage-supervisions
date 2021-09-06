@@ -109,26 +109,51 @@ context('Offender risk tab', () => {
     })
 
     it('displays risk details', () => {
+      const flagName = 'Alert Notice'
       fixture
         .whenViewingOffender()
         .whenClickingSubNavTab('risk')
         .shouldRenderOffenderTab('risk', page => {
-          page.whenClickingRiskRegistration('Alert Notice')
+          page.whenClickingRiskRegistration(flagName)
         })
-        .shouldRenderRiskDetails('Alert Notice', page => {
-          page.registrationDetails(card => {
-            card.value('Notes').contains('Major alert about this offender')
-            card.value('Next review').contains('2 January 2022')
-            card.value('Most recent review').contains('23 August 2021 by Cindy Legford')
-            card.value('Date added').contains('14 May 2020 by Yolanda Gubbins')
-          })
-
+        .shouldRenderRiskDetails(flagName, page => {
           // These texts are long, so just check for a substring
           page.purposeText.contains('To distribute priority information/warning/alerts relating to an offender')
           page.frequencyText.contains('Every 6 months')
           page.terminationText.contains("Don't remove at termination")
           page.furtherInfoText.contains('Should only be used when a national alert notice has been issued')
+
+          page.registrationDetails(card => {
+            card.summaryList(list => {
+              list.value('Notes').contains('Major alert about this offender')
+              list.value('Next review').contains('2 January 2022')
+              list.value('Most recent review').contains('23 August 2021 by Cindy Legford')
+              list.value('Date added').contains('14 May 2020 by Yolanda Gubbins')
+            })
+
+            card.actions.contains('Remove this flag on Delius').click()
+          })
         })
+        .shouldDisplayExitPage('delius')
+        .thenWhenGoingBack()
+        .shouldRenderRiskDetails(flagName, page =>
+          page.registrationDetails(card => card.summaryList(list => list.actions('Notes').contains('Change').click())),
+        )
+        .shouldDisplayExitPage('delius')
+        .thenWhenGoingBack()
+        .shouldRenderRiskDetails(flagName, page =>
+          page.registrationDetails(card =>
+            card.summaryList(list => list.actions('Next review').contains('Review risk flag').click()),
+          ),
+        )
+        .shouldDisplayExitPage('delius')
+        .thenWhenGoingBack()
+        .shouldRenderRiskDetails(flagName, page =>
+          page.registrationDetails(card =>
+            card.summaryList(list => list.actions('Most recent review').contains('View review').click()),
+          ),
+        )
+        .shouldDisplayExitPage('delius')
     })
 
     it('displays removed risks list', () => {
@@ -148,6 +173,7 @@ context('Offender risk tab', () => {
     })
 
     it('displays removed risk details', () => {
+      const flagName = 'Organised Crime'
       fixture
         .whenViewingOffender()
         .whenClickingSubNavTab('risk')
@@ -155,25 +181,34 @@ context('Offender risk tab', () => {
           page.viewInactiveRegistrations.children().click()
         })
         .shouldRenderRemovedRiskFlagPage(page => {
-          page.whenClickingRiskRegistration('Organised Crime')
+          page.whenClickingRiskRegistration(flagName)
         })
-        .shouldRenderRiskDetails('Organised Crime', page => {
-          page.beforeItWasRemoved(card => {
-            card.value('Notes').contains('Deals in stolen weapons')
-            card.value('Most recent review').contains('23 August 2021 by Brian Peashoots')
-            card.value('Date added').contains('6 May 2020 by Wamberto Grundy')
-          })
-
+        .shouldRenderRiskDetails(flagName, page => {
           page.removalDetails(card => {
             card.value('Date removed').contains('19 July 2021 by Brian Peashoots')
             card.value('Why it was removed').contains('No longer a risk')
           })
+
           // These texts are long, so just check for a substring
           page.purposeText.contains('To denote those individuals typically involved in drug or people trafficking')
           page.frequencyText.contains('Every 6 months')
           page.terminationText.contains('Remove at termination. ALT register can be added')
           page.furtherInfoText.contains('There is no legal definition of organised crime in England and Wales.')
+
+          page.beforeItWasRemoved(list => {
+            list.value('Notes').contains('Deals in stolen weapons')
+            list.value('Most recent review').contains('23 August 2021 by Brian Peashoots')
+            list.value('Date added').contains('6 May 2020 by Wamberto Grundy')
+
+            list.actions('Notes').contains('Change').click()
+          })
         })
+        .shouldDisplayExitPage('delius')
+        .thenWhenGoingBack()
+        .shouldRenderRiskDetails(flagName, page =>
+          page.beforeItWasRemoved(list => list.actions('Most recent review').contains('View review').click()),
+        )
+        .shouldDisplayExitPage('delius')
     })
   })
 })
