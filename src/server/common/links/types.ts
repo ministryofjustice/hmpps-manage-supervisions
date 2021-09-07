@@ -8,6 +8,7 @@ export enum BreadcrumbType {
   PersonalContact,
   CaseSentence,
   CaseSentenceOffences,
+  CasePreviousConvictions,
   Compliance,
   CaseActivityLog,
   CaseSchedule,
@@ -18,6 +19,8 @@ export enum BreadcrumbType {
   RemovedRisksList,
   RiskDetails,
   RemovedRiskDetails,
+  ExitToDelius,
+  ExitToOASys,
 }
 
 export interface ResolveBreadcrumbOptions {

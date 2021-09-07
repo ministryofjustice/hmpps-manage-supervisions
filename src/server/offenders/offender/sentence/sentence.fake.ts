@@ -12,6 +12,7 @@ import {
   ConvictionRequirement,
   ConvictionRequirementDetail,
   ConvictionRequirementType,
+  PreviousConvictionSummary,
 } from './sentence.types'
 import { fake } from '../../../util/util.fake'
 import * as faker from 'faker'
@@ -136,6 +137,7 @@ export const fakeComplianceDetails = fake<ComplianceDetails>(() => ({
       complied: fakeComplianceQuantity(),
       acceptableAbsences: fakeComplianceQuantity(),
       failureToComply: fakeComplianceQuantity(),
+      withoutAnOutcome: fakeComplianceQuantity(),
     },
     status: {
       value: faker.random.arrayElement(Object.values(ComplianceStatus)),
@@ -150,4 +152,10 @@ export const fakeComplianceDetails = fake<ComplianceDetails>(() => ({
     dateFrom: DateTime.fromJSDate(faker.date.past()),
     totalBreaches: faker.datatype.number(),
   },
+}))
+
+export const fakePreviousConvictionSummary = fake<PreviousConvictionSummary>(() => ({
+  name: faker.company.bs(),
+  mainOffence: faker.company.bs(),
+  endDate: DateTime.fromJSDate(faker.date.past()),
 }))

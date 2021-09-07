@@ -35,9 +35,18 @@ import { fake } from '../util/util.fake'
 import { Paginated } from './types'
 import { WellKnownAddressTypes } from './well-known'
 
+function paddedNumber(min: number, max: number) {
+  const n = faker.datatype.number({ min, max }).toString()
+  return n.padStart(n.length - max.toString().length, '0')
+}
+
 export function fakeCrn() {
-  const n = faker.datatype.number({ min: 1, max: 999999 }).toString()
-  return faker.random.alpha().toUpperCase() + n.padStart(n.length - 6, '0')
+  return faker.random.alpha().toUpperCase() + paddedNumber(1, 999999)
+}
+
+export function fakePnc() {
+  const year = faker.datatype.number({ min: 2010, max: 2021 })
+  return `${year}/${paddedNumber(1, 999999999)}${faker.random.alpha().toUpperCase()}`
 }
 
 export function fakeIsoDate(type: 'past' | 'recent' | 'soon' | 'future' = 'past'): string {
@@ -128,7 +137,7 @@ export const fakeOffenderAlias = fake<OffenderAlias>(() => ({
 
 export const fakeOffenderDetail = fake<OffenderDetail>((options, partial = {}) => ({
   offenderId: faker.datatype.number(),
-  otherIds: { crn: fakeCrn(), pncNumber: 'some-prn' },
+  otherIds: { crn: fakeCrn(), pncNumber: fakePnc() },
   activeProbationManagedSentence: true,
   firstName: faker.name.firstName(),
   surname: faker.name.lastName(),
@@ -161,7 +170,7 @@ export const fakeOffenderDetail = fake<OffenderDetail>((options, partial = {}) =
 
 export const fakeOffenderDetailSummary = fake<OffenderDetailSummary>((options, partial) => ({
   offenderId: faker.datatype.number(),
-  otherIds: { crn: fakeCrn(), pncNumber: 'some-prn' },
+  otherIds: { crn: fakeCrn(), pncNumber: 'some-pnc' },
   activeProbationManagedSentence: true,
   firstName: faker.name.firstName(),
   surname: faker.name.lastName(),
@@ -314,6 +323,7 @@ export const fakeContactType = fake<ContactType>(() => ({
   description: faker.company.bs(),
   shortDescription: faker.company.bs(),
   appointment: faker.datatype.boolean(),
+  nationalStandard: false,
 }))
 
 export const fakeContactSummary = fake<ContactSummary, { when?: 'past' | 'recent' | 'soon' | 'future' }>(

@@ -1,6 +1,8 @@
 import { PageBase } from './page'
 import { SummaryList, SummaryListCallback } from './components/summary-list'
-import { Table, TableCallback } from './components/Table'
+import { Table, TableCallback } from './components/table'
+import { Card, CardCallback } from './components/card'
+import { DateTime } from 'luxon'
 
 export type TABS = 'overview' | 'schedule' | 'activity' | 'personal' | 'sentence' | 'compliance' | 'risk'
 export type SCHEDULE_TABLE = 'future' | 'recent'
@@ -157,8 +159,8 @@ export class OffenderPage extends PageBase {
 
   get compliance() {
     return {
-      get startBreachButton() {
-        return cy.get('[data-qa="offender/compliance/start-breach"]')
+      get startBreachLink() {
+        return cy.get('a[data-qa="offender/compliance/start-breach"]')
       },
 
       get noCurrentConvictionWarning() {
@@ -177,16 +179,20 @@ export class OffenderPage extends PageBase {
         return cy.get('[data-qa="offender/compliance/current-status"]')
       },
 
-      sentence(callback: (card: SummaryList) => void) {
-        return SummaryList.selectFromCard('Sentence', callback)
+      sentence(callback: CardCallback) {
+        Card.selectByTitle('Sentence', callback)
       },
 
-      breachDetails(callback: (card: SummaryList) => void) {
-        return SummaryList.selectFromCard('Breach details', callback)
+      breachDetails(callback: SummaryListCallback) {
+        SummaryList.selectFromCard('Breach details', callback)
       },
 
-      requirement(callback: (card: SummaryList) => void) {
-        return SummaryList.selectFromCard('Requirement', callback)
+      requirement(callback: SummaryListCallback) {
+        SummaryList.selectFromCard('Requirement', callback)
+      },
+
+      previousOrder(name: string, endDate: DateTime, callback: CardCallback) {
+        Card.selectByTitle(`24 month CJA Community Order (Ended ${endDate.toFormat('d MMMM yyyy')})`, callback)
       },
 
       get requirementName() {
@@ -195,6 +201,14 @@ export class OffenderPage extends PageBase {
 
       get sinceLastBreachMessage() {
         return cy.get('[data-qa="offender/compliance/compliance-since-last-breach"]')
+      },
+
+      get multipleBreachWarning() {
+        return cy.get('[data-qa="offender/compliance/multiple-breaches"]')
+      },
+
+      get viewAllOrdersLink() {
+        return cy.get('a[data-qa="offender/compliance/view-all-orders"]')
       },
     }
   }
@@ -205,12 +219,12 @@ export class OffenderPage extends PageBase {
         return cy.get('[data-qa="offender/risk/no-risk-assessment"]')
       },
 
-      roshCommunity(callback: (card: SummaryList) => void) {
-        SummaryList.selectFromCard('Risk of serious harm (ROSH) in the community', callback)
+      roshCommunity(callback: CardCallback) {
+        Card.selectByTitle('Risk of serious harm (ROSH) in the community', callback)
       },
 
-      roshThemselves(callback: (card: SummaryList) => void) {
-        SummaryList.selectFromCard('Risk of serious harm to themselves', callback)
+      roshThemselves(callback: CardCallback) {
+        Card.selectByTitle('Risk of serious harm to themselves', callback)
       },
 
       get currentNotes() {

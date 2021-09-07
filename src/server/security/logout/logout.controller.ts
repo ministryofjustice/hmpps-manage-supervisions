@@ -1,18 +1,20 @@
-import { Controller, Get, Req, Res } from '@nestjs/common'
-import { Request, Response } from 'express'
-import { ConfigService } from '@nestjs/config'
-import { Config, DependentApisConfig, ServerConfig } from '../../config'
+import { Controller, Get, Redirect, Req } from '@nestjs/common'
+import { Request } from 'express'
+import { LogoutService } from './logout.service'
+import { Public } from '../authentication'
+import { RedirectResponse } from '../../common'
 
 @Controller('logout')
+@Public() // allow unauthenticated users to logout, this helps complete the flow when oauth fails during callback
 export class LogoutController {
-  constructor(private readonly config: ConfigService<Config>) {}
+  constructor(private readonly service: LogoutService) {}
 
   @Get()
-  get(@Req() request: Request, @Res() response: Response) {
-    const { externalUrl, apiClientCredentials } = this.config.get<DependentApisConfig>('apis').hmppsAuth
-    const { domain } = this.config.get<ServerConfig>('server')
-    const authLogoutUrl = `${externalUrl}/logout?client_id=${apiClientCredentials.id}&redirect_uri=${domain}`
+  @Redirect()
+  async get(@Req() request: Request) {
     request.logOut()
-    request.session.destroy(() => response.redirect(authLogoutUrl))
+    await new Promise(resolve => request.session.destroy(resolve))
+    const url = this.service.getLogoutUrl()
+    return RedirectResponse.found(url)
   }
 }

@@ -14,7 +14,7 @@ import { DateTime } from 'luxon'
 import { AddressDetail, GetPersonalDetailsResult, PersonalContactDetail } from './personal.types'
 import * as faker from 'faker'
 import { fakePersonalCircumstanceDetail, fakePersonalContactDetail } from './personal.fake'
-import { fakeBreadcrumbUrl, MockLinksModule } from '../../../common/links/links.mock'
+import { MockLinksModule } from '../../../common/links/links.mock'
 import { BreadcrumbType } from '../../../common/links'
 import { CommunityApiService, WellKnownAddressTypes } from '../../../community-api'
 import { fakeCriminogenicNeed } from '../risk/risk.fake'
@@ -145,6 +145,7 @@ describe('PersonalService', () => {
       .resolves(fakeOkResponse([personalContact]))
 
     const observed = await subject.getPersonalContacts('some-crn')
+    const links = MockLinksModule.of({ crn: 'some-crn', id: 1000 })
     expect(observed).toEqual([
       {
         id: 1000,
@@ -152,10 +153,7 @@ describe('PersonalService', () => {
         description: 'Pippa Wade – Wife',
         displayName: 'Pippa Wade',
         relationship: 'Wife',
-        link: fakeBreadcrumbUrl(BreadcrumbType.PersonalContact, {
-          crn: 'some-crn',
-          id: 1000,
-        }),
+        link: links.url(BreadcrumbType.PersonalContact),
         notes: 'Some notes',
         phone: '0123456789',
         startDate: DateTime.fromObject({ year: 2019, month: 10, day: 5 }),

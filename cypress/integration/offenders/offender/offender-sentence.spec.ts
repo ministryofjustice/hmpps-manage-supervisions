@@ -1,7 +1,17 @@
 import { ViewOffenderFixture } from './view-offender.fixture'
+import { OffenderPreviousOrdersPage } from '../../../pages/offender-previous-orders.page'
 
-context('ViewOffenderSentence', () => {
-  const fixture = new ViewOffenderFixture()
+class Fixture extends ViewOffenderFixture {
+  shouldRenderPreviousOrdersPage(callback: (page: OffenderPreviousOrdersPage) => void) {
+    const page = new OffenderPreviousOrdersPage()
+    page.pageTitle.contains('Previous orders')
+    callback(page)
+    return this
+  }
+}
+
+context('Offender sentence tab', () => {
+  const fixture = new Fixture()
 
   describe('no active conviction', () => {
     before(() => {
@@ -97,10 +107,29 @@ context('ViewOffenderSentence', () => {
           })
 
           page.probationHistory(card => {
-            card.value('Previous orders').contains('Previous orders (1) Last ended on 1 November 2018')
+            card.value('Previous orders').contains('1 previous order Last ended on 1 November 2018')
             card.value('Previous breaches').contains('1 previous breach')
           })
         })
+    })
+
+    it('displays previous convictions details', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('sentence')
+        .shouldRenderOffenderTab('sentence', page => {
+          page.probationHistory(card => {
+            card.value('Previous orders').contains('1 previous order').click()
+          })
+        })
+        .shouldRenderPreviousOrdersPage(page => {
+          page.previousOrdersTable(table => {
+            table.cell(0, 1).contains('Ended on 1 December 2020')
+            table.cell(0, 0).contains('Assault on Police Officer (2 counts)')
+            table.cell(0, 0).contains('24 month Community Order').click()
+          })
+        })
+        .shouldDisplayExitPage('delius')
     })
   })
 })

@@ -23,9 +23,9 @@ import { RiskService } from './risk'
 import { fakeComplianceDetails, fakeConvictionDetails, fakeConvictionRequirement } from './sentence/sentence.fake'
 import { fakeActivityLogEntry } from './activity/activity.fake'
 import { fakeNextAppointmentSummary, fakeRecentAppointments } from './schedule/schedule.fake'
-import { fakeBreadcrumbs, fakeBreadcrumbUrl, MockLinksModule } from '../../common/links/links.mock'
+import { MockLinksModule } from '../../common/links/links.mock'
 import { PersonalService } from './personal'
-import { BreadcrumbType, ResolveBreadcrumbOptions } from '../../common/links'
+import { BreadcrumbType } from '../../common/links'
 import { fakeCriminogenicNeed, fakeRiskRegistrations, fakeRisks } from './risk/risk.fake'
 import { ConfigService } from '@nestjs/config'
 import { FakeConfigModule } from '../../config/config.fake'
@@ -137,10 +137,8 @@ describe('OffenderController', () => {
     const offender = havingOffenderSummary()
     const displayName = getDisplayName(offender)
 
-    const appointmentContactTypes = [fakeAppointmentType().contactType, fakeAppointmentType().contactType]
     const communicationContactTypes = [fakeAppointmentType().contactType, fakeAppointmentType().contactType]
 
-    contactTypesService.getAppointmentContactTypes.resolves(appointmentContactTypes)
     contactTypesService.getCommunicationContactTypes.resolves(communicationContactTypes)
 
     const contacts = fakePaginated([fakeActivityLogEntry(), fakeActivityLogEntry()])
@@ -150,7 +148,10 @@ describe('OffenderController', () => {
       .withArgs(
         'some-crn',
         displayName,
-        match({ contactTypes: [...appointmentContactTypes, ...communicationContactTypes], convictionId: 1234 }),
+        match({
+          include: ['APPOINTMENTS', 'TYPE_' + communicationContactTypes[0], 'TYPE_' + communicationContactTypes[1]],
+          convictionId: 1234,
+        }),
       )
       .resolves(contacts)
 
@@ -170,6 +171,10 @@ describe('OffenderController', () => {
         appointments: {
           description: 'Appointments',
           name: 'Appointments',
+        },
+        'without-an-outcome': {
+          description: 'Appointments without an outcome',
+          name: 'Without an outcome',
         },
         'complied-appointments': {
           description: 'Complied appointments',
@@ -222,6 +227,10 @@ describe('OffenderController', () => {
         appointments: {
           description: 'Appointments',
           name: 'Appointments',
+        },
+        'without-an-outcome': {
+          description: 'Appointments without an outcome',
+          name: 'Without an outcome',
         },
         'complied-appointments': {
           description: 'Complied appointments',
@@ -316,7 +325,7 @@ describe('OffenderController', () => {
 
   function havingOffender() {
     const offender = fakeOffenderDetail({
-      otherIds: { crn: 'some-crn', pncNumber: 'some-prn' },
+      otherIds: { crn: 'some-crn', pncNumber: 'some-pnc' },
       firstName: 'Liz',
       middleNames: ['Danger'],
       surname: 'Haggis',
@@ -328,7 +337,7 @@ describe('OffenderController', () => {
 
   function havingOffenderSummary() {
     const offender = fakeOffenderDetailSummary({
-      otherIds: { crn: 'some-crn', pncNumber: 'some-prn' },
+      otherIds: { crn: 'some-crn', pncNumber: 'some-pnc' },
       firstName: 'Liz',
       middleNames: ['Danger'],
       surname: 'Haggis',
@@ -343,31 +352,33 @@ describe('OffenderController', () => {
     breadcrumbType: BreadcrumbType,
     expected: Partial<OffenderViewModel>,
   ) {
-    const breadcrumbOptions: ResolveBreadcrumbOptions = { crn: 'some-crn', offenderName: 'Liz Danger Haggis' }
+    const links = MockLinksModule.of({ crn: 'some-crn', offenderName: 'Liz Danger Haggis' })
     expect(observed).toEqual({
       ids: {
         crn: 'SOME-CRN',
-        pnc: 'some-prn',
+        pnc: 'some-pnc',
       },
-      breadcrumbs: fakeBreadcrumbs(breadcrumbType, { crn: 'some-crn', offenderName: 'Liz Danger Haggis' }),
+      breadcrumbs: links.breadcrumbs(breadcrumbType),
       displayName: 'Liz Danger Haggis (Bob)',
       shortName: 'Liz Haggis',
       links: {
-        arrangeAppointment: fakeBreadcrumbUrl(BreadcrumbType.NewAppointment, breadcrumbOptions),
-        addActivity: '/offender/some-crn/activity/new',
-        addressBook: fakeBreadcrumbUrl(BreadcrumbType.PersonalAddresses, breadcrumbOptions),
-        circumstances: fakeBreadcrumbUrl(BreadcrumbType.PersonalCircumstances, breadcrumbOptions),
-        disabilities: fakeBreadcrumbUrl(BreadcrumbType.PersonalDisabilities, breadcrumbOptions),
-        overview: fakeBreadcrumbUrl(BreadcrumbType.Case, breadcrumbOptions),
-        personal: fakeBreadcrumbUrl(BreadcrumbType.PersonalDetails, breadcrumbOptions),
-        schedule: fakeBreadcrumbUrl(BreadcrumbType.CaseSchedule, breadcrumbOptions),
-        sentence: fakeBreadcrumbUrl(BreadcrumbType.CaseSentence, breadcrumbOptions),
-        activity: fakeBreadcrumbUrl(BreadcrumbType.CaseActivityLog, breadcrumbOptions),
-        compliance: fakeBreadcrumbUrl(BreadcrumbType.Compliance, breadcrumbOptions),
-        risk: fakeBreadcrumbUrl(BreadcrumbType.CaseRisk, breadcrumbOptions),
-        toDelius: '/offender/some-crn/to-delius',
-        toOASys: '#TODO',
-        viewInactiveRegistrations: fakeBreadcrumbUrl(BreadcrumbType.RemovedRisksList, breadcrumbOptions),
+        arrangeAppointment: links.url(BreadcrumbType.NewAppointment),
+        addActivity: links.url(BreadcrumbType.ExitToDelius),
+        addressBook: links.url(BreadcrumbType.PersonalAddresses),
+        circumstances: links.url(BreadcrumbType.PersonalCircumstances),
+        disabilities: links.url(BreadcrumbType.PersonalDisabilities),
+        overview: links.url(BreadcrumbType.Case),
+        personal: links.url(BreadcrumbType.PersonalDetails),
+        schedule: links.url(BreadcrumbType.CaseSchedule),
+        sentence: links.url(BreadcrumbType.CaseSentence),
+        activity: links.url(BreadcrumbType.CaseActivityLog),
+        compliance: links.url(BreadcrumbType.Compliance),
+        risk: links.url(BreadcrumbType.CaseRisk),
+        toDelius: links.url(BreadcrumbType.ExitToDelius),
+        toOASys: links.url(BreadcrumbType.ExitToOASys),
+        viewInactiveRegistrations: links.url(BreadcrumbType.RemovedRisksList),
+        previousConvictions: links.url(BreadcrumbType.CasePreviousConvictions),
+        startBreach: links.url(BreadcrumbType.ExitToDelius),
       },
       ...expected,
     } as OffenderViewModel)

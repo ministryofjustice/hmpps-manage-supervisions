@@ -3,9 +3,6 @@ import { ADDRESS, OffenderAddressesPage } from '../../../pages/offender-addresse
 import { OffenderDisabilitiesPage } from '../../../pages/offender-disabilities.page'
 import { OffenderPersonalCircumstancesPage } from '../../../pages/offender-personal-circumstances.page'
 import { OffenderPersonalContactPage } from '../../../pages/offender-personal-contact.page'
-import { DeliusExitPage } from '../../../pages/delius-exit.page'
-import { ACTIVE_CONVICTION_ID } from '../../../plugins/convictions'
-import { OFFENDER_ID } from '../../../plugins/offender'
 
 class Fixture extends ViewOffenderFixture {
   whenClickingViewAllAddresses(): this {
@@ -142,13 +139,6 @@ class Fixture extends ViewOffenderFixture {
     assert(page)
     return this
   }
-
-  shouldDisplayDeliusExitPage(name: string, assert: (page: DeliusExitPage) => void) {
-    const page = new DeliusExitPage()
-    page.pageTitle.contains(name)
-    assert(page)
-    return this
-  }
 }
 
 interface ExpectedAddress {
@@ -185,7 +175,7 @@ interface ExpectedCircumstance {
   lastUpdated: string
 }
 
-context('ViewOffenderPersonalDetails', () => {
+context('Offender personal details tab', () => {
   const fixture = new Fixture()
 
   before(() => cy.seed())
@@ -236,6 +226,18 @@ context('ViewOffenderPersonalDetails', () => {
           card.value('Sexual orientation').contains('Bisexual')
         })
       })
+  })
+
+  it('links to oasys interstitial from criminogenic needs', () => {
+    fixture
+      .whenViewingOffender()
+      .whenClickingSubNavTab('personal')
+      .shouldRenderOffenderTab('personal', page => {
+        page.personalDetails(card =>
+          card.value('Criminogenic needs').find('a').contains('View sentence plan in OASys').click(),
+        )
+      })
+      .shouldDisplayExitPage('oasys')
   })
 
   it('displays all address details', () => {
@@ -329,13 +331,6 @@ context('ViewOffenderPersonalDetails', () => {
         page.value('Notes').contains('Divorced')
       })
       .whenClickingChangeContactDetails('Pippa Wade – Wife')
-      .shouldDisplayDeliusExitPage('Use National Delius to make these changes', page => {
-        page.deliusExitButton
-          .should('have.attr', 'href')
-          .and(
-            'include',
-            `http://localhost:8082/NDelius-war/delius/JSP/deeplink.jsp?component=ContactList&offenderId=${OFFENDER_ID}&eventId=${ACTIVE_CONVICTION_ID}`,
-          )
-      })
+      .shouldDisplayExitPage('delius')
   })
 })

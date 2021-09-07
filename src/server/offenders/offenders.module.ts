@@ -10,20 +10,20 @@ import { ActivityService } from './offender/activity'
 import { RiskService } from './offender/risk'
 import { PersonalController } from './offender/personal/personal.controller'
 import { PersonalService } from './offender/personal'
-import { DeliusExitController } from './offender/delius-exit/delius-exit.controller'
 import { ActivityController } from './offender/activity/activity.controller'
 import { RequirementService } from './offender/sentence/requirement.service'
 import { ContactTypesService } from '../community-api'
 import { ComplianceService } from './offender/sentence/compliance.service'
 import { RiskController } from './offender/risk/risk.controller'
 import { SentenceController } from './offender/sentence/sentence.controller'
+import { ExitController } from './offender/exit/exit.controller'
 
 @Module({
   imports: [CommonModule, CommunityApiModule, AssessRisksAndNeedsApiModule],
   controllers: [
     OffenderController,
     PersonalController,
-    DeliusExitController,
+    ExitController,
     ActivityController,
     RiskController,
     SentenceController,

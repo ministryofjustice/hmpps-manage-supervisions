@@ -47,6 +47,11 @@ function getOutcomeFlags(outcome?: AppointmentOutcome): ActivityLogEntryTag[] {
 
 function getAppointmentFlags(contact: ContactSummary | AppointmentDetail): ActivityLogEntryTag[] {
   const tags: ActivityLogEntryTag[] = []
+
+  if (contact.type.nationalStandard) {
+    tags.push({ name: 'national standard (ns)', colour: GovUkUiTagColour.Grey })
+  }
+
   if (contact.sensitive) {
     tags.push({ name: 'sensitive', colour: GovUkUiTagColour.Grey })
   }
@@ -127,7 +132,7 @@ export class ActivityService {
     })
     const meta = await this.contacts.getTypeMeta(contact)
     const base = ActivityService.getActivityLogEntryBase(contact)
-    return ActivityService.getCommunicationActivityLogEntry(crn, contact, meta, base, offenderName)
+    return this.getCommunicationActivityLogEntry(crn, contact, meta, base, offenderName)
   }
 
   private async getActivityLogEntry(
@@ -146,7 +151,7 @@ export class ActivityService {
 
     if (meta.type === ContactTypeCategory.Communication) {
       // is a communication type (either known, or in the CAPI Communication category)
-      return ActivityService.getCommunicationActivityLogEntry(crn, contact, meta, base, offenderName)
+      return this.getCommunicationActivityLogEntry(crn, contact, meta, base, offenderName)
     }
 
     // is unknown contact
@@ -187,6 +192,7 @@ export class ActivityService {
     const start = DateTime.fromISO(startIso)
     const outcomeFlags = [...getAppointmentFlags(contact), ...getOutcomeFlags(contact.outcome)]
     const missingOutcome = outcomeFlags.length === 0 && start <= DateTime.now()
+    const links = this.links.of({ id, crn })
     return {
       id,
       start,
@@ -199,9 +205,9 @@ export class ActivityService {
       end: endIso && DateTime.fromISO(endIso),
       tags: [...outcomeFlags],
       links: {
-        view: this.links.getUrl(BreadcrumbType.Appointment, { id, crn }),
-        addNotes: `/offender/${crn}/appointment/${id}/add-notes`,
-        recordMissingAttendance: missingOutcome ? `/offender/${crn}/appointment/${id}/record-outcome` : null,
+        view: links.url(BreadcrumbType.Appointment),
+        addNotes: links.url(BreadcrumbType.ExitToDelius),
+        recordMissingAttendance: missingOutcome ? links.url(BreadcrumbType.ExitToDelius) : null,
       },
       rarActivity: contact.rarActivity || false,
       requirement,
@@ -214,13 +220,15 @@ export class ActivityService {
         : null,
     }
   }
-  private static getCommunicationActivityLogEntry(
+
+  private getCommunicationActivityLogEntry(
     crn: string,
     contact: ContactSummary,
     meta: GetMetaResult,
     base: Pick<ActivityLogEntryBase, 'id' | 'start' | 'notes' | 'sensitive'>,
     offenderName: string,
   ): CommunicationActivityLogEntry {
+    const links = this.links.of({ id: contact.contactId, crn })
     return {
       ...base,
       type: ContactTypeCategory.Communication,
@@ -231,8 +239,8 @@ export class ActivityService {
       typeName: meta.value.name,
       tags: [],
       links: {
-        view: `/offender/${crn}/activity/communication/${contact.contactId}`,
-        addNotes: `/offender/${crn}/activity/communication/${contact.contactId}/add-notes`,
+        view: links.url(BreadcrumbType.OtherCommunication),
+        addNotes: links.url(BreadcrumbType.ExitToDelius),
       },
       lastUpdatedDateTime: DateTime.fromISO(contact.lastUpdatedDateTime),
       lastUpdatedBy: `${contact.lastUpdatedByUser.forenames} ${contact.lastUpdatedByUser.surname}`,
@@ -285,6 +293,8 @@ export class ActivityService {
     switch (complianceFilter) {
       case ActivityComplianceFilter.Appointments:
         return defaultAppointmentFilters
+      case ActivityComplianceFilter.WithoutOutcome:
+        return { ...defaultAppointmentFilters, outcome: false }
       case ActivityComplianceFilter.CompliedAppointments:
         return { ...defaultAppointmentFilters, complied: true, attended: true }
       case ActivityComplianceFilter.AcceptableAbsenceAppointments:

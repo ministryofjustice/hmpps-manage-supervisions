@@ -1,14 +1,19 @@
 import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
-import { sortBy, minBy } from 'lodash'
+import { minBy, sortBy } from 'lodash'
 import { CommunityApiService, ContactMappingService } from '../../../community-api'
 import { AppointmentListViewModel, NextAppointmentSummary, RecentAppointments } from './schedule.types'
+import { BreadcrumbType, LinksService } from '../../../common/links'
 
 export const MAX_RECENT_APPOINTMENTS = 20
 
 @Injectable()
 export class ScheduleService {
-  constructor(private readonly community: CommunityApiService, private readonly contacts: ContactMappingService) {}
+  constructor(
+    private readonly community: CommunityApiService,
+    private readonly contacts: ContactMappingService,
+    private readonly links: LinksService,
+  ) {}
 
   async getRecentAppointments(crn: string): Promise<RecentAppointments> {
     const { data } = await this.community.appointment.getOffenderAppointmentsByCrnUsingGET({ crn })
@@ -25,7 +30,7 @@ export class ScheduleService {
         start: DateTime.fromISO(apt.appointmentStart),
         end: apt.appointmentEnd && DateTime.fromISO(apt.appointmentEnd),
         name: (await this.contacts.getTypeMeta(apt)).name,
-        link: `/offender/${crn}/appointment/${apt.appointmentId}`,
+        link: this.links.getUrl(BreadcrumbType.Appointment, { crn, id: apt.appointmentId }),
       }
       collection.push(view)
       return agg

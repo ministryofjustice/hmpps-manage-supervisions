@@ -1,0 +1,25 @@
+{% from "govuk/components/summary-list/macro.njk"     import govukSummaryList %}
+
+{% macro offenderExitSummary(offender) %}
+    {{ govukSummaryList({
+        attributes: { 'data-qa': 'offender/exit/offender-details' },
+        rows: [
+            {
+                key: { text: 'Name' },
+                value: { text: offender.displayName }
+            },
+            {
+                key: { text: 'Date of birth' },
+                value: { text: offender.dateOfBirth | dateFormat('dd/MM/yyyy') }
+            } if offender.dateOfBirth,
+            {
+                key: { text: 'CRN' },
+                value: { text: offender.ids.crn }
+            },
+            {
+                key: { text: 'PNC' },
+                value: { text: offender.ids.pnc }
+            } if offender.ids.pnc
+        ]
+    }) }}
+{% endmacro %}

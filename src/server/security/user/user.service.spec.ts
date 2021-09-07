@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing'
-import { UserRole, UserService } from './user.service'
+import { UserService } from './user.service'
 import { MockRestModule } from '../../common/rest/rest.mock'
 import { fakeUser, fakeUserProfile } from './user.fake'
 import { classToPlain } from 'class-transformer'
@@ -34,13 +34,6 @@ describe('UserService', () => {
     client.onGet('/api/user/me').reply(200, classToPlain(profile))
     const observed = await subject.getUser(user)
     expect(observed).toEqual(profile)
-  })
-
-  it('should get user roles', async () => {
-    const roles: UserRole[] = [{ roleCode: 'ROLE_1' }, { roleCode: 'ROLE_2' }]
-    client.onGet('/api/user/me/roles').reply(200, roles)
-    const observed = await subject.getUserRoles(user)
-    expect(observed).toEqual(['ROLE_1', 'ROLE_2'])
   })
 
   it('should get staff details', async () => {

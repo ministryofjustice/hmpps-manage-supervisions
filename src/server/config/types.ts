@@ -1,22 +1,5 @@
 import { URL } from 'url'
 
-export enum DebugFlags {
-  /**
-   * The staff code will be set for non-delius users.
-   */
-  SetStaffCode = 'set-staff',
-
-  /**
-   * The team code will be set for non-delius users.
-   */
-  SetTeamCode = 'set-team',
-
-  /**
-   * The provider code will be set for non-delius users.
-   */
-  SetProviderCode = 'set-provider',
-}
-
 export enum FeatureFlags {
   EnableAppointmentBooking = 'enable-appointment-booking',
 }
@@ -46,7 +29,6 @@ export interface ServerConfig {
   https: boolean
   domain: URL
   staticResourceCacheDuration: number
-  debug: Partial<Record<DebugFlags, string>>
   features: Partial<Record<FeatureFlags, boolean>>
   logLevel: LogLevel
 }
@@ -75,7 +57,7 @@ export interface ClientCredentials {
 }
 
 export interface AuthApiConfig extends ApiConfig {
-  externalUrl: string
+  externalUrl: URL
   apiClientCredentials: ClientCredentials
   systemClientCredentials: ClientCredentials
   issuerPath: string
@@ -89,6 +71,10 @@ export interface DependentApisConfig {
 }
 
 export interface DeliusConfig {
+  baseUrl: URL
+}
+
+export interface OASysConfig {
   baseUrl: URL
 }
 
@@ -195,5 +181,6 @@ export interface Config {
   contacts: WellKnownContactTypeConfig
   requirements: WellKnownRequirementTypeConfig
   delius: DeliusConfig
+  oasys: OASysConfig
   risk: RiskConfig
 }

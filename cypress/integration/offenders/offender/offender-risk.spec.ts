@@ -18,7 +18,7 @@ class Fixture extends ViewOffenderFixture {
   }
 }
 
-context('ViewOffenderPersonalDetails', () => {
+context('Offender risk tab', () => {
   const fixture = new Fixture()
 
   describe('empty risk page', () => {
@@ -30,9 +30,11 @@ context('ViewOffenderPersonalDetails', () => {
         .whenClickingSubNavTab('risk')
         .shouldDisplayCommonHeader()
         .shouldRenderOffenderTab('risk', page => {
-          page.noRisksWarning.contains('There is no OASys risk assessment for Liz Haggis')
           page.noActiveRegistrations.contains('There are no current risk flags. Add risk flags in Delius.')
+          page.noRisksWarning.contains('There is no OASys risk assessment for Liz Haggis')
+          page.noRisksWarning.find('a').contains('View OASys').click()
         })
+        .shouldDisplayExitPage('oasys')
     })
   })
 
@@ -45,31 +47,35 @@ context('ViewOffenderPersonalDetails', () => {
         .whenClickingSubNavTab('risk')
         .shouldDisplayCommonHeader()
         .shouldRenderOffenderTab('risk', page => {
-          page.roshCommunity(card => {
-            card.value('Overall').contains('Very high risk of serious harm')
-            card.value('Very high risk').contains('Children Staff')
-            card.value('High risk').contains('Public')
-            card.title('Medium risk').should('not.exist')
-            card.value('Low risk').contains('Known Adult')
-            card.value('Who is at risk').contains('Someone at risk')
-            card.value('Nature of risk').contains('Some nature of risk')
-            card.value('When is risk greatest').contains('Some risk imminence')
-          })
+          page.roshCommunity(card =>
+            card.summaryList(list => {
+              list.value('Overall').contains('Very high risk of serious harm')
+              list.value('Very high risk').contains('Children Staff')
+              list.value('High risk').contains('Public')
+              list.title('Medium risk').should('not.exist')
+              list.value('Low risk').contains('Known Adult')
+              list.value('Who is at risk').contains('Someone at risk')
+              list.value('Nature of risk').contains('Some nature of risk')
+              list.value('When is risk greatest').contains('Some risk imminence')
+            }),
+          )
 
-          page.roshThemselves(card => {
-            card.value('Risk of suicide or self harm').contains('There are concerns about self-harm and suicide')
-            card.details(
-              'Coping in custody or a hostel',
-              'There were concerns about coping in a hostel and in custody',
-              () => {
-                page.currentNotes.contains('No detail given')
-                page.previousNotes.contains(
-                  'Soluta tempore nemo et velit est perspiciatis. Neque error aut est nemo quasi. Et labore impedit omnis numquam id et eaque facere itaque. Ipsam et atque eos tempora possimus.',
-                )
-              },
-            )
-            card.value('Vulnerability').contains('No concerns')
-          })
+          page.roshThemselves(card =>
+            card.summaryList(list => {
+              list.value('Risk of suicide or self harm').contains('There are concerns about self-harm and suicide')
+              list.details(
+                'Coping in custody or a hostel',
+                'There were concerns about coping in a hostel and in custody',
+                () => {
+                  page.currentNotes.contains('No detail given')
+                  page.previousNotes.contains(
+                    'Soluta tempore nemo et velit est perspiciatis. Neque error aut est nemo quasi. Et labore impedit omnis numquam id et eaque facere itaque. Ipsam et atque eos tempora possimus.',
+                  )
+                },
+              )
+              list.value('Vulnerability').contains('No concerns')
+            }),
+          )
 
           page.riskFlags(table => {
             table.cell(0, 0).contains('Alert Notice')
@@ -81,36 +87,75 @@ context('ViewOffenderPersonalDetails', () => {
           page.noActiveRegistrations.should('not.exist')
         })
     })
-  })
 
-  describe('risk detail page', () => {
-    before(() => cy.seed())
-    it('displays risk details', () => {
+    it('links to oasys interstitial from risk to community card', () => {
       fixture
         .whenViewingOffender()
         .whenClickingSubNavTab('risk')
         .shouldRenderOffenderTab('risk', page => {
-          page.whenClickingRiskRegistration('Alert Notice')
+          page.roshCommunity(card => card.actions.contains('View OASys').click())
         })
-        .shouldRenderRiskDetails('Alert Notice', page => {
-          page.registrationDetails(card => {
-            card.value('Notes').contains('Major alert about this offender')
-            card.value('Next review').contains('2 January 2022')
-            card.value('Most recent review').contains('23 August 2021 by Cindy Legford')
-            card.value('Date added').contains('14 May 2020 by Yolanda Gubbins')
-          })
+        .shouldDisplayExitPage('oasys')
+    })
 
+    it('links to oasys interstitial from risk to themselves card', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('risk')
+        .shouldRenderOffenderTab('risk', page => {
+          page.roshThemselves(card => card.actions.contains('View OASys').click())
+        })
+        .shouldDisplayExitPage('oasys')
+    })
+
+    it('displays risk details', () => {
+      const flagName = 'Alert Notice'
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('risk')
+        .shouldRenderOffenderTab('risk', page => {
+          page.whenClickingRiskRegistration(flagName)
+        })
+        .shouldRenderRiskDetails(flagName, page => {
           // These texts are long, so just check for a substring
           page.purposeText.contains('To distribute priority information/warning/alerts relating to an offender')
           page.frequencyText.contains('Every 6 months')
           page.terminationText.contains("Don't remove at termination")
           page.furtherInfoText.contains('Should only be used when a national alert notice has been issued')
-        })
-    })
-  })
 
-  describe('removed risk list page', () => {
-    before(() => cy.seed())
+          page.registrationDetails(card => {
+            card.summaryList(list => {
+              list.value('Notes').contains('Major alert about this offender')
+              list.value('Next review').contains('2 January 2022')
+              list.value('Most recent review').contains('23 August 2021 by Cindy Legford')
+              list.value('Date added').contains('14 May 2020 by Yolanda Gubbins')
+            })
+
+            card.actions.contains('Remove this flag on Delius').click()
+          })
+        })
+        .shouldDisplayExitPage('delius')
+        .thenWhenGoingBack()
+        .shouldRenderRiskDetails(flagName, page =>
+          page.registrationDetails(card => card.summaryList(list => list.actions('Notes').contains('Change').click())),
+        )
+        .shouldDisplayExitPage('delius')
+        .thenWhenGoingBack()
+        .shouldRenderRiskDetails(flagName, page =>
+          page.registrationDetails(card =>
+            card.summaryList(list => list.actions('Next review').contains('Review risk flag').click()),
+          ),
+        )
+        .shouldDisplayExitPage('delius')
+        .thenWhenGoingBack()
+        .shouldRenderRiskDetails(flagName, page =>
+          page.registrationDetails(card =>
+            card.summaryList(list => list.actions('Most recent review').contains('View review').click()),
+          ),
+        )
+        .shouldDisplayExitPage('delius')
+    })
+
     it('displays removed risks list', () => {
       fixture
         .whenViewingOffender()
@@ -126,11 +171,9 @@ context('ViewOffenderPersonalDetails', () => {
           })
         })
     })
-  })
 
-  describe('removed risk detail page', () => {
-    before(() => cy.seed())
     it('displays removed risk details', () => {
+      const flagName = 'Organised Crime'
       fixture
         .whenViewingOffender()
         .whenClickingSubNavTab('risk')
@@ -138,25 +181,34 @@ context('ViewOffenderPersonalDetails', () => {
           page.viewInactiveRegistrations.children().click()
         })
         .shouldRenderRemovedRiskFlagPage(page => {
-          page.whenClickingRiskRegistration('Organised Crime')
+          page.whenClickingRiskRegistration(flagName)
         })
-        .shouldRenderRiskDetails('Organised Crime', page => {
-          page.beforeItWasRemoved(card => {
-            card.value('Notes').contains('Deals in stolen weapons')
-            card.value('Most recent review').contains('23 August 2021 by Brian Peashoots')
-            card.value('Date added').contains('6 May 2020 by Wamberto Grundy')
-          })
-
+        .shouldRenderRiskDetails(flagName, page => {
           page.removalDetails(card => {
             card.value('Date removed').contains('19 July 2021 by Brian Peashoots')
             card.value('Why it was removed').contains('No longer a risk')
           })
+
           // These texts are long, so just check for a substring
           page.purposeText.contains('To denote those individuals typically involved in drug or people trafficking')
           page.frequencyText.contains('Every 6 months')
           page.terminationText.contains('Remove at termination. ALT register can be added')
           page.furtherInfoText.contains('There is no legal definition of organised crime in England and Wales.')
+
+          page.beforeItWasRemoved(list => {
+            list.value('Notes').contains('Deals in stolen weapons')
+            list.value('Most recent review').contains('23 August 2021 by Brian Peashoots')
+            list.value('Date added').contains('6 May 2020 by Wamberto Grundy')
+
+            list.actions('Notes').contains('Change').click()
+          })
         })
+        .shouldDisplayExitPage('delius')
+        .thenWhenGoingBack()
+        .shouldRenderRiskDetails(flagName, page =>
+          page.beforeItWasRemoved(list => list.actions('Most recent review').contains('View review').click()),
+        )
+        .shouldDisplayExitPage('delius')
     })
   })
 })

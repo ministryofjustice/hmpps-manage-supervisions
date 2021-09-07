@@ -57,10 +57,23 @@ export interface AggregateConvictionRequirement extends ConvictionRequirementBas
 
 export type ConvictionRequirement = UnitConvictionRequirement | AggregateConvictionRequirement
 
+export interface PreviousConvictionSummary {
+  name: string
+  mainOffence: string
+  endDate: DateTime
+}
+
+export interface PreviousConvictionsViewModel extends ViewModel {
+  displayName: string
+  previousConvictions: PreviousConvictionSummary[]
+  links: {
+    toDelius: string
+  }
+}
+
 export interface PreviousConvictions {
   count: number
   lastEnded: DateTime
-  link: string
 }
 
 export interface AdditionalSentence {
@@ -137,6 +150,7 @@ export interface CurrentComplianceConvictionSummary extends ComplianceConviction
     complied: ComplianceQuantity
     acceptableAbsences: ComplianceQuantity
     failureToComply: ComplianceQuantity
+    withoutAnOutcome: ComplianceQuantity
   }
   status: {
     value: ComplianceStatus

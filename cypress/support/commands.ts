@@ -54,8 +54,8 @@ function arrangeAppointment(crn: string = CRN) {
 }
 Cypress.Commands.add('arrangeAppointment', arrangeAppointment)
 
-function viewOffender(crn: string = CRN) {
-  cy.visit(`/offender/${crn}`)
+function viewOffender({ crn = CRN, path = '' }: { crn?: string; path?: string } = {}) {
+  cy.visit(`/offender/${crn}${path}`)
   hmppsAuth.login()
 }
 Cypress.Commands.add('viewOffender', viewOffender)

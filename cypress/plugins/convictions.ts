@@ -74,6 +74,7 @@ export const PREVIOUS_CONVICTIONS: DeepPartial<Conviction>[] = [
       originalLength: 24,
       originalLengthUnits: 'Months',
     },
+    offences: [{ mainOffence: true, offenceCount: 2, detail: { subCategoryDescription: 'Assault on Police Officer' } }],
   },
 ]
 

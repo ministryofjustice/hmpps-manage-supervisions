@@ -13,7 +13,7 @@ Cras congue vitae odio eu rutrum. Donec in dictum massa. Vivamus at placerat neq
 export const CONTACTS: DeepPartial<ContactSummary>[] = [
   {
     contactId: 1,
-    type: { code: 'CHVS', description: 'Home Visit to Case (NS)', appointment: true },
+    type: { code: 'CHVS', description: 'Home Visit to Case (NS)', appointment: true, nationalStandard: true },
     contactStart: '2020-09-04T12:00:00+01:00',
     contactEnd: '2020-09-04T13:00:00+01:00',
     notes: 'Some home visit appointment\n\nWith a new line!',
@@ -181,8 +181,22 @@ export function contacts(crn: string, partials: DeepPartial<ContactSummary>[] = 
     // ftc appointments only
     all({ appointmentsOnly: true, complied: false }, c => c.type.appointment && c.outcome?.complied === false)
 
+    // appointments without an outcome only
+    all(
+      { appointmentsOnly: true, outcome: false },
+      c => c.type.appointment && (c.outcome === null || c.outcome === undefined),
+    )
+
     // appointments only
     all({ appointmentsOnly: true }, c => c.type.appointment)
+
+    // include filter - appointments and currently defined comms categories
+    const commsTypeList = ['CT3A', 'CT3B', 'CTOA', 'CTOB', 'CM3A', 'CMOA', 'CMOB', 'NOT_WELL_KNOWN_COMMUNICATION']
+
+    all(
+      { include: ['APPOINTMENTS', ...commsTypeList.map(t => `TYPE_${t}`)] },
+      c => c.type.appointment || commsTypeList.indexOf(c.type.code) > 0,
+    )
 
     // all contacts with no filter
     all()

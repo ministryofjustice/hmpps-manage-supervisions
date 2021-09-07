@@ -16,6 +16,12 @@ class Fixture extends ViewOffenderFixture {
     })
   }
 
+  whenClickingWithoutAnOutcomeFilter() {
+    return this.shouldRenderOffenderTab('activity', page => {
+      page.filterLink('without-an-outcome').click()
+    })
+  }
+
   shouldRenderActivity({
     id,
     date,
@@ -23,7 +29,6 @@ class Fixture extends ViewOffenderFixture {
     name,
     notes,
     tags = [],
-    havingAttendanceMissing = false,
     havingLongNotes = false,
   }: {
     id: number
@@ -32,7 +37,6 @@ class Fixture extends ViewOffenderFixture {
     name: string
     notes: string
     tags?: { colour: string; text: string }[]
-    havingAttendanceMissing?: boolean
     havingLongNotes?: boolean
   }) {
     return this.shouldRenderOffenderTab('activity', page => {
@@ -51,13 +55,6 @@ class Fixture extends ViewOffenderFixture {
       } else {
         entry.notes.contains(notes)
       }
-
-      if (havingAttendanceMissing) {
-        entry.attendanceMissing.contains('Attendance not recorded')
-        entry.attendanceMissing
-          .get(`a[href="/offender/${this.crn}/appointment/${id}/record-outcome"]`)
-          .contains('Record attendance')
-      }
     })
   }
 
@@ -67,11 +64,16 @@ class Fixture extends ViewOffenderFixture {
     })
   }
 
+  shouldNotRenderActivities(ids: number[]) {
+    return ids.map(id => this.shouldNotRenderActivity({ id: id }))
+  }
+
   shouldRenderAppointmentPage(title: string, assert: (page: OffenderActivityAppointmentPage) => void) {
     const page = new OffenderActivityAppointmentPage()
     page.pageTitle.contains(title)
     assert(page)
   }
+
   shouldRenderCommunicationPage(title: string, assert: (page: OffenderActivityCommunicationPage) => void) {
     const page = new OffenderActivityCommunicationPage()
     page.pageTitle.contains(title)
@@ -79,7 +81,7 @@ class Fixture extends ViewOffenderFixture {
   }
 }
 
-context('ViewOffenderActivity', () => {
+context('Offender activity tab', () => {
   const fixture = new Fixture()
 
   describe('empty activity log', () => {
@@ -93,8 +95,8 @@ context('ViewOffenderActivity', () => {
         .whenClickingSubNavTab('activity')
         .shouldRenderOffenderTab('activity', page => {
           page.addToLogButton.contains('Add to log').click()
-          cy.url().should('include', `/offender/${fixture.crn}/activity/new`)
         })
+        .shouldDisplayExitPage('delius')
     })
 
     it('displays empty activity log', () => {
@@ -126,7 +128,10 @@ context('ViewOffenderActivity', () => {
           time: '12pm to 1pm',
           name: 'Home visit with Catherine Ellis',
           notes: 'Some home visit appointment With a new line!',
-          tags: [{ colour: 'green', text: 'complied' }],
+          tags: [
+            { colour: 'grey', text: 'national standard (ns)' },
+            { colour: 'green', text: 'complied' },
+          ],
         })
 
         .shouldRenderActivity({
@@ -171,7 +176,6 @@ context('ViewOffenderActivity', () => {
           time: '11am to 1pm',
           name: 'Not a well known appointment with Robert Ohagan',
           notes: 'Some unknown appointment',
-          havingAttendanceMissing: true,
         })
 
         .shouldRenderActivity({
@@ -214,6 +218,18 @@ context('ViewOffenderActivity', () => {
           name: 'CPS pack requested',
           notes: 'CPS request',
         })
+    })
+
+    it('displays attendance missing', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('activity')
+        .shouldRenderOffenderTab('activity', page => {
+          const entry = page.entry(5)
+          entry.attendanceMissing.contains('Attendance not recorded')
+          entry.attendanceMissing.contains('Record attendance').click()
+        })
+        .shouldDisplayExitPage('delius')
     })
 
     it('displays appointment detail without outcome', () => {
@@ -310,6 +326,22 @@ context('ViewOffenderActivity', () => {
         .shouldNotRenderActivity({
           id: 1, // a complied attended activity not returned by Wiremocked CAPI when the FTC filters are applied
         })
+    })
+
+    it('displays activity log filtered by appointments without an outcome', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('activity')
+        .whenClickingWithoutAnOutcomeFilter()
+        .shouldRenderActivity({
+          id: 5,
+          date: 'Wednesday 2 September 2020',
+          time: '11am to 1pm',
+          name: 'Not a well known appointment with Robert Ohagan',
+          notes: 'Some unknown appointment',
+          havingLongNotes: false,
+        })
+        .shouldNotRenderActivities([1, 2, 3, 4])
     })
   })
 })

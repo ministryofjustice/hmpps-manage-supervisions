@@ -36,6 +36,7 @@ import { needs } from './needs'
 export const reset = seedModule({ title: 'Reset' }, context => {
   context.client.setReset()
   context.client.community.stubPing()
+  context.client.community.stubPing(true)
   context.client.assessRisksAndNeeds.stubPing()
   context.client.hmppsAuth.stubPing()
 })

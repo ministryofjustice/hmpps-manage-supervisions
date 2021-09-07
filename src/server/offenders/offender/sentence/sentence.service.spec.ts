@@ -13,6 +13,7 @@ import {
   ConvictionRequirement,
   ConvictionRequirementType,
   CurrentComplianceConvictionSummary,
+  PreviousConvictionSummary,
 } from './sentence.types'
 import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
 import { RequirementService } from './requirement.service'
@@ -22,6 +23,8 @@ import { ComplianceService } from './compliance.service'
 import { ActivityComplianceFilter, ActivityService } from '../activity'
 import { BreachService } from '../../../community-api/breach'
 import { fakeBreachSummary } from '../../../community-api/breach/breach.fake'
+import { MockLinksModule } from '../../../common/links/links.mock'
+import { BreadcrumbType } from '../../../common/links'
 
 describe('SentenceService', () => {
   let subject: SentenceService
@@ -44,7 +47,10 @@ describe('SentenceService', () => {
         { provide: ActivityService, useValue: activityService },
         { provide: BreachService, useValue: breachService },
       ],
-      imports: [MockCommunityApiModule.register()],
+      imports: [
+        MockCommunityApiModule.register(),
+        MockLinksModule.register({ [BreadcrumbType.CaseActivityLog]: '/case-activity-log' }),
+      ],
     }).compile()
 
     subject = module.get(SentenceService)
@@ -138,7 +144,6 @@ describe('SentenceService', () => {
       previousConvictions: {
         count: 2,
         lastEnded: DateTime.fromObject({ year: 2019, month: 1, day: 2 }),
-        link: '/offenders/some-crn/previous-convictions',
       },
       previousBreaches: {
         count: 2,
@@ -207,10 +212,11 @@ describe('SentenceService', () => {
       const previousSummary = havingComplianceSummary(previousConviction)
       havingAppointmentCounts(
         {
-          [ActivityComplianceFilter.Appointments]: 6,
+          [ActivityComplianceFilter.Appointments]: 7,
           [ActivityComplianceFilter.CompliedAppointments]: 1,
           [ActivityComplianceFilter.FailedToComplyAppointments]: 2,
           [ActivityComplianceFilter.AcceptableAbsenceAppointments]: 3,
+          [ActivityComplianceFilter.WithoutOutcome]: 1,
         },
         currentSummary.lastRecentBreachEnd,
       )
@@ -225,22 +231,27 @@ describe('SentenceService', () => {
             acceptableAbsences: {
               name: '3 acceptable absences',
               value: 3,
-              link: '/offender/some-crn/activity/acceptable-absence-appointments',
+              link: '/case-activity-log/acceptable-absence-appointments',
             },
             complied: {
               name: '1 complied',
               value: 1,
-              link: '/offender/some-crn/activity/complied-appointments',
+              link: '/case-activity-log/complied-appointments',
             },
             failureToComply: {
               name: '2 unacceptable absences',
               value: 2,
-              link: '/offender/some-crn/activity/failed-to-comply-appointments',
+              link: '/case-activity-log/failed-to-comply-appointments',
+            },
+            withoutAnOutcome: {
+              name: '1 without a recorded outcome',
+              value: 1,
+              link: '/case-activity-log/without-an-outcome',
             },
             total: {
-              name: '6 appointments',
-              value: 6,
-              link: '/offender/some-crn/activity/appointments',
+              name: '7 national standard appointments',
+              value: 7,
+              link: '/case-activity-log/appointments',
             },
           },
           period: 'since last breach',
@@ -356,6 +367,42 @@ describe('SentenceService', () => {
           breachSuggested: false,
         },
       } as Pick<CurrentComplianceConvictionSummary, 'period' | 'status'>)
+    })
+  })
+
+  describe('getting previous convictions', () => {
+    it('handles no previous convictions', async () => {
+      havingConvictions({ convictionId: 100, active: true })
+      const observed = await subject.getPreviousConvictions('some-crn')
+      expect(observed).toEqual([])
+    })
+
+    it('gets previous convictions', async () => {
+      havingConvictions({
+        convictionId: 100,
+        active: false,
+        sentence: {
+          sentenceType: { description: 'ORA Community Order' },
+          originalLength: 12,
+          originalLengthUnits: 'Months',
+          terminationDate: '2021-08-25',
+        },
+        offences: [
+          {
+            mainOffence: true,
+            offenceCount: 2,
+            detail: { subCategoryDescription: 'Some offence' },
+          },
+        ],
+      })
+      const observed = await subject.getPreviousConvictions('some-crn')
+      expect(observed).toEqual([
+        {
+          endDate: DateTime.fromObject({ year: 2021, month: 8, day: 25 }),
+          mainOffence: 'Some offence (2 counts)',
+          name: '12 month Community Order',
+        },
+      ] as PreviousConvictionSummary[])
     })
   })
 })
