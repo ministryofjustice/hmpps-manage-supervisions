@@ -21,7 +21,10 @@ export class SentenceController {
     title: 'Offences',
   })
   async getOffences(@Param('crn') crn: string): Promise<OffencesViewModel> {
-    const offender = await this.offender.getOffenderDetail(crn)
+    const [offender, offence] = await Promise.all([
+      this.offender.getOffenderDetail(crn),
+      this.sentence.getOffenceDetails(crn),
+    ])
     const displayName = getDisplayName(offender)
     return {
       displayName,
@@ -29,6 +32,7 @@ export class SentenceController {
         crn,
         offenderName: displayName,
       }),
+      offence,
     }
   }
 

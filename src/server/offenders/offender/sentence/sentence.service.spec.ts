@@ -119,6 +119,7 @@ describe('SentenceService', () => {
             offenceDate: '2021-02-01',
             offenceCount: 8,
             detail: {
+              code: '80700',
               description: 'Some main offence',
               mainCategoryDescription: 'Some offence category',
               subCategoryDescription: 'Some offence sub-category',
@@ -127,7 +128,7 @@ describe('SentenceService', () => {
           fakeOffence({
             mainOffence: false,
             offenceCount: 9,
-            detail: { subCategoryDescription: 'Some additional offence' },
+            detail: { code: '80701', subCategoryDescription: 'Some additional offence' },
           }),
         ],
       },
@@ -153,7 +154,8 @@ describe('SentenceService', () => {
         date: DateTime.fromObject({ year: 2021, month: 2, day: 1 }),
         description: 'Some offence sub-category (8 counts)',
         category: 'Some offence category',
-        additionalOffences: ['Some additional offence (9 counts)'],
+        code: '80700',
+        additionalOffences: [{ code: '80701', name: 'Some additional offence (9 counts)' }],
       },
       sentence: {
         description: '12 month Community Order',
@@ -174,6 +176,50 @@ describe('SentenceService', () => {
       },
       requirements,
     } as ConvictionDetails)
+  })
+
+  describe('offence detail', () => {
+    it('handles no current conviction', async () => {
+      havingConvictions()
+      const observed = await subject.getOffenceDetails('some-crn')
+      expect(observed).toBeNull()
+    })
+
+    it('gets offence details', async () => {
+      havingConvictions({
+        active: true,
+        offences: [
+          fakeOffence({
+            mainOffence: true,
+            offenceId: '1',
+            offenceDate: '2021-02-01',
+            offenceCount: 8,
+            detail: {
+              code: '80700',
+              description: 'Some main offence',
+              mainCategoryDescription: 'Some offence category',
+              subCategoryDescription: 'Some offence sub-category',
+            },
+          }),
+          fakeOffence({
+            mainOffence: false,
+            offenceCount: 9,
+            detail: { code: '80701', subCategoryDescription: 'Some additional offence' },
+          }),
+        ],
+      })
+
+      const observed = await subject.getOffenceDetails('some-crn')
+
+      expect(observed).toEqual({
+        id: '1',
+        date: DateTime.fromObject({ year: 2021, month: 2, day: 1 }),
+        description: 'Some offence sub-category (8 counts)',
+        category: 'Some offence category',
+        code: '80700',
+        additionalOffences: [{ code: '80701', name: 'Some additional offence (9 counts)' }],
+      })
+    })
   })
 
   describe('compliance summary', () => {

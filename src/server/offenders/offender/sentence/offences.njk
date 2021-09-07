@@ -4,45 +4,43 @@
 
 {% block content %}
     <h1 class="govuk-heading-xl">Offences</h1>
+
+    {% if offence %}
         {% call appSummaryCard({ titleText: 'Main offence', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
-        {{ govukSummaryList({
-            rows: [
-                {
-                    key: { text: "Offence" },
-                    value: { text: mainOffence}
-                },
-                {
-                    key: { text: "Category" },
-                    value: { text: 'hello' }
-                },
-                {
-                    key: { text: "Offence date" },
-                    value: { text: 'hello' }
-                },
-                {
-                    key: { text: "Notes" },
-                    value: { text: 'hello' }
-                }
-            ]
+            {{ govukSummaryList({
+                rows: [
+                    {
+                        key: { text: "Offence" },
+                        value: { text: offence.description }
+                    },
+                    {
+                        key: { text: "Category" },
+                        value: { text: offence.category }
+                    },
+                    {
+                        key: { text: "Offence date" },
+                        value: { text: offence.date | shortDate }
+                    }
+                ]
+            }) }}
+        {%- endcall %}
+
+        {% if offence.additionalOffences.length %}
+            <h2 class="govuk-heading-l govuk-!-margin-top-8">Additional offences</h2>
+            {% for additionalOffence in offence.additionalOffences %}
+                {% call appSummaryCard({
+                    titleText: 'Additional offence ' + additionalOffence.code | brackets,
+                    classes: 'app-summary-card--large-title govuk-!-margin-bottom-6'
+                }) -%}
+                {%- endcall %}
+            {% endfor %}
+        {% endif %}
+
+    {% else %}
+        {{ govukWarningText({
+            attributes: { 'data-qa': 'offender/offence/no-offences' },
+            text: "Offence details are unavailable.",
+            iconFallbackText: "Warning"
         }) }}
-    {%- endcall %}
-    {#<h2 class="govuk-heading-l govuk-!-margin-top-8">Additional offences</h2>
-    {% call appSummaryCard({ titleText: 'Additional offence NUMBER OF OFFENCE', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
-        {{ govukSummaryList({
-            rows: [
-                {
-                    key: { text: "Offence" },
-                    value: { text: conviction.offence.description }
-                },
-                {
-                    key: { text: "Category" },
-                    value: { text: conviction.offence.category }
-                },
-                {
-                    key: { text: "Offence date" },
-                    value: { text: conviction.offence.date | shortDate }
-                }
-            ]
-        }) }}
-    {%- endcall %}#}
+    {% endif %}
 {% endblock %}

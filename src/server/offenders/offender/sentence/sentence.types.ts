@@ -3,12 +3,18 @@ import { PotentiallyExpectedDateTime } from '../../../util'
 import { BreachSummary } from '../../../community-api/breach'
 import { ViewModel } from '../../../common'
 
+export interface ConvictionAdditionalOffence {
+  name: string
+  code: string
+}
+
 export interface ConvictionOffence {
   id: string
   description: string
   category: string
   date: DateTime
-  additionalOffences: string[]
+  code: string
+  additionalOffences: ConvictionAdditionalOffence[]
 }
 
 export interface ConvictionSentenceDetail {
@@ -171,4 +177,5 @@ export interface ComplianceDetails {
 
 export interface OffencesViewModel extends ViewModel {
   displayName: string
+  offence: ConvictionOffence
 }

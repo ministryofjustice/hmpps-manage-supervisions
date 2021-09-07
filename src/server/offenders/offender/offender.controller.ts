@@ -237,6 +237,7 @@ export class OffenderController {
         viewInactiveRegistrations: links.url(BreadcrumbType.RemovedRisksList),
         previousConvictions: links.url(BreadcrumbType.CasePreviousConvictions),
         startBreach: links.url(BreadcrumbType.ExitToDelius), // TODO: redirecting to delius interstitial for now
+        additionalOffences: links.url(BreadcrumbType.CaseSentenceOffences),
       },
     }
   }

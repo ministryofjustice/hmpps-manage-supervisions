@@ -28,9 +28,9 @@
                 {
                     key: { text: "Additional offences" },
                     value: {
-                        html: joinList(conviction.offence.additionalOffences, {
+                        html: joinList(conviction.offence.additionalOffences | map('name'), {
                                 ordered: true,
-                                link: links.toDelius,
+                                link: links.additionalOffences,
                                 linkText: 'View additional offence details'
                             }) if conviction.offence.additionalOffences.length else 'No additional offences'
                     }

@@ -28,6 +28,7 @@ export interface OffenderLinks extends OffenderPageLinks {
   viewInactiveRegistrations: string
   previousConvictions: string
   startBreach: string
+  additionalOffences: string
 }
 
 export interface OffenderViewModelBase<Page extends OffenderPage> extends ViewModel {

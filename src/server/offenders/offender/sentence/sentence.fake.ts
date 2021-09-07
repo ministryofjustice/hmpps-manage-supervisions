@@ -7,6 +7,7 @@ import {
   ComplianceQuantity,
   ComplianceStatus,
   ComplianceStatusAlertLevel,
+  ConvictionAdditionalOffence,
   ConvictionDetails,
   ConvictionOffence,
   ConvictionRequirement,
@@ -19,13 +20,20 @@ import * as faker from 'faker'
 import { DateTime } from 'luxon'
 import { fakeBreachSummary } from '../../../community-api/breach/breach.fake'
 
-export const fakeConvictionOffence = fake<ConvictionOffence>(() => ({
+export const fakeConvictionAdditionalOffence = fake<ConvictionAdditionalOffence>(() => ({
+  name: faker.company.bs(),
+  code: faker.datatype.number().toString(),
+}))
+
+export const fakeConvictionOffence = fake<ConvictionOffence>((options, partial = {}) => ({
   id: faker.datatype.uuid(),
   date: DateTime.fromJSDate(faker.date.past()),
   description: faker.company.bs(),
   category: faker.company.bs(),
-  ogrsCategory: faker.company.bs(),
-  additionalOffences: [faker.company.bs()],
+  code: faker.datatype.number().toString(),
+  additionalOffences: partial.additionalOffences?.map(x => fakeConvictionAdditionalOffence(x)) || [
+    fakeConvictionAdditionalOffence(),
+  ],
 }))
 
 export const fakeAdditionalSentence = fake<AdditionalSentence>(() => ({
