@@ -1,21 +1,30 @@
 import { ViewOffenderFixture } from './view-offender.fixture'
 import { SCHEDULE_TABLE } from '../../../pages/offender.page'
+import { DateTime } from 'luxon'
 
 class Fixture extends ViewOffenderFixture {
-  shouldRenderAppointmentTableFurniture(table: SCHEDULE_TABLE, caption: string): this {
+  shouldRenderAppointmentTableFurniture(table: SCHEDULE_TABLE): this {
     return this.shouldRenderOffenderTab('schedule', page => {
       page.emptyHeader(table).should('not.exist')
-      page.tableCaption(table).contains(caption)
       page.tableHeader(table, 'date').contains('Date')
       page.tableHeader(table, 'time').contains('Time')
       page.tableHeader(table, 'appointment').contains('Appointment')
     })
   }
 
-  shouldRenderAppointmentTableRow(table: SCHEDULE_TABLE, row: number, date: string, time: string, name: string): this {
+  shouldRenderAppointmentTableRow(
+    table: SCHEDULE_TABLE,
+    row: number,
+    start: DateTime,
+    end: DateTime,
+    name: string,
+  ): this {
+    const isToday = new Date() === start.toJSDate()
     return this.shouldRenderOffenderTab('schedule', page => {
-      page.tableData(table, row, 'date').contains(date)
-      page.tableData(table, row, 'time').contains(time)
+      page
+        .tableData(table, row, 'date')
+        .contains(isToday ? 'Today '.concat(this.longDate(start)) : this.longDate(start))
+      page.tableData(table, row, 'time').contains(`${this.time(start)} to ${this.time(end)}`)
       page.tableData(table, row, 'appointment').contains(name)
     })
   }
@@ -26,11 +35,20 @@ class Fixture extends ViewOffenderFixture {
       page.emptyMessage(table).contains(message)
     })
   }
+  longDate(date: DateTime) {
+    const format = date.year === DateTime.now().year ? 'cccc d MMMM' : 'cccc d MMMM yyyy'
+    return date.toFormat(format)
+  }
+  time(date: DateTime) {
+    const hourMinuteFormat = date.minute === 0 ? 'ha' : 'h:mma'
+    return date.toFormat(hourMinuteFormat).toLowerCase()
+  }
 }
 
 context('Offender schedule tab', () => {
   const fixture = new Fixture()
-
+  const start = DateTime.now().startOf('day')
+  const end = DateTime.now().startOf('day').plus({ hour: 1 })
   describe('populated schedule', () => {
     before(() => cy.seed())
 
@@ -40,22 +58,14 @@ context('Offender schedule tab', () => {
         .whenClickingSubNavTab('schedule')
         .shouldDisplayCommonHeader()
 
-        .shouldRenderAppointmentTableFurniture('future', 'Future appointments')
+        .shouldRenderAppointmentTableFurniture('future')
+        .shouldRenderAppointmentTableRow('future', 0, start, end, 'Some recent appointment')
         .shouldRenderAppointmentTableRow(
           'future',
-          0,
-          'Thursday 2 January 2200',
-          '1:30pm to 2pm',
+          1,
+          DateTime.fromISO('2200-01-02T13:30:00'),
+          DateTime.fromISO('2200-01-02T14:00:00'),
           'Home visit with Catherine Ellis',
-        )
-
-        .shouldRenderAppointmentTableFurniture('recent', 'Recent appointments')
-        .shouldRenderAppointmentTableRow(
-          'recent',
-          0,
-          'Monday 3 February 2020',
-          '10am to 11am',
-          'Some recent appointment',
         )
     })
 
@@ -64,7 +74,7 @@ context('Offender schedule tab', () => {
         .whenViewingOffender()
         .whenClickingSubNavTab('schedule')
         .shouldRenderOffenderTab('schedule', page => {
-          page.tableData('future', 0, 'appointment').contains('Home visit with Catherine Ellis').click()
+          page.tableData('future', 1, 'appointment').contains('Home visit with Catherine Ellis').click()
         })
         .shouldDisplayPageWithTitle('Home visit with Catherine Ellis')
     })
@@ -81,7 +91,6 @@ context('Offender schedule tab', () => {
         .whenClickingSubNavTab('schedule')
         .shouldDisplayCommonHeader()
         .shouldDisplayEmptyWarning('future', 'Future appointments', 'There are no future appointments scheduled.')
-        .shouldDisplayEmptyWarning('recent', 'Recent appointments', 'There have been no recent appointments.')
     })
 
     it('can arrange an appointment from offender schedule', () => {
