@@ -1,11 +1,11 @@
 import { Test } from '@nestjs/testing'
-import { MAX_RECENT_APPOINTMENTS, ScheduleService } from './schedule.service'
+import { ScheduleService } from './schedule.service'
 import { AppointmentDetail } from '../../../community-api/client'
 import { CommunityApiService, ContactMappingService } from '../../../community-api'
 import { orderBy, sortBy } from 'lodash'
 import { fakeAppointmentDetail } from '../../../community-api/community-api.fake'
 import { fakeOkResponse } from '../../../common/rest/rest.fake'
-import { AppointmentListViewModel, NextAppointmentSummary, RecentAppointments } from './schedule.types'
+import { AppointmentListViewModel, NextAppointmentSummary } from './schedule.types'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../../community-api/community-api.mock'
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { DateTime } from 'luxon'
@@ -32,12 +32,14 @@ describe('ScheduleService', () => {
 
   it('gets offender appointments', async () => {
     const futureAppointments = 5
+    const soonAppointments = 5
+    const pastAppointments = 5
     const partial: DeepPartial<AppointmentDetail> = { appointmentId: 12345 }
     const appointments = orderBy(
       [
         ...[...Array(futureAppointments)].map(() => fakeAppointmentDetail(partial, { when: 'future' })),
-        ...[...Array(MAX_RECENT_APPOINTMENTS)].map(() => fakeAppointmentDetail(partial, { when: 'recent' })),
-        fakeAppointmentDetail(partial, { when: 'past' }),
+        ...[...Array(soonAppointments)].map(() => fakeAppointmentDetail(partial, { when: 'soon' })),
+        ...[...Array(pastAppointments)].map(() => fakeAppointmentDetail(partial, { when: 'past' })),
       ],
       'appointmentStart',
       'desc',
@@ -58,15 +60,17 @@ describe('ScheduleService', () => {
           end: DateTime.fromISO(x.appointmentEnd),
           name: 'some-appointment-type',
           link: MockLinksModule.of({ crn: 'some-crn', id: 12345 }).url(BreadcrumbType.Appointment),
+          today: DateTime.now().toISODate() === DateTime.fromISO(x.appointmentStart).toISODate(),
         } as AppointmentListViewModel),
     )
     const stub = community.appointment.getOffenderAppointmentsByCrnUsingGET.resolves(fakeOkResponse(appointments))
-    const observed = await subject.getRecentAppointments('some-crn')
-    expect(observed).toEqual({
-      future: sortBy(expected.slice(0, futureAppointments), [x => x.start.toJSDate(), x => x.end.toJSDate()]),
-      recent: expected.slice(futureAppointments, MAX_RECENT_APPOINTMENTS + futureAppointments),
-      past: expected.slice(MAX_RECENT_APPOINTMENTS + futureAppointments),
-    } as RecentAppointments)
+    const observed = await subject.getScheduledAppointments('some-crn')
+    expect(observed).toEqual(
+      sortBy(expected.slice(0, futureAppointments + soonAppointments), [
+        x => x.start.toJSDate(),
+        x => x.end.toJSDate(),
+      ]),
+    )
     expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn' })
   })
 

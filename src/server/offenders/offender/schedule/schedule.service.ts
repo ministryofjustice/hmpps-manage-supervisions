@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { minBy, sortBy } from 'lodash'
 import { CommunityApiService, ContactMappingService } from '../../../community-api'
-import { AppointmentListViewModel, NextAppointmentSummary, RecentAppointments } from './schedule.types'
+import { AppointmentListViewModel, NextAppointmentSummary } from './schedule.types'
 import { BreadcrumbType, LinksService } from '../../../common/links'
+import { AppointmentDetail } from '../../../community-api/client'
 
 export const MAX_RECENT_APPOINTMENTS = 20
 
@@ -15,28 +16,16 @@ export class ScheduleService {
     private readonly links: LinksService,
   ) {}
 
-  async getRecentAppointments(crn: string): Promise<RecentAppointments> {
+  async getScheduledAppointments(crn: string): Promise<AppointmentListViewModel[]> {
     const { data } = await this.community.appointment.getOffenderAppointmentsByCrnUsingGET({ crn })
     const now = DateTime.now()
-    const result: RecentAppointments = await data.reduce(async (aggregate, apt) => {
-      const agg = await aggregate
-      const collection =
-        DateTime.fromISO(apt.appointmentStart) > now
-          ? agg.future
-          : agg.recent.length < MAX_RECENT_APPOINTMENTS
-          ? agg.recent
-          : agg.past
-      const view: AppointmentListViewModel = {
-        start: DateTime.fromISO(apt.appointmentStart),
-        end: apt.appointmentEnd && DateTime.fromISO(apt.appointmentEnd),
-        name: (await this.contacts.getTypeMeta(apt)).name,
-        link: this.links.getUrl(BreadcrumbType.Appointment, { crn, id: apt.appointmentId }),
-      }
-      collection.push(view)
-      return agg
-    }, Promise.resolve({ future: [], recent: [], past: [] }))
 
-    result.future = sortBy(result.future, [x => x.start.toJSDate(), x => x.end?.toJSDate()])
+    let result = await Promise.all(
+      data
+        .filter(apt => DateTime.fromISO(apt.appointmentStart).toISODate() >= now.toISODate())
+        .map(apt => this.getAppointmentEntry(apt, crn)),
+    )
+    result = sortBy(result, [x => x.start.toJSDate(), x => x.end?.toJSDate()])
     return result
   }
 
@@ -56,5 +45,14 @@ export class ScheduleService {
     )
     const meta = await this.contacts.getTypeMeta(nextAppointment)
     return { date: nextAppointment.date, name: meta.name }
+  }
+  private async getAppointmentEntry(apt: AppointmentDetail, crn: string): Promise<AppointmentListViewModel> {
+    return {
+      start: DateTime.fromISO(apt.appointmentStart),
+      end: apt.appointmentEnd && DateTime.fromISO(apt.appointmentEnd),
+      name: (await this.contacts.getTypeMeta(apt)).name,
+      link: this.links.getUrl(BreadcrumbType.Appointment, { crn, id: apt.appointmentId }),
+      today: DateTime.now().toISODate() === DateTime.fromISO(apt.appointmentStart).toISODate(),
+    }
   }
 }

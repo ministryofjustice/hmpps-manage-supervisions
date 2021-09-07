@@ -41,6 +41,28 @@ export const APPOINTMENTS: DeepPartial<AppointmentDetail>[] = [
       isActive: true,
     },
   },
+  {
+    appointmentId: 3,
+    appointmentStart: DateTime.now().startOf('day').toISO(),
+    appointmentEnd: DateTime.now().startOf('day').plus({ hour: 1 }).toISO(),
+    notes: 'Some unknown appointment type',
+    outcome: {
+      attended: true,
+      complied: true,
+      description: 'Some outcome description',
+    },
+    sensitive: true,
+    type: {
+      contactType: 'P123',
+      description: 'Some recent appointment',
+    },
+    staff: { forenames: 'Unallocated', surname: 'Staff', unallocated: true },
+    rarActivity: true,
+    requirement: {
+      isRar: true,
+      isActive: true,
+    },
+  },
 ]
 
 export function appointments(

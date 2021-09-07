@@ -22,7 +22,7 @@ import { ActivityComplianceFilter, ActivityService, GetContactsOptions } from '.
 import { RiskService } from './risk'
 import { fakeComplianceDetails, fakeConvictionDetails, fakeConvictionRequirement } from './sentence/sentence.fake'
 import { fakeActivityLogEntry } from './activity/activity.fake'
-import { fakeNextAppointmentSummary, fakeRecentAppointments } from './schedule/schedule.fake'
+import { fakeAppointmentListViewModel, fakeNextAppointmentSummary } from './schedule/schedule.fake'
 import { MockLinksModule } from '../../common/links/links.mock'
 import { PersonalService } from './personal'
 import { BreadcrumbType } from '../../common/links'
@@ -122,8 +122,8 @@ describe('OffenderController', () => {
   it('gets schedule', async () => {
     havingOffenderSummary()
 
-    const appointments = fakeRecentAppointments()
-    scheduleService.getRecentAppointments.withArgs('some-crn').resolves(appointments)
+    const appointments = [fakeAppointmentListViewModel()]
+    scheduleService.getScheduledAppointments.withArgs('some-crn').resolves(appointments)
 
     const observed = await subject.getSchedule('some-crn')
     shouldReturnViewModel(observed, BreadcrumbType.CaseSchedule, {
