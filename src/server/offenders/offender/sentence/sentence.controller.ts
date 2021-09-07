@@ -1,5 +1,5 @@
 import { Controller, Param, Get, Render } from '@nestjs/common'
-import { OffencesViewModel } from './sentence.types'
+import { OffencesViewModel, ConvictionDetails } from './sentence.types'
 import { Breadcrumb, BreadcrumbType, LinksService } from '../../../common/links'
 import { OffenderService } from '../offender.service'
 import { getDisplayName } from '../../../util/person'

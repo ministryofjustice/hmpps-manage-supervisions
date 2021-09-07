@@ -1,6 +1,48 @@
 {% extends "partials/layout.njk" %}
 {% set pageTitle = 'Offences – ' + displayName %}
+{% from 'components/summary-card.njk' import appSummaryCard %}
 
 {% block content %}
     <h1 class="govuk-heading-xl">Offences</h1>
+        {% call appSummaryCard({ titleText: 'Main offence', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: { text: "Offence" },
+                    value: { text: mainOffence}
+                },
+                {
+                    key: { text: "Category" },
+                    value: { text: 'hello' }
+                },
+                {
+                    key: { text: "Offence date" },
+                    value: { text: 'hello' }
+                },
+                {
+                    key: { text: "Notes" },
+                    value: { text: 'hello' }
+                }
+            ]
+        }) }}
+    {%- endcall %}
+    {#<h2 class="govuk-heading-l govuk-!-margin-top-8">Additional offences</h2>
+    {% call appSummaryCard({ titleText: 'Additional offence NUMBER OF OFFENCE', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: { text: "Offence" },
+                    value: { text: conviction.offence.description }
+                },
+                {
+                    key: { text: "Category" },
+                    value: { text: conviction.offence.category }
+                },
+                {
+                    key: { text: "Offence date" },
+                    value: { text: conviction.offence.date | shortDate }
+                }
+            ]
+        }) }}
+    {%- endcall %}#}
 {% endblock %}
