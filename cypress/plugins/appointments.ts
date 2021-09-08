@@ -41,28 +41,6 @@ export const APPOINTMENTS: DeepPartial<AppointmentDetail>[] = [
       isActive: true,
     },
   },
-  {
-    appointmentId: 3,
-    appointmentStart: DateTime.now().startOf('day').toISO(),
-    appointmentEnd: DateTime.now().startOf('day').plus({ hour: 1 }).toISO(),
-    notes: 'Some unknown appointment type',
-    outcome: {
-      attended: true,
-      complied: true,
-      description: 'Some outcome description',
-    },
-    sensitive: true,
-    type: {
-      contactType: 'P123',
-      description: 'Some recent appointment',
-    },
-    staff: { forenames: 'Unallocated', surname: 'Staff', unallocated: true },
-    rarActivity: true,
-    requirement: {
-      isRar: true,
-      isActive: true,
-    },
-  },
 ]
 
 export function appointments(
@@ -79,7 +57,7 @@ export function appointments(
       .get(`/secure/offenders/crn/${crn}/appointments`)
       .queryMatches({ from: '.+' })
       .priority(1)
-      .returns(appointments.filter(x => DateTime.fromISO(x.appointmentStart) >= DateTime.now()))
+      .returns(appointments.filter(x => DateTime.fromISO(x.appointmentStart).toISODate() >= DateTime.now().toISODate()))
 
     context.client.community.post(`/secure/offenders/crn/${crn}/sentence/${convictionId}/appointments`).returns({
       appointmentId: 1,

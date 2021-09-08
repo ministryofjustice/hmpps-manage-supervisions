@@ -4,9 +4,6 @@ import { minBy, sortBy } from 'lodash'
 import { CommunityApiService, ContactMappingService } from '../../../community-api'
 import { AppointmentListViewModel, NextAppointmentSummary } from './schedule.types'
 import { BreadcrumbType, LinksService } from '../../../common/links'
-import { AppointmentDetail } from '../../../community-api/client'
-
-export const MAX_RECENT_APPOINTMENTS = 20
 
 @Injectable()
 export class ScheduleService {
@@ -17,14 +14,23 @@ export class ScheduleService {
   ) {}
 
   async getScheduledAppointments(crn: string): Promise<AppointmentListViewModel[]> {
-    const { data } = await this.community.appointment.getOffenderAppointmentsByCrnUsingGET({ crn })
     const now = DateTime.now()
-
-    let result = await Promise.all(
-      data
-        .filter(apt => DateTime.fromISO(apt.appointmentStart).toISODate() >= now.toISODate())
-        .map(apt => this.getAppointmentEntry(apt, crn)),
-    )
+    const { data } = await this.community.appointment.getOffenderAppointmentsByCrnUsingGET({
+      crn,
+      from: now.toISODate(),
+    })
+    let result: AppointmentListViewModel[] = await data.reduce(async (aggregate, apt) => {
+      const agg = await aggregate
+      const view: AppointmentListViewModel = {
+        start: DateTime.fromISO(apt.appointmentStart),
+        end: apt.appointmentEnd && DateTime.fromISO(apt.appointmentEnd),
+        name: (await this.contacts.getTypeMeta(apt)).name,
+        link: this.links.getUrl(BreadcrumbType.Appointment, { crn, id: apt.appointmentId }),
+        today: now.toISODate() === DateTime.fromISO(apt.appointmentStart).toISODate(),
+      }
+      agg.push(view)
+      return agg
+    }, Promise.resolve([]))
     result = sortBy(result, [x => x.start.toJSDate(), x => x.end?.toJSDate()])
     return result
   }
@@ -45,14 +51,5 @@ export class ScheduleService {
     )
     const meta = await this.contacts.getTypeMeta(nextAppointment)
     return { date: nextAppointment.date, name: meta.name }
-  }
-  private async getAppointmentEntry(apt: AppointmentDetail, crn: string): Promise<AppointmentListViewModel> {
-    return {
-      start: DateTime.fromISO(apt.appointmentStart),
-      end: apt.appointmentEnd && DateTime.fromISO(apt.appointmentEnd),
-      name: (await this.contacts.getTypeMeta(apt)).name,
-      link: this.links.getUrl(BreadcrumbType.Appointment, { crn, id: apt.appointmentId }),
-      today: DateTime.now().toISODate() === DateTime.fromISO(apt.appointmentStart).toISODate(),
-    }
   }
 }

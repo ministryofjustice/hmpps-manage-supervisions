@@ -50,7 +50,49 @@ context('Offender schedule tab', () => {
   const start = DateTime.now().startOf('day')
   const end = DateTime.now().startOf('day').plus({ hour: 1 })
   describe('populated schedule', () => {
-    before(() => cy.seed())
+    before(() =>
+      cy.seed({
+        appointments: [
+          {
+            appointmentId: 1,
+            appointmentStart: '2200-01-02T13:30:00',
+            appointmentEnd: '2200-01-02T14:00:00',
+            notes: 'Some home visit appointment\n\nWith a new line!',
+            outcome: null,
+            sensitive: true,
+            type: { contactType: 'CHVS', description: 'Home Visit to Case (NS)' },
+            staff: { forenames: 'Catherine', surname: 'Ellis', unallocated: false },
+            rarActivity: true,
+            requirement: {
+              isRar: true,
+              isActive: true,
+            },
+          },
+          {
+            appointmentId: 2,
+            appointmentStart: start.toISO(),
+            appointmentEnd: end.toISO(),
+            notes: 'Some unknown appointment type',
+            outcome: {
+              attended: true,
+              complied: true,
+              description: 'Some outcome description',
+            },
+            sensitive: true,
+            type: {
+              contactType: 'P123',
+              description: 'Some recent appointment',
+            },
+            staff: { forenames: 'Unallocated', surname: 'Staff', unallocated: true },
+            rarActivity: true,
+            requirement: {
+              isRar: true,
+              isActive: true,
+            },
+          },
+        ],
+      }),
+    )
 
     it('displays populated offender schedule', () => {
       fixture

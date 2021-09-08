@@ -63,7 +63,11 @@ describe('ScheduleService', () => {
           today: DateTime.now().toISODate() === DateTime.fromISO(x.appointmentStart).toISODate(),
         } as AppointmentListViewModel),
     )
-    const stub = community.appointment.getOffenderAppointmentsByCrnUsingGET.resolves(fakeOkResponse(appointments))
+    const stub = community.appointment.getOffenderAppointmentsByCrnUsingGET.resolves(
+      fakeOkResponse(
+        appointments.filter(apt => DateTime.fromISO(apt.appointmentStart).toISODate() >= DateTime.now().toISODate()),
+      ),
+    )
     const observed = await subject.getScheduledAppointments('some-crn')
     expect(observed).toEqual(
       sortBy(expected.slice(0, futureAppointments + soonAppointments), [
@@ -71,7 +75,7 @@ describe('ScheduleService', () => {
         x => x.end.toJSDate(),
       ]),
     )
-    expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn' })
+    expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn', from: DateTime.now().toISODate() })
   })
 
   it('gets appointment summary', async () => {
