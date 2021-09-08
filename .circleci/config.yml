@@ -114,10 +114,16 @@ workflows:
       - hmpps/helm_lint:
           name: helm_lint
       - hmpps/build_docker:
-          name: build_docker
+          name: build_docker_publish
           filters:
             branches:
               only:
+                - main
+      - hmpps/build_docker:
+          publish: false
+          filters:
+            branches:
+              ignore:
                 - main
       - hmpps/deploy_env:
           name: deploy_dev
@@ -131,7 +137,22 @@ workflows:
             - helm_lint
             - build-test
             - integration_test
-            - build_docker
+            - build_docker_publish
+      - approve_preprod:
+          type: approval
+          requires:
+            - deploy_dev
+      - hmpps/deploy_env:
+          name: deploy_preprod
+          env: "preprod"
+          show_changelog: true
+          slack_notification: true
+          slack_channel_name: "manage-a-supervision-notifications-preprod"
+          requires:
+            - approve_preprod
+          context:
+            - hmpps-common-vars
+            - hmpps-manage-supervisions-preprod
 
   security:
     triggers:

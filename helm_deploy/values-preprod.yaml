@@ -1,0 +1,19 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+generic-service:
+
+  replicaCount: 2
+
+  ingress:
+    host: hmpps-manage-supervisions-preprod.apps.live-1.cloud-platform.service.justice.gov.uk
+
+  env:
+    HMPPS_AUTH_URL: https://sign-in-preprod.hmpps.service.justice.gov.uk/auth
+    TOKEN_VERIFICATION_API_URL: https://token-verification-api-preprod.prison.service.justice.gov.uk
+    TOKEN_VERIFICATION_ENABLED: true
+    COMMUNITY_API_URL: https://community-api-secure.pre-prod.delius.probation.hmpps.dsd.io
+    ASSESS_RISKS_AND_NEEDS_API_URL: https://assess-risks-and-needs-preprod.hmpps.service.justice.gov.uk
+    DELIUS_BASE_URL: https://ndelius.pre-prod.delius.probation.hmpps.dsd.io
+    OASYS_BASE_URL: https://bridge-oasys.az.justice.gov.uk
+    INGRESS_URL: https://hmpps-manage-supervisions-preprod.apps.live-1.cloud-platform.service.justice.gov.uk
+    ENABLE_APPOINTMENT_BOOKING: false
