@@ -101,7 +101,7 @@ export class OffenderController {
   async getSchedule(@Param('crn') crn: string): Promise<OffenderScheduleViewModel> {
     const [offender, appointments] = await Promise.all([
       this.offenderService.getOffenderSummary(crn),
-      this.scheduleService.getRecentAppointments(crn),
+      this.scheduleService.getScheduledAppointments(crn),
     ])
     return {
       ...this.getBase(OffenderPage.Schedule, offender),

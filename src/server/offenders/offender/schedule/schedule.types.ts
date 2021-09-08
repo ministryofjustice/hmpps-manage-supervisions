@@ -5,12 +5,7 @@ export interface AppointmentListViewModel {
   link: string
   start: DateTime
   end: DateTime
-}
-
-export interface RecentAppointments {
-  future: AppointmentListViewModel[]
-  recent: AppointmentListViewModel[]
-  past: AppointmentListViewModel[]
+  today: boolean
 }
 
 export interface NextAppointmentSummary {

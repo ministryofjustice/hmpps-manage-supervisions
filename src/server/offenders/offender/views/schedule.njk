@@ -1,32 +1,49 @@
 {% extends './_layout.njk' %}
 {% set pageName = 'Schedule' %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% block page %}
-    {% if appointmentBookingEnabled %}
+    {% if appointmentBookingEnabled and appointments.length > 9 %}
         <a href='{{ links.arrangeAppointment }}' class='govuk-button govuk-!-margin-bottom-8' data-qa='offender/arrange-appointment-button'>
             Arrange an appointment
         </a>
     {% endif %}
-
-    {% set headers = [
-        { text: 'Date', attributes: { 'data-qa': 'date' } },
-        { text: 'Time', attributes: { 'data-qa': 'time' } },
-        { text: 'Appointment', attributes: { 'data-qa': 'appointment' } }
-    ] %}
-    {% set columns = [
-        { type: 'long-date', path: 'start', attributes: { 'data-qa': 'date' } },
-        { type: 'time-range', from: 'start', to: 'end', attributes: { 'data-qa': 'time' } },
-        { type: 'link', path: 'name', href: 'link', attributes: { 'data-qa': 'appointment' }
-    }] %}
-
-    {% if appointments.future.length %}
-        {{ govukTable({
-            attributes: { 'data-qa': 'offender/schedule/future' },
-            caption: 'Future appointments',
-            captionClasses: 'govuk-table__caption--m',
-            head: headers,
-            rows: appointments.future | toTableRows(columns)
-        }) }}
+    {% if appointments.length %}
+        <table class="govuk-table" data-qa='offender/schedule/future'>
+            <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th class="govuk-table__header" data-qa='date'>Date</th>
+                <th class="govuk-table__header" style="width: 20%" data-qa='time'>Time</th>
+                <th class="govuk-table__header" style="width: 50%" data-qa='appointment'>Appointment</th>
+            </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+            {% for appointment in appointments %}
+                <tr class="govuk-table__row" >
+                    <td class="govuk-table__cell" data-qa='date'>
+                        {% if appointment.today %}
+                            {% set insetToday %}
+                                <strong>Today</strong><br/>
+                                {{appointment.start | longDate}}
+                            {% endset %}
+                            {{ govukInsetText({
+                                html:insetToday,
+                                classes: "govuk-!-margin-bottom-0 govuk-!-margin-top-0 govuk-!-padding-top-0 govuk-!-padding-bottom-0 govuk-!-padding-left-2 govuk-!-padding-right-0"
+                            }) }}
+                        {% else %}
+                            {{ appointment.start | longDate }}
+                        {% endif %}
+                    </td>
+                    <td class="govuk-table__cell" data-qa='time'>{{ appointment.start | timeRange(appointment.end) }}</td>
+                    <td class="govuk-table__cell" data-qa='appointment'>
+                    <a  href="{{ appointment.link }}">
+                        {{ appointment.name }}
+                    </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     {% else %}
         <div data-qa='offender/schedule/empty-future'>
             <h2 class='govuk-heading-m'>Future appointments</h2>
@@ -35,21 +52,10 @@
             </p>
         </div>
     {% endif %}
-
-    {% if appointments.recent.length %}
-        {{ govukTable({
-            attributes: { 'data-qa': 'offender/schedule/recent' },
-            caption: 'Recent appointments',
-            captionClasses: 'govuk-table__caption--m',
-            head: headers,
-            rows: appointments.recent | toTableRows(columns)
-        }) }}
-    {% else %}
-        <div data-qa='offender/schedule/empty-recent'>
-            <h2 class='govuk-heading-m'>Recent appointments</h2>
-            <p class='govuk-body'>
-                There have been no recent appointments.
-            </p>
-        </div>
+    {% if appointmentBookingEnabled %}
+        <a href='{{ links.arrangeAppointment }}' class='govuk-button govuk-!-margin-bottom-8' data-qa='offender/arrange-appointment-button'>
+            Arrange an appointment
+        </a>
     {% endif %}
+
 {% endblock %}

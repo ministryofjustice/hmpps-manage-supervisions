@@ -57,7 +57,7 @@ export function appointments(
       .get(`/secure/offenders/crn/${crn}/appointments`)
       .queryMatches({ from: '.+' })
       .priority(1)
-      .returns(appointments.filter(x => DateTime.fromISO(x.appointmentStart) >= DateTime.now()))
+      .returns(appointments.filter(x => DateTime.fromISO(x.appointmentStart).toISODate() >= DateTime.now().toISODate()))
 
     context.client.community.post(`/secure/offenders/crn/${crn}/sentence/${convictionId}/appointments`).returns({
       appointmentId: 1,

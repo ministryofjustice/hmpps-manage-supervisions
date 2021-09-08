@@ -2,10 +2,8 @@ import { Injectable } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { minBy, sortBy } from 'lodash'
 import { CommunityApiService, ContactMappingService } from '../../../community-api'
-import { AppointmentListViewModel, NextAppointmentSummary, RecentAppointments } from './schedule.types'
+import { AppointmentListViewModel, NextAppointmentSummary } from './schedule.types'
 import { BreadcrumbType, LinksService } from '../../../common/links'
-
-export const MAX_RECENT_APPOINTMENTS = 20
 
 @Injectable()
 export class ScheduleService {
@@ -15,28 +13,25 @@ export class ScheduleService {
     private readonly links: LinksService,
   ) {}
 
-  async getRecentAppointments(crn: string): Promise<RecentAppointments> {
-    const { data } = await this.community.appointment.getOffenderAppointmentsByCrnUsingGET({ crn })
+  async getScheduledAppointments(crn: string): Promise<AppointmentListViewModel[]> {
     const now = DateTime.now()
-    const result: RecentAppointments = await data.reduce(async (aggregate, apt) => {
+    const { data } = await this.community.appointment.getOffenderAppointmentsByCrnUsingGET({
+      crn,
+      from: now.toISODate(),
+    })
+    let result: AppointmentListViewModel[] = await data.reduce(async (aggregate, apt) => {
       const agg = await aggregate
-      const collection =
-        DateTime.fromISO(apt.appointmentStart) > now
-          ? agg.future
-          : agg.recent.length < MAX_RECENT_APPOINTMENTS
-          ? agg.recent
-          : agg.past
       const view: AppointmentListViewModel = {
         start: DateTime.fromISO(apt.appointmentStart),
         end: apt.appointmentEnd && DateTime.fromISO(apt.appointmentEnd),
         name: (await this.contacts.getTypeMeta(apt)).name,
         link: this.links.getUrl(BreadcrumbType.Appointment, { crn, id: apt.appointmentId }),
+        today: now.toISODate() === DateTime.fromISO(apt.appointmentStart).toISODate(),
       }
-      collection.push(view)
+      agg.push(view)
       return agg
-    }, Promise.resolve({ future: [], recent: [], past: [] }))
-
-    result.future = sortBy(result.future, [x => x.start.toJSDate(), x => x.end?.toJSDate()])
+    }, Promise.resolve([]))
+    result = sortBy(result, [x => x.start.toJSDate(), x => x.end?.toJSDate()])
     return result
   }
 

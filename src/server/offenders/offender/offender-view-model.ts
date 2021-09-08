@@ -1,6 +1,6 @@
 import { ActivityComplianceFilter, ActivityLogEntry } from './activity'
 import { ComplianceDetails, ConvictionDetails } from './sentence'
-import { NextAppointmentSummary, RecentAppointments } from './schedule'
+import { AppointmentListViewModel, NextAppointmentSummary } from './schedule'
 import { RiskRegistrations, Risks } from './risk'
 import { GetPersonalDetailsResult } from './personal'
 import { ViewModel } from '../../common'
@@ -51,7 +51,7 @@ export interface OffenderOverviewViewModel
 }
 
 export interface OffenderScheduleViewModel extends OffenderViewModelBase<OffenderPage.Schedule> {
-  appointments: RecentAppointments
+  appointments: AppointmentListViewModel[]
   appointmentBookingEnabled: boolean
 }
 
