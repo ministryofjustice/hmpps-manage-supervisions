@@ -1,7 +1,7 @@
-import { HmppsAuthPage, HomePage } from '../pages'
+import { HmppsAuthPage, CasesPage } from '../pages'
 
-context('Home', () => {
-  const homePage = new HomePage()
+context('Cases', () => {
+  const casesPage = new CasesPage()
   const authPage = new HmppsAuthPage()
 
   describe('authorized user', () => {
@@ -11,14 +11,14 @@ context('Home', () => {
 
     it('can logout', () => {
       cy.home()
-      homePage.logoutButton.click()
+      casesPage.logoutButton.click()
       authPage.shouldHaveRedirectedToLogoutPage()
     })
 
     it('renders page furniture', () => {
       cy.home()
-      homePage.pageTitle.contains('This site is under construction...')
-      homePage.headerUserName.should('contain.text', 'J. Smith')
+      casesPage.pageTitle.contains('Your cases')
+      casesPage.headerUserName.should('contain.text', 'J. Smith')
     })
   })
 
@@ -29,7 +29,7 @@ context('Home', () => {
 
     it('is unauthorized', () => {
       cy.home()
-      homePage.pageTitle.contains('Access denied')
+      casesPage.pageTitle.contains('Access denied')
     })
   })
 })

@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { configFactory } from './config'
 import { HealthModule } from './health/health.module'
-import { HomeModule } from './home/home.module'
 import { SecurityModule } from './security/security.module'
 import { APP_FILTER } from '@nestjs/core'
 import { HttpExceptionFilter } from './http-exception.filter'
@@ -10,12 +9,13 @@ import { ArrangeAppointmentModule } from './arrange-appointment/arrange-appointm
 import { CommunityApiModule } from './community-api/community-api.module'
 import { OffendersModule } from './offenders/offenders.module'
 import { LoggerModule } from './logger/logger.module'
+import { CasesModule } from './cases/cases.module'
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [configFactory] }),
     HealthModule,
-    HomeModule,
+    CasesModule,
     SecurityModule,
     LoggerModule,
     ArrangeAppointmentModule,

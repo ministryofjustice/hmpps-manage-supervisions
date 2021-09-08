@@ -9,6 +9,8 @@ import {
   ReferenceDataSeedOptions,
   OffenderSeedOptions,
   ContactSeedOptions,
+  casesSeed,
+  CasesSeedOptions,
 } from '../seeds'
 import { WiremockClient } from './wiremock-client'
 import { deliusLdap, hmppsAuthStub } from '../hmpps-auth'
@@ -59,7 +61,7 @@ const { argv } = yargs
     group: 'risk',
   })
 
-type SeedOptions = ReferenceDataSeedOptions & OffenderSeedOptions & ContactSeedOptions
+type SeedOptions = ReferenceDataSeedOptions & OffenderSeedOptions & ContactSeedOptions & CasesSeedOptions
 
 type KebabToCamelCase<T extends string> = T extends `${infer L}-${infer R}`
   ? `${Lowercase<L>}${Capitalize<KebabToCamelCase<R>>}`
@@ -110,7 +112,7 @@ async function seed(args: CamelCased<typeof argv>) {
     options.registrations = []
   }
 
-  const modules = [reset, referenceDataSeed(options), offenderSeed(options), contactsSeed(options)]
+  const modules = [reset, referenceDataSeed(options), offenderSeed(options), contactsSeed(options), casesSeed(options)]
   if (args.hmppsAuth) {
     modules.push(hmppsAuthStub())
   } else {

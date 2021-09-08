@@ -1,0 +1,37 @@
+{% extends "../partials/layout.njk" %}
+
+{% set pageTitle = "Your cases" %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl">
+    {{ pageTitle }}
+  </h1>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <p>Not all cases are suitable for the Manage supervisions pilot. We’re only listing your cases that have:</p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>a single community order</li>
+        <li>a RAR requirement, and no other requirements</li>
+      </ul>
+
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th class="govuk-table__header">Name and CRN</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for case in cases %}
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell">
+                <a href="/offender/{{ case.crn }}/overview" class="govuk-!-font-size-24 govuk-!-font-weight-bold">{{ case.name }}</a><br />
+                <span class="app-!-font-family-tabular govuk-!-margin-bottom-0">{{ case.crn }}</span>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
