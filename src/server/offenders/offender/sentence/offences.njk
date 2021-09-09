@@ -28,10 +28,23 @@
         {% if offence.additionalOffences.length %}
             <h2 class="govuk-heading-l govuk-!-margin-top-8">Additional offences</h2>
             {% for additionalOffence in offence.additionalOffences %}
-                {% call appSummaryCard({
-                    titleText: 'Additional offence ' + additionalOffence.code | brackets,
-                    classes: 'app-summary-card--large-title govuk-!-margin-bottom-6'
-                }) -%}
+                {% call appSummaryCard({titleText: 'Additional offence ' + additionalOffence.code | brackets, classes: 'app-summary-card--large-title govuk-!-margin-bottom-6'}) -%}
+                    {{ govukSummaryList({
+                        rows: [
+                            {
+                                key: { text: "Offence" },
+                                value: { text: additionalOffence.name }
+                            },
+                            {
+                                key: { text: "Category" },
+                                value: { text: additionalOffence.category }
+                            },
+                            {
+                                key: { text: "Offence date" },
+                                value: { text: additionalOffence.date | shortDate }
+                            }
+                        ]
+                    }) }}
                 {%- endcall %}
             {% endfor %}
         {% endif %}

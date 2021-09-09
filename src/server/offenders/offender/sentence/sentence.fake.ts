@@ -23,6 +23,8 @@ import { fakeBreachSummary } from '../../../community-api/breach/breach.fake'
 export const fakeConvictionAdditionalOffence = fake<ConvictionAdditionalOffence>(() => ({
   name: faker.company.bs(),
   code: faker.datatype.number().toString(),
+  category: faker.company.bs(),
+  date: DateTime.fromJSDate(faker.date.past()),
 }))
 
 export const fakeConvictionOffence = fake<ConvictionOffence>((options, partial = {}) => ({

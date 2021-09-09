@@ -6,6 +6,8 @@ import { ViewModel } from '../../../common'
 export interface ConvictionAdditionalOffence {
   name: string
   code: string
+  category: string
+  date: DateTime
 }
 
 export interface ConvictionOffence {

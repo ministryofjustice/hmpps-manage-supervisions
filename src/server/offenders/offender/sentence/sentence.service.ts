@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { Conviction, Offence, Sentence } from '../../../community-api/client'
+import { Conviction, Sentence } from '../../../community-api/client'
 import { maxBy } from 'lodash'
 import { DateTime, DurationUnit } from 'luxon'
 import { getElapsed, quantity, QuantityOptions, urlJoin } from '../../../util'
@@ -36,7 +36,12 @@ function getConvictionOffence(conviction: Conviction): ConvictionOffence | null 
     code: mainOffence.detail.code,
     additionalOffences: conviction.offences
       .filter(x => !x.mainOffence)
-      .map(x => ({ code: x.detail.code, name: getOffenceName(x) })),
+      .map(x => ({
+        code: x.detail.code,
+        name: getOffenceName(x),
+        category: x.detail.mainCategoryDescription,
+        date: DateTime.fromISO(x.offenceDate),
+      })),
   }
 }
 

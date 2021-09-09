@@ -128,7 +128,12 @@ describe('SentenceService', () => {
           fakeOffence({
             mainOffence: false,
             offenceCount: 9,
-            detail: { code: '80701', subCategoryDescription: 'Some additional offence' },
+            offenceDate: '2021-05-01',
+            detail: {
+              code: '80701',
+              subCategoryDescription: 'Some additional offence',
+              mainCategoryDescription: 'Some additional offence category',
+            },
           }),
         ],
       },
@@ -155,7 +160,14 @@ describe('SentenceService', () => {
         description: 'Some offence sub-category (8 counts)',
         category: 'Some offence category',
         code: '80700',
-        additionalOffences: [{ code: '80701', name: 'Some additional offence (9 counts)' }],
+        additionalOffences: [
+          {
+            code: '80701',
+            name: 'Some additional offence (9 counts)',
+            category: 'Some additional offence category',
+            date: DateTime.fromObject({ year: 2021, month: 5, day: 1 }),
+          },
+        ],
       },
       sentence: {
         description: '12 month Community Order',
@@ -204,7 +216,12 @@ describe('SentenceService', () => {
           fakeOffence({
             mainOffence: false,
             offenceCount: 9,
-            detail: { code: '80701', subCategoryDescription: 'Some additional offence' },
+            offenceDate: '2021-05-01',
+            detail: {
+              code: '80701',
+              subCategoryDescription: 'Some additional offence',
+              mainCategoryDescription: 'Some additional offence category',
+            },
           }),
         ],
       })
@@ -217,7 +234,14 @@ describe('SentenceService', () => {
         description: 'Some offence sub-category (8 counts)',
         category: 'Some offence category',
         code: '80700',
-        additionalOffences: [{ code: '80701', name: 'Some additional offence (9 counts)' }],
+        additionalOffences: [
+          {
+            code: '80701',
+            name: 'Some additional offence (9 counts)',
+            category: 'Some additional offence category',
+            date: DateTime.fromObject({ year: 2021, month: 5, day: 1 }),
+          },
+        ],
       })
     })
   })
