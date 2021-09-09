@@ -1,16 +1,16 @@
 import {
-  AllRoshRiskDto,
+  AllRoshRiskDtoAllRisksView,
   AssessmentNeedDto,
   AssessmentNeedDtoSeverity,
   AssessmentNeedsDto,
-  OtherRoshRisksDtoBreachOfTrust,
-  OtherRoshRisksDtoControlIssuesDisruptiveBehaviour,
-  OtherRoshRisksDtoEscapeOrAbscond,
-  OtherRoshRisksDtoRiskToOtherPrisoners,
-  RiskDto,
-  RiskDtoCurrent,
-  RiskDtoPrevious,
-  RiskDtoRisk,
+  OtherRoshRisksDtoAllRisksViewBreachOfTrust,
+  OtherRoshRisksDtoAllRisksViewControlIssuesDisruptiveBehaviour,
+  OtherRoshRisksDtoAllRisksViewEscapeOrAbscond,
+  OtherRoshRisksDtoAllRisksViewRiskToOtherPrisoners,
+  RiskDtoAllRisksView,
+  RiskDtoAllRisksViewCurrent,
+  RiskDtoAllRisksViewPrevious,
+  RiskDtoAllRisksViewRisk,
 } from './client'
 import { fake, fakeEnum, fakeRandomArray } from '../util/util.fake'
 import * as faker from 'faker'
@@ -19,16 +19,17 @@ import { toList } from '../util'
 
 import { NeedsAssessmentSection } from './well-known'
 
-const fakeRiskDto = fake<RiskDto>((options, partial = {}) => {
-  const current = partial.current || fakeEnum(RiskDtoCurrent)
-  const previous = partial.previous || fakeEnum(RiskDtoPrevious)
+const fakeRiskDto = fake<RiskDtoAllRisksView>((options, partial = {}) => {
+  const current = partial.current || fakeEnum(RiskDtoAllRisksViewCurrent)
+  const previous = partial.previous || fakeEnum(RiskDtoAllRisksViewPrevious)
   return {
-    risk: fakeEnum(RiskDtoRisk),
+    risk: fakeEnum(RiskDtoAllRisksViewRisk),
     previous,
     previousConcernsText:
-      previous === RiskDtoPrevious.Yes && faker.datatype.boolean() ? faker.lorem.paragraphs() : null,
+      previous === RiskDtoAllRisksViewPrevious.Yes && faker.datatype.boolean() ? faker.lorem.paragraphs() : null,
     current,
-    currentConcernsText: current === RiskDtoCurrent.Yes && faker.datatype.boolean() ? faker.lorem.paragraphs() : null,
+    currentConcernsText:
+      current === RiskDtoAllRisksViewCurrent.Yes && faker.datatype.boolean() ? faker.lorem.paragraphs() : null,
   }
 })
 
@@ -45,7 +46,7 @@ function fakeRiskLevels() {
   }
 }
 
-export const fakeAllRoshRiskDto = fake<AllRoshRiskDto>((options, partial = {}) => ({
+export const fakeAllRoshRiskDto = fake<AllRoshRiskDtoAllRisksView>((options, partial = {}) => ({
   riskToSelf: {
     suicide: fakeRiskDto(),
     selfHarm: fakeRiskDto(),
@@ -54,10 +55,10 @@ export const fakeAllRoshRiskDto = fake<AllRoshRiskDto>((options, partial = {}) =
     vulnerability: fakeRiskDto(),
   },
   otherRisks: {
-    escapeOrAbscond: fakeEnum(OtherRoshRisksDtoEscapeOrAbscond),
-    controlIssuesDisruptiveBehaviour: fakeEnum(OtherRoshRisksDtoControlIssuesDisruptiveBehaviour),
-    breachOfTrust: fakeEnum(OtherRoshRisksDtoBreachOfTrust),
-    riskToOtherPrisoners: fakeEnum(OtherRoshRisksDtoRiskToOtherPrisoners),
+    escapeOrAbscond: fakeEnum(OtherRoshRisksDtoAllRisksViewEscapeOrAbscond),
+    controlIssuesDisruptiveBehaviour: fakeEnum(OtherRoshRisksDtoAllRisksViewControlIssuesDisruptiveBehaviour),
+    breachOfTrust: fakeEnum(OtherRoshRisksDtoAllRisksViewBreachOfTrust),
+    riskToOtherPrisoners: fakeEnum(OtherRoshRisksDtoAllRisksViewRiskToOtherPrisoners),
   },
   summary: {
     whoIsAtRisk: toList(fakeRandomArray(fakeRiskSubject)),

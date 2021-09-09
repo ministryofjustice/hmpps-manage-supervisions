@@ -1,5 +1,9 @@
 import { Test } from '@nestjs/testing'
-import { AssessmentNeedDtoSeverity, RiskDtoCurrent, RiskDtoPrevious } from '../../../assess-risks-and-needs-api/client'
+import {
+  AssessmentNeedDtoSeverity,
+  RiskDtoAllRisksViewCurrent,
+  RiskDtoAllRisksViewPrevious,
+} from '../../../assess-risks-and-needs-api/client'
 import { fakeOkResponse, fakeRestError } from '../../../common/rest/rest.fake'
 import { RiskRegistrationDetails, CriminogenicNeed, RiskRegistrations, Risks } from './risk.types'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../../community-api/community-api.mock'
@@ -47,33 +51,33 @@ describe('RiskService', () => {
       const risks = fakeAllRoshRiskDto({
         riskToSelf: {
           suicide: {
-            previous: RiskDtoPrevious.No,
+            previous: RiskDtoAllRisksViewPrevious.No,
             previousConcernsText: null,
-            current: RiskDtoCurrent.Yes,
+            current: RiskDtoAllRisksViewCurrent.Yes,
             currentConcernsText: 'Some current concerns',
           },
           selfHarm: {
-            previous: RiskDtoPrevious.Yes,
+            previous: RiskDtoAllRisksViewPrevious.Yes,
             previousConcernsText: null,
-            current: RiskDtoCurrent.Yes,
+            current: RiskDtoAllRisksViewCurrent.Yes,
             currentConcernsText: 'Some ignored current concerns',
           },
           custody: {
-            previous: RiskDtoPrevious.Yes,
+            previous: RiskDtoAllRisksViewPrevious.Yes,
             previousConcernsText: 'Some previous concerns',
-            current: RiskDtoCurrent.No,
+            current: RiskDtoAllRisksViewCurrent.No,
             currentConcernsText: null,
           },
           hostelSetting: {
-            previous: RiskDtoPrevious.No,
+            previous: RiskDtoAllRisksViewPrevious.No,
             previousConcernsText: null,
-            current: RiskDtoCurrent.No,
+            current: RiskDtoAllRisksViewCurrent.No,
             currentConcernsText: null,
           },
           vulnerability: {
-            previous: RiskDtoPrevious.No,
+            previous: RiskDtoAllRisksViewPrevious.No,
             previousConcernsText: null,
-            current: RiskDtoCurrent.No,
+            current: RiskDtoAllRisksViewCurrent.No,
             currentConcernsText: null,
           },
         },
@@ -87,6 +91,7 @@ describe('RiskService', () => {
             LOW: ['Known Adult'],
           },
         },
+        assessedOn: '2000-01-02T13:30:00',
       })
 
       const stub = arn.risk.getRoshRisksByCrn.resolves(fakeOkResponse(risks))
@@ -138,6 +143,7 @@ describe('RiskService', () => {
           current: true,
           previous: true,
         },
+        assessedOn: DateTime.fromISO('2000-01-02T13:30:00'),
       } as Risks)
       expect(stub.getCall(0).firstArg).toEqual({ crn: 'some-crn' })
     })
@@ -171,6 +177,7 @@ describe('RiskService', () => {
           current: false,
           previous: false,
         },
+        assessedOn: null,
       } as Risks)
     })
   })

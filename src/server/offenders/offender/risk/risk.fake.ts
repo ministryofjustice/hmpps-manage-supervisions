@@ -84,6 +84,7 @@ export const fakeRisks = fake<Risks>((options, partial = {}) => ({
     custody: fakeFlatRiskToSelf(),
     vulnerability: fakeFlatRiskToSelf(),
   },
+  assessedOn: DateTime.fromJSDate(faker.date.past()),
 }))
 
 export const fakeCriminogenicNeed = fake<CriminogenicNeed>(() => ({

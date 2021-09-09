@@ -1,38 +1,42 @@
-import { AllRoshRiskDto, RiskDtoCurrent, RiskDtoPrevious } from '../../src/server/assess-risks-and-needs-api/client'
+import {
+  AllRoshRiskDtoAllRisksView,
+  RiskDtoAllRisksViewCurrent,
+  RiskDtoAllRisksViewPrevious,
+} from '../../src/server/assess-risks-and-needs-api/client'
 import { SeedFn } from './wiremock'
 import { fakeAllRoshRiskDto } from '../../src/server/assess-risks-and-needs-api/assess-risks-and-needs-api.fake'
 
-export const RISKS: DeepPartial<AllRoshRiskDto> = {
+export const RISKS: DeepPartial<AllRoshRiskDtoAllRisksView> = {
   riskToSelf: {
     suicide: {
-      previous: RiskDtoPrevious.No,
+      previous: RiskDtoAllRisksViewPrevious.No,
       previousConcernsText: null,
-      current: RiskDtoCurrent.Yes,
+      current: RiskDtoAllRisksViewCurrent.Yes,
       currentConcernsText: null,
     },
     selfHarm: {
-      previous: RiskDtoPrevious.Yes,
+      previous: RiskDtoAllRisksViewPrevious.Yes,
       previousConcernsText: null,
-      current: RiskDtoCurrent.Yes,
+      current: RiskDtoAllRisksViewCurrent.Yes,
       currentConcernsText: null,
     },
     custody: {
-      previous: RiskDtoPrevious.Yes,
+      previous: RiskDtoAllRisksViewPrevious.Yes,
       previousConcernsText:
         'Soluta tempore nemo et velit est perspiciatis.\n\nNeque error aut est nemo quasi. Et labore impedit omnis numquam id et eaque facere itaque. Ipsam et atque eos tempora possimus.',
-      current: RiskDtoCurrent.No,
+      current: RiskDtoAllRisksViewCurrent.No,
       currentConcernsText: null,
     },
     hostelSetting: {
-      previous: RiskDtoPrevious.Yes,
+      previous: RiskDtoAllRisksViewPrevious.Yes,
       previousConcernsText: null,
-      current: RiskDtoCurrent.No,
+      current: RiskDtoAllRisksViewCurrent.No,
       currentConcernsText: null,
     },
     vulnerability: {
-      previous: RiskDtoPrevious.No,
+      previous: RiskDtoAllRisksViewPrevious.No,
       previousConcernsText: null,
-      current: RiskDtoCurrent.No,
+      current: RiskDtoAllRisksViewCurrent.No,
       currentConcernsText: null,
     },
   },
@@ -46,9 +50,10 @@ export const RISKS: DeepPartial<AllRoshRiskDto> = {
       LOW: ['Known Adult'],
     },
   },
+  assessedOn: '2000-01-02T13:30:00',
 }
 
-export function risks(crn: string, partial?: DeepPartial<AllRoshRiskDto>): SeedFn {
+export function risks(crn: string, partial?: DeepPartial<AllRoshRiskDtoAllRisksView>): SeedFn {
   return context => {
     if (partial === null) {
       // special case, no risk data return a 404

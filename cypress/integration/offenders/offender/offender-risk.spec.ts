@@ -49,6 +49,7 @@ context('Offender risk tab', () => {
         .shouldRenderOffenderTab('risk', page => {
           page.roshCommunity(card =>
             card.summaryList(list => {
+              list.value('OASys assessment date').contains('2 January 2000')
               list.value('Overall').contains('Very high risk of serious harm')
               list.value('Very high risk').contains('Children Staff')
               list.value('High risk').contains('Public')
