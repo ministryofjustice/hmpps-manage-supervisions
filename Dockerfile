@@ -15,31 +15,22 @@ WORKDIR /app
 
 RUN apt-get update && apt-get upgrade -y
 RUN mkdir -p /usr/share/man/man1 /usr/share/man/man2
-RUN apt-get install --no-install-recommends -y make python g++ openjdk-11-jre-headless
+RUN apt-get install --no-install-recommends -y openjdk-11-jre-headless
+RUN apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g npm
+RUN npm install -g npm@7 && npm --version
 
-# Stage: build assets
+# Stage: build app
 FROM base as build
+
 COPY . .
 
-RUN npm --version
-
 RUN CYPRESS_INSTALL_BINARY=0 npm ci --no-audit
-
 RUN npm run build
-
-ENV BUILD_NUMBER ${BUILD_NUMBER:-1_0_0}
-ENV GIT_REF ${GIT_REF:-dummy}
-RUN npm run record-build-info
-
 RUN npm prune --no-audit --production
 
 # Stage: copy production assets and dependencies
 FROM base
-
-RUN apt-get autoremove -y && \
-    rm -rf /var/lib/apt/lists/*
 
 COPY --from=build --chown=appuser:appgroup \
         /app/package.json \
@@ -47,10 +38,12 @@ COPY --from=build --chown=appuser:appgroup \
         ./
 
 COPY --from=build --chown=appuser:appgroup \
-        /app/dist ./dist
+        /app/dist \
+        ./dist
 
 COPY --from=build --chown=appuser:appgroup \
-        /app/node_modules ./node_modules
+        /app/node_modules \
+        ./node_modules
 
 EXPOSE 3000
 ENV NODE_ENV='production'

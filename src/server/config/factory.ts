@@ -51,7 +51,8 @@ function string(name: string, fallbackFn?: EnvironmentFallback<string>): string 
 }
 
 function url(name: string, fallbackFn?: EnvironmentFallback<string>) {
-  return Object.freeze(new URL(string(name, fallbackFn)))
+  const value = string(name, fallbackFn)
+  return value ? Object.freeze(new URL(value)) : null
 }
 
 function int(name: string, fallbackFn?: EnvironmentFallback<number>): number {
@@ -229,7 +230,7 @@ const FEATURE_DEFAULTS: Record<FeatureFlags, boolean> = {
 }
 
 export function configFactory(): Config {
-  const authUrl = string('HMPPS_AUTH_URL', developmentOnly('http://localhost:9090/auth'))
+  const authUrl = url('HMPPS_AUTH_URL', developmentOnly('http://localhost:9090/auth'))
 
   const appointment = Object.values(WellKnownAppointmentType)
     .map(type => {
@@ -280,15 +281,20 @@ export function configFactory(): Config {
     })
     .reduce((x, y) => ({ ...x, ...y })) as Record<FeatureFlags, boolean>
 
+  const tokenVerificationEnabled = bool('TOKEN_VERIFICATION_ENABLED', fallback(false))
+
+  if (isProduction() && !ApplicationVersion.version) {
+    throw new Error('No build info file present')
+  }
+
   return {
     server: {
       name: ApplicationVersion.packageData.name,
       description: ApplicationVersion.packageData.description,
-      version: ApplicationVersion.buildNumber,
-      build: ApplicationVersion.buildInfo,
+      version: ApplicationVersion.version || 'unknown',
       port: int('PORT', fallback(3000)),
+      deploymentEnvironment: string('DEPLOYMENT_ENV', developmentOnly('local')),
       isProduction: isProduction(),
-      https: bool('PROTOCOL_HTTPS', fallback(isProduction())),
       domain: url('INGRESS_URL', developmentOnly('http://localhost:3000')),
       staticResourceCacheDuration: int('STATIC_RESOURCE_CACHE_DURATION', fallback(20)),
       features,
@@ -314,7 +320,7 @@ export function configFactory(): Config {
       hmppsAuth: {
         enabled: true,
         url: authUrl,
-        externalUrl: url('HMPPS_AUTH_EXTERNAL_URL', fallback(authUrl)),
+        externalUrl: url('HMPPS_AUTH_EXTERNAL_URL', fallback(authUrl.href)),
         timeout: int('HMPPS_AUTH_TIMEOUT', fallback(10000)),
         apiClientCredentials: {
           id: string('API_CLIENT_ID', developmentOnly('interventions')),
@@ -327,18 +333,21 @@ export function configFactory(): Config {
         issuerPath: string('HMPPS_AUTH_ISSUER_PATH', fallback('/issuer')),
       },
       tokenVerification: {
-        enabled: bool('TOKEN_VERIFICATION_ENABLED', fallback(false)),
-        url: string('TOKEN_VERIFICATION_API_URL', developmentOnly('http://localhost:8100')),
+        enabled: tokenVerificationEnabled,
+        url: url(
+          'TOKEN_VERIFICATION_API_URL',
+          tokenVerificationEnabled ? developmentOnly('http://localhost:8100') : fallback(null),
+        ),
         timeout: int('TOKEN_VERIFICATION_API_TIMEOUT', fallback(10000)),
       },
       community: {
         enabled: true,
-        url: string('COMMUNITY_API_URL', developmentOnly('http://localhost:9091/community-api')),
+        url: url('COMMUNITY_API_URL', developmentOnly('http://localhost:9091/community-api')),
         timeout: int('COMMUNITY_API_TIMEOUT', fallback(30000)),
       },
       assessRisksAndNeeds: {
         enabled: true,
-        url: string('ASSESS_RISKS_AND_NEEDS_API_URL', developmentOnly('http://localhost:9091/assess-risks-and-needs')),
+        url: url('ASSESS_RISKS_AND_NEEDS_API_URL', developmentOnly('http://localhost:9091/assess-risks-and-needs')),
         timeout: int('ASSESS_RISKS_AND_NEEDS_API_TIMEOUT', fallback(30000)),
       },
     },

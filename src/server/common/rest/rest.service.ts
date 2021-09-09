@@ -23,7 +23,7 @@ export class RestService {
   ) {
     const logger = new Logger(`${kebabCase(name)}-api-client`)
     const { url, timeout } = this.config.get<DependentApisConfig>('apis')[name]
-    const axios = Axios.create({ baseURL: url, timeout })
+    const axios = Axios.create({ baseURL: url.href, timeout })
 
     // response logging
     axios.interceptors.response.use(

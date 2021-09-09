@@ -12,10 +12,12 @@ services:
       - '6379:6379'
 
   hmpps-auth:
-    image: quay.io/hmpps/hmpps-auth:latest
+    image: quay.io/hmpps/hmpps-auth
     networks:
       - hmpps
-    container_name: hmpps-auth 
+    container_name: hmpps-auth
+    depends_on:
+      - wiremock
     ports:
       - "9090:8080"
     healthcheck:
@@ -42,7 +44,11 @@ services:
       - -verbose
 
   app:
-    build: .
+    build:
+      context: .
+      args:
+        BUILD_NUMBER: local_compose
+        GIT_REF: unknown
     networks:
       - hmpps
     container_name: hmpps-manage-supervisions
@@ -52,16 +58,22 @@ services:
     ports:
       - "3000:3000"
     environment:
-      NODE_ENV: dev
-      REDIS_HOST: redis
-      HMPPS_AUTH_EXTERNAL_URL: http://localhost:9090/auth
-      HMPPS_AUTH_URL: http://hmpps-auth:8080/auth
-      COMMUNITY_API_URL: http://wiremock:8080
-      # These will need to match new creds in the seed auth service auth
-      API_CLIENT_ID: interventions
-      API_CLIENT_SECRET: clientsecret
-      SYSTEM_CLIENT_ID: interventions
-      SYSTEM_CLIENT_SECRET: clientsecret
+      - PORT=3000
+      - DEPLOYMENT_ENV=local
+      - SESSION_SECRET=test
+      - INGRESS_URL=http://localhost:3000
+      - TOKEN_VERIFICATION_ENABLED=false
+      - HMPPS_AUTH_EXTERNAL_URL=http://localhost:9090/auth
+      - HMPPS_AUTH_URL=http://hmpps-auth:8080/auth
+      - COMMUNITY_API_URL=http://wiremock:8080/community-api
+      - ASSESS_RISKS_AND_NEEDS_API_URL=http://wiremock:8080/assess-risks-and-needs
+      - DELIUS_BASE_URL=http://localhost:9091/delius
+      - OASYS_BASE_URL=http://localhost:9091/oasys
+      - REDIS_HOST=redis
+      - API_CLIENT_ID=interventions
+      - API_CLIENT_SECRET=clientsecret
+      - SYSTEM_CLIENT_ID=interventions
+      - SYSTEM_CLIENT_SECRET=clientsecret
 
 networks:
   hmpps:
