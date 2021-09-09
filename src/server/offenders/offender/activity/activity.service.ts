@@ -191,7 +191,7 @@ export class ActivityService {
 
     const start = DateTime.fromISO(startIso)
     const outcomeFlags = [...getAppointmentFlags(contact), ...getOutcomeFlags(contact.outcome)]
-    const missingOutcome = outcomeFlags.length === 0 && start <= DateTime.now()
+    const missingOutcome = !contact.outcome && start <= DateTime.now()
     const links = this.links.of({ id, crn })
     return {
       id,

@@ -453,6 +453,7 @@ describe('ActivityService', () => {
       havingContacts({
         type: ContactTypeCategory.Appointment,
         notes: 'other appointment, not recorded',
+        sensitive: true, // also sensitive to ensure other tags do not affect this
         outcome: null,
       })
 
@@ -461,10 +462,12 @@ describe('ActivityService', () => {
       const links = MockLinksModule.of({ crn: 'some-crn', id: 1 })
       shouldReturnAppointment(observed, {
         notes: 'other appointment, not recorded',
+        tags: [{ colour: GovUkUiTagColour.Grey, name: 'sensitive' }],
         links: {
           recordMissingAttendance: links.url(BreadcrumbType.ExitToDelius),
         },
         outcome: null,
+        sensitive: true,
       })
     })
 
