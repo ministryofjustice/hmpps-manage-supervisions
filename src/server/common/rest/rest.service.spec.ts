@@ -35,13 +35,13 @@ describe('RestClientService', () => {
   })
 
   it('succeeds without retry', async () => {
-    nock(config.url).matchHeader('authorization', `Bearer ${user.token}`).get(URL).reply(200, OK)
+    nock(config.url.href).matchHeader('authorization', `Bearer ${user.token}`).get(URL).reply(200, OK)
     const observed = await subject.build('community', user).get(URL)
     expect(observed.data).toEqual(OK)
   })
 
   it('succeeds after single retry', async () => {
-    const bad = nock(config.url).matchHeader('authorization', `Bearer ${user.token}`).get(URL).reply(500)
+    const bad = nock(config.url.href).matchHeader('authorization', `Bearer ${user.token}`).get(URL).reply(500)
     const ok = bad.get(URL).reply(200, OK)
     const observed = await subject.build('community', user).get(URL)
     expect(observed.data).toEqual(OK)
@@ -50,7 +50,7 @@ describe('RestClientService', () => {
   })
 
   it('fails after 3 retries', async () => {
-    nock(config.url)
+    nock(config.url.href)
       .matchHeader('authorization', `Bearer ${user.token}`)
       .get(URL)
       .reply(500)

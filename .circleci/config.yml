@@ -46,25 +46,20 @@ jobs:
           key: dependencies-{{ checksum "package-lock.json" }}
       - run:
           name: Install dependencies
-          command: CYPRESS_INSTALL_BINARY=0  npm ci --no-audit
+          command: CYPRESS_INSTALL_BINARY=0 npm ci --no-audit
       - save_cache:
           key: dependencies-{{ checksum "package-lock.json" }}
           paths:
             - node_modules
       - run:
-          name: Record build info
-          command: |
-            npm run build
-            DATE=$(date '+%Y-%m-%d')
-            export BUILD_NUMBER=${DATE}.${CIRCLE_BUILD_NUM}
-            export GIT_REF="$CIRCLE_SHA1"
-            npm run record-build-info
+          name: Build
+          command: npm run build
+      - run:
+          name: Unit tests
+          command: npm run test -- --maxWorkers=2 --ci
       - run:
           name: Lint
           command: npm run lint
-      - run:
-          name: unit tests
-          command: npm run test -- --maxWorkers=2 --ci
       - store_test_results:
           path: test_results
 
@@ -94,6 +89,7 @@ workflows:
   build-test-and-deploy:
     jobs:
       - build-test:
+          context: hmpps-manage-supervisions
           filters:
             tags:
               ignore: /.*/

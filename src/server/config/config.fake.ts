@@ -8,7 +8,7 @@ import { fake } from '../util/util.fake'
 
 export const fakeApiConfig = fake<ApiConfig>(() => ({
   enabled: true,
-  url: faker.internet.url(),
+  url: new URL(faker.internet.url()),
   timeout: faker.datatype.number({ min: 5000, max: 30000 }),
   agent: {
     maxSockets: faker.datatype.number({ min: 50, max: 150 }),
@@ -29,13 +29,9 @@ export const fakeConfig = fake<Config>(() => ({
     name: faker.helpers.slugify(faker.company.bs()),
     description: faker.company.bs(),
     version: faker.system.semver(),
-    build: {
-      buildNumber: faker.system.semver(),
-      gitRef: faker.git.commitSha(),
-    },
     port: faker.datatype.number({ min: 3000, max: 5000 }),
     isProduction: false,
-    https: faker.datatype.boolean(),
+    deploymentEnvironment: 'local',
     domain: new URL(faker.internet.url()),
     staticResourceCacheDuration: faker.datatype.number({ min: 60, max: 6000 }),
     features: {

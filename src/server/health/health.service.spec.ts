@@ -33,7 +33,7 @@ describe('HealthService', () => {
 
   function havingHealthyApi(api: keyof DependentApisConfig, up = true) {
     const [status, data] = up ? [200, 'UP'] : [503, 'DOWN']
-    nock(config[api].url).get('/health/ping').reply(status, { status: data })
+    nock(config[api].url.href).get('/health/ping').reply(status, { status: data })
   }
 
   it('should be healthy when all services are healthy', async () => {
@@ -44,7 +44,6 @@ describe('HealthService', () => {
     expect(observed).toEqual({
       healthy: true,
       checks: { hmppsAuth: 'OK', community: 'OK', assessRisksAndNeeds: 'OK' },
-      build: server.build,
       version: server.version,
     })
   })
@@ -57,7 +56,6 @@ describe('HealthService', () => {
     expect(observed).toEqual({
       healthy: false,
       checks: { hmppsAuth: { status: 'DOWN' }, community: 'OK', assessRisksAndNeeds: 'OK' },
-      build: server.build,
       version: server.version,
     })
   })

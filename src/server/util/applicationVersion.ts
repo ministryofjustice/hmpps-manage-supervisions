@@ -1,26 +1,28 @@
 import * as fs from 'fs'
+import * as path from 'path'
 
-const packageData = JSON.parse(fs.readFileSync('package.json').toString())
-const buildInfoPath = 'build-info.json'
-const buildInfo = fs.existsSync(buildInfoPath)
-  ? JSON.parse(fs.readFileSync(buildInfoPath, { encoding: 'utf8' }).toString())
-  : {}
+const PACKAGE_JSON_PATH = 'package.json'
+const BUILD_INFO_PATH = path.join(__dirname, 'build-info.json')
 
 export interface ApplicationInfo {
-  buildNumber: string
   packageData: {
     name: string
     version: string
     description: string
   }
-  buildInfo: {
-    buildNumber: string
-    gitRef: string
+  version?: string
+}
+
+function getVersion(): string {
+  // try to read from file first, this is created by 'scripts/record-build-info' in the Dockerfile
+  if (fs.existsSync(BUILD_INFO_PATH)) {
+    return JSON.parse(fs.readFileSync(BUILD_INFO_PATH, { encoding: 'utf8' }))
   }
+  // otherwise we're running outside docker, so attempt to read from environment variables
+  return process.env.BUILD_NUMBER || null
 }
 
 export const ApplicationVersion: ApplicationInfo = {
-  buildNumber: buildInfo?.buildNumber || packageData.version,
-  packageData,
-  buildInfo,
+  packageData: JSON.parse(fs.readFileSync(PACKAGE_JSON_PATH, { encoding: 'utf8' })),
+  version: getVersion(),
 }

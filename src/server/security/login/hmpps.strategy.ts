@@ -5,7 +5,7 @@ import { Strategy } from 'passport-oauth2'
 import { AuthApiConfig, ServerConfig } from '../../config'
 import { UserService } from '../user/user.service'
 import { generateOauthClientToken } from '../../common'
-import { titleCase } from '../../util'
+import { titleCase, urlJoin } from '../../util'
 import * as jwt from 'jsonwebtoken'
 
 @Injectable()
@@ -25,11 +25,11 @@ export class HmppsStrategy extends PassportStrategy(Strategy, 'hmpps') {
     const { url, externalUrl, apiClientCredentials } = config.get<AuthApiConfig>('apis.hmppsAuth')
     const { domain } = config.get<ServerConfig>('server')
     return {
-      authorizationURL: `${externalUrl}/oauth/authorize`,
-      tokenURL: `${url}/oauth/token`,
+      authorizationURL: urlJoin(externalUrl, 'oauth', 'authorize'),
+      tokenURL: urlJoin(url, 'oauth', 'token'),
       clientID: apiClientCredentials.id,
       clientSecret: apiClientCredentials.secret,
-      callbackURL: `${domain}/login/callback`,
+      callbackURL: urlJoin(domain, 'login', 'callback'),
       state: true,
       customHeaders: { Authorization: generateOauthClientToken(apiClientCredentials) },
     }

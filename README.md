@@ -13,11 +13,11 @@ Provides probation practitioners with a GDS UI for managing case load.
 
 ## Running
 
-To run locally via the latest docker images: 
+To run locally with docker compose: 
 
 ```bash
 docker compose pull
-docker compose up
+docker compose up --build
 ```
 
 This will use a stubbed API (via wiremock) & allow non-Delius user authentication.
@@ -25,18 +25,6 @@ Navigate to `http://localhost:3000` and login with:
 
 * username: `MANAGE_SUPERVISIONS`
 * password: `password123456`
-
-### Against real dependencies
-
-> TODO: this doesn't actually work right now due to the lack of assess risks & needs API docker compose configuration & community API LDAP configuration.
-
-If you'd like to run with Delius user based authentication & against the real Community API then run.
-
-```bash
-docker compose -f docker-compose.yml -f docker-compose.community-api.yml up
-```
-
-> Warning: this requires access to the private [Oracle DB image](https://github.com/ministryofjustice/hmpps-delius-api/blob/main/doc/development.md#oracle-database)
 
 ## Dependencies
 

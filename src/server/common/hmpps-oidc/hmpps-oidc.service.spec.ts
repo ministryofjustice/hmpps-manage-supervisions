@@ -7,6 +7,7 @@ import { FakeConfigModule } from '../../config/config.fake'
 import * as faker from 'faker'
 import { ConfigService } from '@nestjs/config'
 import { fakeUser } from '../../security/user/user.fake'
+import { urlJoin } from '../../util'
 
 describe('HmppsOidcService', () => {
   let subject: HmppsOidcService
@@ -30,18 +31,18 @@ describe('HmppsOidcService', () => {
 
   function havingDiscovery() {
     const discovery = {
-      issuer: apiConfig.url,
+      issuer: apiConfig.url.href,
       grant_types_supported: ['client_credentials'],
       scopes_supported: ['some-scope'],
       token_endpoint_auth_methods_supported: ['client_secret_basic'],
-      token_endpoint: apiConfig.url + '/token',
+      token_endpoint: urlJoin(apiConfig.url, 'token'),
     }
-    nock(apiConfig.url).get('/issuer/.well-known/openid-configuration').reply(200, discovery)
+    nock(apiConfig.url.href).get('/issuer/.well-known/openid-configuration').reply(200, discovery)
   }
 
   it('getting fresh delius user token', async () => {
     const accessToken = faker.datatype.uuid()
-    nock(apiConfig.url)
+    nock(apiConfig.url.href)
       .post('/token', `grant_type=client_credentials&username=${user.username}`)
       .basicAuth({ user: apiConfig.systemClientCredentials.id, pass: apiConfig.systemClientCredentials.secret })
       .reply(200, {

@@ -20,7 +20,7 @@ export class HealthService {
   constructor(private readonly http: HttpService, private readonly config: ConfigService<Config>) {}
 
   getHealth(): Observable<HealthResult> {
-    const server = this.config.get<ServerConfig>('server')
+    const { version } = this.config.get<ServerConfig>('server')
     const checks = Object.entries(this.config.get<DependentApisConfig>('apis'))
       .filter(([, api]) => api.enabled)
       .map(([name, api]) => this.service(name as keyof DependentApisConfig, api))
@@ -29,8 +29,7 @@ export class HealthService {
         healthy: results.length === 0 || results.every(x => x.healthy),
         checks: results.reduce((agg, x) => ({ ...agg, [x.name]: x.result }), {}),
         uptime: process.uptime(),
-        build: server.build,
-        version: server.version,
+        version,
       })),
     )
   }

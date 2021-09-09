@@ -1,7 +1,7 @@
 import { Controller, Get, Redirect, Req, UseGuards } from '@nestjs/common'
 import { Request } from 'express'
 import { LoginGuard } from './login.guard'
-import { Public } from '../authentication/public.decorator'
+import { Public } from '../authentication'
 import { LoginService } from './login.service'
 import { RedirectResponse } from '../../common'
 

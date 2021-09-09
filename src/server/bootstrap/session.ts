@@ -7,8 +7,8 @@ import * as redis from 'redis'
 
 export function useRedisSession(app: NestExpressApplication) {
   const config = app.get(ConfigService)
-  const serverConfig = config.get<ServerConfig>('server')
-  const sessionConfig = config.get<SessionConfig>('session')
+  const { domain } = config.get<ServerConfig>('server')
+  const { expiryMinutes, secret } = config.get<SessionConfig>('session')
   const RedisStore = connectRedis(session)
 
   app.use(
@@ -17,11 +17,11 @@ export function useRedisSession(app: NestExpressApplication) {
         client: redis.createClient({ ...config.get<RedisConfig>('redis') }),
       }),
       cookie: {
-        secure: serverConfig.https,
+        secure: domain.protocol === 'https:',
         sameSite: 'lax',
-        maxAge: sessionConfig.expiryMinutes * 60 * 1000,
+        maxAge: expiryMinutes * 60 * 1000,
       },
-      secret: sessionConfig.secret,
+      secret,
       resave: false, // redis implements touch so shouldn't need this
       saveUninitialized: false,
       rolling: true,

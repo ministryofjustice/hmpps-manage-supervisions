@@ -20,13 +20,16 @@ export interface ServerConfig {
   name: string
   description: string
   version: string
-  build: {
-    buildNumber: string
-    gitRef: string
-  }
+  /**
+   * True if node is running in 'production' mode.
+   * NOTE: This does not mean the app is deployed to the production environment.
+   */
   isProduction: boolean
+  /**
+   * The name of the environment where the app is deployed.
+   */
+  deploymentEnvironment: string
   port: number
-  https: boolean
   domain: URL
   staticResourceCacheDuration: number
   features: Partial<Record<FeatureFlags, boolean>>
@@ -47,7 +50,7 @@ export interface SessionConfig {
 
 export interface ApiConfig {
   enabled: boolean
-  url: string
+  url: URL
   timeout: number
 }
 
