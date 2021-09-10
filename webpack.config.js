@@ -154,8 +154,8 @@ module.exports = function (options) {
         org: 'ministryofjustice',
         project: 'hmpps-manage-supervisions',
         release: buildNumber || 'unknown',
-        // only create a release from circleci on the main branch
-        dryRun: !buildNumber || !process.env.SENTRY_AUTH_TOKEN || process.env.CIRCLE_BRANCH !== 'main',
+        // only create a release from CI on the main branch
+        dryRun: !buildNumber || !process.env.CI || process.env.GIT_BRANCH !== 'main',
       }),
     ],
   };
