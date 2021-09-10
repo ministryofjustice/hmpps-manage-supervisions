@@ -6,7 +6,7 @@ import {
   RiskDto,
   RiskDtoCurrent,
   RiskDtoPrevious,
-  RoshRiskToSelfDto,
+  RoshRiskToSelfDtoAllRisksView,
 } from '../../../assess-risks-and-needs-api/client'
 import {
   CriminogenicNeed,
@@ -45,7 +45,7 @@ export class RiskService {
       return null
     }
 
-    const { riskToSelf, summary } = risks
+    const { riskToSelf, summary, assessedOn } = risks
 
     const communityRisks: RoshRisk[] = orderBy(
       Object.entries(summary?.riskInCommunity || {})
@@ -72,6 +72,7 @@ export class RiskService {
         custody: flattenRisks({ hostelSetting: 'in a hostel', custody: 'in custody' }, riskToSelf, 'about coping'),
         vulnerability: flattenRisks({ vulnerability: 'a vulnerability' }, riskToSelf),
       },
+      assessedOn: assessedOn ? DateTime.fromISO(assessedOn) : null,
     }
   }
 
@@ -162,7 +163,7 @@ export class RiskService {
   }
 }
 
-function getSummaryRisks(riskToSelf: RoshRiskToSelfDto): { current: boolean; previous: boolean } {
+function getSummaryRisks(riskToSelf: RoshRiskToSelfDtoAllRisksView): { current: boolean; previous: boolean } {
   return Object.values(riskToSelf || {})
     .filter(x => x)
     .map(({ current, previous }) => ({
@@ -179,8 +180,8 @@ function getSummaryRisks(riskToSelf: RoshRiskToSelfDto): { current: boolean; pre
 }
 
 function flattenRisks(
-  meta: Partial<Record<keyof RoshRiskToSelfDto, string>>,
-  riskToSelf: RoshRiskToSelfDto,
+  meta: Partial<Record<keyof RoshRiskToSelfDtoAllRisksView, string>>,
+  riskToSelf: RoshRiskToSelfDtoAllRisksView,
   about = 'about',
 ): FlatRiskToSelf {
   if (!riskToSelf) {

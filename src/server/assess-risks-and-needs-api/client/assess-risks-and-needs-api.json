@@ -3,11 +3,17 @@
   "info": {
     "title": "HMPPS Risks and Needs API",
     "description": "API for managing risks and needs",
-    "contact": { "name": "HMPPS Digital Studio", "email": "feedback@digital.justice.gov.uk" },
-    "version": "2021-08-24.934.864b0c0"
+    "contact": {
+      "name": "HMPPS Digital Studio",
+      "email": "feedback@digital.justice.gov.uk"
+    },
+    "version": "2021-09-06.992.c482abe"
   },
   "servers": [
-    { "url": "https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk", "description": "Generated server url" }
+    {
+      "url": "https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk",
+      "description": "Generated server url"
+    }
   ],
   "paths": {
     "/risks/supplementary": {
@@ -17,40 +23,91 @@
         "operationId": "createSupplementaryRisk",
         "requestBody": {
           "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/CreateSupplementaryRiskDto" } }
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSupplementaryRiskDto"
+              }
+            }
           },
           "required": true
         },
         "responses": {
           "401": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
             "content": {
-              "*/*": { "schema": { "oneOf": [{ "type": "object" }, { "$ref": "#/components/schemas/ErrorResponse" }] } }
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    }
+                  ]
+                }
+              }
             }
           },
           "500": {
             "description": "Internal Server Error",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "404": {
             "description": "Not Found",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "409": {
             "description": "Conflict",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/SupplementaryRiskDto" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplementaryRiskDto"
+                }
+              }
+            }
           },
           "403": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "200": {
             "description": "OK",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/SupplementaryRiskDto" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplementaryRiskDto"
+                }
+              }
+            }
           }
         }
       }
@@ -66,53 +123,133 @@
             "in": "path",
             "description": "Predictor type",
             "required": true,
-            "schema": { "type": "string", "enum": ["RSR"] },
+            "schema": {
+              "type": "string",
+              "enum": ["RSR"]
+            },
             "example": "RSR"
           },
-          { "name": "final", "in": "query", "required": true, "schema": { "type": "boolean" } },
+          {
+            "name": "final",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
           {
             "name": "source",
             "in": "query",
             "required": true,
-            "schema": { "type": "string", "enum": ["ASSESSMENTS_API", "OASYS"] }
+            "schema": {
+              "type": "string",
+              "enum": ["ASSESSMENTS_API", "OASYS"]
+            }
           },
-          { "name": "sourceId", "in": "query", "required": true, "schema": { "type": "string" } },
-          { "name": "algorithmVersion", "in": "query", "required": false, "schema": { "type": "string" } }
+          {
+            "name": "sourceId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "algorithmVersion",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "requestBody": {
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/OffenderAndOffencesDto" } } },
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OffenderAndOffencesDto"
+              }
+            }
+          },
           "required": true
         },
         "responses": {
           "401": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
             "content": {
-              "*/*": { "schema": { "oneOf": [{ "type": "object" }, { "$ref": "#/components/schemas/ErrorResponse" }] } }
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    }
+                  ]
+                }
+              }
             }
           },
           "500": {
             "description": "Internal Server Error",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "404": {
             "description": "Not Found",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "409": {
             "description": "Conflict",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/SupplementaryRiskDto" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplementaryRiskDto"
+                }
+              }
+            }
           },
           "403": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "200": {
             "description": "OK",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/RiskPredictorsDto" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RiskPredictorsDto"
+                }
+              }
+            }
           }
         }
       }
@@ -128,40 +265,90 @@
             "in": "path",
             "description": "Supplementary ID",
             "required": true,
-            "schema": { "type": "string", "format": "uuid" },
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
             "example": "78beac68-884c-4784-9bea-fd8088f52a47"
           }
         ],
         "responses": {
           "401": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
             "content": {
-              "*/*": { "schema": { "oneOf": [{ "type": "object" }, { "$ref": "#/components/schemas/ErrorResponse" }] } }
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    }
+                  ]
+                }
+              }
             }
           },
           "500": {
             "description": "Internal Server Error",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "404": {
             "description": "Supplementary risk source Not Found",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "409": {
             "description": "Conflict",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/SupplementaryRiskDto" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplementaryRiskDto"
+                }
+              }
+            }
           },
           "403": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "200": {
             "description": "OK",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/SupplementaryRiskDto" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplementaryRiskDto"
+                }
+              }
+            }
           }
         }
       }
@@ -177,7 +364,9 @@
             "in": "path",
             "description": "Source ID",
             "required": true,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "example": "78beac68-884c-4784-9bea-fd8088f52a47"
           },
           {
@@ -185,40 +374,90 @@
             "in": "path",
             "description": "Source Type",
             "required": true,
-            "schema": { "type": "string", "enum": ["INTERVENTION_REFERRAL"] },
+            "schema": {
+              "type": "string",
+              "enum": ["INTERVENTION_REFERRAL"]
+            },
             "example": "INTERVENTION_REFERRAL"
           }
         ],
         "responses": {
           "401": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
             "content": {
-              "*/*": { "schema": { "oneOf": [{ "type": "object" }, { "$ref": "#/components/schemas/ErrorResponse" }] } }
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    }
+                  ]
+                }
+              }
             }
           },
           "500": {
             "description": "Internal Server Error",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "404": {
             "description": "Supplementary risk source Not Found",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "409": {
             "description": "Conflict",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/SupplementaryRiskDto" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplementaryRiskDto"
+                }
+              }
+            }
           },
           "403": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "200": {
             "description": "OK",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/SupplementaryRiskDto" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplementaryRiskDto"
+                }
+              }
+            }
           }
         }
       }
@@ -234,41 +473,91 @@
             "in": "path",
             "description": "CRN",
             "required": true,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "example": "X123456"
           }
         ],
         "responses": {
           "401": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
             "content": {
-              "*/*": { "schema": { "oneOf": [{ "type": "object" }, { "$ref": "#/components/schemas/ErrorResponse" }] } }
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    }
+                  ]
+                }
+              }
             }
           },
           "500": {
             "description": "Internal Server Error",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "404": {
             "description": "Supplementary risk source Not Found",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "409": {
             "description": "Conflict",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/SupplementaryRiskDto" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplementaryRiskDto"
+                }
+              }
+            }
           },
           "403": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "200": {
             "description": "OK",
             "content": {
-              "*/*": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/SupplementaryRiskDto" } } }
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SupplementaryRiskDto"
+                  }
+                }
+              }
             }
           }
         }
@@ -285,40 +574,89 @@
             "in": "path",
             "description": "CRN",
             "required": true,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "example": "D1974X"
           }
         ],
         "responses": {
           "401": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
             "content": {
-              "*/*": { "schema": { "oneOf": [{ "type": "object" }, { "$ref": "#/components/schemas/ErrorResponse" }] } }
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    }
+                  ]
+                }
+              }
             }
           },
           "500": {
             "description": "Internal Server Error",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "404": {
             "description": "CRN Not Found",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "409": {
             "description": "Conflict",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/SupplementaryRiskDto" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplementaryRiskDto"
+                }
+              }
+            }
           },
           "403": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "200": {
             "description": "OK",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/AllRoshRiskDto" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AllRoshRiskDto_AllRisksView"
+                }
+              }
+            }
           }
         }
       }
@@ -334,40 +672,89 @@
             "in": "path",
             "description": "CRN",
             "required": true,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "example": "D1974X"
           }
         ],
         "responses": {
           "401": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
             "content": {
-              "*/*": { "schema": { "oneOf": [{ "type": "object" }, { "$ref": "#/components/schemas/ErrorResponse" }] } }
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    }
+                  ]
+                }
+              }
             }
           },
           "500": {
             "description": "Internal Server Error",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "404": {
             "description": "CRN Not Found",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "409": {
             "description": "Conflict",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/SupplementaryRiskDto" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplementaryRiskDto"
+                }
+              }
+            }
           },
           "403": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "200": {
             "description": "OK",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/RiskRoshSummaryDto" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RiskRoshSummaryDto"
+                }
+              }
+            }
           }
         }
       }
@@ -383,40 +770,89 @@
             "in": "path",
             "description": "CRN",
             "required": true,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "example": "D1974X"
           }
         ],
         "responses": {
           "401": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
             "content": {
-              "*/*": { "schema": { "oneOf": [{ "type": "object" }, { "$ref": "#/components/schemas/ErrorResponse" }] } }
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    }
+                  ]
+                }
+              }
             }
           },
           "500": {
             "description": "Internal Server Error",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "404": {
             "description": "CRN Not Found",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "409": {
             "description": "Conflict",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/SupplementaryRiskDto" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplementaryRiskDto"
+                }
+              }
+            }
           },
           "403": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "200": {
             "description": "OK",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/RoshRiskToSelfDto" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoshRiskToSelfDto"
+                }
+              }
+            }
           }
         }
       }
@@ -432,40 +868,89 @@
             "in": "path",
             "description": "CRN",
             "required": true,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "example": "D1974X"
           }
         ],
         "responses": {
           "401": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
             "content": {
-              "*/*": { "schema": { "oneOf": [{ "type": "object" }, { "$ref": "#/components/schemas/ErrorResponse" }] } }
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    }
+                  ]
+                }
+              }
             }
           },
           "500": {
             "description": "Internal Server Error",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "404": {
             "description": "CRN Not Found",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "409": {
             "description": "Conflict",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/SupplementaryRiskDto" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplementaryRiskDto"
+                }
+              }
+            }
           },
           "403": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "200": {
             "description": "OK",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/OtherRoshRisksDto" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OtherRoshRisksDto"
+                }
+              }
+            }
           }
         }
       }
@@ -481,40 +966,89 @@
             "in": "path",
             "description": "CRN",
             "required": true,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "example": "D1974X"
           }
         ],
         "responses": {
           "401": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
             "content": {
-              "*/*": { "schema": { "oneOf": [{ "type": "object" }, { "$ref": "#/components/schemas/ErrorResponse" }] } }
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    }
+                  ]
+                }
+              }
             }
           },
           "500": {
             "description": "Internal Server Error",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "404": {
             "description": "CRN Not Found",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "409": {
             "description": "Conflict",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/SupplementaryRiskDto" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplementaryRiskDto"
+                }
+              }
+            }
           },
           "403": {
             "description": "Unauthorized",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "200": {
             "description": "OK",
-            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/AssessmentNeedsDto" } } }
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssessmentNeedsDto"
+                }
+              }
+            }
           }
         }
       }
@@ -525,13 +1059,23 @@
       "ErrorResponse": {
         "type": "object",
         "properties": {
-          "status": { "type": "integer", "description": "Status of Error Code", "format": "int32", "example": 400 },
+          "status": {
+            "type": "integer",
+            "description": "Status of Error Code",
+            "format": "int32",
+            "example": 400
+          },
           "developerMessage": {
             "type": "string",
             "description": "Developer Information message",
             "example": "System is down"
           },
-          "errorCode": { "type": "integer", "description": "Internal Error Code", "format": "int32", "example": 20012 },
+          "errorCode": {
+            "type": "integer",
+            "description": "Internal Error Code",
+            "format": "int32",
+            "example": 20012
+          },
           "userMessage": {
             "type": "string",
             "description": "Error message information",
@@ -565,10 +1109,26 @@
             "description": "Source Id",
             "example": "78beac68-884c-4784-9bea-fd8088f52a47 or 1989823"
           },
-          "crn": { "type": "string", "description": "Offender CRN", "example": "DX12340A" },
-          "createdByUser": { "type": "string", "description": "Created By User", "example": "Paul Newman" },
-          "createdByUserType": { "type": "string", "description": "Created By User Type", "example": "delius" },
-          "createdDate": { "type": "string", "description": "Created At", "format": "date-time" },
+          "crn": {
+            "type": "string",
+            "description": "Offender CRN",
+            "example": "DX12340A"
+          },
+          "createdByUser": {
+            "type": "string",
+            "description": "Created By User",
+            "example": "Paul Newman"
+          },
+          "createdByUserType": {
+            "type": "string",
+            "description": "Created By User Type",
+            "example": "delius"
+          },
+          "createdDate": {
+            "type": "string",
+            "description": "Created At",
+            "format": "date-time"
+          },
           "riskSummaryComments": {
             "type": "string",
             "description": "Risk Summary Comments",
@@ -591,9 +1151,21 @@
             "description": "Source Id",
             "example": "78beac68-884c-4784-9bea-fd8088f52a47 or 1989823"
           },
-          "crn": { "type": "string", "description": "Offender CRN", "example": "DX12340A" },
-          "createdByUserType": { "type": "string", "description": "Created By User Type", "example": "delius" },
-          "createdDate": { "type": "string", "description": "Created At", "format": "date-time" },
+          "crn": {
+            "type": "string",
+            "description": "Offender CRN",
+            "example": "DX12340A"
+          },
+          "createdByUserType": {
+            "type": "string",
+            "description": "Created By User Type",
+            "example": "delius"
+          },
+          "createdDate": {
+            "type": "string",
+            "description": "Created At",
+            "format": "date-time"
+          },
           "riskSummaryComments": {
             "type": "string",
             "description": "Risk Summary Comments",
@@ -605,7 +1177,14 @@
       "CurrentOffence": {
         "required": ["offenceCode", "offenceSubcode"],
         "type": "object",
-        "properties": { "offenceCode": { "type": "string" }, "offenceSubcode": { "type": "string" } },
+        "properties": {
+          "offenceCode": {
+            "type": "string"
+          },
+          "offenceSubcode": {
+            "type": "string"
+          }
+        },
         "description": "Current Offence"
       },
       "CurrentOffences": {
@@ -685,8 +1264,12 @@
             "example": "NO_PROBLEMS, SOME_PROBLEMS, SIGNIFICANT_PROBLEMS, MISSING",
             "enum": ["NO_PROBLEMS", "SOME_PROBLEMS", "SIGNIFICANT_PROBLEMS", "MISSING"]
           },
-          "previousOffences": { "$ref": "#/components/schemas/PreviousOffences" },
-          "currentOffences": { "$ref": "#/components/schemas/CurrentOffences" }
+          "previousOffences": {
+            "$ref": "#/components/schemas/PreviousOffences"
+          },
+          "currentOffences": {
+            "$ref": "#/components/schemas/CurrentOffences"
+          }
         },
         "description": "Offences for dynamic scoring"
       },
@@ -707,16 +1290,31 @@
         ],
         "type": "object",
         "properties": {
-          "crn": { "type": "string", "description": "Offender CRN", "example": "DX12340A" },
+          "crn": {
+            "type": "string",
+            "description": "Offender CRN",
+            "example": "DX12340A"
+          },
           "gender": {
             "type": "string",
             "description": "Gender",
             "example": "MALE, FEMALE",
             "enum": ["MALE", "FEMALE"]
           },
-          "dob": { "type": "string", "description": "date of birth", "format": "date", "example": "1980-01-01" },
-          "assessmentDate": { "type": "string", "description": "Assessment date", "format": "date-time" },
-          "currentOffence": { "$ref": "#/components/schemas/CurrentOffence" },
+          "dob": {
+            "type": "string",
+            "description": "date of birth",
+            "format": "date",
+            "example": "1980-01-01"
+          },
+          "assessmentDate": {
+            "type": "string",
+            "description": "Assessment date",
+            "format": "date-time"
+          },
+          "currentOffence": {
+            "$ref": "#/components/schemas/CurrentOffence"
+          },
           "dateOfFirstSanction": {
             "type": "string",
             "description": "Date of first sanction for the offender",
@@ -797,7 +1395,9 @@
             "description": "Have you completed an interview with the individual?",
             "example": true
           },
-          "dynamicScoringOffences": { "$ref": "#/components/schemas/DynamicScoringOffences" }
+          "dynamicScoringOffences": {
+            "$ref": "#/components/schemas/DynamicScoringOffences"
+          }
         }
       },
       "PreviousOffences": {
@@ -813,20 +1413,36 @@
             "description": "Wounding/GBH (Sections 18/20 Offences Against the Person Act 1861)",
             "example": true
           },
-          "aggravatedBurglary": { "type": "boolean", "description": "Aggravated burglary", "example": true },
-          "arson": { "type": "boolean", "description": "Arson", "example": true },
+          "aggravatedBurglary": {
+            "type": "boolean",
+            "description": "Aggravated burglary",
+            "example": true
+          },
+          "arson": {
+            "type": "boolean",
+            "description": "Arson",
+            "example": true
+          },
           "criminalDamage": {
             "type": "boolean",
             "description": "Criminal damage with intent to endanger life",
             "example": true
           },
-          "kidnapping": { "type": "boolean", "description": "Kidnapping/false imprisonment", "example": true },
+          "kidnapping": {
+            "type": "boolean",
+            "description": "Kidnapping/false imprisonment",
+            "example": true
+          },
           "firearmPossession": {
             "type": "boolean",
             "description": "Possession of a firearm with intent to endanger life or resist arrest",
             "example": true
           },
-          "robbery": { "type": "boolean", "description": "Robbery", "example": true },
+          "robbery": {
+            "type": "boolean",
+            "description": "Robbery",
+            "example": true
+          },
           "offencesWithWeapon": {
             "type": "boolean",
             "description": "Any other offence involving possession and/or use of weapons",
@@ -839,36 +1455,78 @@
         "required": ["algorithmVersion", "calculatedAt", "errors", "scores", "type"],
         "type": "object",
         "properties": {
-          "algorithmVersion": { "type": "string" },
-          "calculatedAt": { "type": "string", "format": "date-time" },
-          "type": { "type": "string", "enum": ["RSR"] },
-          "scoreType": { "type": "string", "enum": ["STATIC", "DYNAMIC"] },
-          "scores": { "type": "object", "additionalProperties": { "$ref": "#/components/schemas/Score" } },
-          "errors": { "type": "array", "items": { "type": "string" } }
+          "algorithmVersion": {
+            "type": "string"
+          },
+          "calculatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["RSR"]
+          },
+          "scoreType": {
+            "type": "string",
+            "enum": ["STATIC", "DYNAMIC"]
+          },
+          "scores": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Score"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
         }
       },
       "Score": {
         "required": ["isValid"],
         "type": "object",
         "properties": {
-          "level": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "VERY_HIGH", "NOT_APPLICABLE"] },
-          "score": { "type": "number" },
-          "isValid": { "type": "boolean" }
+          "level": {
+            "type": "string",
+            "enum": ["LOW", "MEDIUM", "HIGH", "VERY_HIGH", "NOT_APPLICABLE"]
+          },
+          "score": {
+            "type": "number"
+          },
+          "isValid": {
+            "type": "boolean"
+          }
         }
       },
-      "AllRoshRiskDto": {
+      "AllRoshRiskDto_AllRisksView": {
         "required": ["otherRisks", "riskToSelf", "summary"],
         "type": "object",
         "properties": {
-          "riskToSelf": { "$ref": "#/components/schemas/RoshRiskToSelfDto" },
-          "otherRisks": { "$ref": "#/components/schemas/OtherRoshRisksDto" },
-          "summary": { "$ref": "#/components/schemas/RiskRoshSummaryDto" }
+          "riskToSelf": {
+            "$ref": "#/components/schemas/RoshRiskToSelfDto_AllRisksView"
+          },
+          "otherRisks": {
+            "$ref": "#/components/schemas/OtherRoshRisksDto_AllRisksView"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/RiskRoshSummaryDto_AllRisksView"
+          },
+          "assessedOn": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       },
-      "OtherRoshRisksDto": {
+      "OtherRoshRisksDto_AllRisksView": {
         "type": "object",
         "properties": {
-          "escapeOrAbscond": { "type": "string", "description": "Escape / abscond", "enum": ["YES", "NO", "DK"] },
+          "escapeOrAbscond": {
+            "type": "string",
+            "description": "Escape / abscond",
+            "enum": ["YES", "NO", "DK"]
+          },
           "controlIssuesDisruptiveBehaviour": {
             "type": "string",
             "description": "Control issues / disruptive behaviour",
@@ -883,6 +1541,219 @@
             "type": "string",
             "description": "Risks to other prisoners",
             "enum": ["YES", "NO", "DK"]
+          }
+        }
+      },
+      "RiskDto_AllRisksView": {
+        "type": "object",
+        "properties": {
+          "risk": {
+            "type": "string",
+            "description": "is there any risk",
+            "example": "Yes, No, Don't know, null",
+            "enum": ["YES", "NO", "DK"]
+          },
+          "previous": {
+            "type": "string",
+            "description": "Previous concerns",
+            "example": "Yes, No, Don't know",
+            "enum": ["YES", "NO", "DK"]
+          },
+          "previousConcernsText": {
+            "type": "string",
+            "description": "Previous concerns supporting comments",
+            "example": "Risk of self harms concerns due to ..."
+          },
+          "current": {
+            "type": "string",
+            "description": "Current concerns",
+            "example": "Yes, No, Don't know",
+            "enum": ["YES", "NO", "DK"]
+          },
+          "currentConcernsText": {
+            "type": "string",
+            "description": "Current concerns supporting comments",
+            "example": "Risk of self harms concerns due to ..."
+          }
+        },
+        "description": "Vulnerability"
+      },
+      "RiskRoshSummaryDto_AllRisksView": {
+        "required": ["riskInCommunity", "riskInCustody"],
+        "type": "object",
+        "properties": {
+          "whoIsAtRisk": {
+            "type": "string",
+            "description": "Who is at risk?",
+            "example": "X, Y and Z are at risk"
+          },
+          "natureOfRisk": {
+            "type": "string",
+            "description": "What is the nature of the risk?",
+            "example": "The nature of the risk is X"
+          },
+          "riskImminence": {
+            "type": "string",
+            "description": "When is the risk likely to be greatest. Consider the timescale and indicate whether risk is immediate or not. Consider the risks in custody as well as on release.",
+            "example": "the risk is imminent and more probably in X situation"
+          },
+          "riskIncreaseFactors": {
+            "type": "string",
+            "description": "What circumstances are likely to increase risk. Describe factors, actions, events which might increase level of risk, now and in the future.",
+            "example": "If offender in situation X the risk can be higher"
+          },
+          "riskMitigationFactors": {
+            "type": "string",
+            "description": "What factors are likely to reduce the risk. Describe factors, actions, and events which may reduce or contain the level of risk. What has previously stopped him / her?",
+            "example": "Giving offender therapy in X will reduce the risk"
+          },
+          "riskInCommunity": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "description": "Assess the risk of serious harm the offender poses in the community",
+              "example": {
+                "HIGH ": ["Children", "Public", "Know adult"],
+                "MEDIUM": ["Staff"],
+                "LOW": ["Prisoners"]
+              },
+              "items": {
+                "type": "string",
+                "description": "Assess the risk of serious harm the offender poses in the community",
+                "example": "{\"HIGH \":[\"Children\",\"Public\",\"Know adult\"],\"MEDIUM\":[\"Staff\"],\"LOW\":[\"Prisoners\"]}"
+              }
+            },
+            "description": "Assess the risk of serious harm the offender poses in the community",
+            "example": {
+              "HIGH ": ["Children", "Public", "Know adult"],
+              "MEDIUM": ["Staff"],
+              "LOW": ["Prisoners"]
+            }
+          },
+          "riskInCustody": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "description": "Assess the risk of serious harm the offender poses on the basis that they could be released imminently back into the community.Assess both the risk of serious harm the offender presents now, in custody, and the risk they could present to others whilst in a custodial setting.",
+              "example": {
+                "HIGH ": ["Know adult"],
+                "VERY_HIGH": ["Staff", "Prisoners"],
+                "LOW": ["Children", "Public"]
+              },
+              "items": {
+                "type": "string",
+                "description": "Assess the risk of serious harm the offender poses on the basis that they could be released imminently back into the community.Assess both the risk of serious harm the offender presents now, in custody, and the risk they could present to others whilst in a custodial setting.",
+                "example": "{\"HIGH \":[\"Know adult\"],\"VERY_HIGH\":[\"Staff\",\"Prisoners\"],\"LOW\":[\"Children\",\"Public\"]}"
+              }
+            },
+            "description": "Assess the risk of serious harm the offender poses on the basis that they could be released imminently back into the community.Assess both the risk of serious harm the offender presents now, in custody, and the risk they could present to others whilst in a custodial setting.",
+            "example": {
+              "HIGH ": ["Know adult"],
+              "VERY_HIGH": ["Staff", "Prisoners"],
+              "LOW": ["Children", "Public"]
+            }
+          }
+        }
+      },
+      "RoshRiskToSelfDto_AllRisksView": {
+        "type": "object",
+        "properties": {
+          "suicide": {
+            "$ref": "#/components/schemas/RiskDto_AllRisksView"
+          },
+          "selfHarm": {
+            "$ref": "#/components/schemas/RiskDto_AllRisksView"
+          },
+          "custody": {
+            "$ref": "#/components/schemas/RiskDto_AllRisksView"
+          },
+          "hostelSetting": {
+            "$ref": "#/components/schemas/RiskDto_AllRisksView"
+          },
+          "vulnerability": {
+            "$ref": "#/components/schemas/RiskDto_AllRisksView"
+          }
+        }
+      },
+      "RiskRoshSummaryDto": {
+        "required": ["riskInCommunity", "riskInCustody"],
+        "type": "object",
+        "properties": {
+          "whoIsAtRisk": {
+            "type": "string",
+            "description": "Who is at risk?",
+            "example": "X, Y and Z are at risk"
+          },
+          "natureOfRisk": {
+            "type": "string",
+            "description": "What is the nature of the risk?",
+            "example": "The nature of the risk is X"
+          },
+          "riskImminence": {
+            "type": "string",
+            "description": "When is the risk likely to be greatest. Consider the timescale and indicate whether risk is immediate or not. Consider the risks in custody as well as on release.",
+            "example": "the risk is imminent and more probably in X situation"
+          },
+          "riskIncreaseFactors": {
+            "type": "string",
+            "description": "What circumstances are likely to increase risk. Describe factors, actions, events which might increase level of risk, now and in the future.",
+            "example": "If offender in situation X the risk can be higher"
+          },
+          "riskMitigationFactors": {
+            "type": "string",
+            "description": "What factors are likely to reduce the risk. Describe factors, actions, and events which may reduce or contain the level of risk. What has previously stopped him / her?",
+            "example": "Giving offender therapy in X will reduce the risk"
+          },
+          "riskInCommunity": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "description": "Assess the risk of serious harm the offender poses in the community",
+              "example": {
+                "HIGH ": ["Children", "Public", "Know adult"],
+                "MEDIUM": ["Staff"],
+                "LOW": ["Prisoners"]
+              },
+              "items": {
+                "type": "string",
+                "description": "Assess the risk of serious harm the offender poses in the community",
+                "example": "{\"HIGH \":[\"Children\",\"Public\",\"Know adult\"],\"MEDIUM\":[\"Staff\"],\"LOW\":[\"Prisoners\"]}"
+              }
+            },
+            "description": "Assess the risk of serious harm the offender poses in the community",
+            "example": {
+              "HIGH ": ["Children", "Public", "Know adult"],
+              "MEDIUM": ["Staff"],
+              "LOW": ["Prisoners"]
+            }
+          },
+          "riskInCustody": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "description": "Assess the risk of serious harm the offender poses on the basis that they could be released imminently back into the community.Assess both the risk of serious harm the offender presents now, in custody, and the risk they could present to others whilst in a custodial setting.",
+              "example": {
+                "HIGH ": ["Know adult"],
+                "VERY_HIGH": ["Staff", "Prisoners"],
+                "LOW": ["Children", "Public"]
+              },
+              "items": {
+                "type": "string",
+                "description": "Assess the risk of serious harm the offender poses on the basis that they could be released imminently back into the community.Assess both the risk of serious harm the offender presents now, in custody, and the risk they could present to others whilst in a custodial setting.",
+                "example": "{\"HIGH \":[\"Know adult\"],\"VERY_HIGH\":[\"Staff\",\"Prisoners\"],\"LOW\":[\"Children\",\"Public\"]}"
+              }
+            },
+            "description": "Assess the risk of serious harm the offender poses on the basis that they could be released imminently back into the community.Assess both the risk of serious harm the offender presents now, in custody, and the risk they could present to others whilst in a custodial setting.",
+            "example": {
+              "HIGH ": ["Know adult"],
+              "VERY_HIGH": ["Staff", "Prisoners"],
+              "LOW": ["Children", "Public"]
+            }
+          },
+          "assessedOn": {
+            "type": "string",
+            "description": "The date and time that the assessment was completed",
+            "format": "date-time"
           }
         }
       },
@@ -920,82 +1791,74 @@
         },
         "description": "Vulnerability"
       },
-      "RiskRoshSummaryDto": {
-        "required": ["riskInCommunity", "riskInCustody"],
-        "type": "object",
-        "properties": {
-          "whoIsAtRisk": { "type": "string", "description": "Who is at risk?", "example": "X, Y and Z are at risk" },
-          "natureOfRisk": {
-            "type": "string",
-            "description": "What is the nature of the risk?",
-            "example": "The nature of the risk is X"
-          },
-          "riskImminence": {
-            "type": "string",
-            "description": "When is the risk likely to be greatest. Consider the timescale and indicate whether risk is immediate or not. Consider the risks in custody as well as on release.",
-            "example": "the risk is imminent and more probably in X situation"
-          },
-          "riskIncreaseFactors": {
-            "type": "string",
-            "description": "What circumstances are likely to increase risk. Describe factors, actions, events which might increase level of risk, now and in the future.",
-            "example": "If offender in situation X the risk can be higher"
-          },
-          "riskMitigationFactors": {
-            "type": "string",
-            "description": "What factors are likely to reduce the risk. Describe factors, actions, and events which may reduce or contain the level of risk. What has previously stopped him / her?",
-            "example": "Giving offender therapy in X will reduce the risk"
-          },
-          "riskInCommunity": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "description": "Assess the risk of serious harm the offender poses in the community",
-              "example": { "HIGH ": ["Children", "Public", "Know adult"], "MEDIUM": ["Staff"], "LOW": ["Prisoners"] },
-              "items": {
-                "type": "string",
-                "description": "Assess the risk of serious harm the offender poses in the community",
-                "example": "{\"HIGH \":[\"Children\",\"Public\",\"Know adult\"],\"MEDIUM\":[\"Staff\"],\"LOW\":[\"Prisoners\"]}"
-              }
-            },
-            "description": "Assess the risk of serious harm the offender poses in the community",
-            "example": { "HIGH ": ["Children", "Public", "Know adult"], "MEDIUM": ["Staff"], "LOW": ["Prisoners"] }
-          },
-          "riskInCustody": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "description": "Assess the risk of serious harm the offender poses on the basis that they could be released imminently back into the community.Assess both the risk of serious harm the offender presents now, in custody, and the risk they could present to others whilst in a custodial setting.",
-              "example": {
-                "HIGH ": ["Know adult"],
-                "VERY_HIGH": ["Staff", "Prisoners"],
-                "LOW": ["Children", "Public"]
-              },
-              "items": {
-                "type": "string",
-                "description": "Assess the risk of serious harm the offender poses on the basis that they could be released imminently back into the community.Assess both the risk of serious harm the offender presents now, in custody, and the risk they could present to others whilst in a custodial setting.",
-                "example": "{\"HIGH \":[\"Know adult\"],\"VERY_HIGH\":[\"Staff\",\"Prisoners\"],\"LOW\":[\"Children\",\"Public\"]}"
-              }
-            },
-            "description": "Assess the risk of serious harm the offender poses on the basis that they could be released imminently back into the community.Assess both the risk of serious harm the offender presents now, in custody, and the risk they could present to others whilst in a custodial setting.",
-            "example": { "HIGH ": ["Know adult"], "VERY_HIGH": ["Staff", "Prisoners"], "LOW": ["Children", "Public"] }
-          }
-        }
-      },
       "RoshRiskToSelfDto": {
         "type": "object",
         "properties": {
-          "suicide": { "$ref": "#/components/schemas/RiskDto" },
-          "selfHarm": { "$ref": "#/components/schemas/RiskDto" },
-          "custody": { "$ref": "#/components/schemas/RiskDto" },
-          "hostelSetting": { "$ref": "#/components/schemas/RiskDto" },
-          "vulnerability": { "$ref": "#/components/schemas/RiskDto" }
+          "suicide": {
+            "$ref": "#/components/schemas/RiskDto"
+          },
+          "selfHarm": {
+            "$ref": "#/components/schemas/RiskDto"
+          },
+          "custody": {
+            "$ref": "#/components/schemas/RiskDto"
+          },
+          "hostelSetting": {
+            "$ref": "#/components/schemas/RiskDto"
+          },
+          "vulnerability": {
+            "$ref": "#/components/schemas/RiskDto"
+          },
+          "assessedOn": {
+            "type": "string",
+            "description": "The date and time that the assessment was completed",
+            "format": "date-time"
+          }
+        }
+      },
+      "OtherRoshRisksDto": {
+        "type": "object",
+        "properties": {
+          "escapeOrAbscond": {
+            "type": "string",
+            "description": "Escape / abscond",
+            "enum": ["YES", "NO", "DK"]
+          },
+          "controlIssuesDisruptiveBehaviour": {
+            "type": "string",
+            "description": "Control issues / disruptive behaviour",
+            "enum": ["YES", "NO", "DK"]
+          },
+          "breachOfTrust": {
+            "type": "string",
+            "description": "Concerns in respect of breach of trust",
+            "enum": ["YES", "NO", "DK"]
+          },
+          "riskToOtherPrisoners": {
+            "type": "string",
+            "description": "Risks to other prisoners",
+            "enum": ["YES", "NO", "DK"]
+          },
+          "assessedOn": {
+            "type": "string",
+            "description": "The date and time that the assessment was completed",
+            "format": "date-time"
+          }
         }
       },
       "AssessmentNeedDto": {
         "type": "object",
         "properties": {
-          "section": { "type": "string", "description": "The section of the need in oasys", "example": "DRUG_MISUSE" },
-          "name": { "type": "string", "description": "The name of the section need", "example": "Drug misuse" },
+          "section": {
+            "type": "string",
+            "description": "The section of the need in oasys",
+            "example": "DRUG_MISUSE"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the section need",
+            "example": "Drug misuse"
+          },
           "overThreshold": {
             "type": "boolean",
             "description": "Represents whether the weighted score of the section is over the threshold",
@@ -1043,17 +1906,23 @@
           "identifiedNeeds": {
             "type": "array",
             "description": "Collection of assessment need sections which have been answered and identified as needs",
-            "items": { "$ref": "#/components/schemas/AssessmentNeedDto" }
+            "items": {
+              "$ref": "#/components/schemas/AssessmentNeedDto"
+            }
           },
           "notIdentifiedNeeds": {
             "type": "array",
             "description": "Collection of assessment need sections which have been answered but are not identified as needs",
-            "items": { "$ref": "#/components/schemas/AssessmentNeedDto" }
+            "items": {
+              "$ref": "#/components/schemas/AssessmentNeedDto"
+            }
           },
           "unansweredNeeds": {
             "type": "array",
             "description": "Collection of assessment need sections which have not been answered",
-            "items": { "$ref": "#/components/schemas/AssessmentNeedDto" }
+            "items": {
+              "$ref": "#/components/schemas/AssessmentNeedDto"
+            }
           },
           "assessedOn": {
             "type": "string",

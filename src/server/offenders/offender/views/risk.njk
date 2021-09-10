@@ -34,6 +34,10 @@
             {{ govukSummaryList({
                 rows: [
                     {
+                     key: { text: "OASys assessment date" },
+                     value: { text: risks.assessedOn | shortDate if risks.assessedOn else 'Unknown' }
+                    },
+                    {
                         key: { text: "Overall" },
                         value: { html: govukTag({
                             text: risks.community.level.text + ' risk of serious harm',

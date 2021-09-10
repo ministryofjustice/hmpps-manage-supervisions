@@ -18,6 +18,7 @@ export interface Risks {
     custody: FlatRiskToSelf
     vulnerability: FlatRiskToSelf
   }
+  assessedOn: DateTime
 }
 
 export enum RiskLevel {
