@@ -15,23 +15,32 @@
         <li>a RAR requirement, and no other requirements</li>
       </ul>
 
-      <table class="govuk-table">
+{% if cases.length %}
+      <table class="govuk-table" data-qa="cases/case-list">
         <thead class="govuk-table__head">
           <tr class="govuk-table__row">
-            <th class="govuk-table__header">Name and CRN</th>
+            <th class="govuk-table__header" data-qa="offender-details">Name and CRN</th>
           </tr>
         </thead>
         <tbody class="govuk-table__body">
           {% for case in cases %}
             <tr class="govuk-table__row">
-              <td class="govuk-table__cell">
-                <a href="/offender/{{ case.crn }}/overview" class="govuk-!-font-size-24 govuk-!-font-weight-bold">{{ case.name }}</a><br />
-                <span class="app-!-font-family-tabular govuk-!-margin-bottom-0">{{ case.crn }}</span>
+              <td class="govuk-table__cell" data-qa="offender-details">
+                <a href="/offender/{{ case.crn }}/overview" class="govuk-!-font-size-24 govuk-!-font-weight-bold" data-qa="offender-link">{{ case.name }}</a><br />
+                <span class="app-!-font-family-tabular govuk-!-margin-bottom-0" data-qa="offender-crn">{{ case.crn }}</span>
               </td>
             </tr>
           {% endfor %}
         </tbody>
       </table>
+{% else %}
+      <div data-qa='cases/case-list/empty'>
+          <p class='govuk-body'>
+              There are no suitable cases.
+          </p>
+      </div>
+
+{% endif %}
     </div>
   </div>
 {% endblock %}

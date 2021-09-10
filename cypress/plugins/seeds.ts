@@ -85,14 +85,6 @@ export interface OffenderSeedOptions {
   convictions?: { active: ConvictionSeedOptions | null; previous?: ConvictionSeedOptions[] }
 }
 
-export interface CasesSeedOptions {
-  cases?: DeepPartial<StaffCaseloadEntry>[]
-}
-
-export function casesSeed(options: CasesSeedOptions = {}): SeedModule {
-  return seedModule({ title: 'Cases' }, cases(options.cases))
-}
-
 /**
  * Seeds offenders based on specified partials or just Liz Haggis otherwise.
  */
@@ -177,4 +169,15 @@ export function contactsSeed({
     appointments(crn, activeConvictionId, options.appointments),
     contacts(crn, options.contacts),
   )
+}
+
+export interface CasesSeedOptions {
+  cases?: DeepPartial<StaffCaseloadEntry>[]
+}
+
+/**
+ * Seeds cases
+ */
+export function casesSeed(options: CasesSeedOptions = {}): SeedModule {
+  return seedModule({ title: 'Cases' }, cases(options.cases))
 }

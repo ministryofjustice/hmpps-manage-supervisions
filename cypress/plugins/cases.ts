@@ -1,8 +1,8 @@
 import { StaffCaseloadEntry } from '../../src/server/community-api/client'
 import { fakePaginated, fakeStaffCaseloadEntry } from '../../src/server/community-api/community-api.fake'
 import { SeedFn } from './wiremock'
-import { STAFF_CODE } from './staff'
 import { CRN } from './offender'
+import { USERNAME } from './hmpps-auth'
 
 const CASES: DeepPartial<StaffCaseloadEntry>[] = [
   {
@@ -17,6 +17,6 @@ const CASES: DeepPartial<StaffCaseloadEntry>[] = [
 export function cases(partials: DeepPartial<StaffCaseloadEntry>[] = CASES): SeedFn {
   return context => {
     const cases = partials.map(p => fakeStaffCaseloadEntry(p))
-    context.client.community.get(`/secure/staff/username/${STAFF_CODE}/cases`).returns(fakePaginated(cases))
+    context.client.community.get(`/secure/staff/username/${USERNAME}/cases`).returns(fakePaginated(cases))
   }
 }

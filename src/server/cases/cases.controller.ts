@@ -10,7 +10,7 @@ export class CasesController {
   @Render('cases/index')
   @Breadcrumb({ type: BreadcrumbType.Cases, title: 'Cases' })
   async getCases(@Req() request) {
-    const cases = await this.casesService.getCases(request.user.staffCode)
+    const cases = await this.casesService.getCases(request.user.username)
     return { cases }
   }
 }
