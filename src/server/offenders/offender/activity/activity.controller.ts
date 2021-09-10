@@ -37,6 +37,11 @@ export class ActivityController {
         id,
         offenderName: displayName,
         entityName: appointment.name,
+        parentOverrides: {
+          [BreadcrumbType.Appointment]: appointment.isFuture
+            ? BreadcrumbType.CaseSchedule
+            : BreadcrumbType.CaseActivityLog,
+        },
       }),
     }
   }

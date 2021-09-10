@@ -27,6 +27,11 @@ export interface ResolveBreadcrumbOptions {
   entityName?: string
   crn?: string
   offenderName?: string
+
+  /**
+   * Override some parent meta.
+   */
+  parentOverrides?: Partial<Record<BreadcrumbType, BreadcrumbType>>
 }
 
 export interface BreadcrumbMeta {

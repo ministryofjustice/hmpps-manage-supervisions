@@ -77,4 +77,19 @@ describe('LinksService', () => {
       { text: 'Addresses' },
     ])
   })
+
+  it('gets breadcrumb with overrides', () => {
+    const observed = subject.resolveAll(BreadcrumbType.PersonalAddresses, {
+      crn: 'some-crn',
+      offenderName: 'Liz Haggis',
+      parentOverrides: {
+        [BreadcrumbType.PersonalDetails]: BreadcrumbType.Cases,
+      },
+    })
+    expect(observed).toEqual([
+      { text: 'Cases', href: '/' },
+      { text: 'Personal details', href: '/offender/some-crn/personal' },
+      { text: 'Addresses' },
+    ])
+  })
 })
