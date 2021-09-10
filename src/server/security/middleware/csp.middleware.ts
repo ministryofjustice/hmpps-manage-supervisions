@@ -7,7 +7,7 @@ export function csp() {
         defaultSrc: ["'self'"],
         // Hash allows inline script pulled in from https://github.com/alphagov/govuk-frontend/blob/master/src/govuk/template.njk
         scriptSrc: ["'self'", "'sha256-+6WnXIl4mbFTCARd8N3COQmT3bJJmo32N8q8ZSQAIcU='"],
-        styleSrc: ["'self'", 'code.jquery.com'],
+        styleSrc: ["'self'"],
         fontSrc: ["'self'"],
       },
     },
