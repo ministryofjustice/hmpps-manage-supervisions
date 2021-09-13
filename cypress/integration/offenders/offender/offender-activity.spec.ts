@@ -128,10 +128,7 @@ context('Offender activity tab', () => {
           time: '12pm to 1pm',
           name: 'Home visit with Catherine Ellis',
           notes: 'Some home visit appointment With a new line!',
-          tags: [
-            { colour: 'grey', text: 'national standard (ns)' },
-            { colour: 'green', text: 'complied' },
-          ],
+          tags: [{ colour: 'green', text: 'complied' }],
         })
 
         .shouldRenderActivity({

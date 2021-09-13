@@ -29,8 +29,11 @@ export interface ActivityLogEntryBase<Links extends ActivityLogEntryLinks = Acti
 }
 
 export interface AppointmentActivityLogEntry
-  extends ActivityLogEntryBase<ActivityLogEntryLinks & { recordMissingAttendance: string | null }> {
+  extends ActivityLogEntryBase<
+    ActivityLogEntryLinks & { recordMissingAttendance: string | null } & { toDelius: string }
+  > {
   type: ContactTypeCategory.Appointment
+  nationalStandard: boolean
   end?: DateTime
   rarActivity: boolean
   requirement?: AppointmentRequirementDetail
