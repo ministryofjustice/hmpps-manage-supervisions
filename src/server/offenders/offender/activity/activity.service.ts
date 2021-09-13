@@ -50,10 +50,6 @@ function getOutcomeFlags(outcome?: AppointmentOutcome): ActivityLogEntryTag[] {
 function getAppointmentFlags(contact: ContactSummary | AppointmentDetail): ActivityLogEntryTag[] {
   const tags: ActivityLogEntryTag[] = []
 
-  if (contact.type.nationalStandard) {
-    tags.push({ name: 'national standard (ns)', colour: GovUkUiTagColour.Grey })
-  }
-
   if (contact.sensitive) {
     tags.push({ name: 'sensitive', colour: GovUkUiTagColour.Grey })
   }

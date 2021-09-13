@@ -453,10 +453,7 @@ describe('ActivityService', () => {
       shouldReturnAppointment(observed, {
         notes: 'Some NSI appointment',
         nationalStandard: true,
-        tags: [
-          { colour: GovUkUiTagColour.Grey, name: 'national standard (ns)' },
-          { colour: GovUkUiTagColour.Green, name: 'complied' },
-        ],
+        tags: [{ colour: GovUkUiTagColour.Green, name: 'complied' }],
       })
     })
 
