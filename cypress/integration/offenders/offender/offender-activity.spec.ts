@@ -235,15 +235,13 @@ context('Offender activity tab', () => {
         .whenClickingSubNavTab('activity')
         .whenClickingActivityEntry(1)
 
-        .shouldRenderAppointmentPage('Home visit with Catherine Ellis', page => {
+        .shouldRenderAppointmentPage('National standard appointment Home visit with Catherine Ellis', page => {
           page.detail('Type of appointment').contains('Home visit')
           page.detail('Date').contains('2 January 2200')
           page.detail('Time').contains('1:30pm to 2pm')
           page.detail('Appointment notes').contains('Some home visit appointment')
           page.detail('Sensitive').contains('Yes')
           page.detail('RAR activity').contains('Yes')
-          page.detail('Counts towards RAR').contains('Yes')
-
           page.outcomeTable.should('not.exist')
         })
     })
@@ -255,9 +253,13 @@ context('Offender activity tab', () => {
         .whenClickingActivityEntry(2)
 
         .shouldRenderAppointmentPage('Some recent appointment', page => {
-          page.outcome('Attended').contains('Yes')
+          page.detail('Type of appointment').contains('Some recent appointment')
+          page.detail('Date').contains('3 February 2020')
+          page.detail('Time').contains('10am to 11am')
+          page.detail('RAR activity').contains('Yes')
           page.outcome('Complied').contains('Yes')
-          page.outcome('Description').contains('Some outcome description')
+          page.outcome('Appointment notes').contains('Some unknown appointment type')
+          page.outcome('Sensitive').contains('Yes')
         })
     })
     it('displays phone call communication detail ', () => {

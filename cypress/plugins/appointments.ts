@@ -11,7 +11,7 @@ export const APPOINTMENTS: DeepPartial<AppointmentDetail>[] = [
     notes: 'Some home visit appointment\n\nWith a new line!',
     outcome: null,
     sensitive: true,
-    type: { contactType: 'CHVS', description: 'Home Visit to Case (NS)' },
+    type: { contactType: 'CHVS', description: 'Home Visit to Case (NS)', nationalStandard: true },
     staff: { forenames: 'Catherine', surname: 'Ellis', unallocated: false },
     rarActivity: true,
     requirement: {
