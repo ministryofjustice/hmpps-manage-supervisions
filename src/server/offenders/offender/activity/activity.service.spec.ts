@@ -113,7 +113,7 @@ describe('ActivityService', () => {
         addNotes: links.url(BreadcrumbType.ExitToDelius),
         recordMissingAttendance: null,
         view: links.url(BreadcrumbType.Appointment),
-        toDelius: links.url(BreadcrumbType.ExitToDelius),
+        updateOutcome: links.url(BreadcrumbType.ExitToDelius),
       },
       requirement: {
         requirementId: 84512,
@@ -292,7 +292,7 @@ describe('ActivityService', () => {
               addNotes: links.url(BreadcrumbType.ExitToDelius),
               recordMissingAttendance: null,
               view: links.url(BreadcrumbType.Appointment),
-              toDelius: links.url(BreadcrumbType.ExitToDelius),
+              updateOutcome: links.url(BreadcrumbType.ExitToDelius),
             },
             name: `some ${expected.notes}`,
             outcome: {

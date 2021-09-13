@@ -209,7 +209,7 @@ export class ActivityService {
         // user is prompted to record outcome for appointments in the past without an existing outcome
         recordMissingAttendance:
           !contact.outcome && start <= DateTime.now() ? links.url(BreadcrumbType.ExitToDelius) : null,
-        toDelius: links.url(BreadcrumbType.ExitToDelius),
+        updateOutcome: links.url(BreadcrumbType.ExitToDelius),
       },
       rarActivity: contact.rarActivity || false,
       requirement,

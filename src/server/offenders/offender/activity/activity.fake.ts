@@ -22,7 +22,7 @@ export const fakeActivityLogEntry = fake<ActivityLogEntry, FakeActivityLogEntryO
         view: faker.internet.url(),
         addNotes: faker.internet.url(),
         recordMissingAttendance: faker.internet.url(),
-        toDelius: faker.internet.url(),
+        updateOutcome: faker.internet.url(),
       },
       category: faker.company.bs(),
       typeName: faker.company.bs(),
