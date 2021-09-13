@@ -1,4 +1,5 @@
-import { Controller, Get, Render, Req } from '@nestjs/common'
+import { Controller, Get, Render } from '@nestjs/common'
+import { AuthenticatedUser } from '../common'
 import { Breadcrumb, BreadcrumbType } from '../common/links'
 import { CasesService } from './cases.service'
 
@@ -9,8 +10,8 @@ export class CasesController {
   @Get()
   @Render('cases/index')
   @Breadcrumb({ type: BreadcrumbType.Cases, title: 'Cases' })
-  async getCases(@Req() request) {
-    const cases = await this.casesService.getCases(request.user.username)
+  async getCases(@AuthenticatedUser() user: User) {
+    const cases = await this.casesService.getCases(user.username)
     return { cases }
   }
 }
