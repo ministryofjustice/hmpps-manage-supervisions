@@ -371,6 +371,7 @@ describe('OffenderController', () => {
         personal: links.url(BreadcrumbType.PersonalDetails),
         schedule: links.url(BreadcrumbType.CaseSchedule),
         sentence: links.url(BreadcrumbType.CaseSentence),
+        additionalOffences: links.url(BreadcrumbType.CaseSentenceOffences),
         activity: links.url(BreadcrumbType.CaseActivityLog),
         compliance: links.url(BreadcrumbType.Compliance),
         risk: links.url(BreadcrumbType.CaseRisk),
