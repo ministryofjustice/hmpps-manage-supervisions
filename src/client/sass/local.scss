@@ -10,7 +10,7 @@ abbr {
   background: govuk-colour("red");
 }
 
-$widths: ("15pc": 15%, "30pc": 30%, "55pc": 55%);
+$widths: ("15pc": 15%, "20pc": 20%, "30pc": 30%, "50pc": 50%, "55pc": 55%);
 @each $name, $width in $widths {
   .app-width-#{$name} {
     width: $width !important;
