@@ -7,7 +7,14 @@ import { MockLinksModule } from '../../../common/links/links.mock'
 import { BreadcrumbType } from '../../../common/links'
 import { fakeOffenderDetailSummary } from '../../../community-api/community-api.fake'
 import { getDisplayName } from '../../../util'
-import { fakeCommunicationActivityLogEntry } from './activity.fake'
+import { fakeActivityLogEntry } from './activity.fake'
+import { ContactTypeCategory } from '../../../config'
+import {
+  AppointmentActivityLogEntry,
+  AppointmentViewModel,
+  CommunicationActivityLogEntry,
+  CommunicationViewModel,
+} from './activity.types'
 
 describe('ActivityController', () => {
   let subject: ActivityController
@@ -30,14 +37,37 @@ describe('ActivityController', () => {
     subject = module.get(ActivityController)
   })
 
-  it('should be defined', () => {
-    expect(subject).toBeDefined()
+  it('gets appointment', async () => {
+    const offender = havingOffenderSummary()
+
+    const appointment = fakeActivityLogEntry(
+      { type: ContactTypeCategory.Appointment },
+      { when: 'future' },
+    ) as AppointmentActivityLogEntry
+    const displayName = getDisplayName(offender)
+    activityService.getAppointment.withArgs('some-crn', 111).resolves(appointment)
+
+    const observed = await subject.getAppointment('some-crn', 111)
+    const links = MockLinksModule.of({
+      crn: 'some-crn',
+      offenderName: displayName,
+      entityName: appointment.name,
+      id: 111,
+      parentOverrides: {
+        [BreadcrumbType.Appointment]: BreadcrumbType.CaseSchedule,
+      },
+    })
+    expect(observed).toEqual({
+      displayName,
+      breadcrumbs: links.breadcrumbs(BreadcrumbType.Appointment),
+      appointment,
+    } as AppointmentViewModel)
   })
 
   it('gets communication', async () => {
     const offender = havingOffenderSummary()
 
-    const contact = fakeCommunicationActivityLogEntry()
+    const contact = fakeActivityLogEntry({ type: ContactTypeCategory.Communication }) as CommunicationActivityLogEntry
     const displayName = getDisplayName(offender)
     activityService.getCommunicationContact.withArgs('some-crn', 111, displayName).resolves(contact)
 
@@ -52,7 +82,7 @@ describe('ActivityController', () => {
       displayName,
       breadcrumbs: links.breadcrumbs(BreadcrumbType.OtherCommunication),
       contact,
-    })
+    } as CommunicationViewModel)
   })
 
   function havingOffenderSummary() {

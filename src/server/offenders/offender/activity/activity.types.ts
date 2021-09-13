@@ -20,6 +20,7 @@ export interface ActivityLogEntryBase<Links extends ActivityLogEntryLinks = Acti
   start: DateTime
   name: string
   category: string
+  isFuture: boolean
   typeName: string
   notes?: string
   tags: ActivityLogEntryTag[]

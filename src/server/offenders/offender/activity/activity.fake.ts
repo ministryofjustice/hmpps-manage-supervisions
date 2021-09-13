@@ -1,16 +1,20 @@
 import { fake } from '../../../util/util.fake'
-import { FakeAppointmentDetailOptions } from '../../../community-api/community-api.fake'
 import * as faker from 'faker'
 import { ContactTypeCategory } from '../../../config'
 import { DateTime } from 'luxon'
-import { ActivityLogEntry, CommunicationActivityLogEntry } from './activity.types'
+import { ActivityLogEntry } from './activity.types'
 import { AppointmentRequirementDetail } from '../../../community-api/client'
 
-export const fakeActivityLogEntry = fake<ActivityLogEntry, FakeAppointmentDetailOptions>(
+export interface FakeActivityLogEntryOptions {
+  when?: 'past' | 'recent' | 'soon' | 'future'
+}
+
+export const fakeActivityLogEntry = fake<ActivityLogEntry, FakeActivityLogEntryOptions>(
   ({ when = 'past' }, { type = faker.random.arrayElement(Object.values(ContactTypeCategory)) }) => {
     const base = {
       id: faker.datatype.number(),
       start: DateTime.fromJSDate(faker.date[when]()),
+      isFuture: when === 'soon' || when === 'future',
       notes: faker.company.bs(),
       name: faker.company.bs(),
       tags: [],
@@ -47,20 +51,3 @@ export const fakeActivityLogEntry = fake<ActivityLogEntry, FakeAppointmentDetail
     }
   },
 )
-export const fakeCommunicationActivityLogEntry = fake<CommunicationActivityLogEntry>(() => ({
-  id: faker.datatype.number(),
-  start: DateTime.fromJSDate(faker.datatype.datetime()),
-  notes: faker.company.bs(),
-  name: faker.company.bs(),
-  tags: [],
-  links: {
-    view: faker.internet.url(),
-    addNotes: faker.internet.url(),
-  },
-  category: faker.company.bs(),
-  typeName: faker.company.bs(),
-  sensitive: faker.datatype.boolean(),
-  type: ContactTypeCategory.Communication,
-  lastUpdatedDateTime: DateTime.fromJSDate(faker.datatype.datetime()),
-  lastUpdatedBy: faker.datatype.string(),
-}))

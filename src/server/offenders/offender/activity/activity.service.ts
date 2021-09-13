@@ -29,6 +29,8 @@ import { BreachService } from '../../../community-api/breach'
 import { Mutable } from '../../../@types/mutable'
 import { GovUkUiTagColour } from '../../../util/govuk-ui'
 
+type CommonActivityLogEntryBase = Pick<ActivityLogEntryBase, 'id' | 'start' | 'notes' | 'sensitive' | 'isFuture'>
+
 export type GetContactsOptions = Omit<
   ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
   'crn' | 'contactDateTo'
@@ -131,7 +133,7 @@ export class ActivityService {
       contactId,
     })
     const meta = await this.contacts.getTypeMeta(contact)
-    const base = ActivityService.getActivityLogEntryBase(contact)
+    const base = ActivityService.getCommonActivityLogEntryBase(contact)
     return this.getCommunicationActivityLogEntry(crn, contact, meta, base, offenderName)
   }
 
@@ -147,7 +149,7 @@ export class ActivityService {
       return this.getAppointmentActivityLogEntry(crn, contact, meta)
     }
 
-    const base = ActivityService.getActivityLogEntryBase(contact)
+    const base = ActivityService.getCommonActivityLogEntryBase(contact)
 
     if (meta.type === ContactTypeCategory.Communication) {
       // is a communication type (either known, or in the CAPI Communication category)
@@ -190,8 +192,7 @@ export class ActivityService {
       : { id: contact.contactId, start: contact.contactStart, end: contact.contactEnd, requirement: null }
 
     const start = DateTime.fromISO(startIso)
-    const outcomeFlags = [...getAppointmentFlags(contact), ...getOutcomeFlags(contact.outcome)]
-    const missingOutcome = !contact.outcome && start <= DateTime.now()
+    const isFuture = start > DateTime.now()
     const links = this.links.of({ id, crn })
     return {
       id,
@@ -199,15 +200,18 @@ export class ActivityService {
       notes: contact.notes,
       sensitive: contact.sensitive || false,
       type: ContactTypeCategory.Appointment,
-      category: `${start > DateTime.now() ? 'Future' : 'Previous'} appointment`,
+      category: `${isFuture ? 'Future' : 'Previous'} appointment`,
+      isFuture,
       name: meta.name,
       typeName: meta.value.name,
       end: endIso && DateTime.fromISO(endIso),
-      tags: [...outcomeFlags],
+      tags: [...getAppointmentFlags(contact), ...getOutcomeFlags(contact.outcome)],
       links: {
         view: links.url(BreadcrumbType.Appointment),
         addNotes: links.url(BreadcrumbType.ExitToDelius),
-        recordMissingAttendance: missingOutcome ? links.url(BreadcrumbType.ExitToDelius) : null,
+        // user is prompted to record outcome for appointments in the past without an existing outcome
+        recordMissingAttendance:
+          !contact.outcome && start <= DateTime.now() ? links.url(BreadcrumbType.ExitToDelius) : null,
       },
       rarActivity: contact.rarActivity || false,
       requirement,
@@ -225,7 +229,7 @@ export class ActivityService {
     crn: string,
     contact: ContactSummary,
     meta: GetMetaResult,
-    base: Pick<ActivityLogEntryBase, 'id' | 'start' | 'notes' | 'sensitive'>,
+    base: CommonActivityLogEntryBase,
     offenderName: string,
   ): CommunicationActivityLogEntry {
     const links = this.links.of({ id: contact.contactId, crn })
@@ -249,14 +253,14 @@ export class ActivityService {
     }
   }
 
-  private static getActivityLogEntryBase(
-    contact: ContactSummary,
-  ): Pick<ActivityLogEntryBase, 'id' | 'start' | 'notes' | 'sensitive'> {
+  private static getCommonActivityLogEntryBase(contact: ContactSummary): CommonActivityLogEntryBase {
+    const start = DateTime.fromISO(contact.contactStart)
     return {
       id: contact.contactId,
       start: DateTime.fromISO(contact.contactStart),
       notes: contact.notes,
       sensitive: contact.sensitive || false,
+      isFuture: start > DateTime.now(),
     }
   }
 

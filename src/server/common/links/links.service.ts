@@ -100,11 +100,12 @@ export class LinksService implements ILinksService {
     const visited = [type]
 
     while (meta.parent != undefined) {
-      if (visited.includes(meta.parent)) {
-        throw new Error(`recursive breadcrumb ${[...visited, meta.parent].map(x => BreadcrumbType[x]).join(' -> ')}`)
+      const parent = options.parentOverrides?.[meta.type] ?? meta.parent
+      if (visited.includes(parent)) {
+        throw new Error(`recursive breadcrumb ${[...visited, parent].map(x => BreadcrumbType[x]).join(' -> ')}`)
       }
-      visited.push(meta.parent)
-      meta = this.getMeta(meta.parent)
+      visited.push(parent)
+      meta = this.getMeta(parent)
       result.unshift({
         text: resolveTitle(meta, options),
         href: resolveUrl(meta, options),
