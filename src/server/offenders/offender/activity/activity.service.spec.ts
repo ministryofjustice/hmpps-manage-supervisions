@@ -113,6 +113,7 @@ describe('ActivityService', () => {
         addNotes: links.url(BreadcrumbType.ExitToDelius),
         recordMissingAttendance: null,
         view: links.url(BreadcrumbType.Appointment),
+        updateOutcome: links.url(BreadcrumbType.ExitToDelius),
       },
       requirement: {
         requirementId: 84512,
@@ -291,6 +292,7 @@ describe('ActivityService', () => {
               addNotes: links.url(BreadcrumbType.ExitToDelius),
               recordMissingAttendance: null,
               view: links.url(BreadcrumbType.Appointment),
+              updateOutcome: links.url(BreadcrumbType.ExitToDelius),
             },
             name: `some ${expected.notes}`,
             outcome: {
@@ -374,6 +376,7 @@ describe('ActivityService', () => {
       shouldReturnAppointment(observed, {
         notes: 'well known, complied RAR appointment',
         rarActivity: true,
+        nationalStandard: false,
         tags: [
           { colour: GovUkUiTagColour.Purple, name: 'rar' },
           { colour: GovUkUiTagColour.Green, name: 'complied' },
@@ -395,6 +398,7 @@ describe('ActivityService', () => {
         notes: 'well known, not complied sensitive appointment',
         outcome: { complied: false },
         sensitive: true,
+        nationalStandard: false,
         tags: [
           { colour: GovUkUiTagColour.Grey, name: 'sensitive' },
           { colour: GovUkUiTagColour.Red, name: 'failed to comply' },
@@ -413,6 +417,7 @@ describe('ActivityService', () => {
 
       shouldReturnAppointment(observed, {
         notes: 'well known, unacceptable absence appointment',
+        nationalStandard: false,
         outcome: { attended: false, complied: false },
         tags: [{ colour: GovUkUiTagColour.Red, name: 'unacceptable absence' }],
       })
@@ -429,6 +434,7 @@ describe('ActivityService', () => {
 
       shouldReturnAppointment(observed, {
         notes: 'well known, acceptable absence appointment',
+        nationalStandard: false,
         outcome: { attended: false, complied: true },
         tags: [{ colour: GovUkUiTagColour.Green, name: 'acceptable absence' }],
       })
@@ -446,10 +452,8 @@ describe('ActivityService', () => {
 
       shouldReturnAppointment(observed, {
         notes: 'Some NSI appointment',
-        tags: [
-          { colour: GovUkUiTagColour.Grey, name: 'national standard (ns)' },
-          { colour: GovUkUiTagColour.Green, name: 'complied' },
-        ],
+        nationalStandard: true,
+        tags: [{ colour: GovUkUiTagColour.Green, name: 'complied' }],
       })
     })
 
@@ -466,6 +470,7 @@ describe('ActivityService', () => {
       const links = MockLinksModule.of({ crn: 'some-crn', id: 1 })
       shouldReturnAppointment(observed, {
         notes: 'other appointment, not recorded',
+        nationalStandard: false,
         tags: [{ colour: GovUkUiTagColour.Grey, name: 'sensitive' }],
         links: {
           recordMissingAttendance: links.url(BreadcrumbType.ExitToDelius),

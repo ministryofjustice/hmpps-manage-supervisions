@@ -50,10 +50,6 @@ function getOutcomeFlags(outcome?: AppointmentOutcome): ActivityLogEntryTag[] {
 function getAppointmentFlags(contact: ContactSummary | AppointmentDetail): ActivityLogEntryTag[] {
   const tags: ActivityLogEntryTag[] = []
 
-  if (contact.type.nationalStandard) {
-    tags.push({ name: 'national standard (ns)', colour: GovUkUiTagColour.Grey })
-  }
-
   if (contact.sensitive) {
     tags.push({ name: 'sensitive', colour: GovUkUiTagColour.Grey })
   }
@@ -202,6 +198,7 @@ export class ActivityService {
       type: ContactTypeCategory.Appointment,
       category: `${isFuture ? 'Future' : 'Previous'} appointment`,
       isFuture,
+      nationalStandard: contact.type.nationalStandard,
       name: meta.name,
       typeName: meta.value.name,
       end: endIso && DateTime.fromISO(endIso),
@@ -212,6 +209,7 @@ export class ActivityService {
         // user is prompted to record outcome for appointments in the past without an existing outcome
         recordMissingAttendance:
           !contact.outcome && start <= DateTime.now() ? links.url(BreadcrumbType.ExitToDelius) : null,
+        updateOutcome: links.url(BreadcrumbType.ExitToDelius),
       },
       rarActivity: contact.rarActivity || false,
       requirement,

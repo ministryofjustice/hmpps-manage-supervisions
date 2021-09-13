@@ -22,6 +22,7 @@ export const fakeActivityLogEntry = fake<ActivityLogEntry, FakeActivityLogEntryO
         view: faker.internet.url(),
         addNotes: faker.internet.url(),
         recordMissingAttendance: faker.internet.url(),
+        updateOutcome: faker.internet.url(),
       },
       category: faker.company.bs(),
       typeName: faker.company.bs(),
@@ -33,6 +34,7 @@ export const fakeActivityLogEntry = fake<ActivityLogEntry, FakeActivityLogEntryO
         return {
           ...base,
           type,
+          nationalStandard: faker.datatype.boolean(),
           end: base.start.plus({ hour: 1 }),
           rarActivity: faker.datatype.boolean(),
           requirement: {
