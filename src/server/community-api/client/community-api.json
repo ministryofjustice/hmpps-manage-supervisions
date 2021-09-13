@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "description": "<h2>REST service for accessing community probation information</h2><p>This service provides endpoints for accessing data primary sourced from National Delius about people that are of interest to HM Probation Service.</p><p>There is cross-over with the <b>prison-api</b> though suspects on remand will not be surfaced by this API unless that have previously been on probation.</p><div>This service is secured by <b>OAuth2</b> with tokens supplied by HMPPS Auth. Most read-only endpoints require the <b>ROLE_COMMUNITY</b> to access, but check each endpoint where this differs.<p>This service can be accessed in a number environments. For each environment a different set of OAuth2 credentials from HMPPS Auth are required</p><ul><li>Development: <b>https://community-api.dev.probation.service.justice.gov.uk</b></li><li>Test: <b>https://community-api.test.probation.service.justice.gov.uk</b></li><li>Pre-production: <b>https://community-api.pre-prod.delius.probation.hmpps.dsd.io</b></li><li>Production: <b>https://community-api.probation.service.justice.gov.uk</b></li></ul><div>",
-    "version": "2021-08-31",
+    "version": "2021-09-08.6231.e96e6fb",
     "title": "Community API Documentation",
     "termsOfService": "https://gateway.nomis-api.service.justice.gov.uk/auth/terms",
     "contact": {
@@ -14,7 +14,7 @@
       "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
     }
   },
-  "host": "localhost:8080",
+  "host": "community-api-secure.test.delius.probation.hmpps.dsd.io",
   "basePath": "/",
   "tags": [
     {
@@ -96,6 +96,10 @@
     {
       "name": "Sentence requirements and breach",
       "description": "Offender sentence requires and breaches of those requirements"
+    },
+    {
+      "name": "Smoke test",
+      "description": "Smoke Test Helper Resource"
     },
     {
       "name": "Staff",
@@ -1400,7 +1404,7 @@
           {
             "name": "include",
             "in": "query",
-            "description": "include",
+            "description": "Contacts to include. Can be a contact type code, prefixed with 'type_' or appointments",
             "required": false,
             "type": "array",
             "items": {
@@ -6312,6 +6316,81 @@
         }
       }
     },
+    "/secure/smoketest/offenders/crn/{crn}/custody/reset": {
+      "post": {
+        "tags": ["Smoke test"],
+        "summary": "Resets custody data to the state before a Delius offender record has been matched to a NOMIS record",
+        "description": "Only used for smoke tests, not production ready",
+        "operationId": "resetCustodySmokeTestDataUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "crn",
+            "in": "path",
+            "description": "crn",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "JWT supplied invalid or absent"
+          },
+          "403": {
+            "description": "Requires role ROLE_SMOKE_TEST"
+          },
+          "404": {
+            "description": "Either the requested offender was not found or no active custodial sentences were found"
+          }
+        }
+      }
+    },
+    "/secure/smoketest/offenders/crn/{crn}/details": {
+      "post": {
+        "tags": ["Smoke test"],
+        "summary": "Updates the specified offenders details",
+        "description": "Only used for smoke tests, not production ready",
+        "operationId": "updateOffenderDetailsUsingPOST",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "crn",
+            "in": "path",
+            "description": "crn",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "offenderDetails",
+            "description": "offenderDetails",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateOffenderDetails"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "JWT supplied invalid or absent"
+          },
+          "403": {
+            "description": "Requires role ROLE_SMOKE_TEST"
+          },
+          "404": {
+            "description": "The requested offender was not found"
+          }
+        }
+      }
+    },
     "/secure/staff/list": {
       "post": {
         "tags": ["Staff"],
@@ -6509,6 +6588,102 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/StaffDetails"
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "JWT supplied invalid or absent"
+          },
+          "403": {
+            "description": "Requires role ROLE_COMMUNITY"
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Unrecoverable error whilst processing request.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/secure/staff/username/{username}/cases": {
+      "get": {
+        "tags": ["Staff"],
+        "summary": "EXPERIMENTAL: Return list of of currently managed offenders, with RAR requirement and only a single active sentence",
+        "description": "Accepts a Delius Username. No backward compatibility guaranteed - intended for the use of the Manage a Supervision service, behaviour or responses may be modified in the future.",
+        "operationId": "getCasesUsingGET",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "paged",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "sort.sorted",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "sort.unsorted",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "unpaged",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Delius username",
+            "required": true,
+            "type": "string",
+            "x-example": "SheliaHancockNPS"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/PageOfStaffCaseloadEntry"
             }
           },
           "400": {
@@ -9768,6 +9943,53 @@
       },
       "title": "PageOfPrimaryIdentifiers"
     },
+    "PageOfStaffCaseloadEntry": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StaffCaseloadEntry"
+          }
+        },
+        "empty": {
+          "type": "boolean"
+        },
+        "first": {
+          "type": "boolean"
+        },
+        "last": {
+          "type": "boolean"
+        },
+        "number": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "numberOfElements": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageable": {
+          "$ref": "#/definitions/Pageable"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "sort": {
+          "$ref": "#/definitions/Sort"
+        },
+        "totalElements": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "PageOfStaffCaseloadEntry"
+    },
     "Pageable": {
       "type": "object",
       "properties": {
@@ -10813,6 +11035,30 @@
       },
       "title": "Sort"
     },
+    "StaffCaseloadEntry": {
+      "type": "object",
+      "properties": {
+        "crn": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "middleNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "preferredName": {
+          "type": "string"
+        },
+        "surname": {
+          "type": "string"
+        }
+      },
+      "title": "StaffCaseloadEntry"
+    },
     "StaffDetails": {
       "type": "object",
       "properties": {
@@ -11052,6 +11298,20 @@
         }
       },
       "title": "UpdateCustodyBookingNumber"
+    },
+    "UpdateOffenderDetails": {
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "example": "John"
+        },
+        "surname": {
+          "type": "string",
+          "example": "Smith"
+        }
+      },
+      "title": "UpdateOffenderDetails"
     },
     "UpdateOffenderNomsNumber": {
       "type": "object",

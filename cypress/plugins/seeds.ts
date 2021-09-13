@@ -1,4 +1,4 @@
-import { seedModule } from './wiremock'
+import { SeedModule, seedModule } from './wiremock'
 import { SeedTeamOfficeLocationsOptions, teamOfficeLocations } from './teams'
 import {
   AppointmentDetail,
@@ -10,6 +10,7 @@ import {
   PersonalContact,
   Registration,
   Requirement,
+  StaffCaseloadEntry,
   StaffDetails,
 } from '../../src/server/community-api/client'
 import { appointmentTypes } from './appointment-types'
@@ -29,6 +30,7 @@ import { contactTypes } from './contact-types'
 import { nsis } from './nsis'
 import * as faker from 'faker'
 import { needs } from './needs'
+import { cases } from './cases'
 
 /**
  * Resets the wiremock server, this should always be the first seed module loaded.
@@ -167,4 +169,15 @@ export function contactsSeed({
     appointments(crn, activeConvictionId, options.appointments),
     contacts(crn, options.contacts),
   )
+}
+
+export interface CasesSeedOptions {
+  cases?: DeepPartial<StaffCaseloadEntry>[]
+}
+
+/**
+ * Seeds cases
+ */
+export function casesSeed(options: CasesSeedOptions = {}): SeedModule {
+  return seedModule({ title: 'Cases' }, cases(options.cases))
 }

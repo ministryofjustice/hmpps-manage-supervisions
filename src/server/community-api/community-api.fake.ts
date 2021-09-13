@@ -28,6 +28,7 @@ import {
   Nsi,
   ProbationArea,
   Team,
+  StaffCaseloadEntry,
 } from './client'
 import * as faker from 'faker'
 import { DateTime } from 'luxon'
@@ -593,5 +594,15 @@ export const fakeNsi = fake<Nsi>((options, { active = true } = {}) => {
     softDeleted: false,
     actualStartDate: fakeIsoDate(),
     actualEndDate: active ? null : fakeIsoDate(),
+  }
+})
+
+export const fakeStaffCaseloadEntry = fake<StaffCaseloadEntry>(() => {
+  return {
+    crn: fakeCrn(),
+    firstName: faker.name.firstName(),
+    surname: faker.name.lastName(),
+    middleNames: [faker.name.middleName()],
+    preferredName: faker.name.findName(),
   }
 })
