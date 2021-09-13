@@ -5,9 +5,10 @@ import { OffenderService } from '../offender.service'
 import { SentenceService } from './sentence.service'
 import { MockLinksModule } from '../../../common/links/links.mock'
 import { fakeOffenderDetail } from '../../../community-api/community-api.fake'
-import { fakePreviousConvictionSummary } from './sentence.fake'
+import { fakeConvictionOffence, fakePreviousConvictionSummary } from './sentence.fake'
 import { PreviousConvictionsViewModel } from './sentence.types'
 import { BreadcrumbType } from '../../../common/links'
+import { ViewModel } from '../../../common'
 
 describe('SentenceController', () => {
   let subject: SentenceController
@@ -47,5 +48,21 @@ describe('SentenceController', () => {
         toDelius: links.url(BreadcrumbType.ExitToDelius),
       },
     } as PreviousConvictionsViewModel)
+  })
+
+  it('gets offence details', async () => {
+    const offender = fakeOffenderDetail({ firstName: 'Liz', middleNames: ['Danger'], surname: 'Haggis' })
+    offenderService.getOffenderDetail.withArgs('some-crn').resolves(offender)
+
+    const offenceDetails = fakeConvictionOffence()
+    sentenceService.getOffenceDetails.withArgs('some-crn').resolves(offenceDetails)
+
+    const observed = await subject.getOffences('some-crn')
+    const links = MockLinksModule.of({ crn: 'some-crn', offenderName: 'Liz Danger Haggis' })
+    expect(observed).toEqual({
+      displayName: 'Liz Danger Haggis',
+      breadcrumbs: links.breadcrumbs(BreadcrumbType.CaseSentenceOffences),
+      offence: offenceDetails,
+    } as ViewModel)
   })
 })

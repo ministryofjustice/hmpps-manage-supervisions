@@ -1,0 +1,59 @@
+{% extends "partials/layout.njk" %}
+{% set pageTitle = 'Offences – ' + displayName %}
+{% from 'components/summary-card.njk' import appSummaryCard %}
+
+{% block content %}
+    <h1 class="govuk-heading-xl">Offences</h1>
+
+    {% if offence %}
+        {% call appSummaryCard({ titleText: 'Main offence', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
+            {{ govukSummaryList({
+                rows: [
+                    {
+                        key: { text: "Offence" },
+                        value: { text: offence.description }
+                    },
+                    {
+                        key: { text: "Category" },
+                        value: { text: offence.category }
+                    },
+                    {
+                        key: { text: "Offence date" },
+                        value: { text: offence.date | shortDate }
+                    }
+                ]
+            }) }}
+        {%- endcall %}
+
+        {% if offence.additionalOffences.length %}
+            <h2 class="govuk-heading-l govuk-!-margin-top-8">Additional offences</h2>
+            {% for additionalOffence in offence.additionalOffences %}
+                {% call appSummaryCard({titleText: 'Additional offence ' + additionalOffence.code | brackets, classes: 'app-summary-card--large-title govuk-!-margin-bottom-6'}) -%}
+                    {{ govukSummaryList({
+                        rows: [
+                            {
+                                key: { text: "Offence" },
+                                value: { text: additionalOffence.name }
+                            },
+                            {
+                                key: { text: "Category" },
+                                value: { text: additionalOffence.category }
+                            },
+                            {
+                                key: { text: "Offence date" },
+                                value: { text: additionalOffence.date | shortDate }
+                            }
+                        ]
+                    }) }}
+                {%- endcall %}
+            {% endfor %}
+        {% endif %}
+
+    {% else %}
+        {{ govukWarningText({
+            attributes: { 'data-qa': 'offender/offence/no-offences' },
+            text: "Offence details are unavailable.",
+            iconFallbackText: "Warning"
+        }) }}
+    {% endif %}
+{% endblock %}

@@ -14,6 +14,7 @@ export const ACTIVE_CONVICTION: DeepPartial<Conviction> = {
     {
       mainOffence: true,
       detail: {
+        code: '05600',
         mainCategoryDescription: 'Betting, Gaming and Lotteries (Indictable)',
         subCategoryDescription: 'Cheats at gambling or enables or assists person to cheat (Gambling Act 2005)',
       },
@@ -23,6 +24,7 @@ export const ACTIVE_CONVICTION: DeepPartial<Conviction> = {
     {
       mainOffence: false,
       detail: {
+        code: '80701',
         mainCategoryDescription: 'Assault on Police Officer',
         subCategoryDescription: 'Assault on Police Officer',
       },

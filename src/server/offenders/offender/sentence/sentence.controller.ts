@@ -1,9 +1,9 @@
-import { Controller, Get, Param, Render } from '@nestjs/common'
+import { Controller, Param, Get, Render } from '@nestjs/common'
+import { OffencesViewModel, PreviousConvictionsViewModel } from './sentence.types'
 import { Breadcrumb, BreadcrumbType, LinksService } from '../../../common/links'
 import { OffenderService } from '../offender.service'
-import { PreviousConvictionsViewModel } from './sentence.types'
-import { SentenceService } from './sentence.service'
 import { getDisplayName } from '../../../util'
+import { SentenceService } from './sentence.service'
 
 @Controller('offender/:crn(\\w+)/sentence')
 export class SentenceController {
@@ -12,6 +12,29 @@ export class SentenceController {
     private readonly links: LinksService,
     private readonly sentence: SentenceService,
   ) {}
+
+  @Get('offences')
+  @Render('offenders/offender/sentence/offences')
+  @Breadcrumb({
+    type: BreadcrumbType.CaseSentenceOffences,
+    parent: BreadcrumbType.CaseSentence,
+    title: 'Offences',
+  })
+  async getOffences(@Param('crn') crn: string): Promise<OffencesViewModel> {
+    const [offender, offence] = await Promise.all([
+      this.offender.getOffenderDetail(crn),
+      this.sentence.getOffenceDetails(crn),
+    ])
+    const displayName = getDisplayName(offender)
+    return {
+      displayName,
+      breadcrumbs: this.links.resolveAll(BreadcrumbType.CaseSentenceOffences, {
+        crn,
+        offenderName: displayName,
+      }),
+      offence,
+    }
+  }
 
   @Get('previous-convictions')
   @Render('offenders/offender/sentence/previous-convictions')

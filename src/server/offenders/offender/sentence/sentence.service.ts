@@ -10,6 +10,7 @@ import {
   ComplianceStatus,
   ComplianceStatusAlertLevel,
   ConvictionDetails,
+  ConvictionOffence,
   ConvictionRequirement,
   PreviousConvictionSummary,
 } from './sentence.types'
@@ -20,6 +21,29 @@ import { ComplianceService } from './compliance.service'
 import { ActivityComplianceFilter, ActivityService } from '../activity'
 import { BreachService } from '../../../community-api/breach'
 import { BreadcrumbType, LinksService } from '../../../common/links'
+
+function getConvictionOffence(conviction: Conviction): ConvictionOffence | null {
+  const mainOffence = conviction.offences.find(x => x.mainOffence)
+  if (!mainOffence) {
+    return null
+  }
+
+  return {
+    id: mainOffence.offenceId,
+    description: getOffenceName(mainOffence),
+    category: mainOffence.detail.mainCategoryDescription,
+    date: DateTime.fromISO(mainOffence.offenceDate),
+    code: mainOffence.detail.code,
+    additionalOffences: conviction.offences
+      .filter(x => !x.mainOffence)
+      .map(x => ({
+        code: x.detail.code,
+        name: getOffenceName(x),
+        category: x.detail.mainCategoryDescription,
+        date: DateTime.fromISO(x.offenceDate),
+      })),
+  }
+}
 
 @Injectable()
 export class SentenceService {
@@ -32,6 +56,15 @@ export class SentenceService {
     private readonly links: LinksService,
   ) {}
 
+  async getOffenceDetails(crn: string): Promise<ConvictionOffence | null> {
+    const { current } = await this.getConvictionsAndRequirements(crn)
+    if (!current) {
+      return null
+    }
+
+    return getConvictionOffence(current)
+  }
+
   async getConvictionDetails(crn: string): Promise<ConvictionDetails | null> {
     const { requirements, current, previous } = await this.getConvictionsAndRequirements(crn)
 
@@ -42,7 +75,6 @@ export class SentenceService {
     }
 
     const sentence = current.sentence
-    const mainOffence = current.offences.find(x => x.mainOffence)
 
     return {
       previousConvictions: previous.length
@@ -57,13 +89,7 @@ export class SentenceService {
           .reduce((agg, x) => [...agg, ...x], [])
           .filter(x => !x.active && x.proven).length,
       },
-      offence: mainOffence && {
-        id: mainOffence.offenceId,
-        description: getOffenceName(mainOffence),
-        category: mainOffence.detail.mainCategoryDescription,
-        date: DateTime.fromISO(mainOffence.offenceDate),
-        additionalOffences: current.offences.filter(x => !x.mainOffence).map(getOffenceName),
-      },
+      offence: getConvictionOffence(current),
       sentence: sentence
         ? {
             description: getSentenceName(sentence),

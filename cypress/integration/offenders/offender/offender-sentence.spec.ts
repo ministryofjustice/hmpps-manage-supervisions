@@ -1,10 +1,17 @@
 import { ViewOffenderFixture } from './view-offender.fixture'
 import { OffenderPreviousOrdersPage } from '../../../pages/offender-previous-orders.page'
+import { OffenderOffencesPage } from '../../../pages/offender-offences.page'
 
 class Fixture extends ViewOffenderFixture {
   shouldRenderPreviousOrdersPage(callback: (page: OffenderPreviousOrdersPage) => void) {
     const page = new OffenderPreviousOrdersPage()
     page.pageTitle.contains('Previous orders')
+    callback(page)
+    return this
+  }
+  shouldRenderOffencesPage(callback: (page: OffenderOffencesPage) => void) {
+    const page = new OffenderOffencesPage()
+    page.pageTitle.contains('Offences')
     callback(page)
     return this
   }
@@ -130,6 +137,31 @@ context('Offender sentence tab', () => {
           })
         })
         .shouldDisplayExitPage('delius')
+    })
+
+    it('displays additional offence detaiils', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('sentence')
+        .shouldRenderOffenderTab('sentence', page => {
+          page.offence(list => {
+            list.value('Additional offences').find('a').contains('View additional offence details').click()
+          })
+        })
+        .shouldRenderOffencesPage(page => {
+          page.mainOffence(list => {
+            list
+              .value('Offence')
+              .contains('Cheats at gambling or enables or assists person to cheat (Gambling Act 2005) (1 count)')
+            list.value('Category').contains('Betting, Gaming and Lotteries (Indictable)')
+            list.value('Offence date').contains('1 February 2021')
+          })
+          page.additionalOffence('80701', list => {
+            list.value('Offence').contains('Assault on Police Officer (1 count)')
+            list.value('Category').contains('Assault on Police Officer')
+            list.value('Offence date').contains('9 September 2019')
+          })
+        })
     })
   })
 })

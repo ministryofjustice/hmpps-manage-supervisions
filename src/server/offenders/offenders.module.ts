@@ -23,10 +23,10 @@ import { ExitController } from './offender/exit/exit.controller'
   controllers: [
     OffenderController,
     PersonalController,
+    ExitController,
     ActivityController,
     RiskController,
     SentenceController,
-    ExitController,
   ],
   providers: [
     OffenderService,
