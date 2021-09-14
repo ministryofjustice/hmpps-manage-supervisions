@@ -14,25 +14,27 @@ export interface ActivityLogEntryTag {
   colour: GovUkUiTagColour
 }
 
-export interface ActivityLogEntryBase<Links extends ActivityLogEntryLinks = ActivityLogEntryLinks> {
-  type: ContactTypeCategory
+interface ActivityLogEntryBase<Type extends ContactTypeCategory, Links = {}> {
+  type: Type
   id: number
   start: DateTime
   name: string
   category: string
   isFuture: boolean
-  typeName: string
+  /**
+   * Well known entry name if available
+   */
+  typeName?: string
   notes?: string
-  tags: ActivityLogEntryTag[]
-  links: Links
+  links: ActivityLogEntryLinks & Links
   sensitive: boolean
 }
 
 export interface AppointmentActivityLogEntry
   extends ActivityLogEntryBase<
-    ActivityLogEntryLinks & { recordMissingAttendance: string | null } & { updateOutcome: string }
+    ContactTypeCategory.Appointment,
+    { recordMissingAttendance: string | null; updateOutcome: string }
   > {
-  type: ContactTypeCategory.Appointment
   nationalStandard: boolean
   end?: DateTime
   rarActivity: boolean
@@ -41,22 +43,26 @@ export interface AppointmentActivityLogEntry
     complied: boolean
     attended: boolean
     description: string
+    tag: ActivityLogEntryTag
   }
 }
 
-export interface CommunicationActivityLogEntry extends ActivityLogEntryBase {
-  type: ContactTypeCategory.Communication
+export interface CommunicationActivityLogEntry extends ActivityLogEntryBase<ContactTypeCategory.Communication> {
   lastUpdatedDateTime: DateTime
   lastUpdatedBy: string
   from?: string
   to?: string
 }
 
-export interface UnknownActivityLogEntry extends ActivityLogEntryBase<null> {
-  type: ContactTypeCategory.Other
-}
+export type UnknownActivityLogEntry = ActivityLogEntryBase<ContactTypeCategory.Other>
 
 export type ActivityLogEntry = AppointmentActivityLogEntry | CommunicationActivityLogEntry | UnknownActivityLogEntry
+
+export interface ActivityLogEntryGroup {
+  date: DateTime
+  isToday: boolean
+  entries: ActivityLogEntry[]
+}
 
 export interface AppointmentViewModel extends ViewModel {
   displayName: string

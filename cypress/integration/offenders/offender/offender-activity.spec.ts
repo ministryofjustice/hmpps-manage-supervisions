@@ -2,12 +2,23 @@ import { ViewOffenderFixture } from './view-offender.fixture'
 import { OffenderActivityAppointmentPage } from '../../../pages'
 import { LONG_CONTACT_NOTES } from '../../../plugins/contacts'
 import { OffenderActivityCommunicationPage } from '../../../pages/offender-activity-communication.page'
+import { Tag } from '../../../pages/components/tag'
+
+interface ExpectedAppointment {
+  id: number
+  date: string
+  title: string
+  subTitle?: string
+  notes: string
+  notesType?: 'plain' | 'closed-detail' | 'open-detail'
+  sensitive?: boolean
+  action?: string | { colour: string; name: string }
+  summary?: Record<string, string>
+}
 
 class Fixture extends ViewOffenderFixture {
   whenClickingActivityEntry(id: number) {
-    return this.shouldRenderOffenderTab('activity', page => {
-      page.entry(id).title.find('a').click()
-    })
+    return this.shouldRenderOffenderTab('activity', page => page.clickEntryLink(id))
   }
 
   whenClickingFailuresToComplyFilter() {
@@ -22,50 +33,49 @@ class Fixture extends ViewOffenderFixture {
     })
   }
 
-  shouldRenderActivity({
-    id,
-    date,
-    time,
-    name,
-    notes,
-    tags = [],
-    havingLongNotes = false,
-  }: {
-    id: number
-    date: string
-    time: string
-    name: string
-    notes: string
-    tags?: { colour: string; text: string }[]
-    havingLongNotes?: boolean
-  }) {
+  shouldRenderActivity({ notesType = 'plain', ...expected }: ExpectedAppointment) {
     return this.shouldRenderOffenderTab('activity', page => {
-      const entry = page.entry(id)
-      entry.title.contains(date).contains(time)
-      entry.title.find('a').contains(name)
+      page.group(expected.date, group =>
+        group.entry(expected.id, entry => {
+          entry.title.contains(expected.title)
+          if (expected.subTitle) {
+            entry.subTitle.contains(expected.subTitle)
+          }
+          if (typeof expected.action === 'string') {
+            entry.actionLinks.contains(expected.action)
+          } else if (typeof expected.action === 'object') {
+            const { name, colour } = expected.action
+            entry.actions.within(() => Tag.byNameAndColour(name, colour))
+          }
 
-      entry.tags.should('have.length', tags.length)
-      for (const { colour, text } of tags) {
-        entry.tags.contains(text).should('have.class', `govuk-tag--${colour}`)
-      }
+          entry.notes.contains(expected.notes.replace(/\s+/g, ' '))
+          switch (notesType) {
+            case 'closed-detail':
+              entry.notesDetail(expected.sensitive, detail => detail.shouldBeClosed())
+              break
+            case 'open-detail':
+              entry.notesDetail(expected.sensitive, detail => detail.shouldBeOpen())
+              break
+          }
 
-      if (havingLongNotes) {
-        entry.notes.contains(notes.substr(0, 200)) // just assert first 200 chars as it can cut off in the last word
-        entry.longNotesLink.contains('View full details').should('have.attr', 'href')
-      } else {
-        entry.notes.contains(notes)
-      }
+          if (expected.summary) {
+            entry.summaryList(list => {
+              for (const [k, v] of Object.entries(expected.summary)) {
+                list.value(k).contains(v)
+              }
+            })
+          }
+        }),
+      )
     })
   }
 
-  shouldNotRenderActivity({ id }: { id: number }) {
-    return this.shouldRenderOffenderTab('activity', page => {
-      page.entry(id).title.should('not.exist')
-    })
+  shouldNotRenderActivityWithId(id: number) {
+    return this.shouldRenderOffenderTab('activity', page => page.entry(id).should('not.exist'))
   }
 
-  shouldNotRenderActivities(ids: number[]) {
-    return ids.map(id => this.shouldNotRenderActivity({ id: id }))
+  shouldRenderActivityWithId(id: number) {
+    return this.shouldRenderOffenderTab('activity', page => page.entry(id).should('exist'))
   }
 
   shouldRenderAppointmentPage(title: string, assert: (page: OffenderActivityAppointmentPage) => void) {
@@ -123,71 +133,26 @@ context('Offender activity tab', () => {
         .shouldDisplayCommonHeader()
 
         .shouldRenderActivity({
-          id: 1,
-          date: 'Friday 4 September 2020',
-          time: '12pm to 1pm',
-          name: 'Home visit with Catherine Ellis',
-          notes: 'Some home visit appointment With a new line!',
-          tags: [{ colour: 'green', text: 'complied' }],
-        })
-
-        .shouldRenderActivity({
-          id: 2,
-          date: 'Thursday 3 September 2020',
-          time: '10:30am to 11:15am',
-          name: 'Office visit',
-          notes: LONG_CONTACT_NOTES,
-          tags: [{ colour: 'red', text: 'failed to comply' }],
-          havingLongNotes: true,
-        })
-
-        .shouldRenderActivity({
-          id: 3,
-          date: 'Thursday 3 September 2020',
-          time: '10:30am to 11:15am',
-          name: 'Office visit',
-          notes: LONG_CONTACT_NOTES,
-          tags: [
-            { colour: 'grey', text: 'sensitive' },
-            { colour: 'green', text: 'acceptable absence' },
-          ],
-          havingLongNotes: true,
-        })
-
-        .shouldRenderActivity({
-          id: 4,
-          date: 'Thursday 3 September 2020',
-          time: '10:30am to 11:15am',
-          name: 'Office visit',
-          notes: LONG_CONTACT_NOTES,
-          tags: [
-            { colour: 'purple', text: 'rar' },
-            { colour: 'red', text: 'unacceptable absence' },
-          ],
-          havingLongNotes: true,
-        })
-
-        .shouldRenderActivity({
-          id: 5,
-          date: 'Wednesday 2 September 2020',
-          time: '11am to 1pm',
-          name: 'Not a well known appointment with Robert Ohagan',
-          notes: 'Some unknown appointment',
-        })
-
-        .shouldRenderActivity({
           id: 6,
           date: 'Friday 4 September 2020',
-          time: '11am',
-          name: 'Phone call from Liz Danger Haggis',
-          notes: 'Phone call from Liz to double check when his next appointment was.',
+          title: 'Phone call from Liz Danger Haggis at 11am',
+          notes: 'No notes',
+        })
+
+        .shouldRenderActivity({
+          id: 1,
+          date: 'Friday 4 September 2020',
+          title: 'Home visit with Catherine Ellis at 12pm',
+          subTitle: 'National standard appointment',
+          notes: LONG_CONTACT_NOTES,
+          notesType: 'open-detail', // long, not sensitive & in the first 3 entries
+          action: { colour: 'green', name: 'complied' },
         })
 
         .shouldRenderActivity({
           id: 7,
           date: 'Friday 4 September 2020',
-          time: '1pm',
-          name: 'Email or text message to Liz Danger Haggis',
+          title: 'Email or text message to Liz Danger Haggis at 1pm',
           notes:
             'Hi Liz - it was good to speak today. To confirm, your next probation appointment is by telephone on 7th April 2021 at 10:00.',
         })
@@ -195,25 +160,48 @@ context('Offender activity tab', () => {
         .shouldRenderActivity({
           id: 8,
           date: 'Friday 4 September 2020',
-          time: '2pm',
-          name: 'Not a well known communication',
+          title: 'Not a well known communication at 2pm',
           notes: 'Some unknown communication',
+          notesType: 'closed-detail',
+          sensitive: true,
         })
 
         .shouldRenderActivity({
-          id: 9,
-          date: 'Friday 4 September 2020',
-          time: '2pm',
-          name: 'System generated unknown contact',
-          notes: 'Unknown system generated contact',
+          id: 2,
+          date: 'Thursday 3 September 2020',
+          title: 'Office visit at 10:30am',
+          subTitle: 'Appointment',
+          notes: 'Some office visit appointment With a new line!',
+          action: { colour: 'red', name: 'failed to comply' },
         })
 
         .shouldRenderActivity({
-          id: 11,
-          date: 'Friday 4 September 2020',
-          time: '2pm',
-          name: 'CPS pack requested',
-          notes: 'CPS request',
+          id: 3,
+          date: 'Thursday 3 September 2020',
+          title: 'Office visit at 11am',
+          subTitle: 'Appointment',
+          notes: LONG_CONTACT_NOTES,
+          notesType: 'closed-detail',
+          action: { colour: 'green', name: 'acceptable absence' },
+        })
+
+        .shouldRenderActivity({
+          id: 4,
+          date: 'Thursday 3 September 2020',
+          title: 'Office visit at 11:30am',
+          subTitle: 'Appointment',
+          notes: LONG_CONTACT_NOTES,
+          notesType: 'closed-detail',
+          action: { colour: 'red', name: 'unacceptable absence' },
+          summary: { 'RAR activity': 'Yes' },
+        })
+
+        .shouldRenderActivity({
+          id: 5,
+          date: 'Wednesday 2 September 2020',
+          title: 'Not a well known appointment with Robert Ohagan at 11am',
+          subTitle: 'Appointment',
+          notes: 'Some unknown appointment',
         })
     })
 
@@ -222,9 +210,9 @@ context('Offender activity tab', () => {
         .whenViewingOffender()
         .whenClickingSubNavTab('activity')
         .shouldRenderOffenderTab('activity', page => {
-          const entry = page.entry(5)
-          entry.attendanceMissing.contains('Attendance not recorded')
-          entry.attendanceMissing.contains('Record attendance').click()
+          page.group('Wednesday 2 September 2020', group => {
+            group.entry(5, card => card.actionLinks.contains('Record an outcome').click())
+          })
         })
         .shouldDisplayExitPage('delius')
     })
@@ -262,6 +250,7 @@ context('Offender activity tab', () => {
           page.outcome('Sensitive').contains('Yes')
         })
     })
+
     it('displays phone call communication detail ', () => {
       fixture
         .whenViewingOffender()
@@ -273,10 +262,11 @@ context('Offender activity tab', () => {
           page.detailShouldNotExist('To')
           page.detail('Date').contains('4 September 2020')
           page.detail('Time').contains('11am')
-          page.detail('Details').contains('Phone call from Liz to double check when his next appointment was.')
+          page.detail('Details').contains('No notes')
           page.getLastUpdated().contains('Last updated by Andy Smith on Friday 4 September 2020 at 11:20am')
         })
     })
+
     it('displays email/text communication detail ', () => {
       fixture
         .whenViewingOffender()
@@ -296,35 +286,16 @@ context('Offender activity tab', () => {
           page.getLastUpdated().contains('Last updated by John Smith on Friday 4 September 2020 at 2:20pm')
         })
     })
+
     it('displays activity log filtered to display failure to complies', () => {
       fixture
         .whenViewingOffender()
         .whenClickingSubNavTab('activity')
         .whenClickingFailuresToComplyFilter()
-        .shouldRenderActivity({
-          id: 2,
-          date: 'Thursday 3 September 2020',
-          time: '10:30am to 11:15am',
-          name: 'Office visit',
-          notes: LONG_CONTACT_NOTES,
-          tags: [{ colour: 'red', text: 'failed to comply' }],
-          havingLongNotes: true,
-        })
-        .shouldRenderActivity({
-          id: 4,
-          date: 'Thursday 3 September 2020',
-          time: '10:30am to 11:15am',
-          name: 'Office visit',
-          notes: LONG_CONTACT_NOTES,
-          tags: [
-            { colour: 'purple', text: 'rar' },
-            { colour: 'red', text: 'unacceptable absence' },
-          ],
-          havingLongNotes: true,
-        })
-        .shouldNotRenderActivity({
-          id: 1, // a complied attended activity not returned by Wiremocked CAPI when the FTC filters are applied
-        })
+        .shouldRenderActivityWithId(2)
+        .shouldRenderActivityWithId(4)
+        // a complied attended activity not returned by Wiremocked CAPI when the FTC filters are applied
+        .shouldNotRenderActivityWithId(1)
     })
 
     it('displays activity log filtered by appointments without an outcome', () => {
@@ -332,15 +303,11 @@ context('Offender activity tab', () => {
         .whenViewingOffender()
         .whenClickingSubNavTab('activity')
         .whenClickingWithoutAnOutcomeFilter()
-        .shouldRenderActivity({
-          id: 5,
-          date: 'Wednesday 2 September 2020',
-          time: '11am to 1pm',
-          name: 'Not a well known appointment with Robert Ohagan',
-          notes: 'Some unknown appointment',
-          havingLongNotes: false,
-        })
-        .shouldNotRenderActivities([1, 2, 3, 4])
+        .shouldRenderActivityWithId(5)
+        .shouldNotRenderActivityWithId(1)
+        .shouldNotRenderActivityWithId(2)
+        .shouldNotRenderActivityWithId(3)
+        .shouldNotRenderActivityWithId(4)
     })
   })
 })

@@ -66,10 +66,9 @@ describe('ActivityController', () => {
 
   it('gets communication', async () => {
     const offender = havingOffenderSummary()
-
-    const contact = fakeActivityLogEntry({ type: ContactTypeCategory.Communication }) as CommunicationActivityLogEntry
     const displayName = getDisplayName(offender)
-    activityService.getCommunicationContact.withArgs('some-crn', 111, displayName).resolves(contact)
+    const contact = fakeActivityLogEntry({ type: ContactTypeCategory.Communication }) as CommunicationActivityLogEntry
+    activityService.getCommunicationContact.withArgs('some-crn', 111, offender).resolves(contact)
 
     const observed = await subject.getCommunication('some-crn', 111)
     const links = MockLinksModule.of({

@@ -3,10 +3,36 @@ import { SummaryList, SummaryListCallback } from './components/summary-list'
 import { Table, TableCallback } from './components/table'
 import { Card, CardCallback } from './components/card'
 import { DateTime } from 'luxon'
+import { kebabCase } from 'lodash'
+import { Details, DetailsCallback } from './components/details'
 
 export type TABS = 'overview' | 'schedule' | 'activity' | 'personal' | 'sentence' | 'compliance' | 'risk'
 export type SCHEDULE_TABLE = 'future' | 'recent'
 export type SCHEDULE_COL = 'date' | 'time' | 'appointment'
+
+class ActivityLogGroupEntry extends Card {
+  get subTitle() {
+    return this.title.find('[data-qa="sub-title"]')
+  }
+
+  get notes() {
+    return this.body.find('[data-qa=notes]')
+  }
+
+  notesDetail(sensitive: boolean, callback: DetailsCallback) {
+    Details.byName(sensitive ? 'Notes (sensitive)' : 'Notes', callback)
+  }
+}
+
+class ActivityLogGroup {
+  get title() {
+    return cy.get('[data-qa="offender/activity/group-title"]')
+  }
+
+  entry(id: number, callback: (entry: ActivityLogGroupEntry) => void) {
+    Card.selectByQa(`offender/activity/${id}`, () => callback(new ActivityLogGroupEntry()))
+  }
+}
 
 export class OffenderPage extends PageBase {
   subNavTab(name: TABS) {
@@ -87,32 +113,19 @@ export class OffenderPage extends PageBase {
         return cy.get(`[data-qa="offender/activity-filter-${filterType}"]`)
       },
 
+      group(date: string, callback: (group: ActivityLogGroup) => void) {
+        cy.get(`[data-qa="offender/activity/${kebabCase(date)}"]`).within(() => {
+          const group = new ActivityLogGroup()
+          callback(group)
+        })
+      },
+
+      clickEntryLink(id: number) {
+        new ActivityLogGroup().entry(id, entry => entry.title.find('a').click())
+      },
+
       entry(id: number) {
-        return {
-          select(selector: string) {
-            return cy.get(`[data-qa="offender/activity/${id}"] ${selector}`)
-          },
-
-          get title() {
-            return this.select('h3')
-          },
-
-          get tags() {
-            return this.select('[data-qa="tag"]')
-          },
-
-          get notes() {
-            return this.select('.note-panel')
-          },
-
-          get longNotesLink() {
-            return this.select('.note-panel [data-qa="view-link"] a')
-          },
-
-          get attendanceMissing() {
-            return this.select('[data-qa="attendance-missing"]')
-          },
-        }
+        return cy.get(`[data-qa="offender/activity/${id}"]`)
       },
     }
   }

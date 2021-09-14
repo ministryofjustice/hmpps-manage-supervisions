@@ -3,7 +3,15 @@ import { ConfigService } from '@nestjs/config'
 import { Config, ContactTypeCategory, WellKnownContactTypeConfig } from '../../config'
 import { staffName } from '../../util'
 import { AppointmentType } from '../client'
-import { BreachEndMetaResult, BreachStartMetaResult, GetMetaOptions, GetMetaResult } from './types'
+import {
+  AppointmentMetaResult,
+  BreachEndMetaResult,
+  BreachStartMetaResult,
+  CommunicationMetaResult,
+  GetMetaOptions,
+  GetMetaResult,
+  WarningLetterMetaResult,
+} from './contact-mapping.types'
 import { ContactTypesService } from '../contact-types'
 
 function isAppointmentType(value: any): value is AppointmentType {
@@ -17,58 +25,20 @@ export class ContactMappingService {
     this.config = config.get<WellKnownContactTypeConfig>('contacts')
   }
 
-  async getTypeMeta({ type, staff }: GetMetaOptions): Promise<GetMetaResult> {
-    const { code, appointment } = isAppointmentType(type)
-      ? { code: type.contactType.trim().toUpperCase(), appointment: true }
-      : { code: type.code.trim().toUpperCase(), appointment: type.appointment || false }
+  async getTypeMeta(options: GetMetaOptions): Promise<GetMetaResult> {
+    const { code, appointment } = isAppointmentType(options.type)
+      ? { code: options.type.contactType.trim().toUpperCase(), appointment: true }
+      : { code: options.type.code.trim().toUpperCase(), appointment: options.type.appointment || false }
 
-    // check for breach stuff first as that's easy
-    const breach = this.getBreachMeta(code)
-    if (breach !== null) {
-      return breach
-    }
-
-    const category = appointment ? ContactTypeCategory.Appointment : ContactTypeCategory.Communication
-    const config = this.config[category]
-    const meta = Object.values(config).find(x =>
-      'code' in x ? x.code === code : Object.values(x.codes).includes(code),
-    )
-
-    const communication = await this.contactTypesService.isCommunicationContactType(code)
-
-    function appointmentName(typeName: string) {
-      const staffFullName = staffName(staff)
-      return staffFullName ? `${typeName} with ${staffFullName}` : typeName
-    }
-
-    if (!meta) {
-      return {
-        type: communication ? ContactTypeCategory.Communication : ContactTypeCategory.Other,
-        value: { appointment, communication, name: type.description },
-        name: appointment ? appointmentName(type.description) : type.description,
-      }
-    }
-
-    if (appointment) {
-      return {
-        type: category,
-        value: meta,
-        name: appointmentName(meta.name),
-      }
-    }
-
-    return {
-      type: category,
-      value: meta,
-      name: meta.name,
-    }
-  }
-
-  getBreachMeta(code: string): BreachStartMetaResult | BreachEndMetaResult | null {
     return (
-      this.getBreachCategoryMeta(code, ContactTypeCategory.BreachStart) ||
-      this.getBreachCategoryMeta(code, ContactTypeCategory.BreachEnd) ||
-      null
+      this.appointment(code, appointment, options) ||
+      this.getBreachMeta(code) ||
+      this.warningLetter(code, options) ||
+      (await this.communication(code, options)) || {
+        type: ContactTypeCategory.Other,
+        name: options.type.description,
+        value: null,
+      }
     )
   }
 
@@ -79,7 +49,36 @@ export class ContactMappingService {
     ]
   }
 
-  private getBreachCategoryMeta(
+  getBreachMeta(code: string): BreachStartMetaResult | BreachEndMetaResult | null {
+    return (
+      this.breach(code, ContactTypeCategory.BreachStart) || this.breach(code, ContactTypeCategory.BreachEnd) || null
+    )
+  }
+
+  private appointment(
+    code: string,
+    isAppointment: boolean,
+    { type, staff }: GetMetaOptions,
+  ): AppointmentMetaResult | null {
+    if (!isAppointment) {
+      // dont even bother checking our well known stuff if the API says it's not an appointment as some appointment APIs might not work with it
+      // TODO maybe we should still check and log an error if the meta is bad?
+      return null
+    }
+
+    const config = this.config[ContactTypeCategory.Appointment]
+    const meta = Object.values(config).find(x => Object.values(x.codes).includes(code))
+    const typeName = meta?.name || type.description
+    const staffFullName = staffName(staff)
+    const name = staffFullName ? `${typeName} with ${staffFullName}` : typeName
+    return {
+      type: ContactTypeCategory.Appointment,
+      name,
+      value: meta || null,
+    }
+  }
+
+  private breach(
     code: string,
     category: ContactTypeCategory.BreachStart | ContactTypeCategory.BreachEnd,
   ): BreachStartMetaResult | BreachEndMetaResult | null {
@@ -89,5 +88,28 @@ export class ContactMappingService {
       type: category,
       value,
     }) as BreachStartMetaResult | BreachEndMetaResult
+  }
+
+  private warningLetter(code: string, { type }: GetMetaOptions): WarningLetterMetaResult | null {
+    return Object.values(this.config[ContactTypeCategory.WarningLetter]).includes(code)
+      ? {
+          type: ContactTypeCategory.WarningLetter,
+          name: type.description,
+          value: {},
+        }
+      : null
+  }
+
+  private async communication(code: string, { type }: GetMetaOptions): Promise<CommunicationMetaResult | null> {
+    const isCommunication = await this.contactTypesService.isCommunicationContactType(code)
+    if (!isCommunication) {
+      return null
+    }
+    const meta = Object.values(this.config[ContactTypeCategory.Communication]).find(x => x.code === code)
+    return {
+      type: ContactTypeCategory.Communication,
+      name: meta?.name || type.description,
+      value: meta || null,
+    }
   }
 }

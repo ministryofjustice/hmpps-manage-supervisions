@@ -59,7 +59,7 @@ export class ActivityController {
   ): Promise<CommunicationViewModel> {
     const offender = await this.offender.getOffenderSummary(crn)
     const displayName = getDisplayName(offender)
-    const contact = await this.activity.getCommunicationContact(crn, id, displayName)
+    const contact = await this.activity.getCommunicationContact(crn, id, offender)
     return {
       displayName,
       contact,

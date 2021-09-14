@@ -21,7 +21,7 @@ import { ScheduleService } from './schedule'
 import { ActivityComplianceFilter, ActivityService, GetContactsOptions } from './activity'
 import { RiskService } from './risk'
 import { fakeComplianceDetails, fakeConvictionDetails, fakeConvictionRequirement } from './sentence/sentence.fake'
-import { fakeActivityLogEntry } from './activity/activity.fake'
+import { fakeActivityLogEntryGroup } from './activity/activity.fake'
 import { fakeAppointmentListViewModel, fakeNextAppointmentSummary } from './schedule/schedule.fake'
 import { MockLinksModule } from '../../common/links/links.mock'
 import { PersonalService } from './personal'
@@ -31,7 +31,6 @@ import { ConfigService } from '@nestjs/config'
 import { FakeConfigModule } from '../../config/config.fake'
 import { ContactTypesService } from '../../community-api'
 import { FeatureFlags } from '../../config'
-import { getDisplayName } from '../../util'
 
 describe('OffenderController', () => {
   let subject: OffenderController
@@ -135,19 +134,18 @@ describe('OffenderController', () => {
 
   it('gets activity', async () => {
     const offender = havingOffenderSummary()
-    const displayName = getDisplayName(offender)
 
     const communicationContactTypes = [fakeAppointmentType().contactType, fakeAppointmentType().contactType]
 
     contactTypesService.getCommunicationContactTypes.resolves(communicationContactTypes)
 
-    const contacts = fakePaginated([fakeActivityLogEntry(), fakeActivityLogEntry()])
+    const contacts = fakePaginated([fakeActivityLogEntryGroup(), fakeActivityLogEntryGroup()])
 
     sentenceService.getConvictionId.withArgs('some-crn').resolves(1234)
     activityService.getActivityLogPage
       .withArgs(
         'some-crn',
-        displayName,
+        offender,
         match({
           include: ['APPOINTMENTS', 'TYPE_' + communicationContactTypes[0], 'TYPE_' + communicationContactTypes[1]],
           convictionId: 1234,
@@ -158,7 +156,7 @@ describe('OffenderController', () => {
     const observed = await subject.getActivity('some-crn')
     shouldReturnViewModel(observed, BreadcrumbType.CaseActivityLog, {
       page: OffenderPage.Activity,
-      contacts: contacts.content,
+      groups: contacts.content,
       pagination: {
         page: contacts.number,
         size: contacts.size,
@@ -196,14 +194,13 @@ describe('OffenderController', () => {
 
   it('gets filtered activity list', async () => {
     const offender = havingOffenderSummary()
-    const displayName = getDisplayName(offender)
-    const contacts = fakePaginated([fakeActivityLogEntry(), fakeActivityLogEntry()])
+    const contacts = fakePaginated([fakeActivityLogEntryGroup(), fakeActivityLogEntryGroup()])
 
     sentenceService.getConvictionId.withArgs('some-crn').resolves(1234)
     activityService.getActivityLogPage
       .withArgs(
         'some-crn',
-        displayName,
+        offender,
         match({
           convictionId: 1234,
           complianceFilter: ActivityComplianceFilter.CompliedAppointments,
@@ -214,7 +211,7 @@ describe('OffenderController', () => {
     const observed = await subject.getActivityFiltered('some-crn', ActivityComplianceFilter.CompliedAppointments)
     shouldReturnViewModel(observed, BreadcrumbType.CaseActivityLog, {
       page: OffenderPage.Activity,
-      contacts: contacts.content,
+      groups: contacts.content,
       pagination: {
         page: contacts.number,
         size: contacts.size,

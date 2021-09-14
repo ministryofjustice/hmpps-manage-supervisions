@@ -94,7 +94,7 @@ context('Offender risk tab', () => {
         .whenViewingOffender()
         .whenClickingSubNavTab('risk')
         .shouldRenderOffenderTab('risk', page => {
-          page.roshCommunity(card => card.actions.contains('View OASys').click())
+          page.roshCommunity(card => card.actionLinks.contains('View OASys').click())
         })
         .shouldDisplayExitPage('oasys')
     })
@@ -104,7 +104,7 @@ context('Offender risk tab', () => {
         .whenViewingOffender()
         .whenClickingSubNavTab('risk')
         .shouldRenderOffenderTab('risk', page => {
-          page.roshThemselves(card => card.actions.contains('View OASys').click())
+          page.roshThemselves(card => card.actionLinks.contains('View OASys').click())
         })
         .shouldDisplayExitPage('oasys')
     })
@@ -132,7 +132,7 @@ context('Offender risk tab', () => {
               list.value('Date added').contains('14 May 2020 by Yolanda Gubbins')
             })
 
-            card.actions.contains('Remove this flag on Delius').click()
+            card.actionLinks.contains('Remove this flag on Delius').click()
           })
         })
         .shouldDisplayExitPage('delius')

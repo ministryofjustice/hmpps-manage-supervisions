@@ -17,6 +17,7 @@ import { ComplianceService } from './offender/sentence/compliance.service'
 import { RiskController } from './offender/risk/risk.controller'
 import { SentenceController } from './offender/sentence/sentence.controller'
 import { ExitController } from './offender/exit/exit.controller'
+import { ActivityLogEntryService } from './offender/activity/activity-log-entry.service'
 
 @Module({
   imports: [CommonModule, CommunityApiModule, AssessRisksAndNeedsApiModule],
@@ -38,6 +39,7 @@ import { ExitController } from './offender/exit/exit.controller'
     RequirementService,
     ContactTypesService,
     ComplianceService,
+    ActivityLogEntryService,
   ],
 })
 export class OffendersModule {}
