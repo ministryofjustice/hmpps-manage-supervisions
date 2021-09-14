@@ -11,7 +11,7 @@ import {
   WellKnownContactTypeMeta,
   WellKnownWarningLetterType,
 } from './types'
-import { ApplicationVersion } from '../util'
+import { getApplicationInfo } from '../util'
 import { requirements } from './requirements'
 
 interface EnvironmentFallback<T> {
@@ -283,15 +283,16 @@ export function configFactory(): Config {
 
   const tokenVerificationEnabled = bool('TOKEN_VERIFICATION_ENABLED', fallback(false))
 
-  if (isProduction() && !ApplicationVersion.version) {
+  const appInfo = getApplicationInfo()
+  if (isProduction() && !appInfo.version) {
     throw new Error('No build info file present')
   }
 
   return {
     server: {
-      name: ApplicationVersion.packageData.name,
-      description: ApplicationVersion.packageData.description,
-      version: ApplicationVersion.version || 'unknown',
+      name: appInfo.name,
+      description: appInfo.description,
+      version: appInfo.version || 'unknown',
       port: int('PORT', fallback(3000)),
       deploymentEnvironment: string('DEPLOYMENT_ENV', developmentOnly('local')),
       isProduction: isProduction(),
