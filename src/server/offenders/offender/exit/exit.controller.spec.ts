@@ -77,7 +77,15 @@ describe('ExitController', () => {
       },
     } as DeliusExitViewModel)
   })
+  it('displays delius exit link correctly when no conviction for a crn', async () => {
+    sentenceService.getConvictionId.withArgs('some-crn').resolves(undefined)
 
+    const observed = await subject.getDeliusExit('some-crn')
+
+    expect(observed.links.deliusContactLog).toEqual(
+      'https://delius/NDelius-war/delius/JSP/deeplink.jsp?component=ContactList&offenderId=84520',
+    )
+  })
   it('displays oasys exit', async () => {
     const observed = await subject.getOASysExit('some-crn')
 

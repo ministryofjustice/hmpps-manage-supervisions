@@ -34,7 +34,7 @@ export class ExitController {
     const contactLog = new URL('/NDelius-war/delius/JSP/deeplink.jsp', this.config.get<DeliusConfig>('delius').baseUrl)
     contactLog.searchParams.set('component', 'ContactList')
     contactLog.searchParams.set('offenderId', offender.offenderId.toString())
-    contactLog.searchParams.set('eventId', convictionId.toString())
+    if (convictionId) contactLog.searchParams.set('eventId', convictionId.toString())
 
     const homePage = new URL('/NDelius-war/delius/JSP/homepage.jsp', this.config.get<DeliusConfig>('delius').baseUrl)
 
