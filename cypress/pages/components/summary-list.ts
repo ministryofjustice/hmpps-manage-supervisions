@@ -1,4 +1,5 @@
 import { Card } from './card'
+import { Details, DetailsCallback } from './details'
 
 export type SummaryListCallback = (card: SummaryList) => void
 
@@ -19,19 +20,18 @@ export class SummaryList {
     return this.title(title).siblings('dd.govuk-summary-list__actions')
   }
 
-  detailsList(title: string, name: string, callback: SummaryListCallback) {
-    const details = this.value(title).find('details').contains(name)
-    details.click()
-    return details
-      .parents('details')
-      .find('dl')
-      .within(() => callback(new SummaryList()))
+  detailsList(title: string, name: string, callback: SummaryListCallback, startsClosed = true) {
+    this.details(title, name, details => {
+      if (startsClosed) {
+        details.shouldBeClosed()
+        details.toggle()
+      }
+      cy.get('dl').within(() => callback(new SummaryList()))
+    })
   }
 
-  details(title: string, name: string, callback: () => void) {
-    const details = this.value(title).find('details').contains(name)
-    details.click()
-    return details.parents('details').within(() => callback())
+  details(title: string, name: string, callback: DetailsCallback) {
+    this.value(title).within(() => Details.byName(name, callback))
   }
 
   /**

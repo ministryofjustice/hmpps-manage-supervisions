@@ -247,12 +247,11 @@ export class OffenderController {
       this.offenderService.getOffenderSummary(crn),
       this.sentenceService.getConvictionId(crn),
     ])
-    const displayName = getDisplayName(offender)
-    const contacts = await this.activityService.getActivityLogPage(crn, displayName, { ...options, convictionId })
+    const contacts = await this.activityService.getActivityLogPage(crn, offender, { ...options, convictionId })
     return {
       ...this.getBase(OffenderPage.Activity, offender),
       page: OffenderPage.Activity,
-      contacts: contacts.content,
+      groups: contacts.content,
       pagination: {
         page: contacts.number,
         size: contacts.size,

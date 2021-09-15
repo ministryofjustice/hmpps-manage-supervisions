@@ -185,7 +185,7 @@ context('Offender compliance tab', () => {
         .whenViewingOffender()
         .whenClickingSubNavTab('compliance')
         .shouldRenderOffenderTab('compliance', page =>
-          page.sentence(card => card.actions.contains('View sentence details').click()),
+          page.sentence(card => card.actionLinks.contains('View sentence details').click()),
         )
         .shouldRenderOffenderTab('sentence')
     })
@@ -196,7 +196,7 @@ context('Offender compliance tab', () => {
         .whenClickingSubNavTab('compliance')
         .shouldRenderOffenderTab('compliance', page => {
           page.previousOrder('24 month CJA Community Order', previousTerminationDate, card =>
-            card.actions.contains('View order').click(),
+            card.actionLinks.contains('View order').click(),
           )
         })
         .shouldDisplayExitPage('delius')

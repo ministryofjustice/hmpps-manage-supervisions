@@ -3,44 +3,40 @@ import { ActivityService } from './activity.service'
 import { DateTime, Settings } from 'luxon'
 import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
 import {
+  AppointmentDetail,
   ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
   ContactSummary,
+  OffenderDetail,
 } from '../../../community-api/client'
-import {
-  AppointmentMetaResult,
-  CommunicationMetaResult,
-  CommunityApiService,
-  ContactMappingService,
-  Paginated,
-} from '../../../community-api'
+import { CommunityApiService, ContactMappingService, Paginated } from '../../../community-api'
 import { ContactTypeCategory } from '../../../config'
 import {
   fakeAppointmentDetail,
   fakeContactSummary,
-  fakeContactType,
+  fakeOffenderDetail,
   fakePaginated,
 } from '../../../community-api/community-api.fake'
 import { fakeOkResponse } from '../../../common/rest/rest.fake'
 import {
   ActivityComplianceFilter,
   ActivityLogEntry,
+  ActivityLogEntryGroup,
   AppointmentActivityLogEntry,
   CommunicationActivityLogEntry,
-  UnknownActivityLogEntry,
 } from './activity.types'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../../community-api/community-api.mock'
-import { MockLinksModule } from '../../../common/links/links.mock'
-import { BreadcrumbType } from '../../../common/links'
-import { merge } from 'lodash'
 import { FakeConfigModule } from '../../../config/config.fake'
 import { BreachService } from '../../../community-api/breach'
-import { GovUkUiTagColour } from '../../../util/govuk-ui'
+import { ActivityLogEntryService } from './activity-log-entry.service'
+import { fakeContactMeta } from '../../../community-api/contact-mapping/contact-mapping.fake'
+import { fakeActivityLogEntry } from './activity.fake'
 
 describe('ActivityService', () => {
   let subject: ActivityService
   let community: MockCommunityApiService
   let contactMapping: SinonStubbedInstance<ContactMappingService>
   let breachService: SinonStubbedInstance<BreachService>
+  let entryService: SinonStubbedInstance<ActivityLogEntryService>
   const now = DateTime.fromObject({ year: 2020, month: 3, day: 1 })
 
   beforeEach(async () => {
@@ -48,14 +44,16 @@ describe('ActivityService', () => {
 
     contactMapping = createStubInstance(ContactMappingService)
     breachService = createStubInstance(BreachService)
+    entryService = createStubInstance(ActivityLogEntryService)
 
     const module = await Test.createTestingModule({
       providers: [
         ActivityService,
         { provide: ContactMappingService, useValue: contactMapping },
         { provide: BreachService, useValue: breachService },
+        { provide: ActivityLogEntryService, useValue: entryService },
       ],
-      imports: [MockCommunityApiModule.register(), MockLinksModule, FakeConfigModule.register()],
+      imports: [MockCommunityApiModule.register(), FakeConfigModule.register()],
     }).compile()
 
     subject = module.get(ActivityService)
@@ -63,74 +61,110 @@ describe('ActivityService', () => {
   })
 
   it('gets appointment', async () => {
-    const appointment = fakeAppointmentDetail({
-      appointmentId: 91747,
-      appointmentStart: '2020-07-13T12:00:00',
-      appointmentEnd: '2020-07-13T13:00:00',
-      notes: 'Some appointment notes',
-      sensitive: false,
-      outcome: { complied: false, attended: true, description: 'Some outcome' },
-      rarActivity: false,
-      requirement: {
-        requirementId: 84512,
-        isActive: true,
-        isRar: true,
-      },
-    })
+    const appointment = fakeAppointmentDetail()
+
     community.appointment.getOffenderAppointmentByCrnUsingGET
       .withArgs(match({ crn: 'some-crn', appointmentId: 123 }))
       .resolves(fakeOkResponse(appointment))
 
-    contactMapping.getTypeMeta.withArgs(appointment).returns(
-      Promise.resolve({
-        name: 'Some appointment with some staff member',
-        type: ContactTypeCategory.Appointment,
-        value: { name: 'Some appointment' },
-      } as AppointmentMetaResult),
-    )
+    const meta = fakeContactMeta(ContactTypeCategory.Appointment)
+    contactMapping.getTypeMeta.withArgs(appointment).resolves(meta)
+
+    const entry = fakeActivityLogEntry() as AppointmentActivityLogEntry
+    entryService.getAppointmentActivityLogEntry.withArgs('some-crn', appointment, meta).returns(entry)
 
     const observed = await subject.getAppointment('some-crn', 123)
 
-    const links = MockLinksModule.of({ crn: 'some-crn', id: 91747 })
-    expect(observed).toEqual({
-      id: 91747,
-      category: 'Future appointment',
-      start: DateTime.fromObject({ year: 2020, month: 7, day: 13, hour: 12 }),
-      end: DateTime.fromObject({ year: 2020, month: 7, day: 13, hour: 13 }),
-      isFuture: true,
-      name: 'Some appointment with some staff member',
-      notes: 'Some appointment notes',
-      sensitive: false,
-      tags: [
-        {
-          colour: GovUkUiTagColour.Red,
-          name: 'failed to comply',
-        },
-      ],
-      type: 'appointment',
-      typeName: 'Some appointment',
-      links: {
-        addNotes: links.url(BreadcrumbType.ExitToDelius),
-        recordMissingAttendance: null,
-        view: links.url(BreadcrumbType.Appointment),
-        updateOutcome: links.url(BreadcrumbType.ExitToDelius),
-      },
-      requirement: {
-        requirementId: 84512,
-        isActive: true,
-        isRar: true,
-      },
-      outcome: { complied: false, attended: true, description: 'Some outcome' },
-      rarActivity: false,
-    } as AppointmentActivityLogEntry)
+    expect(observed).toBe(entry)
   })
+
+  it('fails to map non-appointment contact to appointment', async () => {
+    const appointment = fakeAppointmentDetail()
+
+    community.appointment.getOffenderAppointmentByCrnUsingGET
+      .withArgs(match({ crn: 'some-crn', appointmentId: 123 }))
+      .resolves(fakeOkResponse(appointment))
+
+    const meta = fakeContactMeta(ContactTypeCategory.Communication)
+    contactMapping.getTypeMeta.withArgs(appointment).resolves(meta)
+
+    await expect(() => subject.getAppointment('some-crn', 123)).rejects.toThrow(
+      "contact with id '123' is not an appointment",
+    )
+  })
+
+  it('gets communication', async () => {
+    const contact = fakeContactSummary()
+    const offender = fakeOffenderDetail()
+
+    community.contactAndAttendance.getOffenderContactSummaryByCrnUsingGET
+      .withArgs(match({ crn: 'some-crn', contactId: 123 }))
+      .resolves(fakeOkResponse(contact))
+
+    const meta = fakeContactMeta(ContactTypeCategory.Communication)
+    contactMapping.getTypeMeta.withArgs(contact).resolves(meta)
+
+    const entry = fakeActivityLogEntry() as CommunicationActivityLogEntry
+    entryService.getCommunicationActivityLogEntry.withArgs('some-crn', contact, meta, offender).returns(entry)
+
+    const observed = await subject.getCommunicationContact('some-crn', 123, offender)
+
+    expect(observed).toBe(entry)
+  })
+
+  it('fails to map non-communication contact to a communication', async () => {
+    const contact = fakeContactSummary()
+    const offender = fakeOffenderDetail()
+
+    community.contactAndAttendance.getOffenderContactSummaryByCrnUsingGET
+      .withArgs(match({ crn: 'some-crn', contactId: 123 }))
+      .resolves(fakeOkResponse(contact))
+
+    const meta = fakeContactMeta(ContactTypeCategory.Appointment)
+    contactMapping.getTypeMeta.withArgs(contact).resolves(meta)
+
+    await expect(() => subject.getCommunicationContact('some-crn', 123, offender)).rejects.toThrow(
+      "contact with id '123' is not a communication",
+    )
+  })
+
+  function havingAppointmentEntry(contact: ContactSummary | AppointmentDetail) {
+    const entry = fakeActivityLogEntry({ type: ContactTypeCategory.Appointment })
+    const meta = fakeContactMeta(ContactTypeCategory.Appointment)
+    contactMapping.getTypeMeta.withArgs(contact).resolves(meta)
+    entryService.getAppointmentActivityLogEntry.withArgs('some-crn', contact, meta).resolves(entry)
+    return entry
+  }
+
+  function havingCommunicationEntry(contact: ContactSummary, offender: OffenderDetail) {
+    const entry = fakeActivityLogEntry({ type: ContactTypeCategory.Communication })
+    const meta = fakeContactMeta(ContactTypeCategory.Communication)
+    contactMapping.getTypeMeta.withArgs(contact).resolves(meta)
+    entryService.getCommunicationActivityLogEntry.withArgs('some-crn', contact, meta, offender).resolves(entry)
+    return entry
+  }
+
+  function havingUnknownEntry(contact: ContactSummary) {
+    const entry = fakeActivityLogEntry({ type: ContactTypeCategory.Other })
+    const meta = fakeContactMeta(ContactTypeCategory.Other)
+    contactMapping.getTypeMeta.withArgs(contact).resolves(meta)
+    entryService.getUnknownActivityLogEntry.withArgs(contact, meta).resolves(entry)
+    return entry
+  }
 
   describe('activity log compliance filters', () => {
     let stub: ReturnType<typeof havingContacts>
+    const offender = fakeOffenderDetail()
+    const appointment = fakeContactSummary()
+    const communication = fakeContactSummary()
+    const unknown = fakeContactSummary()
+    let appointmentEntry: ActivityLogEntry
+    let communicationEntry: ActivityLogEntry
+    let unknownEntry: ActivityLogEntry
 
     function havingContacts() {
       return community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET.resolves(
-        fakeOkResponse(fakePaginated([])),
+        fakeOkResponse(fakePaginated([appointment, communication, unknown])),
       )
     }
 
@@ -141,6 +175,8 @@ describe('ActivityService', () => {
         crn: 'some-crn',
         contactDateFrom: '2019-03-01',
         contactDateTo: '2020-03-02',
+        page: 1,
+        pageSize: 999,
         ...expected,
       } as ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest)
     }
@@ -153,16 +189,46 @@ describe('ActivityService', () => {
 
     beforeEach(() => {
       stub = havingContacts()
+      appointmentEntry = havingAppointmentEntry(appointment)
+      communicationEntry = havingCommunicationEntry(communication, offender)
+      unknownEntry = havingUnknownEntry(unknown)
+    })
+
+    it('maps & sorts entry groups', async () => {
+      appointmentEntry.start = DateTime.fromISO('2020-02-01T12:00:00')
+      unknownEntry.start = DateTime.fromISO('2020-02-01T13:00:00')
+      communicationEntry.start = now
+      const observed = await subject.getActivityLogPage('some-crn', offender, {})
+      expect(observed).toEqual({
+        content: [
+          {
+            date: now.startOf('day'),
+            isToday: true,
+            entries: [communicationEntry],
+          },
+          {
+            date: DateTime.fromObject({ year: 2020, month: 2, day: 1 }),
+            isToday: false,
+            entries: [appointmentEntry, unknownEntry],
+          },
+        ],
+        first: true,
+        last: true,
+        number: 0,
+        size: 2,
+        totalElements: 2,
+        totalPages: 1,
+      } as Paginated<ActivityLogEntryGroup>)
     })
 
     it('does not apply any date from filters when not filtering for compliance', async () => {
-      await subject.getActivityLogPage('some-crn', 'some offender', {})
+      await subject.getActivityLogPage('some-crn', offender, {})
       shouldHaveFilteredContacts({ contactDateFrom: undefined })
     })
 
     it('gets unfiltered contacts & falls back to last 12 months when no breach', async () => {
       havingLastBreachEnd(null)
-      await subject.getActivityLogPage('some-crn', 'some offender', {
+      await subject.getActivityLogPage('some-crn', offender, {
         convictionId: 1,
         complianceFilter: ActivityComplianceFilter.Appointments,
       })
@@ -170,35 +236,35 @@ describe('ActivityService', () => {
     })
 
     it('filters appointments', async () => {
-      await subject.getActivityLogPage('some-crn', 'some offender', {
+      await subject.getActivityLogPage('some-crn', offender, {
         complianceFilter: ActivityComplianceFilter.Appointments,
       })
       shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true })
     })
 
     it('filters complied appointments', async () => {
-      await subject.getActivityLogPage('some-crn', 'some offender', {
+      await subject.getActivityLogPage('some-crn', offender, {
         complianceFilter: ActivityComplianceFilter.CompliedAppointments,
       })
       shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true, attended: true, complied: true })
     })
 
     it('filters acceptable absence appointments', async () => {
-      await subject.getActivityLogPage('some-crn', 'some offender', {
+      await subject.getActivityLogPage('some-crn', offender, {
         complianceFilter: ActivityComplianceFilter.AcceptableAbsenceAppointments,
       })
       shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true, attended: false, complied: true })
     })
 
     it('filters failed to comply appointments', async () => {
-      await subject.getActivityLogPage('some-crn', 'some offender', {
+      await subject.getActivityLogPage('some-crn', offender, {
         complianceFilter: ActivityComplianceFilter.FailedToComplyAppointments,
       })
       shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true, complied: false })
     })
 
     it('filters warning letter contacts', async () => {
-      await subject.getActivityLogPage('some-crn', 'some offender', {
+      await subject.getActivityLogPage('some-crn', offender, {
         complianceFilter: ActivityComplianceFilter.WarningLetters,
       })
       shouldHaveFilteredContacts({ contactTypes: ['AWLI', 'AWL2', 'AWLF', 'AWLS', 'C040', 'CLBR', 'CBRC', 'CLOB'] })
@@ -206,7 +272,7 @@ describe('ActivityService', () => {
 
     it('filters appointments from last breach end', async () => {
       havingLastBreachEnd(DateTime.fromObject({ year: 2018, month: 5, day: 6 }))
-      await subject.getActivityLogPage('some-crn', 'some offender', {
+      await subject.getActivityLogPage('some-crn', offender, {
         complianceFilter: ActivityComplianceFilter.Appointments,
         convictionId: 1,
       })
@@ -220,7 +286,7 @@ describe('ActivityService', () => {
 
     it('filters appointments from specified date', async () => {
       havingLastBreachEnd(DateTime.fromObject({ year: 2018, month: 5, day: 6 }))
-      await subject.getActivityLogPage('some-crn', 'some offender', {
+      await subject.getActivityLogPage('some-crn', offender, {
         complianceFilter: ActivityComplianceFilter.Appointments,
         convictionId: 1,
         contactDateFrom: '2018-04-05',
@@ -232,322 +298,5 @@ describe('ActivityService', () => {
         convictionId: 1,
       })
     })
-  })
-
-  describe('activity log page', () => {
-    function havingContacts(
-      ...partials: (DeepPartial<ContactSummary> & {
-        notes: string
-        type: ContactTypeCategory | null
-        meta?: any
-        nationalStandard?: boolean
-      })[]
-    ) {
-      const contacts = partials.map(({ type, meta, nationalStandard = false, ...partial }, i) => {
-        const contact = fakeContactSummary([
-          {
-            contactStart: '2018-01-01T12:00:00',
-            contactEnd: '2018-01-01T13:00:00',
-            contactId: i + 1,
-            sensitive: false,
-            outcome: {
-              complied: true,
-              attended: true,
-              description: 'Some outcome',
-            },
-            type: fakeContactType({ nationalStandard }),
-            lastUpdatedByUser: { forenames: 'Some', surname: 'User' },
-            lastUpdatedDateTime: '2018-04-01T12:00:00',
-          },
-          partial,
-        ])
-        contactMapping.getTypeMeta.withArgs(contact).resolves({
-          name: `some ${contact.notes}`,
-          type: type,
-          value: { ...meta, name: 'Some type' },
-        })
-        return contact
-      })
-
-      community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET.resolves(
-        fakeOkResponse(fakePaginated(contacts)),
-      )
-    }
-
-    function shouldReturnAppointment(
-      observed: Paginated<ActivityLogEntry>,
-      expected: DeepPartial<AppointmentActivityLogEntry>,
-    ) {
-      const links = MockLinksModule.of({ crn: 'some-crn', id: 1 })
-      expect(observed.content).toEqual([
-        merge(
-          {
-            id: 1,
-            type: ContactTypeCategory.Appointment,
-            category: 'Previous appointment',
-            start: DateTime.fromObject({ year: 2018, month: 1, day: 1, hour: 12 }),
-            end: DateTime.fromObject({ year: 2018, month: 1, day: 1, hour: 13 }),
-            isFuture: false,
-            links: {
-              addNotes: links.url(BreadcrumbType.ExitToDelius),
-              recordMissingAttendance: null,
-              view: links.url(BreadcrumbType.Appointment),
-              updateOutcome: links.url(BreadcrumbType.ExitToDelius),
-            },
-            name: `some ${expected.notes}`,
-            outcome: {
-              attended: true,
-              complied: true,
-              description: 'Some outcome',
-            },
-            rarActivity: false,
-            requirement: null,
-            sensitive: false,
-            tags: [],
-            typeName: 'Some type',
-          } as ActivityLogEntry,
-          expected,
-        ),
-      ])
-    }
-
-    function shouldReturnCommunication(
-      observed: Paginated<ActivityLogEntry>,
-      expected: DeepPartial<CommunicationActivityLogEntry>,
-    ) {
-      const links = MockLinksModule.of({ crn: 'some-crn', id: 1 })
-      expect(observed.content).toEqual([
-        merge(
-          {
-            id: 1,
-            type: ContactTypeCategory.Communication,
-            category: 'Other communication',
-            start: DateTime.fromObject({ year: 2018, month: 1, day: 1, hour: 12 }),
-            isFuture: false,
-            links: {
-              addNotes: links.url(BreadcrumbType.ExitToDelius),
-              view: links.url(BreadcrumbType.OtherCommunication),
-            },
-            name: `some ${expected.notes}`,
-            sensitive: false,
-            tags: [],
-            typeName: 'Some type',
-            lastUpdatedBy: 'Some User',
-            lastUpdatedDateTime: DateTime.fromObject({ year: 2018, month: 4, day: 1, hour: 12 }),
-          } as ActivityLogEntry,
-          expected,
-        ),
-      ])
-    }
-
-    function shouldReturnUnknown(
-      observed: Paginated<ActivityLogEntry>,
-      expected: DeepPartial<UnknownActivityLogEntry>,
-    ) {
-      expect(observed.content).toEqual([
-        merge(
-          {
-            id: 1,
-            type: ContactTypeCategory.Other,
-            category: 'Unclassified contact',
-            start: DateTime.fromObject({ year: 2018, month: 1, day: 1, hour: 12 }),
-            isFuture: false,
-            links: null,
-            name: `some ${expected.notes}`,
-            sensitive: false,
-            tags: [],
-            typeName: 'Some type',
-          } as ActivityLogEntry,
-          expected,
-        ),
-      ])
-    }
-
-    it('gets well known, complied RAR appointment', async () => {
-      havingContacts({
-        type: ContactTypeCategory.Appointment,
-        notes: 'well known, complied RAR appointment',
-        outcome: { complied: true, attended: true },
-        rarActivity: true,
-      })
-
-      const observed = await subject.getActivityLogPage('some-crn', 'some offender')
-
-      shouldReturnAppointment(observed, {
-        notes: 'well known, complied RAR appointment',
-        rarActivity: true,
-        nationalStandard: false,
-        tags: [
-          { colour: GovUkUiTagColour.Purple, name: 'rar' },
-          { colour: GovUkUiTagColour.Green, name: 'complied' },
-        ],
-      })
-    })
-
-    it('gets well known, not complied sensitive appointment', async () => {
-      havingContacts({
-        type: ContactTypeCategory.Appointment,
-        notes: 'well known, not complied sensitive appointment',
-        outcome: { complied: false, attended: true },
-        sensitive: true,
-      })
-
-      const observed = await subject.getActivityLogPage('some-crn', 'some offender')
-
-      shouldReturnAppointment(observed, {
-        notes: 'well known, not complied sensitive appointment',
-        outcome: { complied: false },
-        sensitive: true,
-        nationalStandard: false,
-        tags: [
-          { colour: GovUkUiTagColour.Grey, name: 'sensitive' },
-          { colour: GovUkUiTagColour.Red, name: 'failed to comply' },
-        ],
-      })
-    })
-
-    it('gets well known, unacceptable absence appointment', async () => {
-      havingContacts({
-        type: ContactTypeCategory.Appointment,
-        notes: 'well known, unacceptable absence appointment',
-        outcome: { complied: false, attended: false },
-      })
-
-      const observed = await subject.getActivityLogPage('some-crn', 'some offender')
-
-      shouldReturnAppointment(observed, {
-        notes: 'well known, unacceptable absence appointment',
-        nationalStandard: false,
-        outcome: { attended: false, complied: false },
-        tags: [{ colour: GovUkUiTagColour.Red, name: 'unacceptable absence' }],
-      })
-    })
-
-    it('gets well known, acceptable absence appointment', async () => {
-      havingContacts({
-        type: ContactTypeCategory.Appointment,
-        notes: 'well known, acceptable absence appointment',
-        outcome: { complied: true, attended: false },
-      })
-
-      const observed = await subject.getActivityLogPage('some-crn', 'some offender')
-
-      shouldReturnAppointment(observed, {
-        notes: 'well known, acceptable absence appointment',
-        nationalStandard: false,
-        outcome: { attended: false, complied: true },
-        tags: [{ colour: GovUkUiTagColour.Green, name: 'acceptable absence' }],
-      })
-    })
-
-    it('gets a national standard appointment', async () => {
-      havingContacts({
-        type: ContactTypeCategory.Appointment,
-        notes: 'Some NSI appointment',
-        outcome: { complied: true, attended: true },
-        nationalStandard: true,
-      })
-
-      const observed = await subject.getActivityLogPage('some-crn', 'some-offender')
-
-      shouldReturnAppointment(observed, {
-        notes: 'Some NSI appointment',
-        nationalStandard: true,
-        tags: [{ colour: GovUkUiTagColour.Green, name: 'complied' }],
-      })
-    })
-
-    it('gets other appointment, not recorded', async () => {
-      havingContacts({
-        type: ContactTypeCategory.Appointment,
-        notes: 'other appointment, not recorded',
-        sensitive: true, // also sensitive to ensure other tags do not affect this
-        outcome: null,
-      })
-
-      const observed = await subject.getActivityLogPage('some-crn', 'some offender')
-
-      const links = MockLinksModule.of({ crn: 'some-crn', id: 1 })
-      shouldReturnAppointment(observed, {
-        notes: 'other appointment, not recorded',
-        nationalStandard: false,
-        tags: [{ colour: GovUkUiTagColour.Grey, name: 'sensitive' }],
-        links: {
-          recordMissingAttendance: links.url(BreadcrumbType.ExitToDelius),
-        },
-        outcome: null,
-        sensitive: true,
-      })
-    })
-
-    it('gets well known communication', async () => {
-      havingContacts({
-        type: ContactTypeCategory.Communication,
-        notes: 'well known communication',
-      })
-
-      const observed = await subject.getActivityLogPage('some-crn', 'some offender')
-
-      shouldReturnCommunication(observed, {
-        notes: 'well known communication',
-      })
-    })
-
-    it('gets unknown contact', async () => {
-      havingContacts({
-        type: ContactTypeCategory.Other,
-        notes: 'unknown contact',
-      })
-
-      const observed = await subject.getActivityLogPage('some-crn', 'some offender')
-
-      shouldReturnUnknown(observed, { notes: 'unknown contact' })
-    })
-  })
-
-  it('gets a communication contact', async () => {
-    const contact = fakeContactSummary({
-      contactId: 111,
-      notes: 'Some contact notes',
-      contactStart: '2020-07-13T12:00:00',
-      lastUpdatedDateTime: '2020-07-13T12:00:00',
-      sensitive: false,
-      lastUpdatedByUser: { forenames: 'Alan', surname: 'Jones' },
-    })
-    community.contactAndAttendance.getOffenderContactSummaryByCrnUsingGET
-      .withArgs(match({ crn: 'some-crn', contactId: 111 }))
-      .resolves(fakeOkResponse(contact))
-
-    contactMapping.getTypeMeta.withArgs(contact).returns(
-      Promise.resolve({
-        name: 'Some communication with some offender',
-        type: ContactTypeCategory.Communication,
-        value: { name: 'Some contact', from: '{}', to: '{}', description: 'Some contact with {}' },
-      } as CommunicationMetaResult),
-    )
-
-    const observed = await subject.getCommunicationContact('some-crn', 111, 'some offender')
-
-    const links = MockLinksModule.of({ id: 111, crn: 'some-crn' })
-    expect(observed).toEqual({
-      id: 111,
-      category: 'Other communication',
-      start: DateTime.fromObject({ year: 2020, month: 7, day: 13, hour: 12 }),
-      isFuture: true,
-      name: 'Some contact with some offender',
-      from: 'some offender',
-      to: 'some offender',
-      notes: 'Some contact notes',
-      type: 'communication',
-      lastUpdatedDateTime: DateTime.fromObject({ year: 2020, month: 7, day: 13, hour: 12 }),
-      lastUpdatedBy: `Alan Jones`,
-      sensitive: false,
-      typeName: 'Some contact',
-      tags: [],
-      links: {
-        addNotes: links.url(BreadcrumbType.ExitToDelius),
-        view: links.url(BreadcrumbType.OtherCommunication),
-      },
-    } as CommunicationActivityLogEntry)
   })
 })

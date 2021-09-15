@@ -1,88 +1,74 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { groupBy, orderBy } from 'lodash'
 import {
-  AppointmentDetail,
-  AppointmentOutcome,
   ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
   ContactSummary,
+  OffenderDetail,
 } from '../../../community-api/client'
-import {
-  CommunicationMetaResult,
-  CommunityApiService,
-  ContactMappingService,
-  GetMetaResult,
-  isAppointment,
-  Paginated,
-} from '../../../community-api'
+import { CommunityApiService, ContactMappingService, Paginated } from '../../../community-api'
 import {
   ActivityComplianceFilter,
   ActivityLogEntry,
-  ActivityLogEntryBase,
-  ActivityLogEntryTag,
+  ActivityLogEntryGroup,
   AppointmentActivityLogEntry,
   CommunicationActivityLogEntry,
 } from './activity.types'
 import { DateTime } from 'luxon'
 import { ContactTypeCategory, WellKnownContactTypeConfig } from '../../../config'
-import { BreadcrumbType, LinksService } from '../../../common/links'
 import { ConfigService } from '@nestjs/config'
 import { BreachService } from '../../../community-api/breach'
 import { Mutable } from '../../../@types/mutable'
-import { GovUkUiTagColour } from '../../../util/govuk-ui'
+import { ActivityLogEntryService } from './activity-log-entry.service'
 
-type CommonActivityLogEntryBase = Pick<ActivityLogEntryBase, 'id' | 'start' | 'notes' | 'sensitive' | 'isFuture'>
+export const PAGE_SIZE = 999
 
 export type GetContactsOptions = Omit<
   ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
-  'crn' | 'contactDateTo'
+  'crn' | 'contactDateTo' | 'page' | 'pageSize'
 > & { complianceFilter?: ActivityComplianceFilter }
-
-function getOutcomeFlags(outcome?: AppointmentOutcome): ActivityLogEntryTag[] {
-  switch (outcome?.complied) {
-    case true:
-      return [{ name: outcome.attended ? 'complied' : 'acceptable absence', colour: GovUkUiTagColour.Green }]
-    case false:
-      return [{ name: outcome.attended ? 'failed to comply' : 'unacceptable absence', colour: GovUkUiTagColour.Red }]
-    default:
-      return []
-  }
-}
-
-function getAppointmentFlags(contact: ContactSummary | AppointmentDetail): ActivityLogEntryTag[] {
-  const tags: ActivityLogEntryTag[] = []
-
-  if (contact.sensitive) {
-    tags.push({ name: 'sensitive', colour: GovUkUiTagColour.Grey })
-  }
-
-  if (contact.rarActivity) {
-    tags.push({ name: 'rar', colour: GovUkUiTagColour.Purple })
-  }
-
-  return tags
-}
 
 @Injectable()
 export class ActivityService {
   constructor(
     private readonly community: CommunityApiService,
     private readonly contacts: ContactMappingService,
-    private readonly links: LinksService,
     private readonly config: ConfigService,
     private readonly breach: BreachService,
+    private readonly entryService: ActivityLogEntryService,
   ) {}
 
   async getActivityLogPage(
     crn: string,
-    offenderName: string,
+    offender: OffenderDetail,
     options: GetContactsOptions = {},
-  ): Promise<Paginated<ActivityLogEntry>> {
+  ): Promise<Paginated<ActivityLogEntryGroup>> {
     const resolvedOptions = await this.constructContactFilter(crn, options)
     const {
-      data: { totalPages, first, last, number, size, totalElements, content: contacts = [] },
-    } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET(resolvedOptions)
+      data: { content: contacts = [] },
+    } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET({
+      ...resolvedOptions,
+      // TODO pagination is disabled
+      page: 1,
+      pageSize: PAGE_SIZE,
+    })
 
-    const content = await Promise.all(contacts.map(contact => this.getActivityLogEntry(crn, contact, offenderName)))
-    return { totalPages, first, last, number, size, totalElements, content }
+    const entries = await Promise.all(contacts.map(contact => this.getActivityLogEntry(crn, contact, offender)))
+    const today = DateTime.now().startOf('day')
+    const groups: ActivityLogEntryGroup[] = Object.entries(groupBy(entries, x => x.start.toISODate())).map(
+      ([key, entries]) => {
+        const date = DateTime.fromISO(key)
+        return { date, isToday: date.equals(today), entries: orderBy(entries, x => x.start) }
+      },
+    )
+    return {
+      totalPages: 1,
+      first: true,
+      last: true,
+      number: 0,
+      size: groups.length,
+      totalElements: groups.length,
+      content: orderBy(groups, x => x.date, 'desc'),
+    }
   }
 
   async getActivityLogComplianceCount(
@@ -99,9 +85,11 @@ export class ActivityService {
       // we need to be careful to preserve a null contactDateFrom from a null lastRecentBreachEnd here
       // as it has a special meaning: 'I already checked the last breach end date, dont check again'
       contactDateFrom: from?.toISODate(),
-      pageSize: 1,
     })
-    const { data } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET(resolvedOptions)
+    const { data } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET({
+      ...resolvedOptions,
+      pageSize: 1, // we only need the count so a page size of 1 is fine.
+    })
     return data.totalElements
   }
 
@@ -112,153 +100,42 @@ export class ActivityService {
     })
 
     const meta = await this.contacts.getTypeMeta(appointment)
-    if (!isAppointment(meta)) {
-      throw new Error(`cannot determine that appointment with id '${appointmentId}' is a valid appointment`)
+    if (meta.type !== ContactTypeCategory.Appointment) {
+      throw new NotFoundException(`contact with id '${appointmentId}' is not an appointment`)
     }
 
-    return this.getAppointmentActivityLogEntry(crn, appointment, meta)
+    return this.entryService.getAppointmentActivityLogEntry(crn, appointment, meta)
   }
 
   async getCommunicationContact(
     crn: string,
     contactId: number,
-    offenderName: string,
+    offender: OffenderDetail,
   ): Promise<CommunicationActivityLogEntry> {
     const { data: contact } = await this.community.contactAndAttendance.getOffenderContactSummaryByCrnUsingGET({
       crn,
       contactId,
     })
     const meta = await this.contacts.getTypeMeta(contact)
-    const base = ActivityService.getCommonActivityLogEntryBase(contact)
-    return this.getCommunicationActivityLogEntry(crn, contact, meta, base, offenderName)
+    if (meta.type !== ContactTypeCategory.Communication) {
+      throw new NotFoundException(`contact with id '${contactId}' is not a communication`)
+    }
+    return this.entryService.getCommunicationActivityLogEntry(crn, contact, meta, offender)
   }
 
   private async getActivityLogEntry(
     crn: string,
     contact: ContactSummary,
-    offenderName: string,
+    offender: OffenderDetail,
   ): Promise<ActivityLogEntry> {
     const meta = await this.contacts.getTypeMeta(contact)
-
-    if (isAppointment(meta)) {
-      // is either a well-known or 'other' appointment
-      return this.getAppointmentActivityLogEntry(crn, contact, meta)
-    }
-
-    const base = ActivityService.getCommonActivityLogEntryBase(contact)
-
-    if (meta.type === ContactTypeCategory.Communication) {
-      // is a communication type (either known, or in the CAPI Communication category)
-      return this.getCommunicationActivityLogEntry(crn, contact, meta, base, offenderName)
-    }
-
-    // is unknown contact
-    return {
-      ...base,
-      type: ContactTypeCategory.Other,
-      category: 'Unclassified contact',
-      name: meta.name,
-      typeName: meta.value.name,
-      tags: [],
-      links: null,
-    }
-  }
-
-  private getAppointmentActivityLogEntry(
-    crn: string,
-    contact: AppointmentDetail | ContactSummary,
-    meta: GetMetaResult,
-  ): AppointmentActivityLogEntry {
-    function isAppointment(value: any): value is AppointmentDetail {
-      return 'appointmentStart' in value
-    }
-
-    const {
-      id,
-      start: startIso,
-      end: endIso,
-      requirement = null,
-    } = isAppointment(contact)
-      ? {
-          id: contact.appointmentId,
-          start: contact.appointmentStart,
-          end: contact.appointmentEnd,
-          requirement: contact.requirement,
-        }
-      : { id: contact.contactId, start: contact.contactStart, end: contact.contactEnd, requirement: null }
-
-    const start = DateTime.fromISO(startIso)
-    const isFuture = start > DateTime.now()
-    const links = this.links.of({ id, crn })
-    return {
-      id,
-      start,
-      notes: contact.notes,
-      sensitive: contact.sensitive || false,
-      type: ContactTypeCategory.Appointment,
-      category: `${isFuture ? 'Future' : 'Previous'} appointment`,
-      isFuture,
-      nationalStandard: contact.type.nationalStandard,
-      name: meta.name,
-      typeName: meta.value.name,
-      end: endIso && DateTime.fromISO(endIso),
-      tags: [...getAppointmentFlags(contact), ...getOutcomeFlags(contact.outcome)],
-      links: {
-        view: links.url(BreadcrumbType.Appointment),
-        addNotes: links.url(BreadcrumbType.ExitToDelius),
-        // user is prompted to record outcome for appointments in the past without an existing outcome
-        recordMissingAttendance:
-          !contact.outcome && start <= DateTime.now() ? links.url(BreadcrumbType.ExitToDelius) : null,
-        updateOutcome: links.url(BreadcrumbType.ExitToDelius),
-      },
-      rarActivity: contact.rarActivity || false,
-      requirement,
-      outcome: contact.outcome
-        ? {
-            complied: contact.outcome.complied,
-            attended: contact.outcome.attended,
-            description: contact.outcome.description,
-          }
-        : null,
-    }
-  }
-
-  private getCommunicationActivityLogEntry(
-    crn: string,
-    contact: ContactSummary,
-    meta: GetMetaResult,
-    base: CommonActivityLogEntryBase,
-    offenderName: string,
-  ): CommunicationActivityLogEntry {
-    const links = this.links.of({ id: contact.contactId, crn })
-    return {
-      ...base,
-      type: ContactTypeCategory.Communication,
-      category: 'Other communication',
-      name: (meta as CommunicationMetaResult).value.description
-        ? (meta as CommunicationMetaResult).value.description.replace('{}', offenderName)
-        : meta.name,
-      typeName: meta.value.name,
-      tags: [],
-      links: {
-        view: links.url(BreadcrumbType.OtherCommunication),
-        addNotes: links.url(BreadcrumbType.ExitToDelius),
-      },
-      lastUpdatedDateTime: DateTime.fromISO(contact.lastUpdatedDateTime),
-      lastUpdatedBy: `${contact.lastUpdatedByUser.forenames} ${contact.lastUpdatedByUser.surname}`,
-      from: (meta as CommunicationMetaResult).value?.from?.replace('{}', offenderName),
-      to: (meta as CommunicationMetaResult).value?.to?.replace('{}', offenderName),
-    }
-  }
-
-  private static getCommonActivityLogEntryBase(contact: ContactSummary): CommonActivityLogEntryBase {
-    const start = DateTime.fromISO(contact.contactStart)
-    return {
-      id: contact.contactId,
-      start: DateTime.fromISO(contact.contactStart),
-      notes: contact.notes,
-      sensitive: contact.sensitive || false,
-      isFuture: start > DateTime.now(),
+    switch (meta.type) {
+      case ContactTypeCategory.Appointment:
+        return this.entryService.getAppointmentActivityLogEntry(crn, contact, meta)
+      case ContactTypeCategory.Communication:
+        return this.entryService.getCommunicationActivityLogEntry(crn, contact, meta, offender)
+      default:
+        return this.entryService.getUnknownActivityLogEntry(contact, meta)
     }
   }
 

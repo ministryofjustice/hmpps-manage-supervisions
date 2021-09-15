@@ -161,6 +161,7 @@
   },
   "lint-staged": {
     "*.ts": "eslint --fix",
-    "*.{json}": "prettier --write"
+    "./*.json": "prettier --write",
+    "./!(wiremock)/**/*.json": "prettier --write"
   }
 }

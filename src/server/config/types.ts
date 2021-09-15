@@ -90,7 +90,7 @@ export enum WellKnownAppointmentType {
 
 export interface WellKnownAppointmentTypeMeta {
   name: string
-  codes: {
+  codes?: {
     nonRar: string
   }
 }

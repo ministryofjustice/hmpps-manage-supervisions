@@ -17,7 +17,12 @@
                 <h{{ headingLevel }} class="app-summary-card__title">
                     {{ params.titleHtml | safe if params.titleHtml else params.titleText }}
                 </h{{ headingLevel }}>
-                {% if params.actions.items.length %}
+
+                {% if params.actionsHtml %}
+                    <div class="app-summary-card__actions">
+                        {{ params.actionsHtml | safe }}
+                    </div>
+                {% elif params.actions.items.length %}
                     <div class="app-summary-card__actions">
                         {% if params.actions.items.length == 1 %}
                             {{ _actionLink(params.actions.items[0]) | indent(12) | trim }}

@@ -182,10 +182,12 @@ class WiremockApiHelper {
 }
 
 class FluentWiremockContext {
+  regex = false
+
   constructor(
     private readonly helper: WiremockApiHelper,
     readonly basePath: string,
-    readonly mapping: WireMock.CreateStubMappingRequest = {
+    private readonly mapping: WireMock.CreateStubMappingRequest = {
       request: { method: 'GET', headers: {} },
       response: { status: 200 },
     },
@@ -193,6 +195,11 @@ class FluentWiremockContext {
 
   async getRequests(path: string) {
     return this.helper.getRequests(this.resolvePath(path))
+  }
+
+  withRegex(value = true) {
+    this.regex = value
+    return this
   }
 
   priority(priority: number): this {
@@ -255,6 +262,10 @@ class FluentWiremockContext {
   }
 
   private response(response: WireMock.StubMappingResponse) {
+    if (this.regex) {
+      this.mapping.request.urlPathPattern = this.mapping.request.urlPath
+      delete this.mapping.request.urlPath
+    }
     this.helper.stub({ ...this.mapping, response })
   }
 

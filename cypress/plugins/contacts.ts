@@ -16,26 +16,26 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     type: { code: 'CHVS', description: 'Home Visit to Case (NS)', appointment: true, nationalStandard: true },
     contactStart: '2020-09-04T12:00:00+01:00',
     contactEnd: '2020-09-04T13:00:00+01:00',
-    notes: 'Some home visit appointment\n\nWith a new line!',
+    notes: LONG_CONTACT_NOTES,
     staff: { forenames: 'Catherine', surname: 'Ellis', unallocated: false },
     outcome: { complied: true, attended: true },
     sensitive: false,
   },
   {
     contactId: 2,
-    type: { code: 'APAT', description: 'Office visit', appointment: true },
+    type: { code: 'APAT', description: 'Office visit', appointment: true, nationalStandard: false },
     contactStart: '2020-09-03T10:30:00+01:00',
-    contactEnd: '2020-09-03T11:15:00+01:00',
-    notes: LONG_CONTACT_NOTES,
+    contactEnd: '2020-09-03T11:00:00+01:00',
+    notes: 'Some office visit appointment\n\nWith a new line!',
     staff: { unallocated: true },
     outcome: { complied: false, attended: true },
     sensitive: false,
   },
   {
     contactId: 3,
-    type: { code: 'APAT', description: 'Office visit', appointment: true },
-    contactStart: '2020-09-03T10:30:00+01:00',
-    contactEnd: '2020-09-03T11:15:00+01:00',
+    type: { code: 'APAT', description: 'Office visit', appointment: true, nationalStandard: false },
+    contactStart: '2020-09-03T11:00:00+01:00',
+    contactEnd: '2020-09-03T11:30:00+01:00',
     notes: LONG_CONTACT_NOTES,
     staff: { forenames: 'Unallocated', surname: 'Staff', unallocated: true },
     outcome: { complied: true, attended: false },
@@ -43,9 +43,9 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
   },
   {
     contactId: 4,
-    type: { code: 'APAT', description: 'Office visit', appointment: true },
-    contactStart: '2020-09-03T10:30:00+01:00',
-    contactEnd: '2020-09-03T11:15:00+01:00',
+    type: { code: 'APAT', description: 'Office visit', appointment: true, nationalStandard: false },
+    contactStart: '2020-09-03T11:30:00+01:00',
+    contactEnd: '2020-09-03T12:00:00+01:00',
     notes: LONG_CONTACT_NOTES,
     staff: { forenames: 'Unallocated', surname: 'Staff', unallocated: true },
     outcome: { complied: false, attended: false },
@@ -68,10 +68,11 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     type: { code: 'CTOA', description: 'Phone Contact from Offender', appointment: false },
     contactStart: '2020-09-04T11:00:00+01:00',
     contactEnd: '2020-09-04T00:00:00+01:00',
-    notes: 'Phone call from Liz to double check when his next appointment was.',
+    notes: null,
     outcome: null,
     lastUpdatedDateTime: '2020-09-04T11:20:23+01:00',
     lastUpdatedByUser: { forenames: `Andy`, surname: `Smith` },
+    sensitive: false,
   },
   {
     contactId: 7,
@@ -83,6 +84,7 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     outcome: null,
     lastUpdatedDateTime: '2020-09-04T14:20:23+01:00',
     lastUpdatedByUser: { forenames: `John`, surname: `Smith` },
+    sensitive: false,
   },
   {
     contactId: 8,
@@ -97,6 +99,7 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     outcome: null,
     lastUpdatedDateTime: '2020-09-04T15:20:23+01:00',
     lastUpdatedByUser: { forenames: `John`, surname: `Rover` },
+    sensitive: true,
   },
   {
     contactId: 9,
@@ -111,6 +114,7 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     outcome: null,
     lastUpdatedDateTime: '2020-09-04T14:20:23+01:00',
     lastUpdatedByUser: { forenames: `Michael`, surname: `Smith` },
+    sensitive: false,
   },
   {
     contactId: 10,
@@ -122,6 +126,7 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     contactStart: '2019-05-05T00:00:00+01:00',
     contactEnd: '2019-05-05T00:00:00+01:00',
     outcome: null,
+    sensitive: false,
   },
   {
     contactId: 11,
@@ -136,6 +141,7 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     notes: 'CPS request',
     lastUpdatedDateTime: '2020-09-04T15:20:23+01:00',
     lastUpdatedByUser: { forenames: `John`, surname: `Rover` },
+    sensitive: false,
   },
 ]
 
@@ -147,12 +153,13 @@ export function contacts(crn: string, partials: DeepPartial<ContactSummary>[] = 
     function all(
       query: Omit<ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest, 'crn'> = {},
       predicate?: (contact: ContactSummary) => boolean,
+      rule?: keyof WireMock.MatchRules,
     ) {
       const filtered = predicate ? contacts.filter(predicate) : contacts
       context.client.community
         .priority(priority++)
         .get(`/secure/offenders/crn/${crn}/contact-summary`)
-        .query(query)
+        .query(query, rule)
         .returns({
           content: filtered,
           number: 0,
@@ -190,13 +197,10 @@ export function contacts(crn: string, partials: DeepPartial<ContactSummary>[] = 
     // appointments only
     all({ appointmentsOnly: true }, c => c.type.appointment)
 
-    // include filter - appointments and currently defined comms categories
+    // TODO remove this once we stop using it
+    // HACK: we're only using the include filter in a single place so we're hard coding it here
     const commsTypeList = ['CT3A', 'CT3B', 'CTOA', 'CTOB', 'CM3A', 'CMOA', 'CMOB', 'NOT_WELL_KNOWN_COMMUNICATION']
-
-    all(
-      { include: ['APPOINTMENTS', ...commsTypeList.map(t => `TYPE_${t}`)] },
-      c => c.type.appointment || commsTypeList.indexOf(c.type.code) > 0,
-    )
+    all({ include: ['.+'] }, c => c.type.appointment || commsTypeList.indexOf(c.type.code) > 0, 'matches')
 
     // all contacts with no filter
     all()

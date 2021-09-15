@@ -1,3 +1,4 @@
+import { kebabCase } from 'lodash'
 import { NunjucksFilter } from './types'
 
 export class FullStop implements NunjucksFilter {
@@ -17,5 +18,14 @@ export class Brackets implements NunjucksFilter {
       return ''
     }
     return `(${value})`
+  }
+}
+
+export class Slug implements NunjucksFilter {
+  filter(value: string): any {
+    if (!value) {
+      return ''
+    }
+    return kebabCase(value)
   }
 }

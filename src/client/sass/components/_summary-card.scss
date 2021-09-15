@@ -67,6 +67,11 @@
   @include govuk-font($size: 24, $weight: bold);
 }
 
+.app-summary-card--plain-header .app-summary-card__header {
+  background: none;
+  padding-bottom: 0;
+}
+
 @media print {
   .app-summary-card__header {
     break-inside: avoid;

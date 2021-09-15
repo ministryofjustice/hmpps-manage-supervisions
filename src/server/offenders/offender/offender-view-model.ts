@@ -1,4 +1,4 @@
-import { ActivityComplianceFilter, ActivityLogEntry } from './activity'
+import { ActivityComplianceFilter, ActivityLogEntryGroup } from './activity'
 import { ComplianceDetails, ConvictionDetails } from './sentence'
 import { AppointmentListViewModel, NextAppointmentSummary } from './schedule'
 import { RiskRegistrations, Risks } from './risk'
@@ -57,7 +57,7 @@ export interface OffenderScheduleViewModel extends OffenderViewModelBase<Offende
 }
 
 export interface OffenderActivityViewModel extends OffenderViewModelBase<OffenderPage.Activity> {
-  contacts: ActivityLogEntry[]
+  groups: ActivityLogEntryGroup[]
   pagination: {
     page?: number
     size?: number
