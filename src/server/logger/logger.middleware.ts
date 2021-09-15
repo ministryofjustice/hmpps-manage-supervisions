@@ -11,11 +11,16 @@ export class LoggerMiddleware implements NestMiddleware {
       const { ip, method, originalUrl } = req
       const userAgent = req.get('user-agent') || ''
 
-      await next()
+      res.on('finish', () => {
+        const { statusCode } = res
 
-      const { statusCode } = res
-      const meta = { method, url: originalUrl, statusCode, userAgent, ip }
-      this.logger.log(`${method} ${originalUrl} => ${statusCode}`, meta)
+        // we have to set the user here as the async hook doesnt get resolved in this callback.
+        const meta = { method, url: originalUrl, statusCode, userAgent, ip, user: req.user?.uuid }
+        this.logger.log(`${method} ${originalUrl} => ${statusCode}`, meta)
+      })
+
+      // since we're wrapping all middleware, including nest in this logger async hook, all will have access to the user
+      next()
     })
   }
 }

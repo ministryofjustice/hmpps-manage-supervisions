@@ -81,10 +81,9 @@ class NestWinstonWrapper implements ContextualNestLoggerService {
 
     // add the user identifiers to the meta if available
     const store = LOGGER_HOOK.getStore()
-    if (store) {
-      addMeta({ ...store })
+    if (store?.user) {
+      addMeta({ user: store.user })
     }
-
     this.logger.log(toWinstonLogLevel(nestLevel), message, ...args)
   }
 }
