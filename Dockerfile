@@ -22,6 +22,8 @@ RUN npm install -g npm@7 && npm --version
 
 # Stage: build app
 FROM base as build
+ARG BUILD_NUMBER
+ARG GIT_REF
 
 COPY . .
 
