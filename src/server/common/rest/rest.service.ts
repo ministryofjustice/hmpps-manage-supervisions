@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { Config, DependentApisConfig } from '../../config'
+import { Config, DependentApisConfig, ServerConfig } from '../../config'
 import { kebabCase } from 'lodash'
 import Axios from 'axios'
 import { getRequestName, SanitisedAxiosError } from './SanitisedAxiosError'
@@ -23,12 +23,18 @@ export class RestService {
   ) {
     const logger = new Logger(`${kebabCase(name)}-api-client`)
     const { url, timeout } = this.config.get<DependentApisConfig>('apis')[name]
+    const { isProduction } = this.config.get<ServerConfig>('server')
     const axios = Axios.create({ baseURL: url.href, timeout })
 
     // response logging
     axios.interceptors.response.use(
       r => {
-        logger.log(`${getRequestName(r.config)} -> ${r.status} ${r.statusText} ${JSON.stringify(r.data)}`)
+        const items = [`${getRequestName(r.config)} -> ${r.status}`, r.statusText]
+        if (!isProduction) {
+          // only log api responses in development mode as it may contain PII
+          items.push(JSON.stringify(r.data))
+        }
+        logger.log(items.join(' '))
         return r
       },
       err => {
