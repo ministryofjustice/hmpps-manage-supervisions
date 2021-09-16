@@ -1,7 +1,7 @@
 import { ViewOffenderFixture } from './view-offender.fixture'
 import { OffenderActivityAppointmentPage } from '../../../pages'
 import { LONG_CONTACT_NOTES } from '../../../plugins/contacts'
-import { OffenderActivityCommunicationPage } from '../../../pages/offender-activity-communication.page'
+import { OffenderActivityDetailPage } from '../../../pages/offender-activity-detail.page'
 import { Tag } from '../../../pages/components/tag'
 
 interface ExpectedAppointment {
@@ -84,10 +84,11 @@ class Fixture extends ViewOffenderFixture {
     assert(page)
   }
 
-  shouldRenderCommunicationPage(title: string, assert: (page: OffenderActivityCommunicationPage) => void) {
-    const page = new OffenderActivityCommunicationPage()
+  shouldRenderActivityDetailPage(title: string, assert: (page: OffenderActivityDetailPage) => void) {
+    const page = new OffenderActivityDetailPage()
     page.pageTitle.contains(title)
     assert(page)
+    return this
   }
 }
 
@@ -167,6 +168,13 @@ context('Offender activity tab', () => {
         })
 
         .shouldRenderActivity({
+          id: 11,
+          date: 'Friday 4 September 2020',
+          title: 'CPS Package Request',
+          notes: 'CPS request',
+        })
+
+        .shouldRenderActivity({
           id: 2,
           date: 'Thursday 3 September 2020',
           title: 'Office visit at 10:30am',
@@ -202,6 +210,13 @@ context('Offender activity tab', () => {
           title: 'Not a well known appointment with Robert Ohagan at 11am',
           subTitle: 'Appointment',
           notes: 'Some unknown appointment',
+        })
+
+        .shouldRenderActivity({
+          id: 10,
+          date: 'Sunday 5 May 2019',
+          title: 'Breach not proven',
+          notes: 'No notes',
         })
     })
 
@@ -257,13 +272,16 @@ context('Offender activity tab', () => {
         .whenClickingSubNavTab('activity')
         .whenClickingActivityEntry(6)
 
-        .shouldRenderCommunicationPage('Phone call from Liz Danger Haggis', page => {
-          page.detail('From').contains('Liz Danger Haggis')
-          page.detailShouldNotExist('To')
-          page.detail('Date').contains('4 September 2020')
-          page.detail('Time').contains('11am')
-          page.detail('Details').contains('No notes')
-          page.getLastUpdated().contains('Last updated by Andy Smith on Friday 4 September 2020 at 11:20am')
+        .shouldRenderActivityDetailPage('Phone call from Liz Danger Haggis', page => {
+          page.detail(list => {
+            list.value('From').contains('Liz Danger Haggis')
+            list.title('To').should('not.exist')
+            list.value('Date').contains('4 September 2020')
+            list.value('Time').contains('11am')
+            list.value('Details').contains('No notes')
+          })
+
+          page.lastUpdated.contains('Last updated by Andy Smith on Friday 4 September 2020 at 11:20am')
         })
     })
 
@@ -273,17 +291,36 @@ context('Offender activity tab', () => {
         .whenClickingSubNavTab('activity')
         .whenClickingActivityEntry(7)
 
-        .shouldRenderCommunicationPage('Email or text message to Liz Danger Haggis', page => {
-          page.detail('To').contains('Liz Danger Haggis')
-          page.detailShouldNotExist('From')
-          page.detail('Date').contains('4 September 2020')
-          page.detail('Time').contains('1pm')
-          page
-            .detail('Details')
-            .contains(
-              'Hi Liz - it was good to speak today. To confirm, your next probation appointment is by telephone on 7th April 2021 at 10:00',
-            )
-          page.getLastUpdated().contains('Last updated by John Smith on Friday 4 September 2020 at 2:20pm')
+        .shouldRenderActivityDetailPage('Email or text message to Liz Danger Haggis', page => {
+          page.detail(list => {
+            list.title('From').should('not.exist')
+            list.value('To').contains('Liz Danger Haggis')
+            list.value('Date').contains('4 September 2020')
+            list.value('Time').contains('1pm')
+            list
+              .value('Details')
+              .contains(
+                'Hi Liz - it was good to speak today. To confirm, your next probation appointment is by telephone on 7th April 2021 at 10:00',
+              )
+          })
+
+          page.lastUpdated.contains('Last updated by John Smith on Friday 4 September 2020 at 2:20pm')
+        })
+    })
+
+    it('displays other contact detail ', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('activity')
+        .whenClickingActivityEntry(11)
+
+        .shouldRenderActivityDetailPage('CPS Package Request', page => {
+          page.detail(list => {
+            list.value('Date').contains('4 September 2020')
+            list.value('Notes').contains('CPS request')
+          })
+
+          page.lastUpdated.contains('Last updated by John Rover on Friday 4 September 2020 at 3:20pm')
         })
     })
 
@@ -296,6 +333,8 @@ context('Offender activity tab', () => {
         .shouldRenderActivityWithId(4)
         // a complied attended activity not returned by Wiremocked CAPI when the FTC filters are applied
         .shouldNotRenderActivityWithId(1)
+        .shouldNotRenderActivityWithId(10)
+        .shouldNotRenderActivityWithId(11)
     })
 
     it('displays activity log filtered by appointments without an outcome', () => {
@@ -308,6 +347,8 @@ context('Offender activity tab', () => {
         .shouldNotRenderActivityWithId(2)
         .shouldNotRenderActivityWithId(3)
         .shouldNotRenderActivityWithId(4)
+        .shouldNotRenderActivityWithId(10)
+        .shouldNotRenderActivityWithId(11)
     })
   })
 })

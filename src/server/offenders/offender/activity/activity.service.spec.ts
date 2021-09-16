@@ -148,7 +148,7 @@ describe('ActivityService', () => {
     const entry = fakeActivityLogEntry({ type: ContactTypeCategory.Other })
     const meta = fakeContactMeta(ContactTypeCategory.Other)
     contactMapping.getTypeMeta.withArgs(contact).resolves(meta)
-    entryService.getUnknownActivityLogEntry.withArgs(contact, meta).resolves(entry)
+    entryService.getUnknownActivityLogEntry.withArgs('some-crn', contact, meta).resolves(entry)
     return entry
   }
 

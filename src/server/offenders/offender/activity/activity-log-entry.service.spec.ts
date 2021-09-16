@@ -149,7 +149,7 @@ describe('ActivityLogEntryService', () => {
       start: DateTime.fromObject({ year: 2020, month: 1, day: 1, hour: 12 }),
       lastUpdatedDateTime: DateTime.fromObject({ year: 2020, month: 1, day: 2, hour: 14 }),
       links: {
-        view: links.url(BreadcrumbType.OtherCommunication),
+        view: links.url(BreadcrumbType.Communication),
         addNotes: links.url(BreadcrumbType.ExitToDelius),
       },
       name: 'some communication with Liz Haggis',
@@ -185,11 +185,11 @@ describe('ActivityLogEntryService', () => {
       type: ContactTypeCategory.Communication,
       category: 'Other communication',
       isFuture: false,
-      lastUpdatedBy: 'Jorge Swift',
       start: DateTime.fromObject({ year: 2020, month: 1, day: 1, hour: 12 }),
+      lastUpdatedBy: 'Jorge Swift',
       lastUpdatedDateTime: DateTime.fromObject({ year: 2020, month: 1, day: 2, hour: 14 }),
       links: {
-        view: links.url(BreadcrumbType.OtherCommunication),
+        view: links.url(BreadcrumbType.Communication),
         addNotes: links.url(BreadcrumbType.ExitToDelius),
       },
       name: 'some communication',
@@ -207,11 +207,14 @@ describe('ActivityLogEntryService', () => {
       notes: 'some unknown contact notes',
       sensitive: true,
       contactStart: '2020-01-01T12:00:00',
+      lastUpdatedDateTime: '2020-01-02T14:00:00',
+      lastUpdatedByUser: { forenames: 'Jorge', surname: 'Swift' },
     })
 
     const meta = fakeContactMeta(ContactTypeCategory.Other)
-    const observed = subject.getUnknownActivityLogEntry(contact, meta)
+    const observed = subject.getUnknownActivityLogEntry('some-crn', contact, meta)
 
+    const links = MockLinksModule.of({ id: 1, crn: 'some-crn' })
     expect(observed).toEqual({
       id: 1,
       type: ContactTypeCategory.Other,
@@ -219,7 +222,12 @@ describe('ActivityLogEntryService', () => {
       typeName: null,
       isFuture: false,
       start: DateTime.fromObject({ year: 2020, month: 1, day: 1, hour: 12 }),
-      links: null,
+      lastUpdatedBy: 'Jorge Swift',
+      lastUpdatedDateTime: DateTime.fromObject({ year: 2020, month: 1, day: 2, hour: 14 }),
+      links: {
+        view: links.url(BreadcrumbType.OtherActivityLogEntry),
+        addNotes: links.url(BreadcrumbType.ExitToDelius),
+      },
       name: 'some unknown contact',
       notes: 'some unknown contact notes',
       sensitive: true,

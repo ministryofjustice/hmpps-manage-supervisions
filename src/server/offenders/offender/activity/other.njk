@@ -13,23 +13,11 @@
         },
         rows: [
             {
-                key: { text: "From" },
-                value: { text: contact.from }
-            } if contact.from ,
-            {
-                key: { text: "To" },
-                value: { text: contact.to }
-            } if contact.to ,
-            {
                 key: { text: "Date" },
                 value: { text: contact.start | shortDate }
             },
             {
-                key: { text: "Time" },
-                value: { text: contact.start | time(contact.start) }
-            },
-            {
-                key: { text: "Details" },
+                key: { text: "Notes" },
                 value: { html: (contact.notes or 'No notes') | nl2br | safe }
             }
         ]

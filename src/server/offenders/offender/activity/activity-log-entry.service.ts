@@ -104,7 +104,7 @@ export class ActivityLogEntryService {
       name: meta.value?.description ? meta.value.description.replace('{}', offenderName) : meta.name,
       typeName: meta.value?.name || contact.type.description,
       links: {
-        view: links.url(BreadcrumbType.OtherCommunication),
+        view: links.url(BreadcrumbType.Communication),
         addNotes: links.url(BreadcrumbType.ExitToDelius),
       },
       lastUpdatedDateTime: DateTime.fromISO(contact.lastUpdatedDateTime),
@@ -114,14 +114,20 @@ export class ActivityLogEntryService {
     }
   }
 
-  getUnknownActivityLogEntry(contact: ContactSummary, meta: GetMetaResult): UnknownActivityLogEntry {
+  getUnknownActivityLogEntry(crn: string, contact: ContactSummary, meta: GetMetaResult): UnknownActivityLogEntry {
+    const links = this.links.of({ id: contact.contactId, crn })
     return {
       ...ActivityLogEntryService.getCommonActivityLogEntryBase(contact),
       type: ContactTypeCategory.Other,
       category: 'Unclassified contact',
       name: meta.name,
       typeName: meta.value && 'name' in meta.value ? meta.value.name : null,
-      links: null,
+      links: {
+        view: links.url(BreadcrumbType.OtherActivityLogEntry),
+        addNotes: links.url(BreadcrumbType.ExitToDelius),
+      },
+      lastUpdatedDateTime: DateTime.fromISO(contact.lastUpdatedDateTime),
+      lastUpdatedBy: `${contact.lastUpdatedByUser.forenames} ${contact.lastUpdatedByUser.surname}`,
     }
   }
 
