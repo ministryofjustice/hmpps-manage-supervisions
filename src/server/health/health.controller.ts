@@ -1,8 +1,6 @@
 import { Controller, Get, UseFilters } from '@nestjs/common'
 import { HealthService } from './health.service'
-import { HealthException, HealthResult } from './types'
-import { Observable } from 'rxjs'
-import { tap } from 'rxjs/operators'
+import { HealthException, HealthResult } from './health.types'
 import { HealthFilter } from './health.filter'
 import { Public } from '../security'
 
@@ -13,14 +11,12 @@ export class HealthController {
   constructor(private readonly service: HealthService) {}
 
   @Get()
-  get(): Observable<HealthResult> {
-    return this.service.getHealth().pipe(
-      tap(result => {
-        if (!result.healthy) {
-          throw new HealthException(result)
-        }
-      }),
-    )
+  async get(): Promise<HealthResult> {
+    const result = await this.service.getHealth()
+    if (!result.healthy) {
+      throw new HealthException(result)
+    }
+    return result
   }
 
   @Get('ping')

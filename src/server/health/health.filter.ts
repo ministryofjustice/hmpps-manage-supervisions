@@ -1,5 +1,5 @@
 import { Catch, ExceptionFilter, ArgumentsHost } from '@nestjs/common'
-import { HealthException } from './types'
+import { HealthException } from './health.types'
 
 @Catch(HealthException)
 export class HealthFilter implements ExceptionFilter {

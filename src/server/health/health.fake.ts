@@ -1,23 +1,14 @@
 import * as faker from 'faker'
-import { merge } from 'lodash'
-import { HealthResult } from './types'
+import { HealthResult } from './health.types'
+import { fake } from '../util/util.fake'
 
-export function fakeHealthResult(partial: DeepPartial<HealthResult> = {}): HealthResult {
-  return merge(
-    {
-      healthy: true,
-      checks: {
-        hmppsAuth: 'OK',
-        tokenVerification: 'OK',
-        community: 'OK',
-      },
-      uptime: faker.datatype.float(1000),
-      version: faker.git.shortSha(),
-      build: {
-        buildNumber: faker.git.shortSha(),
-        gitRef: faker.git.commitSha(),
-      },
-    },
-    partial,
-  )
-}
+export const fakeHealthResult = fake<HealthResult>(() => ({
+  healthy: true,
+  checks: {
+    hmppsAuth: 'OK',
+    tokenVerification: 'OK',
+    community: 'OK',
+  },
+  uptime: faker.datatype.float(1000),
+  version: faker.git.shortSha(),
+}))
