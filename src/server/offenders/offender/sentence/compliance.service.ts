@@ -3,7 +3,7 @@ import { maxBy } from 'lodash'
 import { Conviction } from '../../../community-api/client'
 import { ComplianceActiveBreachSummary, ComplianceConvictionSummary } from './sentence.types'
 import { getElapsed, quantity } from '../../../util'
-import { DateTime, DurationUnit } from 'luxon'
+import { DateTime } from 'luxon'
 
 import { getOffenceName, getSentenceName } from './util'
 import { BreachService } from '../../../community-api/breach'
@@ -21,7 +21,7 @@ export class ComplianceService {
       ? getElapsed(
           conviction.sentence.startDate,
           conviction.sentence.originalLength,
-          conviction.sentence.originalLengthUnits?.toLowerCase() as DurationUnit,
+          conviction.sentence.originalLengthUnits,
         )
       : null
 

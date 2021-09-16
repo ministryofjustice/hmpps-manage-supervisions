@@ -301,7 +301,7 @@ export const fakeAppointmentDetail = fake<AppointmentDetail, FakeAppointmentDeta
   return {
     appointmentId: faker.datatype.number(),
     appointmentStart: date.toISO(),
-    appointmentEnd: date.plus({ hour: 1 }).toISO(),
+    appointmentEnd: date.plus({ hours: 1 }).toISO(),
     notes: faker.company.bs(),
     officeLocation: fakeOfficeLocation(),
     outcome: fakeAppointmentOutcome(),
@@ -333,7 +333,7 @@ export const fakeContactSummary = fake<ContactSummary, { when?: 'past' | 'recent
     return {
       contactId: faker.datatype.number(),
       contactStart: date.toISO(),
-      contactEnd: date.plus({ hour: 1 }).toISO(),
+      contactEnd: date.plus({ hours: 1 }).toISO(),
       notes: faker.company.bs(),
       officeLocation: fakeOfficeLocation(),
       outcome: fakeAppointmentOutcome(),

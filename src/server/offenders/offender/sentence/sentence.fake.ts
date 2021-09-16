@@ -99,7 +99,7 @@ export const fakeConvictionDetails = fake<ConvictionDetails>((options, partial =
       length: '12 months',
       startDate,
       endDate: startDate.plus({ years: 1 }),
-      convictionDate: startDate.plus({ week: 1 }),
+      convictionDate: startDate.plus({ weeks: 1 }),
       elapsed: '1 month elapsed (of 12 months)',
       responsibleCourt: faker.address.streetAddress(),
       courtAppearance: faker.address.streetAddress(),

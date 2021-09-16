@@ -1,13 +1,9 @@
 import { Validate, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator'
-import { DateTime } from 'luxon'
+import { DateTime, DateObjectUnits } from 'luxon'
 
 export const IS_DATE_INPUT = 'isDateInput'
 
-export interface DateInput {
-  day: number
-  month: number
-  year: number
-}
+export type DateInput = Required<Pick<DateObjectUnits, 'year' | 'month' | 'day'>>
 
 export function IsDateInput(options?: ValidationOptions) {
   return Validate(DateInputValidator, options)

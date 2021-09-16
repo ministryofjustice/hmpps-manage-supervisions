@@ -85,7 +85,7 @@ describe('SentenceService', () => {
 
   it('gets sentence details', async () => {
     const sentenceDate = DateTime.now()
-      .minus({ month: 6, day: 1 })
+      .minus({ months: 6, days: 1 })
       .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
 
     havingConvictions(

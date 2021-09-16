@@ -51,8 +51,7 @@ export enum ColumnType {
 
 export type ColumnBase<Path extends string = 'path'> = { type: ColumnType; defaultValue?: any } & {
   [P in Path]: string
-} &
-  Omit<TableColumn, 'data' | 'html' | 'format'>
+} & Omit<TableColumn, 'data' | 'html' | 'format'>
 
 export interface TextColumn extends ColumnBase {
   type: ColumnType.Text

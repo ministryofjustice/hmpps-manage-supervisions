@@ -63,6 +63,8 @@ export class RestService {
     axios.defaults.raxConfig = {
       instance: axios,
       retry: 3,
+      backoffType: 'static',
+      retryDelay: 100,
     }
     rax.attach(axios)
 
