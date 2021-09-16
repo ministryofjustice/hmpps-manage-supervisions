@@ -36,10 +36,13 @@ export type BreachStartMetaResult = GetMetaResultBase<ContactTypeCategory.Breach
 
 export type BreachEndMetaResult = GetMetaResultBase<ContactTypeCategory.BreachEnd, WellKnownBreachEndContactTypeMeta>
 
+export type SystemMetaResult = GetMetaResultBase<ContactTypeCategory.System>
+
 export type GetMetaResult =
   | AppointmentMetaResult
   | CommunicationMetaResult
   | BreachStartMetaResult
   | BreachEndMetaResult
   | WarningLetterMetaResult
+  | SystemMetaResult
   | UnknownMetaResult

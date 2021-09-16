@@ -119,10 +119,7 @@ export class OffenderController {
     title: 'Activity log',
   })
   async getActivity(@Param('crn') crn: string): Promise<OffenderActivityViewModel> {
-    const communicationTypes = (await this.contactTypesService.getCommunicationContactTypes()).map(
-      typeCode => `TYPE_${typeCode}`,
-    )
-    return this.activityPageCommon(crn, { include: ['APPOINTMENTS', ...communicationTypes] })
+    return this.activityPageCommon(crn, {})
   }
 
   @Get(`${OffenderPage.Activity}/:filter`)

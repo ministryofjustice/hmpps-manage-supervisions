@@ -10,6 +10,7 @@ import {
   CommunicationMetaResult,
   GetMetaOptions,
   GetMetaResult,
+  SystemMetaResult,
   WarningLetterMetaResult,
 } from './contact-mapping.types'
 import { ContactTypesService } from '../contact-types'
@@ -34,6 +35,7 @@ export class ContactMappingService {
       this.appointment(code, appointment, options) ||
       this.getBreachMeta(code) ||
       this.warningLetter(code, options) ||
+      this.getSystemMeta(options) ||
       (await this.communication(code, options)) || {
         type: ContactTypeCategory.Other,
         name: options.type.description,
@@ -54,7 +56,15 @@ export class ContactMappingService {
       this.breach(code, ContactTypeCategory.BreachStart) || this.breach(code, ContactTypeCategory.BreachEnd) || null
     )
   }
-
+  private getSystemMeta({ type }: GetMetaOptions): SystemMetaResult | null {
+    return !isAppointmentType(type) && type.systemGenerated
+      ? {
+          type: ContactTypeCategory.System,
+          name: type.description,
+          value: null,
+        }
+      : null
+  }
   private appointment(
     code: string,
     isAppointment: boolean,

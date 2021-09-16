@@ -11,7 +11,7 @@ import {
 } from '../../config'
 import { ConfigService } from '@nestjs/config'
 import { fakeAppointmentType, fakeContactType, fakeStaffHuman } from '../community-api.fake'
-import { AppointmentMetaResult, CommunicationMetaResult } from './contact-mapping.types'
+import { AppointmentMetaResult, CommunicationMetaResult, SystemMetaResult } from './contact-mapping.types'
 import { ContactTypesService } from '../contact-types'
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
 
@@ -106,5 +106,20 @@ describe('ContactMappingService', () => {
       name: 'Some communication',
       value: null,
     } as CommunicationMetaResult)
+  })
+  it('gets system contact type meta', async () => {
+    const observed = await subject.getTypeMeta({
+      staff: fakeStaffHuman(),
+      type: fakeContactType({
+        appointment: false,
+        systemGenerated: true,
+        description: 'System contact',
+      }),
+    })
+    expect(observed).toEqual({
+      type: ContactTypeCategory.System,
+      name: 'System contact',
+      value: null,
+    } as SystemMetaResult)
   })
 })
