@@ -5,14 +5,15 @@ import { ConfigService } from '@nestjs/config'
 import { ServerConfig } from '../config'
 
 export function useSentry(app: NestExpressApplication) {
-  const { deploymentEnvironment, version, name } = app.get(ConfigService).get<ServerConfig>('server')
+  const { deploymentEnvironment, version } = app.get(ConfigService).get<ServerConfig>('server')
   // dsn should be set through environment variable SENTRY_DSN, otherwise sentry wil be disabled
   Sentry.init({
     environment: deploymentEnvironment,
-    release: `${name}@${version}`,
+    release: version,
     tracesSampler({ request }) {
       return !request.url.startsWith('/health') && !request.url.startsWith('/assets')
     },
+    debug: true,
   })
   app.use(Sentry.Handlers.requestHandler())
 }
