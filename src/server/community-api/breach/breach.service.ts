@@ -61,7 +61,7 @@ export class BreachService {
             crn,
             convictionId,
             minBy(inactiveBreachRequests, x => x.actualStartDate.toJSDate()).actualStartDate,
-            maxBy(inactiveBreachRequests, x => x.actualEndDate.toJSDate()).actualEndDate.plus({ day: 1 }),
+            maxBy(inactiveBreachRequests, x => x.actualEndDate.toJSDate()).actualEndDate.plus({ days: 1 }),
           )
         : []
 

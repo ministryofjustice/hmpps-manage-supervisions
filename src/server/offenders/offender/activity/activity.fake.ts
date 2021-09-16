@@ -35,7 +35,7 @@ export const fakeActivityLogEntry = fake<ActivityLogEntry, FakeActivityLogEntryO
           ...base,
           type,
           nationalStandard: faker.datatype.boolean(),
-          end: base.start.plus({ hour: 1 }),
+          end: base.start.plus({ hours: 1 }),
           rarActivity: faker.datatype.boolean(),
           requirement: {
             requirementId: faker.datatype.number(),

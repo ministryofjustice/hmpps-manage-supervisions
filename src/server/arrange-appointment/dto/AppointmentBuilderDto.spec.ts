@@ -71,8 +71,8 @@ class Given {
 }
 
 describe('AppointmentBuilderDto validation & mapping', () => {
-  const future = DateTime.fromJSDate(faker.date.future(), { locale: 'en-gb' })
-  const past = DateTime.fromJSDate(faker.date.past(), { locale: 'en-gb' })
+  const future = DateTime.fromJSDate(faker.date.future(), { zone: 'Europe/London' })
+  const past = DateTime.fromJSDate(faker.date.past(), { zone: 'Europe/London' })
 
   describe('mapping', () => {
     const plain: DeepPartial<AppointmentBuilderDto> = {

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { Conviction, Sentence } from '../../../community-api/client'
 import { maxBy } from 'lodash'
-import { DateTime, DurationUnit } from 'luxon'
+import { DateTime } from 'luxon'
 import { getElapsed, quantity, QuantityOptions, urlJoin } from '../../../util'
 import {
   ComplianceDetails,
@@ -295,20 +295,11 @@ export class SentenceService {
       convictionId: current.convictionId,
     })
 
-    return {
-      current,
-      previous,
-      requirements,
-    }
+    return { current, previous, requirements }
   }
 
   private static getElapsedOf(sentence: Sentence): string | null {
-    const result = getElapsed(
-      sentence.startDate,
-      sentence.originalLength,
-      sentence.originalLengthUnits?.toLowerCase() as DurationUnit,
-    )
-
+    const result = getElapsed(sentence.startDate, sentence.originalLength, sentence.originalLengthUnits)
     return result && `${result.elapsed} elapsed (of ${result.length})`
   }
 }

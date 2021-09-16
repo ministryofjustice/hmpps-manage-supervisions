@@ -1,4 +1,4 @@
-import { DateObject, DateTime, DurationUnit } from 'luxon'
+import { DateInput, DateTime, DurationUnit } from 'luxon'
 import { TIME_FORMAT } from '../validators'
 import { quantity } from './math'
 
@@ -15,7 +15,7 @@ export function getPotentiallyExpectedDateTime(date: string, expectedDate: strin
     : null
 }
 
-export type RawDate = DateTime | Date | string | DateObject
+export type RawDate = string | DateInput
 
 export function getDateTime(dateOrIso: RawDate, time?: string): DateTime {
   if (!time || !dateOrIso) {
@@ -66,18 +66,18 @@ export function isActiveDateRange(range: { startDate?: RawDate; endDate?: RawDat
   return !endDate || endDate > now
 }
 
-export function getElapsed(
-  date: RawDate,
-  length: number,
-  units: DurationUnit,
-): { elapsed: string; length: string } | null {
+export function getElapsed(date: RawDate, length: number, units: string): { elapsed: string; length: string } | null {
   if (!units || !length) {
     return null
   }
 
+  // luxon requires that duration units are plural for some reason...
+  const cleanUnits = units.trim().toLowerCase()
+  const durationUnit = (cleanUnits.endsWith('s') ? cleanUnits : cleanUnits + 's') as DurationUnit
+
   try {
     const start = safeGetDateTime(date)
-    const diffToNow = DateTime.now().diff(start, units).as(units)
+    const diffToNow = DateTime.now().diff(start, durationUnit).as(durationUnit)
     if (diffToNow < 0) {
       // must start in the future
       return null
@@ -85,8 +85,8 @@ export function getElapsed(
 
     const elapsed = Math.min(Math.floor(diffToNow), length)
     return {
-      elapsed: quantity(elapsed, units),
-      length: quantity(length, units),
+      elapsed: quantity(elapsed, durationUnit),
+      length: quantity(length, durationUnit),
     }
   } catch (err) {
     // probably bad units

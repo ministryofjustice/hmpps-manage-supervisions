@@ -1,5 +1,4 @@
 import { Test } from '@nestjs/testing'
-import { HttpModule } from '@nestjs/axios'
 import { ConfigService } from '@nestjs/config'
 import * as nock from 'nock'
 import { HealthService } from './health.service'
@@ -14,7 +13,6 @@ describe('HealthService', () => {
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       imports: [
-        HttpModule,
         FakeConfigModule.register({
           apis: {
             hmppsAuth: { enabled: true },
@@ -40,10 +38,10 @@ describe('HealthService', () => {
     havingHealthyApi('hmppsAuth')
     havingHealthyApi('community')
     havingHealthyApi('assessRisksAndNeeds')
-    const { uptime, ...observed } = await service.getHealth().toPromise()
+    const { uptime, ...observed } = await service.getHealth()
     expect(observed).toEqual({
       healthy: true,
-      checks: { hmppsAuth: 'OK', community: 'OK', assessRisksAndNeeds: 'OK' },
+      checks: { hmppsAuth: { status: 'UP' }, community: { status: 'UP' }, assessRisksAndNeeds: { status: 'UP' } },
       version: server.version,
     })
   })
@@ -52,10 +50,10 @@ describe('HealthService', () => {
     havingHealthyApi('hmppsAuth', false)
     havingHealthyApi('community')
     havingHealthyApi('assessRisksAndNeeds')
-    const { uptime, ...observed } = await service.getHealth().toPromise()
+    const { uptime, ...observed } = await service.getHealth()
     expect(observed).toEqual({
       healthy: false,
-      checks: { hmppsAuth: { status: 'DOWN' }, community: 'OK', assessRisksAndNeeds: 'OK' },
+      checks: { hmppsAuth: { status: 'DOWN' }, community: { status: 'UP' }, assessRisksAndNeeds: { status: 'UP' } },
       version: server.version,
     })
   })

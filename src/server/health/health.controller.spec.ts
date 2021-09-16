@@ -3,8 +3,7 @@ import { HealthController } from './health.controller'
 import { SinonStubbedInstance, createStubInstance } from 'sinon'
 import { HealthService } from './health.service'
 import { fakeHealthResult } from './health.fake'
-import { of } from 'rxjs'
-import { HealthException } from './types'
+import { HealthException } from './health.types'
 
 describe('HealthController', () => {
   let controller: HealthController
@@ -22,14 +21,14 @@ describe('HealthController', () => {
 
   it('should not throw when healthy', async () => {
     const result = fakeHealthResult({ healthy: true })
-    service.getHealth.returns(of(result))
-    const observed = await controller.get().toPromise()
+    service.getHealth.resolves(result)
+    const observed = await controller.get()
     expect(observed).toBe(result)
   })
 
   it('should throw when unhealthy', async () => {
     const result = fakeHealthResult({ healthy: false })
-    service.getHealth.returns(of(result))
-    await expect(async () => controller.get().toPromise()).rejects.toThrow(new HealthException(result))
+    service.getHealth.resolves(result)
+    await expect(async () => controller.get()).rejects.toThrow(new HealthException(result))
   })
 })

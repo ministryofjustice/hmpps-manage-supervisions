@@ -22,7 +22,7 @@ export const fakeAppointmentBuilderDto = fakeClass(
       locationDescription: faker.address.streetAddress(),
       date: { day: date.day, month: date.month, year: date.year } as any,
       startTime: date.toFormat(TIME_FORMAT),
-      endTime: date.plus({ hour: 1 }).toFormat(TIME_FORMAT),
+      endTime: date.plus({ hours: 1 }).toFormat(TIME_FORMAT),
       addNotes: true,
       notes: faker.lorem.sentences(3),
       sensitive: faker.datatype.boolean(),

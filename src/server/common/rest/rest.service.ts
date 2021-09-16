@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { Config, DependentApisConfig, ServerConfig } from '../../config'
 import { kebabCase } from 'lodash'
-import Axios from 'axios'
+import Axios, { AxiosInstance } from 'axios'
 import { getRequestName, SanitisedAxiosError } from './SanitisedAxiosError'
 import * as rax from 'retry-axios'
 import { ConfigService } from '@nestjs/config'
@@ -20,7 +20,7 @@ export class RestService {
     name: keyof DependentApisConfig,
     user: User,
     authMethod: AuthenticationMethod = AuthenticationMethod.PassThroughUserToken,
-  ) {
+  ): AxiosInstance {
     const logger = new Logger(`${kebabCase(name)}-api-client`)
     const { url, timeout } = this.config.get<DependentApisConfig>('apis')[name]
     const { isProduction } = this.config.get<ServerConfig>('server')
@@ -63,6 +63,8 @@ export class RestService {
     axios.defaults.raxConfig = {
       instance: axios,
       retry: 3,
+      backoffType: 'static',
+      retryDelay: 100,
     }
     rax.attach(axios)
 

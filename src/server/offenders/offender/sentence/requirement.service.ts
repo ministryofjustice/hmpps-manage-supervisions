@@ -8,7 +8,7 @@ import {
   GetConvictionRequirementsOptions,
 } from './sentence.types'
 import { getPotentiallyExpectedDateTime, quantity } from '../../../util'
-import { groupBy, trimEnd } from 'lodash'
+import { groupBy } from 'lodash'
 import { ConfigService } from '@nestjs/config'
 import { Config, getWellKnownRequirementName, isRar, WellKnownRequirementTypeConfig } from '../../../config'
 import { CommunityApiService } from '../../../community-api'
@@ -88,14 +88,16 @@ export class RequirementService {
       return value
     }
 
-    units = trimEnd(units.trim().toLowerCase(), 's')
-    if (trimEnd(targetUnits, 's') === units) {
+    // in luxon, duration units must be plural...
+    const cleanUnits = units.trim().toLowerCase()
+    const durationUnits = cleanUnits.endsWith('s') ? cleanUnits : ((cleanUnits + 's') as DurationUnit)
+    if (targetUnits === durationUnits) {
       return value
     }
 
     // got to transform
     try {
-      return Math.floor(Duration.fromObject({ [units]: value }).as(targetUnits))
+      return Math.floor(Duration.fromObject({ [durationUnits]: value }).as(targetUnits))
     } catch (err) {
       this.logger.error(`Cannot convert '${value}' from '${units}' to '${targetUnits}'`, err)
       return 0
