@@ -57,7 +57,9 @@ We will include the [UUID](https://github.com/ministryofjustice/hmpps-auth/blob/
 
 In particular, we need to make sure we log all read operations done through our UI, because they will not be recorded by any other system.
 
-These log messages will be written to application `stdout` and `stderr`, which are [automatically aggregated by Cloud Platform into Azure Application Insights](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/logging-an-app/log-collection-and-storage.html#application-log-collection-and-storage), and which are retained there for 13 months. Correlation IDs in AppInsights allow reconstruction of cross-service data for comprehensive audit purposes; we should test that this is working before going live.
+These log messages will be written to application `stdout` and `stderr`, which are [automatically aggregated by Cloud Platform](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/logging-an-app/log-collection-and-storage.html#application-log-collection-and-storage).
+
+We will also configure the service to send its logs to Azure AppInsights, which has a retention period of 13 months. Correlation IDs in AppInsights allow reconstruction of cross-service data for comprehensive audit purposes; we should test that this is working before going live.
 
 ## Consequences
 
