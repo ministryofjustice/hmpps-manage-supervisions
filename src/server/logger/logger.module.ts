@@ -33,7 +33,7 @@ import { NestExpressApplication } from '@nestjs/platform-express'
 })
 export class LoggerModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).exclude('/health', '/health/ping').forRoutes('*')
+    consumer.apply(LoggerMiddleware).exclude('/health', '/health/ping', '/favicon.ico').forRoutes('*')
   }
 
   static useLogger(app: NestExpressApplication) {
