@@ -79,7 +79,7 @@ describe('ActivityController', () => {
     })
     expect(observed).toEqual({
       displayName,
-      breadcrumbs: links.breadcrumbs(BreadcrumbType.OtherCommunication),
+      breadcrumbs: links.breadcrumbs(BreadcrumbType.Communication),
       contact,
     } as CommunicationViewModel)
   })

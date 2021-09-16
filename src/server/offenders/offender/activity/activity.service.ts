@@ -12,6 +12,7 @@ import {
   ActivityLogEntryGroup,
   AppointmentActivityLogEntry,
   CommunicationActivityLogEntry,
+  UnknownActivityLogEntry,
 } from './activity.types'
 import { DateTime } from 'luxon'
 import { ContactTypeCategory, WellKnownContactTypeConfig } from '../../../config'
@@ -52,7 +53,10 @@ export class ActivityService {
       pageSize: PAGE_SIZE,
     })
 
-    const entries = await Promise.all(contacts.map(contact => this.getActivityLogEntry(crn, contact, offender)))
+    // TODO filtering out system generated contacts for now
+    const entries = await Promise.all(
+      contacts.filter(x => !x.type.systemGenerated).map(contact => this.getActivityLogEntry(crn, contact, offender)),
+    )
     const today = DateTime.now().startOf('day')
     const groups: ActivityLogEntryGroup[] = Object.entries(groupBy(entries, x => x.start.toISODate())).map(
       ([key, entries]) => {
@@ -123,6 +127,21 @@ export class ActivityService {
     return this.entryService.getCommunicationActivityLogEntry(crn, contact, meta, offender)
   }
 
+  async getUnknownContact(crn: string, contactId: number): Promise<UnknownActivityLogEntry> {
+    const { data: contact } = await this.community.contactAndAttendance.getOffenderContactSummaryByCrnUsingGET({
+      crn,
+      contactId,
+    })
+    const meta = await this.contacts.getTypeMeta(contact)
+    if (meta.type === ContactTypeCategory.Appointment) {
+      throw new NotFoundException(`contact with id '${contactId}' is not an appointment`)
+    }
+    if (meta.type === ContactTypeCategory.Communication) {
+      throw new NotFoundException(`contact with id '${contactId}' is not a communication`)
+    }
+    return this.entryService.getUnknownActivityLogEntry(crn, contact, meta)
+  }
+
   private async getActivityLogEntry(
     crn: string,
     contact: ContactSummary,
@@ -135,7 +154,7 @@ export class ActivityService {
       case ContactTypeCategory.Communication:
         return this.entryService.getCommunicationActivityLogEntry(crn, contact, meta, offender)
       default:
-        return this.entryService.getUnknownActivityLogEntry(contact, meta)
+        return this.entryService.getUnknownActivityLogEntry(crn, contact, meta)
     }
   }
 

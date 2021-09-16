@@ -57,10 +57,12 @@
     {%- endcall %}
 {%- endmacro %}
 
-{% macro communicationCard(entry, open) -%}
+{% macro plainCard(entry, open, options) -%}
     {% set title %}
         <a href="{{ entry.links.view }}">{{ entry.name }}</a>
-        <span class="govuk-!-font-weight-regular">at {{ entry.start | time }}</span>
+        {% if options.time %}
+            <span class="govuk-!-font-weight-regular">at {{ entry.start | time }}</span>
+        {% endif %}
     {% endset %}
     {% call appSummaryCard({
         titleHtml: title,
@@ -117,7 +119,11 @@
                         {% case 'appointment' %}
                             {{ appointmentCard(entry, open) }}
                         {% case 'communication' %}
-                            {{ communicationCard(entry, open) }}
+                            {{ plainCard(entry, open, { time: true }) }}
+                        {% case 'system' %}
+                            {# TODO system generated #}
+                        {% default %}
+                            {{ plainCard(entry, open) }}
                         {% endswitch %}
                     {% endfor %}
                 </section>

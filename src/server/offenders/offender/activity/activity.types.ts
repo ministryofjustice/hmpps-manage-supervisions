@@ -54,7 +54,10 @@ export interface CommunicationActivityLogEntry extends ActivityLogEntryBase<Cont
   to?: string
 }
 
-export type UnknownActivityLogEntry = ActivityLogEntryBase<ContactTypeCategory.Other>
+export interface UnknownActivityLogEntry extends ActivityLogEntryBase<ContactTypeCategory.Other> {
+  lastUpdatedDateTime: DateTime
+  lastUpdatedBy: string
+}
 
 export type ActivityLogEntry = AppointmentActivityLogEntry | CommunicationActivityLogEntry | UnknownActivityLogEntry
 
@@ -68,9 +71,15 @@ export interface AppointmentViewModel extends ViewModel {
   displayName: string
   appointment: AppointmentActivityLogEntry
 }
+
 export interface CommunicationViewModel extends ViewModel {
   displayName: string
   contact: CommunicationActivityLogEntry
+}
+
+export interface OtherActivityLogEntryViewModel extends ViewModel {
+  displayName: string
+  contact: UnknownActivityLogEntry
 }
 
 export enum ActivityComplianceFilter {

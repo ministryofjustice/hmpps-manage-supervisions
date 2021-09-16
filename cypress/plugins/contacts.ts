@@ -107,6 +107,7 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
       code: 'SYSTEM_GENERATED_UNKNOWN',
       description: 'System generated unknown contact',
       appointment: false,
+      systemGenerated: true,
     },
     contactStart: '2020-09-04T14:00:00+01:00',
     contactEnd: '2020-09-04T00:00:00+01:00',
@@ -127,6 +128,7 @@ export const CONTACTS: DeepPartial<ContactSummary>[] = [
     contactEnd: '2019-05-05T00:00:00+01:00',
     outcome: null,
     sensitive: false,
+    notes: null,
   },
   {
     contactId: 11,
@@ -196,11 +198,6 @@ export function contacts(crn: string, partials: DeepPartial<ContactSummary>[] = 
 
     // appointments only
     all({ appointmentsOnly: true }, c => c.type.appointment)
-
-    // TODO remove this once we stop using it
-    // HACK: we're only using the include filter in a single place so we're hard coding it here
-    const commsTypeList = ['CT3A', 'CT3B', 'CTOA', 'CTOB', 'CM3A', 'CMOA', 'CMOB', 'NOT_WELL_KNOWN_COMMUNICATION']
-    all({ include: ['.+'] }, c => c.type.appointment || commsTypeList.indexOf(c.type.code) > 0, 'matches')
 
     // all contacts with no filter
     all()

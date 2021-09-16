@@ -1,6 +1,6 @@
 import { Controller, Get, Param, ParseIntPipe, Render } from '@nestjs/common'
 import { ActivityService } from './activity.service'
-import { AppointmentViewModel, CommunicationViewModel } from './activity.types'
+import { AppointmentViewModel, CommunicationViewModel, OtherActivityLogEntryViewModel } from './activity.types'
 import { OffenderService } from '../offender.service'
 import { getDisplayName } from '../../../util'
 import { Breadcrumb, BreadcrumbType, LinksService } from '../../../common/links'
@@ -49,7 +49,7 @@ export class ActivityController {
   @Get('communication/:id(\\d+)')
   @Render('offenders/offender/activity/communication')
   @Breadcrumb({
-    type: BreadcrumbType.OtherCommunication,
+    type: BreadcrumbType.Communication,
     parent: BreadcrumbType.CaseActivityLog,
     title: options => options.entityName,
   })
@@ -63,7 +63,33 @@ export class ActivityController {
     return {
       displayName,
       contact,
-      breadcrumbs: this.links.resolveAll(BreadcrumbType.OtherCommunication, {
+      breadcrumbs: this.links.resolveAll(BreadcrumbType.Communication, {
+        crn,
+        id,
+        offenderName: displayName,
+        entityName: contact.name,
+      }),
+    }
+  }
+
+  @Get('other/:id(\\d+)')
+  @Render('offenders/offender/activity/other')
+  @Breadcrumb({
+    type: BreadcrumbType.OtherActivityLogEntry,
+    parent: BreadcrumbType.CaseActivityLog,
+    title: options => options.entityName,
+  })
+  async getUnknown(
+    @Param('crn') crn: string,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<OtherActivityLogEntryViewModel> {
+    const offender = await this.offender.getOffenderSummary(crn)
+    const displayName = getDisplayName(offender)
+    const contact = await this.activity.getUnknownContact(crn, id)
+    return {
+      displayName,
+      contact,
+      breadcrumbs: this.links.resolveAll(BreadcrumbType.OtherActivityLogEntry, {
         crn,
         id,
         offenderName: displayName,
