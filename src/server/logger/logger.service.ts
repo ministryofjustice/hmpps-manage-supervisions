@@ -1,9 +1,11 @@
 import { Injectable, LoggerService as NestLoggerService, LogLevel as NestLogLevel } from '@nestjs/common'
 import * as winston from 'winston'
 import { ConfigService } from '@nestjs/config'
-import { maxBy, isEmpty } from 'lodash'
+import { isEmpty, maxBy } from 'lodash'
 import { Config, LogLevel, ServerConfig } from '../config'
 import { LOGGER_HOOK } from './logger.hook'
+import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry'
+import { Severity } from '@sentry/types'
 
 function toWinstonLogLevel(level: NestLogLevel): LogLevel {
   switch (level) {
@@ -27,7 +29,11 @@ export interface ContextualNestLoggerService extends NestLoggerService {
 }
 
 class NestWinstonWrapper implements ContextualNestLoggerService {
-  constructor(private readonly logger: winston.Logger, private readonly currentContext: string) {}
+  constructor(
+    private readonly logger: winston.Logger,
+    private readonly currentContext: string,
+    private readonly sentry: SentryService,
+  ) {}
 
   error(message: any, ...optionalParams: any[]) {
     this.wrap('error', message, optionalParams)
@@ -59,12 +65,19 @@ class NestWinstonWrapper implements ContextualNestLoggerService {
 
   child({ context, ...options }: Record<string, any> = {}) {
     const nextContext = [this.currentContext, context].filter(x => x).join('|')
-    return new NestWinstonWrapper(this.logger.child({ context: nextContext || undefined, ...options }), nextContext)
+    return new NestWinstonWrapper(
+      this.logger.child({ context: nextContext || undefined, ...options }),
+      nextContext,
+      this.sentry,
+    )
   }
 
   private wrap(nestLevel: NestLogLevel, message: any, args: any[] = []) {
+    function getMeta() {
+      return args.find(x => typeof x === 'object')
+    }
     function addMeta(source: any) {
-      const meta = args.find(x => typeof x === 'object')
+      const meta = getMeta()
       if (meta) {
         Object.assign(meta, source)
       } else {
@@ -84,6 +97,18 @@ class NestWinstonWrapper implements ContextualNestLoggerService {
     if (store?.user) {
       addMeta({ user: store.user })
     }
+
+    if (nestLevel === 'error') {
+      // only send errors to sentry
+      const exception = args.find(x => x && (x instanceof Error || (x.stack && x.message)))
+      const sentry = this.sentry.instance()
+      if (exception) {
+        sentry.captureException(exception, { extra: { message }, user: { id: store?.user } })
+      } else {
+        sentry.captureMessage(message, { level: Severity.Error, user: { id: store?.user }, extra: getMeta() })
+      }
+    }
+
     this.logger.log(toWinstonLogLevel(nestLevel), message, ...args)
   }
 }
@@ -118,7 +143,7 @@ export class LoggerService extends NestWinstonWrapper {
     })
   }
 
-  constructor(config: ConfigService<Config>) {
-    super(LoggerService.rootLoggerFactory(config), null)
+  constructor(config: ConfigService<Config>, @InjectSentry() sentry: SentryService) {
+    super(LoggerService.rootLoggerFactory(config), null, sentry)
   }
 }

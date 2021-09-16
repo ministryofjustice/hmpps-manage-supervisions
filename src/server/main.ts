@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config'
 import { Logger } from '@nestjs/common'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { AppModule } from './app.module'
-import { useBodyParser, useGovUkUi, useRedisSession, useTrustProxy, useSentry } from './bootstrap'
+import { useBodyParser, useGovUkUi, useRedisSession, useTrustProxy } from './bootstrap'
 import { ServerConfig } from './config'
 import { Settings } from 'luxon'
 import { LoggerModule } from './logger/logger.module'
@@ -16,7 +16,6 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { bodyParser: false, bufferLogs: true })
   LoggerModule.useLogger(app)
 
-  useSentry(app)
   useBodyParser(app)
   useTrustProxy(app)
   useRedisSession(app)
