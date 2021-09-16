@@ -150,6 +150,7 @@ export enum ContactTypeCategory {
   Other = 'other',
   BreachStart = 'breach-start',
   BreachEnd = 'breach-end',
+  System = 'system',
 }
 
 export interface WellKnownContactTypeConfig {

@@ -147,7 +147,6 @@ describe('OffenderController', () => {
         'some-crn',
         offender,
         match({
-          include: ['APPOINTMENTS', 'TYPE_' + communicationContactTypes[0], 'TYPE_' + communicationContactTypes[1]],
           convictionId: 1234,
         }),
       )
