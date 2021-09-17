@@ -3,12 +3,14 @@ import {
   AppointmentMetaResult,
   CommunicationMetaResult,
   GetMetaResult,
+  SystemMetaResult,
   UnknownMetaResult,
 } from './contact-mapping.types'
 
 export function fakeContactMeta(type: ContactTypeCategory.Appointment, wellKnow?: boolean): AppointmentMetaResult
 export function fakeContactMeta(type: ContactTypeCategory.Communication, wellKnow?: boolean): CommunicationMetaResult
 export function fakeContactMeta(type: ContactTypeCategory.Other, wellKnow?: boolean): UnknownMetaResult
+export function fakeContactMeta(type: ContactTypeCategory.System, wellKnow?: boolean): SystemMetaResult
 export function fakeContactMeta(type: ContactTypeCategory, wellKnown = true): GetMetaResult {
   switch (type) {
     case ContactTypeCategory.Appointment:
@@ -39,5 +41,7 @@ export function fakeContactMeta(type: ContactTypeCategory, wellKnown = true): Ge
       return { type: ContactTypeCategory.BreachStart, name: 'some breach start', value: null }
     case ContactTypeCategory.BreachEnd:
       return { type: ContactTypeCategory.BreachEnd, name: 'some breach end', value: null }
+    case ContactTypeCategory.System:
+      return { type: ContactTypeCategory.System, name: 'some system contact', value: null }
   }
 }

@@ -9,7 +9,12 @@ import {
 import { ContactTypeCategory } from '../../../config'
 import { DateTime } from 'luxon'
 import { BreadcrumbType } from '../../../common/links'
-import { AppointmentActivityLogEntry, CommunicationActivityLogEntry, UnknownActivityLogEntry } from './activity.types'
+import {
+  AppointmentActivityLogEntry,
+  CommunicationActivityLogEntry,
+  SystemActivityLogEntry,
+  UnknownActivityLogEntry,
+} from './activity.types'
 import { fakeContactMeta } from '../../../community-api/contact-mapping/contact-mapping.fake'
 
 describe('ActivityLogEntryService', () => {
@@ -232,5 +237,33 @@ describe('ActivityLogEntryService', () => {
       notes: 'some unknown contact notes',
       sensitive: true,
     } as UnknownActivityLogEntry)
+  })
+
+  it('gets system activity log entry', () => {
+    const contact = fakeContactSummary({
+      contactId: 1,
+      notes: 'system contact notes',
+      sensitive: true,
+      contactStart: '2020-01-01T12:00:00',
+    })
+
+    const meta = fakeContactMeta(ContactTypeCategory.System)
+    const observed = subject.getSystemActivityLogEntry('some-crn', contact, meta)
+
+    const links = MockLinksModule.of({ id: 1, crn: 'some-crn' })
+    expect(observed).toEqual({
+      id: 1,
+      type: ContactTypeCategory.System,
+      category: 'System contact',
+      isFuture: false,
+      start: DateTime.fromObject({ year: 2020, month: 1, day: 1, hour: 12 }),
+      links: {
+        view: links.url(BreadcrumbType.ExitToDelius),
+        addNotes: null,
+      },
+      name: 'some system contact',
+      notes: 'system contact notes',
+      sensitive: true,
+    } as SystemActivityLogEntry)
   })
 })

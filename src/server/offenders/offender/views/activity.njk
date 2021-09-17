@@ -121,7 +121,7 @@
                         {% case 'communication' %}
                             {{ plainCard(entry, open, { time: true }) }}
                         {% case 'system' %}
-                            {# TODO system generated #}
+                            {{ plainCard(entry, open) }}
                         {% default %}
                             {{ plainCard(entry, open) }}
                         {% endswitch %}

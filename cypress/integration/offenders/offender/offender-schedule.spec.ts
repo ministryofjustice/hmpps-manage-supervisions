@@ -48,7 +48,7 @@ class Fixture extends ViewOffenderFixture {
 context('Offender schedule tab', () => {
   const fixture = new Fixture()
   const start = DateTime.now().startOf('day')
-  const end = DateTime.now().startOf('day').plus({ hour: 1 })
+  const end = DateTime.now().startOf('day').plus({ hours: 1 })
   describe('populated schedule', () => {
     before(() =>
       cy.seed({

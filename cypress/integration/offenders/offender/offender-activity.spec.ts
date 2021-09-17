@@ -166,7 +166,12 @@ context('Offender activity tab', () => {
           notesType: 'closed-detail',
           sensitive: true,
         })
-
+        .shouldRenderActivity({
+          id: 9,
+          date: 'Friday 4 September 2020',
+          title: 'System generated unknown contact',
+          notes: 'Unknown system generated contact',
+        })
         .shouldRenderActivity({
           id: 11,
           date: 'Friday 4 September 2020',
@@ -231,7 +236,13 @@ context('Offender activity tab', () => {
         })
         .shouldDisplayExitPage('delius')
     })
-
+    it('displays system contact on activity log with link to delius', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('activity')
+        .whenClickingActivityEntry(9)
+        .shouldDisplayExitPage('delius')
+    })
     it('displays appointment detail without outcome', () => {
       fixture
         .whenViewingOffender()

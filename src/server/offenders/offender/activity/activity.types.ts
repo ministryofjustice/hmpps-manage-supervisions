@@ -58,8 +58,12 @@ export interface UnknownActivityLogEntry extends ActivityLogEntryBase<ContactTyp
   lastUpdatedDateTime: DateTime
   lastUpdatedBy: string
 }
-
-export type ActivityLogEntry = AppointmentActivityLogEntry | CommunicationActivityLogEntry | UnknownActivityLogEntry
+export type SystemActivityLogEntry = ActivityLogEntryBase<ContactTypeCategory.System>
+export type ActivityLogEntry =
+  | AppointmentActivityLogEntry
+  | CommunicationActivityLogEntry
+  | UnknownActivityLogEntry
+  | SystemActivityLogEntry
 
 export interface ActivityLogEntryGroup {
   date: DateTime

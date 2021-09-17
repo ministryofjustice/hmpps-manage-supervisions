@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { AppointmentDetail, ContactSummary, OffenderDetail } from '../../../community-api/client'
-import { AppointmentMetaResult, CommunicationMetaResult, GetMetaResult } from '../../../community-api'
+import { AppointmentMetaResult, CommunicationMetaResult, GetMetaResult, SystemMetaResult } from '../../../community-api'
 import {
   ActivityLogEntry,
   AppointmentActivityLogEntry,
   CommunicationActivityLogEntry,
+  SystemActivityLogEntry,
   UnknownActivityLogEntry,
 } from './activity.types'
 import { DateTime } from 'luxon'
@@ -128,6 +129,20 @@ export class ActivityLogEntryService {
       },
       lastUpdatedDateTime: DateTime.fromISO(contact.lastUpdatedDateTime),
       lastUpdatedBy: `${contact.lastUpdatedByUser.forenames} ${contact.lastUpdatedByUser.surname}`,
+    }
+  }
+
+  getSystemActivityLogEntry(crn: string, contact: ContactSummary, meta: SystemMetaResult): SystemActivityLogEntry {
+    const links = this.links.of({ id: contact.contactId, crn })
+    return {
+      ...ActivityLogEntryService.getCommonActivityLogEntryBase(contact),
+      type: ContactTypeCategory.System,
+      category: 'System contact',
+      name: meta.name,
+      links: {
+        view: links.url(BreadcrumbType.ExitToDelius),
+        addNotes: null,
+      },
     }
   }
 
