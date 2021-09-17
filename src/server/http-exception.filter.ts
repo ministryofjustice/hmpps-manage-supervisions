@@ -26,9 +26,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
   }
 
   private handleAxiosError(exception: SanitisedAxiosError, host: ArgumentsHost) {
-    switch (exception.status) {
+    switch (exception.response?.status) {
       case HttpStatus.NOT_FOUND:
-        return this.renderErrorPage(exception, host, exception.status)
+        return this.renderErrorPage(exception, host, HttpStatus.NOT_FOUND)
 
       default:
         return this.renderErrorPage(exception, host, 500)

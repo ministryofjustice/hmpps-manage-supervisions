@@ -5,10 +5,11 @@ import { FakeConfigModule } from '../../config/config.fake'
 import { ApiConfig } from '../../config'
 import { ConfigService } from '@nestjs/config'
 import { fakeUser } from '../../security/user/user.fake'
-import { SanitisedAxiosError } from './SanitisedAxiosError'
 import { SinonStubbedInstance, createStubInstance } from 'sinon'
 import { HmppsOidcService } from '../hmpps-oidc/hmpps-oidc.service'
 import { Logger } from '@nestjs/common'
+import { MockLoggerModule } from '../../logger/logger.mock'
+import { SanitisedAxiosError } from './SanitisedAxiosError'
 
 const URL = '/some-url'
 const OK = Object.freeze({ hello: 'world' })
@@ -24,7 +25,7 @@ describe('RestService', () => {
     oidc = createStubInstance(HmppsOidcService)
 
     const module = await Test.createTestingModule({
-      imports: [FakeConfigModule.register()],
+      imports: [FakeConfigModule.register(), MockLoggerModule],
       providers: [RestService, { provide: HmppsOidcService, useValue: oidc }],
     })
       .setLogger(new Logger())
@@ -59,7 +60,31 @@ describe('RestService', () => {
       .get(URL)
       .reply(500)
       .get(URL)
-      .reply(500)
-    await expect(subject.build('community', user).get(URL)).rejects.toThrow(SanitisedAxiosError)
+      .reply(500, { error: 'some error' })
+
+    let exception: SanitisedAxiosError
+    try {
+      await subject.build('community', user).get(URL)
+    } catch (err) {
+      exception = err
+    }
+
+    expect({ ...exception, message: exception.message }).toEqual({
+      message: 'Request failed with status code 500',
+      api: {
+        baseUrl: config.url.href,
+        name: 'community',
+      },
+      name: 'SanitisedAxiosError',
+      request: {
+        method: 'GET',
+        url: URL,
+      },
+      response: {
+        data: { error: 'some error' },
+        status: 500,
+        statusText: null,
+      },
+    })
   })
 })

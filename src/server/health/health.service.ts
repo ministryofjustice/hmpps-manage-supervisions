@@ -38,7 +38,7 @@ export class HealthService {
       return { name, healthy: true, result: result.data }
     } catch (err) {
       const reason = (Axios.isAxiosError(err) && err.response?.data) || err.message || null
-      this.logger.error(`${name} is unhealthy`, { reason, service: name })
+      this.logger.warn(`${name} is unhealthy`, { reason, service: name })
       return { name, healthy: false, result: reason }
     }
   }

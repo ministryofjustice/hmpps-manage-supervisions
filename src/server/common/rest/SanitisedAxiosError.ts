@@ -1,36 +1,42 @@
-import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
+import { AxiosError, AxiosResponse } from 'axios'
 import { HttpStatus } from '@nestjs/common'
-import { urlJoin } from '../../util'
+import { DependentApisConfig } from '../../config'
 
-export function getRequestName(request: AxiosRequestConfig): string {
-  return [
-    request.method?.toUpperCase(),
-    urlJoin(request.baseURL, request.url),
-    request.data ? JSON.stringify(request.data) : null,
-  ]
-    .filter(x => x)
-    .join(' ')
+export interface ApiMeta {
+  name: keyof DependentApisConfig
+  baseUrl: string
 }
 
 /**
  * Wraps an axios errors, that may contain sensitive request headers.
  */
 export class SanitisedAxiosError extends Error {
-  constructor(inner: AxiosError) {
-    super(SanitisedAxiosError.getMessage(inner))
-    this.status = (inner.response?.status as HttpStatus) || null
+  constructor(inner: AxiosError, public readonly api: ApiMeta) {
+    super(inner.message)
+    this.stack = inner.stack
+    this.name = SanitisedAxiosError.name
+    this.request = {
+      url: inner.config.url,
+      method: inner.config.method?.toUpperCase(),
+    }
+    this.response = inner.response
+      ? {
+          status: inner.response.status as HttpStatus,
+          statusText: inner.response.statusText,
+          data: inner.response.data,
+        }
+      : null
   }
 
-  readonly status: HttpStatus
+  readonly request: {
+    url: string
+    method: string
+  }
 
-  public static getMessage(err: AxiosError): string {
-    const requestName = getRequestName(err.config)
-    const message = err.response
-      ? [err.response.status, err.response.statusText, err.response.data ? JSON.stringify(err.response.data) : null]
-          .filter(x => x)
-          .join(' ')
-      : err.message
-    return `${requestName} -> ${message}`
+  readonly response?: {
+    status: HttpStatus
+    statusText: string
+    data?: any
   }
 
   static async catchStatus<T>(action: () => Promise<AxiosResponse<T>>, ...statuses: HttpStatus[]): Promise<T | null> {
@@ -38,7 +44,7 @@ export class SanitisedAxiosError extends Error {
       const { data } = await action()
       return data
     } catch (err) {
-      if (err instanceof SanitisedAxiosError && statuses.includes(err.status)) {
+      if (err instanceof SanitisedAxiosError && err.response && statuses.includes(err.response.status)) {
         return null
       }
       throw err
