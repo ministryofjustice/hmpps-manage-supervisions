@@ -21,7 +21,7 @@ import { BreachService } from '../../../community-api/breach'
 import { Mutable } from '../../../@types/mutable'
 import { ActivityLogEntryService } from './activity-log-entry.service'
 
-export const PAGE_SIZE = 999
+export const PAGE_SIZE = 1000
 
 export type GetContactsOptions = Omit<
   ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
@@ -49,7 +49,7 @@ export class ActivityService {
     } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET({
       ...resolvedOptions,
       // TODO pagination is disabled
-      page: 1,
+      page: 0,
       pageSize: PAGE_SIZE,
     })
 

@@ -175,8 +175,8 @@ describe('ActivityService', () => {
         crn: 'some-crn',
         contactDateFrom: '2019-03-01',
         contactDateTo: '2020-03-02',
-        page: 1,
-        pageSize: 999,
+        page: 0,
+        pageSize: 1000,
         ...expected,
       } as ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest)
     }
