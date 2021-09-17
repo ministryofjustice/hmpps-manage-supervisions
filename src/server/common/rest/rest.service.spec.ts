@@ -13,7 +13,7 @@ import { Logger } from '@nestjs/common'
 const URL = '/some-url'
 const OK = Object.freeze({ hello: 'world' })
 
-describe('RestClientService', () => {
+describe('RestService', () => {
   let subject: RestService
   let user: User
   let config: ApiConfig

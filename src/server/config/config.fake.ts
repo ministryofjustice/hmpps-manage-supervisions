@@ -38,6 +38,7 @@ export const fakeConfig = fake<Config>(() => ({
       [FeatureFlags.EnableAppointmentBooking]: true,
     },
     logLevel: LogLevel.Info,
+    sentryDsn: faker.internet.url(),
   },
   redis: {
     host: faker.internet.domainName(),

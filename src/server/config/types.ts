@@ -34,6 +34,7 @@ export interface ServerConfig {
   staticResourceCacheDuration: number
   features: Partial<Record<FeatureFlags, boolean>>
   logLevel: LogLevel
+  sentryDsn?: string
 }
 
 export interface RedisConfig {

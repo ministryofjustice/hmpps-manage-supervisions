@@ -21,12 +21,15 @@ export function useGovUkUi(app: NestExpressApplication) {
     watch: !isProduction,
   })
 
+  const filterNames = []
   for (const Filter of Object.values(filters)) {
     const name = camelCase(Filter.name)
-    logger.log(`adding filter ${name}`)
+    filterNames.push(name)
     const filter: filters.NunjucksFilter = new Filter()
     environment.addFilter(name, filter.filter, filter.async)
   }
+
+  logger.debug(`adding nunjucks filters ${filterNames.join(', ')}`)
 
   app.useStaticAssets(path.join(__dirname, 'assets'), {
     prefix: '/assets',

@@ -44,17 +44,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     switch (status) {
       case HttpStatus.FORBIDDEN:
-        if (response.locals.authorized === false) {
-          // the authorization guard failed => display unauthorized page
-          return response.status(status).render('pages/unauthorized')
-        }
-
         // the authentication guard failed => redirect to login
         request.logout()
         return response.redirect(`/login?${LoginService.REDIRECT_PARAM}=${encodeURIComponent(request.originalUrl)}`)
 
       case HttpStatus.UNAUTHORIZED:
-        // result of oauth failure eg invalid callback, user profile does not exist => display unauthorized page
+        // the authorization guard failed
+        // or result of oauth failure eg invalid callback, user profile does not exist => display unauthorized page
+        // => display unauthorized page
         return response.status(status).render('pages/unauthorized')
 
       case HttpStatus.MOVED_PERMANENTLY:
@@ -66,10 +63,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         if (typeof meta === 'object' && 'url' in meta) {
           return response.redirect(meta.url, status)
         }
-        return response.status(500).render('pages/error', {
-          message: 'Invalid redirect',
-          status: 500,
-        })
+        return this.renderErrorPage(new Error('Invalid redirect'), host, 500)
 
       default:
         return this.renderErrorPage(exception, host, status)

@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common'
 import { Request, Response } from 'express'
 import { Reflector } from '@nestjs/core'
 import { Role } from './authorization.types'
@@ -30,10 +30,18 @@ export class AuthorizedGuard implements CanActivate {
       this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [context.getHandler(), context.getClass()]) || DEFAULT_ROLES
 
     if (requiredRoles.length === 0) {
-      // the handler explicitly declared no roles
+      // the handler explicitly declared no roles required for this endpoint
       return true
     }
 
-    return (response.locals.authorized = requiredRoles.some(role => user.authorities?.includes(role)))
+    if (requiredRoles.some(role => user.authorities?.includes(role))) {
+      // user has the required roles
+      return true
+    }
+
+    // user does not have the required roles =>
+    // we wouldn't normally throw from a guard but if we return false,
+    // nest will throw a forbidden error, which will get mixed up with authentication.
+    throw new UnauthorizedException()
   }
 }

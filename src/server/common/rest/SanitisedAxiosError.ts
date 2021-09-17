@@ -1,11 +1,11 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { HttpStatus } from '@nestjs/common'
+import { urlJoin } from '../../util'
 
 export function getRequestName(request: AxiosRequestConfig): string {
   return [
     request.method?.toUpperCase(),
-    request.baseURL,
-    request.url,
+    urlJoin(request.baseURL, request.url),
     request.data ? JSON.stringify(request.data) : null,
   ]
     .filter(x => x)

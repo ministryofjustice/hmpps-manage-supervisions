@@ -4,6 +4,7 @@ import { Reflector } from '@nestjs/core'
 import { fakeUser } from '../user/user.fake'
 import { ROLES_KEY } from './roles.decorator'
 import { Role } from './authorization.types'
+import { UnauthorizedException } from '@nestjs/common'
 
 const handler = 'handler'
 const cls = 'cls'
@@ -61,9 +62,7 @@ describe('AuthorizedGuard', () => {
 
   it('is not authorised when does not have specified role', async () => {
     havingEndpointRoles(Role.ReadWrite)
-    const result = await subject.canActivate(context)
-    expect(result).toBe(false)
-    expect(locals.authorized).toBe(false)
+    expect(() => subject.canActivate(context)).toThrow(UnauthorizedException)
   })
 
   function havingEndpointRoles(...roles: Role[]) {

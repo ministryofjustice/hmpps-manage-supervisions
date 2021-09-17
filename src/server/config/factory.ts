@@ -300,6 +300,7 @@ export function configFactory(): Config {
       staticResourceCacheDuration: int('STATIC_RESOURCE_CACHE_DURATION', fallback(20)),
       features,
       logLevel: stringEnum(LogLevel, 'LOG_LEVEL', fallback(LogLevel.Info)),
+      sentryDsn: string('SENTRY_DSN', developmentOnly(null)),
     },
     redis: {
       host: string('REDIS_HOST', developmentOnly('localhost')),
