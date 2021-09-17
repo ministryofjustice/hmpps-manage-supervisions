@@ -7,15 +7,19 @@ export function fakeOkResponse<T>(data: T): AxiosResponse<T> {
 }
 
 export function fakeRestError(status: HttpStatus): SanitisedAxiosError {
-  return new SanitisedAxiosError({
-    response: { status, data: {}, statusText: 'OK', config: {}, headers: {} },
-    isAxiosError: true,
-    config: {},
-    name: 'Some fake axios error',
-    message: 'Some fake axios error',
-    request: {},
-    toJSON() {
-      return null
+  return new SanitisedAxiosError(
+    {
+      name: 'AxiosError',
+      isAxiosError: true,
+      config: { url: '/some-url', method: 'get' },
+      request: {},
+      response: { status, data: {}, statusText: 'OK', config: {}, headers: {} },
+      message: 'Some fake axios error',
+      toJSON() {
+        return null
+      },
+      stack: 'Some stack trace',
     },
-  })
+    { name: 'community', baseUrl: 'https://community-api' },
+  )
 }

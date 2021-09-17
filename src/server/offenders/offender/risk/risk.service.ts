@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { groupBy, orderBy } from 'lodash'
 import { CommunityApiService } from '../../../community-api'
 import {
@@ -30,6 +30,8 @@ import { AssessRisksAndNeedsApiService } from '../../../assess-risks-and-needs-a
 
 @Injectable()
 export class RiskService {
+  private readonly logger = new Logger(RiskService.name)
+
   constructor(
     private readonly community: CommunityApiService,
     private readonly assessRisksAndNeeds: AssessRisksAndNeedsApiService,
@@ -42,6 +44,7 @@ export class RiskService {
     )
 
     if (!risks) {
+      this.logger.log(`offender with crn '${crn}' has no risk assessment available`)
       return null
     }
 

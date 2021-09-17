@@ -1,11 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { Config, DependentApisConfig, ServerConfig } from '../../config'
-import { kebabCase } from 'lodash'
 import Axios, { AxiosInstance } from 'axios'
-import { getRequestName, SanitisedAxiosError } from './SanitisedAxiosError'
+import { ApiMeta, SanitisedAxiosError } from './SanitisedAxiosError'
 import * as rax from 'retry-axios'
 import { ConfigService } from '@nestjs/config'
 import { HmppsOidcService } from '../hmpps-oidc/hmpps-oidc.service'
+import { ContextualNestLoggerService, LoggerService } from '../../logger'
 
 export enum AuthenticationMethod {
   PassThroughUserToken,
@@ -14,39 +14,50 @@ export enum AuthenticationMethod {
 
 @Injectable()
 export class RestService {
-  constructor(private readonly config: ConfigService<Config>, private readonly oidc: HmppsOidcService) {}
+  private readonly logger: ContextualNestLoggerService
+  constructor(
+    private readonly config: ConfigService<Config>,
+    private readonly oidc: HmppsOidcService,
+    logger: LoggerService,
+  ) {
+    this.logger = logger.of(RestService.name)
+  }
 
   build(
     name: keyof DependentApisConfig,
     user: User,
     authMethod: AuthenticationMethod = AuthenticationMethod.PassThroughUserToken,
   ): AxiosInstance {
-    const logger = new Logger(`${kebabCase(name)}-api-client`)
     const { url, timeout } = this.config.get<DependentApisConfig>('apis')[name]
     const { isProduction } = this.config.get<ServerConfig>('server')
     const axios = Axios.create({ baseURL: url.href, timeout })
+    const apiMeta: ApiMeta = { name, baseUrl: url.href }
+    const logger = this.logger.child(apiMeta)
 
     // response logging
     axios.interceptors.response.use(
       r => {
-        const items = [`${getRequestName(r.config)} -> ${r.status}`, r.statusText]
-        if (!isProduction) {
-          // only log api responses in development mode as it may contain PII
-          items.push(JSON.stringify(r.data))
-        }
-        logger.log(items.join(' '))
+        logger.log('request successful', {
+          method: r.config.method.toUpperCase(),
+          url: r.config.url,
+          status: r.status,
+          statusText: r.statusText,
+          // do not log bodies in production mode as they may contain PII
+          ...(isProduction ? {} : { requestBody: r.config.data, responseBody: r.data }),
+        })
         return r
       },
       err => {
         if (Axios.isAxiosError(err)) {
-          const { currentRetryAttempt, retry } = rax.getConfig(err)
-          const messages = [
-            currentRetryAttempt ? `[retry ${currentRetryAttempt}/${retry}] ` : '',
-            SanitisedAxiosError.getMessage(err),
-          ].filter(x => x)
-          logger.error(messages.join(' '))
-        } else {
-          logger.error('rest request failed', err)
+          // on failed requests, log retries only - since we're re-throwing, we can expect the consumer service to log,
+          // or for the exception to bubble up to be unhandled where it will be logged by nest.
+          const { currentRetryAttempt, retry: totalRetryAttempts } = rax.getConfig(err)
+          if (currentRetryAttempt) {
+            logger.warn(
+              `request failed on retry ${currentRetryAttempt}/${totalRetryAttempts}`,
+              new SanitisedAxiosError(err, apiMeta),
+            )
+          }
         }
         // we have to re-throw as-is for the retry to work
         throw err
@@ -73,7 +84,7 @@ export class RestService {
       r => r,
       err => {
         if (Axios.isAxiosError(err)) {
-          throw new SanitisedAxiosError(err)
+          throw new SanitisedAxiosError(err, apiMeta)
         }
         throw err
       },
