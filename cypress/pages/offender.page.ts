@@ -127,6 +127,10 @@ export class OffenderPage extends PageBase {
       entry(id: number) {
         return cy.get(`[data-qa="offender/activity/${id}"]`)
       },
+
+      systemContactTitle(id: number, title: string) {
+        return cy.get(`[data-qa="offender/activity/${id}"]`).contains(title)
+      },
     }
   }
 
