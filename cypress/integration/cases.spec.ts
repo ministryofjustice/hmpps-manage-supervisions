@@ -23,7 +23,7 @@ context('Cases', () => {
       casesPage.headerUserName.should('contain.text', 'J. Smith')
     })
 
-    it('renders offender list', () => {
+    it('renders case list', () => {
       cy.home()
       fixture.shouldRenderCasesHeader('Name and CRN').shouldRenderCasesRow(0, 'Liz Danger Haggis', 'X009923')
     })

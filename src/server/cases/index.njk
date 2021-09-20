@@ -26,7 +26,7 @@
           {% for case in cases %}
             <tr class="govuk-table__row">
               <td class="govuk-table__cell" data-qa="offender-details">
-                <a href="/offender/{{ case.crn }}/overview" class="govuk-!-font-size-24 govuk-!-font-weight-bold" data-qa="offender-link">{{ case.name }}</a><br />
+                <a href="{{ case.links.view }}" class="govuk-!-font-size-24 govuk-!-font-weight-bold" data-qa="offender-link">{{ case.name }}</a><br />
                 <span class="app-!-font-family-tabular govuk-!-margin-bottom-0" data-qa="offender-crn">{{ case.crn }}</span>
               </td>
             </tr>

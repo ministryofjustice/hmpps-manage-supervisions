@@ -316,7 +316,7 @@ context('Arrange appointment happy path & validation', () => {
     page.confirm.timeMessage.contains(`${longDate(start)} from ${time(start)}`)
     page.confirm.phoneMessage.contains('Liz')
     page.confirm.phoneMessage.contains('07734 111992')
-    page.confirm.finishButton.should('have.attr', 'href').and('include', `offender/${CRN}/overview`)
+    page.confirm.finishButton.should('have.attr', 'href').and('include', `case/${CRN}/overview`)
   }
 
   function shouldHaveBookedAppointment({ start, end, type, location, notes, sensitive }: AppointmentBookingTestCase) {

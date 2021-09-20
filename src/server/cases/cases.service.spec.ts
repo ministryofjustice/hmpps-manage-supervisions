@@ -5,6 +5,9 @@ import { StaffCaseloadEntry } from '../community-api/client'
 import { fakePaginated } from '../community-api/community-api.fake'
 import { MockCommunityApiModule, MockCommunityApiService } from '../community-api/community-api.mock'
 import { CasesService } from './cases.service'
+import { MockLinksModule } from '../common/links/links.mock'
+import { Case } from './cases.types'
+import { BreadcrumbType } from '../common/links'
 
 describe('CasesService', () => {
   let subject: CasesService
@@ -13,7 +16,7 @@ describe('CasesService', () => {
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [CasesService],
-      imports: [MockCommunityApiModule.register()],
+      imports: [MockCommunityApiModule.register(), MockLinksModule],
     }).compile()
 
     subject = module.get(CasesService)
@@ -34,8 +37,9 @@ describe('CasesService', () => {
       {
         crn: 'J125347',
         name: 'Dan Archibald Gotham',
+        links: { view: MockLinksModule.of({ crn: 'J125347' }).url(BreadcrumbType.Case) },
       },
-    ])
+    ] as Case[])
 
     expect(stub.getCall(0).firstArg).toEqual({ username: 'some-username', unpaged: true })
   })

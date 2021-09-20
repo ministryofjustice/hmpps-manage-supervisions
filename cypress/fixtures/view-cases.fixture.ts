@@ -14,7 +14,7 @@ export class ViewCasesFixture {
       .get('a[data-qa="offender-link"]')
       .contains(name)
       .should('have.attr', 'href')
-      .and('include', `offender/${crn}/overview`)
+      .and('include', `case/${crn}/overview`)
     this.page.tableData(row).get('span[data-qa="offender-crn"]').contains(crn)
     return this
   }
