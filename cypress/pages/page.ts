@@ -1,4 +1,8 @@
 export abstract class PageBase {
+  get documentTitle() {
+    return cy.get('title')
+  }
+
   get pageTitle() {
     return cy.get('h1')
   }
