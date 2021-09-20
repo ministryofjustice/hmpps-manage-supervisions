@@ -1,0 +1,170 @@
+{% extends "./_layout.njk" %}
+{% set pageName = 'Overview' %}
+{% from '_join.njk' import join %}
+{% from 'components/summary-card.njk' import appSummaryCard %}
+
+{% block page %}
+    {% call appSummaryCard({
+        titleText: 'Schedule',
+        classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
+        actions: { items: [{ href: links.schedule, text: "View schedule" }] }
+    }) -%}
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: { text: 'Next appointment' },
+                    value: {
+                        text: ((nextAppointment.date | longDateTime) + ' (' + nextAppointment.name + ')') if nextAppointment else 'No appointments scheduled'
+                    }
+                }
+            ]
+        }) }}
+    {%- endcall %}
+
+    {% call appSummaryCard({
+        titleText: 'Personal details',
+        classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
+        actions: { items: [{ href: links.personal, text: "View all personal details" }] }
+    }) -%}
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: { text: "Name" },
+                    value: { text: personalDetails.name }
+                },
+                {
+                    key: { text: "Preferred name/Known as" },
+                    value: { text: personalDetails.preferredName }
+                } if personalDetails.preferredName,
+                {
+                    key: { text: "Gender" },
+                    value: { text: personalDetails.genderSummary or 'Unknown' }
+                },
+                {
+                    key: { text: "Date of birth" },
+                    value: { text: personalDetails.dateOfBirth | dob if personalDetails.dateOfBirth else 'Unknown' }
+                },
+                {
+                    key: { text: 'Mobile number' if contactDetails.phoneNumbers.other else 'Phone number' },
+                    value: { html: contactDetails.phoneNumbers.mobile }
+                } if contactDetails.phoneNumbers.mobile,
+                {
+                    key: { text: 'Telephone number' if contactDetails.phoneNumbers.mobile else 'Phone number' },
+                    value: { html: contactDetails.phoneNumbers.other }
+                } if contactDetails.phoneNumbers.other,
+                {
+                    key: { text: "Current circumstances and disabilities" },
+                    value: {
+                        html: join(personalDetails.currentCircumstances | concatArrays(personalDetails.disabilities))
+                            if personalDetails.currentCircumstances.length > 0 or personalDetails.disabilities.length > 0 else 'None'
+                    }
+                }
+            ]
+        }) }}
+    {%- endcall %}
+
+    {% call appSummaryCard({
+        titleText: 'Risk',
+        classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
+        actions: { items: [{ href: links.risk, text: "View all risk details" }] }
+    }) -%}
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: { text: 'Risk of serious harm (ROSH) in the community' },
+                    value: { html: govukTag({
+                    text: risks.community.level.text + ' risk of serious harm',
+                    classes: risks.community.level.colour | tagClassName
+                }) if risks.community.level else 'No concerns' } if risks
+                    else { text: 'There is no OASys risk assessment' }
+                },
+                {
+                    key: { text: 'Risk of serious harm to themselves' },
+                    value: { text: 'Current concerns' if risks.self.current
+                        else ('Previous concerns' if risks.self.previous
+                        else ('No concerns' if risks else 'There is no OASys risk assessment'))
+                    }
+                },
+                {
+                    key: { text: 'Risk flags' },
+                    value: { html: join(registrations.active | map('text')) if registrations.active.length > 0 else 'No risk flags' }
+                }
+            ]
+        }) }}
+    {%- endcall %}
+
+    {% if compliance.current %}
+        {% call appSummaryCard({
+            titleText: 'Sentence',
+            classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
+            actions: { items: [{ href: links.sentence, text: "View all sentence details" }] }
+        }) -%}
+            {{ govukSummaryList({
+                rows: [
+                    {
+                        key: { text: 'Main offence' },
+                        value: { text: compliance.current.mainOffence }
+                    },
+                    {
+                        key: { text: 'Order' },
+                        value: { text: compliance.current.name + (' ' + (compliance.current.progress + ' elapsed') | brackets) if compliance.current.progress }
+                    },
+                    {
+                        key: { text: 'Requirements' },
+                        value: { text: compliance.current.requirement or 'No requirements' }
+                    },
+                    {
+                        key: { text: 'Previous orders' },
+                        value: { text: (compliance.previous.convictions.length | quantity('previous order')
+                                + ' '
+                                + compliance.previous.totalBreaches
+                                    | quantity('breach on a previous order', { overridePlural: 'breaches on previous orders', zero: 'No' })
+                                    | brackets)
+                            if compliance.previous.convictions.length > 0 else 'No previous orders' }
+                    }
+                ]
+            }) }}
+        {%- endcall %}
+
+        {% call appSummaryCard({ titleText: 'Activity and compliance', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
+            {{ govukSummaryList({
+                rows: [
+                    {
+                        key: { text: 'Compliance' },
+                        value: {
+                            html: join([
+                                    compliance.current.status.description | fullStop + (' No breach in progress yet.' if compliance.current.status.breachSuggested),
+                                    compliance.current.previousBreaches.length
+                                        | quantity('prior breach' if compliance.current.status.value === 'in-breach' else 'breach', { zero: 'No', plural: 'es' })
+                                        + ' on current order'
+                                ], { link: links.compliance, linkText: 'View all compliance details' }
+                            ) if compliance.current else 'Current compliance details are unavailable.'
+                        }
+                    },
+                    {
+                        key: { text: 'Activity log' },
+                        value: {
+                        html: join(
+                            [
+                                compliance.current.appointments.total,
+                                compliance.current.appointments.withoutAnOutcome,
+                                compliance.current.appointments.complied,
+                                compliance.current.appointments.failureToComply,
+                                compliance.current.appointments.acceptableAbsences
+                            ] | filter('value') | map('name') | arrayCoalesce(['No appointments']),
+                            { link: links.activity, linkText: 'View all activity' }
+                        ) if compliance.current else 'Current compliance details are unavailable.'
+                    }
+                    }
+                ]
+            }) }}
+        {%- endcall %}
+    {% else %}
+        {{ govukWarningText({
+            attributes: { 'data-qa': 'offender/overview/no-current-conviction' },
+            text: "No current conviction is available.",
+            iconFallbackText: "Warning"
+        }) }}
+    {% endif %}
+
+{% endblock %}

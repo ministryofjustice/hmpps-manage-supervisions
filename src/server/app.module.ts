@@ -7,7 +7,7 @@ import { APP_FILTER } from '@nestjs/core'
 import { HttpExceptionFilter } from './http-exception.filter'
 import { ArrangeAppointmentModule } from './arrange-appointment/arrange-appointment.module'
 import { CommunityApiModule } from './community-api/community-api.module'
-import { OffendersModule } from './offenders/offenders.module'
+import { CaseModule } from './case/case.module'
 import { LoggerModule } from './logger/logger.module'
 import { CasesModule } from './cases/cases.module'
 import { SentryModule } from '@ntegral/nestjs-sentry'
@@ -33,7 +33,7 @@ import { SentryModule } from '@ntegral/nestjs-sentry'
     LoggerModule,
     ArrangeAppointmentModule,
     CommunityApiModule,
-    OffendersModule,
+    CaseModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: HttpExceptionFilter }],
 })

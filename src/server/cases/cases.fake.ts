@@ -7,5 +7,6 @@ export const fakeCase = fake<Case>(() => {
   return {
     crn: fakeCrn(),
     name: faker.name.findName(),
+    links: { view: faker.internet.url() },
   }
 })

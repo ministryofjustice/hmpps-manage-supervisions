@@ -1,0 +1,144 @@
+{% extends "../_layout.njk" %}
+{% set pageName = 'Activity log' %}
+{% from 'components/summary-card.njk' import appSummaryCard %}
+
+{% macro flatNotes(notes) -%}
+    <p class="govuk-!-margin-bottom-0" data-qa='notes'>{{ notes | nl2br | safe }}</p>
+{%- endmacro %}
+{% macro systemContact(entry) -%}
+    <div class="govuk-hint govuk-!-margin-bottom-2 govuk-!-margin-left-3">
+        <a href="{{ entry.links.view }}" class="app-!-inherit-colour" data-qa="offender/activity/{{ entry.id }}" >{{ entry.name }}</a>
+    </div>
+{%- endmacro %}
+
+{% macro entryNotes(entry, open) -%}
+    {% if entry.notes %}
+        {% if entry.notes.length > 250 or entry.sensitive %}
+            {{ govukDetails({
+                summaryText: "Notes (sensitive)" if entry.sensitive else "Notes",
+                html: flatNotes(entry.notes),
+                open: open and not entry.sensitive,
+                classes: 'govuk-!-margin-bottom-0'
+            }) }}
+        {% else %}
+            {{ flatNotes(entry.notes) }}
+        {% endif %}
+    {% elif entry.sensitive %}
+        {{ flatNotes('Sensitive (no notes)') }}
+    {% else %}
+        {{ flatNotes('No notes') }}
+    {% endif %}
+{%- endmacro %}
+
+{% macro appointmentCard(entry, open) -%}
+    {% set title %}
+        <span class="govuk-heading-s govuk-!-margin-bottom-0">
+            <a href="{{ entry.links.view }}">{{ entry.name }}</a>
+            <span class="govuk-!-font-weight-regular">at {{ entry.start | time }}</span>
+        </span>
+        <span class='govuk-!-font-size-16' data-qa='sub-title'>
+            {% if entry.nationalStandard %}
+                National standard appointment
+            {% else %}
+                Appointment
+            {% endif %}
+        </span>
+    {% endset %}
+    {% call appSummaryCard({
+        titleHtml: title,
+        classes: 'govuk-!-margin-bottom-2',
+        attributes: { 'data-qa': 'offender/activity/' + entry.id },
+        actions: { items: [{ href: entry.links.recordMissingAttendance, text: "Record an outcome" }] } if not entry.outcome,
+        actionsHtml: govukTag({ text: entry.outcome.tag.name, classes: entry.outcome.tag.colour | tagClassName }) if entry.outcome
+    }) -%}
+        {% if entry.rarActivity %}
+            {{ govukSummaryList({
+                classes: 'govuk-!-margin-bottom-0',
+                rows: [{ key: { text: 'RAR activity' }, value: { text: 'Yes' } }]
+            }) }}
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-1">
+        {% endif %}
+        {{ entryNotes(entry, open) }}
+    {%- endcall %}
+{%- endmacro %}
+
+{% macro plainCard(entry, open, options) -%}
+    {% set title %}
+        <a href="{{ entry.links.view }}">{{ entry.name }}</a>
+        {% if options.time %}
+            <span class="govuk-!-font-weight-regular">at {{ entry.start | time }}</span>
+        {% endif %}
+    {% endset %}
+    {% call appSummaryCard({
+        titleHtml: title,
+        classes: 'govuk-!-margin-bottom-2 app-summary-card--plain-header',
+        attributes: { 'data-qa': 'offender/activity/' + entry.id }
+    }) -%}
+        {{ entryNotes(entry, open) }}
+    {%- endcall %}
+{%- endmacro %}
+
+{% block page %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-third">
+            <div class="app-card">
+                {{ govukButton({
+                    text: 'Add to log',
+                    href: links.addActivity,
+                    attributes: {
+                        'data-qa': 'offender/add-activity-button'
+                    }
+                }) }}
+                <p> Filter the activity log by National Standard (NS) activities: </p>
+
+                <h3 class="govuk-heading-m">Compliance filters</h3>
+
+                <ul class="govuk-list govuk-!-margin-bottom-0">
+                <li><a {% if not currentFilter %}class="govuk-!-font-weight-bold" aria-current="page"{% endif %} href="{{links.activity}}">All activity</a></li>
+
+                {% for key, value in filters %}
+                    <li><a {% if currentFilter == key %}class="govuk-!-font-weight-bold" aria-current="page"{% endif %} data-qa="offender/activity-filter-{{ key }}" href="{{links.activity}}/{{ key }}">{{ value.name }}</a></li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class='govuk-grid-column-two-thirds'>
+            {% if title %}
+                <h2 class="govuk-heading-m">
+                    {{ title }}
+                </h2>
+                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+            {% endif %}
+
+            {% set index = 0 %}
+            {% for group in groups %}
+                <section class='govuk-!-margin-bottom-7' data-qa='offender/activity/{{ group.date | longDate | slug }}'>
+                    <h3 class="govuk-heading-s govuk-!-margin-bottom-2" data-qa='offender/activity/group-title'>
+                        {{ 'Today' if group.isToday else group.date | longDate }}
+                    </h3>
+                    {% for entry in group.entries %}
+                        {% set index = index + 1 %}
+                        {% set open = index < 4 %}
+                        {% switch entry.type %}
+                        {% case 'appointment' %}
+                            {{ appointmentCard(entry, open) }}
+                        {% case 'communication' %}
+                            {{ plainCard(entry, open, { time: true }) }}
+                        {% case 'system' %}
+                            {{ systemContact(entry) }}
+                        {% default %}
+                            {{ plainCard(entry, open) }}
+                        {% endswitch %}
+                    {% endfor %}
+                </section>
+            {% endfor %}
+
+            {% if groups.length === 0 %}
+                <p class='govuk-body' data-qa='offender/activity/empty'>
+                    There are no entries in the activity log.
+                </p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

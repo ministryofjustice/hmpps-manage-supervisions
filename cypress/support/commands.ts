@@ -25,9 +25,9 @@ declare global {
       arrangeAppointment: typeof arrangeAppointment
 
       /**
-       * Navigates to view offender page & logs in.
+       * Navigates to view case page & logs in.
        */
-      viewOffender: typeof viewOffender
+      viewCase: typeof viewCase
     }
   }
 }
@@ -54,8 +54,8 @@ function arrangeAppointment(crn: string = CRN) {
 }
 Cypress.Commands.add('arrangeAppointment', arrangeAppointment)
 
-function viewOffender({ crn = CRN, path = '' }: { crn?: string; path?: string } = {}) {
-  cy.visit(`/offender/${crn}${path}`)
+function viewCase({ crn = CRN, path = '' }: { crn?: string; path?: string } = {}) {
+  cy.visit(`/case/${crn}${path}`)
   hmppsAuth.login()
 }
-Cypress.Commands.add('viewOffender', viewOffender)
+Cypress.Commands.add('viewCase', viewCase)

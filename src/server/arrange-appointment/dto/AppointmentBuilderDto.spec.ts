@@ -72,7 +72,7 @@ class Given {
 
 describe('AppointmentBuilderDto validation & mapping', () => {
   const future = DateTime.fromJSDate(faker.date.future(), { zone: 'Europe/London' })
-  const past = DateTime.fromJSDate(faker.date.past(), { zone: 'Europe/London' })
+  const past = DateTime.fromJSDate(faker.date.past(), { zone: 'Europe/London' }).minus({ days: 1 })
 
   describe('mapping', () => {
     const plain: DeepPartial<AppointmentBuilderDto> = {

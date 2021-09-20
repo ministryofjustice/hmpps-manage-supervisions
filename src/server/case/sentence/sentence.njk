@@ -1,0 +1,214 @@
+{% extends "../_layout.njk" %}
+{% set pageName = 'Sentence' %}
+{% from '_join.njk' import joinList %}
+{% from 'components/summary-card.njk' import appSummaryCard %}
+
+{% macro requirementSummary(requirement) %}
+    {{ govukSummaryList({
+        rows: [
+            {
+                key: { text: "Length" },
+                value: { text: requirement.length }
+            },
+            {
+                key: { text: "Progress" },
+                value: { text: requirement.progress }
+            } if requirement.progress,
+            {
+                key: { text: "Start date" },
+                value: { text: requirement.startDate | expectedDate }
+            } if requirement.startDate,
+            {
+                key: { text: "Termination date" },
+                value: { text: requirement.endDate | expectedDate }
+            } if requirement.endDate,
+            {
+                key: { text: "Termination reason" },
+                value: { text: requirement.terminationReason }
+            } if requirement.terminationReason,
+            {
+                key: { text: "Notes" },
+                value: { html: requirement.notes | nl2br if requirement.notes else 'No notes' }
+            }
+        ]
+    }) }}
+{% endmacro %}
+
+{% block page %}
+    {% if conviction.offence %}
+        {% call appSummaryCard({ titleText: 'Offence', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: { text: "Main offence" },
+                    value: { text: conviction.offence.description }
+                },
+                {
+                    key: { text: "Category" },
+                    value: { text: conviction.offence.category }
+                },
+                {
+                    key: { text: "Offence date" },
+                    value: { text: conviction.offence.date | shortDate }
+                },
+                {
+                    key: { html: '<abbr title="Offender Group Reconviction Scale">OGRS</abbr>' },
+                    value: { text: conviction.offence.ogrsCategory }
+                } if conviction.offence.ogrsCategory,
+                {
+                    key: { text: "Additional offences" },
+                    value: {
+                        html: joinList(conviction.offence.additionalOffences | map('name'), {
+                                ordered: true,
+                                link: links.additionalOffences,
+                                linkText: 'View additional offence details'
+                            }) if conviction.offence.additionalOffences.length else 'No additional offences'
+                    }
+                }
+            ]
+        }) }}
+        {%- endcall %}
+    {% elseif conviction %}
+        {{ govukWarningText({
+            attributes: { 'data-qa': 'offender/sentence/no-offences' },
+            text: "Offence details are unavailable.",
+            iconFallbackText: "Warning"
+        }) }}
+    {% endif %}
+
+    {% if conviction.sentence %}
+        {% call appSummaryCard({ titleText: 'Conviction', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: { text: "Sentencing court" },
+                    value: { text: conviction.sentence.courtAppearance }
+                } if conviction.sentence.courtAppearance,
+                {
+                    key: { text: "Responsible court" },
+                    value: { text: conviction.sentence.responsibleCourt }
+                } if conviction.sentence.responsibleCourt,
+                {
+                    key: { text: "Conviction date" },
+                    value: { text: conviction.sentence.convictionDate | shortDate }
+                }
+            ]
+        }) }}
+        {%- endcall %}
+
+        {% set additionalSentences %}
+            {% for additionalSentences in conviction.sentence.additionalSentences %}
+                {{ govukDetails({
+                    summaryText: additionalSentences.name,
+                    classes: 'govuk-!-margin-top-2 govuk-!-margin-bottom-0',
+                    html: govukSummaryList({
+                        rows: [
+                            {
+                                key: { text: "Sentence" },
+                                value: { text: additionalSentences.name }
+                            },
+                            {
+                                key: { text: "Value" },
+                                value: { text: additionalSentences.value }
+                            } if additionalSentences.value,
+                            {
+                                key: { text: "Length" },
+                                value: { text: additionalSentences.length }
+                            } if additionalSentences.length,
+                            {
+                                key: { text: "Notes" },
+                                value: { html: additionalSentences.notes | nl2br if additionalSentences.notes else 'No notes' }
+                            }
+                        ]
+                    })
+                }) }}
+            {% endfor %}
+        {% endset %}
+
+        {% set requirements %}
+            {% for requirement in conviction.requirements %}
+                {% set requirementSummaryHtml %}
+                    {% if requirement.type === 'aggregate' %}
+                        {% for aggregateRequirement in requirement.requirements %}
+                            <h3 class="govuk-heading-s {{ 'govuk-!-margin-top-4' if loop.index > 1 }}">Requirement {{ loop.index }}</h3>
+                            {{ requirementSummary(aggregateRequirement) }}
+                        {% endfor %}
+                    {% else %}
+                        {{ requirementSummary(requirement) }}
+                    {% endif %}
+                {% endset %}
+
+
+                {{ govukDetails({
+                    summaryText: requirement.name,
+                    classes: 'govuk-!-margin-top-2 govuk-!-margin-bottom-0',
+                    html: requirementSummaryHtml
+                }) }}
+            {% endfor %}
+        {% endset %}
+
+        {% call appSummaryCard({ titleText: 'Sentence', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: { text: "Order" },
+                    value: { text: conviction.sentence.description }
+                },
+                {
+                    key: { text: "Requirements" },
+                    value: { html: requirements if conviction.requirements.length else 'No requirements' }
+                },
+                {
+                    key: { text: "Start date" },
+                    value: { text: conviction.sentence.startDate | shortDate },
+                    classes: 'qa-start-date'
+                },
+                {
+                    key: { text: "Expected end date" },
+                    value: { text: conviction.sentence.endDate | shortDate }
+                },
+                {
+                    key: { text: "Time elapsed" },
+                    value: { text: conviction.sentence.elapsed }
+                },
+                {
+                    key: { text: "Additional sentences" },
+                    value: {
+                        html: additionalSentences if conviction.sentence.additionalSentences else 'No additional sentences'
+                    }
+                }
+            ]
+        }) }}
+        {%- endcall %}
+    {% else %}
+        {{ govukWarningText({
+            attributes: { 'data-qa': 'offender/sentence/no-sentence' },
+            text: "Sentence details are unavailable.",
+            iconFallbackText: "Warning"
+        }) }}
+    {% endif %}
+
+    {% if conviction.previousConvictions %}
+        {% set previousOrders %}
+            <a href="{{ links.previousConvictions }}">
+                {{ conviction.previousConvictions.count | quantity('previous order') }}
+            </a>
+            <br>
+            Last ended on {{ conviction.previousConvictions.lastEnded | shortDate }}
+        {% endset %}
+        {% call appSummaryCard({ titleText: 'Probation history', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: { text: "Previous orders" },
+                    value: { html: previousOrders }
+                },
+                {
+                    key: { text: "Previous breaches" },
+                    value: { text: conviction.previousBreaches.count | quantity('previous breach', { plural: 'es' }) }
+                }
+            ]
+        }) }}
+        {%- endcall %}
+    {% endif %}
+{% endblock %}
