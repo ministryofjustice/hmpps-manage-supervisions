@@ -53,10 +53,7 @@ export class ActivityService {
       pageSize: PAGE_SIZE,
     })
 
-    // TODO filtering out system generated contacts for now
-    const entries = await Promise.all(
-      contacts.filter(x => !x.type.systemGenerated).map(contact => this.getActivityLogEntry(crn, contact, offender)),
-    )
+    const entries = await Promise.all(contacts.map(contact => this.getActivityLogEntry(crn, contact, offender)))
     const today = DateTime.now().startOf('day')
     const groups: ActivityLogEntryGroup[] = Object.entries(groupBy(entries, x => x.start.toISODate())).map(
       ([key, entries]) => {
@@ -153,6 +150,8 @@ export class ActivityService {
         return this.entryService.getAppointmentActivityLogEntry(crn, contact, meta)
       case ContactTypeCategory.Communication:
         return this.entryService.getCommunicationActivityLogEntry(crn, contact, meta, offender)
+      case ContactTypeCategory.System:
+        return this.entryService.getSystemActivityLogEntry(crn, contact, meta)
       default:
         return this.entryService.getUnknownActivityLogEntry(crn, contact, meta)
     }

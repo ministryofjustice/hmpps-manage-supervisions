@@ -5,6 +5,11 @@
 {% macro flatNotes(notes) -%}
     <p class="govuk-!-margin-bottom-0" data-qa='notes'>{{ notes | nl2br | safe }}</p>
 {%- endmacro %}
+{% macro systemContact(entry) -%}
+    <div class="govuk-hint govuk-!-margin-bottom-2 govuk-!-margin-left-3">
+        <a href="{{ entry.links.view }}" class="app-!-inherit-colour" data-qa="offender/activity/{{ entry.id }}" >{{ entry.name }}</a>
+    </div>
+{%- endmacro %}
 
 {% macro entryNotes(entry, open) -%}
     {% if entry.notes %}
@@ -121,7 +126,7 @@
                         {% case 'communication' %}
                             {{ plainCard(entry, open, { time: true }) }}
                         {% case 'system' %}
-                            {# TODO system generated #}
+                            {{ systemContact(entry) }}
                         {% default %}
                             {{ plainCard(entry, open) }}
                         {% endswitch %}

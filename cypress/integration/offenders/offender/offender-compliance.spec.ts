@@ -72,14 +72,14 @@ function complianceAppointments({
 
 context('Offender compliance tab', () => {
   const fixture = new Fixture()
-  const twoYearsAgo = DateTime.now().minus({ year: 2 })
+  const twoYearsAgo = DateTime.now().minus({ years: 2 })
 
   it('displays empty compliance page', () => {
     cy.seed({
       convictions: {
         active: null,
         // old conviction terminated >2 years ago is ignored
-        previous: [{ conviction: { sentence: { terminationDate: twoYearsAgo.minus({ month: 1 }).toISODate() } } }],
+        previous: [{ conviction: { sentence: { terminationDate: twoYearsAgo.minus({ months: 1 }).toISODate() } } }],
       },
     })
 
@@ -95,7 +95,7 @@ context('Offender compliance tab', () => {
   })
 
   describe('clean compliance page', () => {
-    const previousTerminationDate = twoYearsAgo.plus({ month: 1 })
+    const previousTerminationDate = twoYearsAgo.plus({ months: 1 })
     before(() => {
       cy.seed({
         convictions: {
@@ -166,7 +166,7 @@ context('Offender compliance tab', () => {
         .shouldDisplayCommonHeader()
         .shouldRenderOffenderTab('compliance', page => {
           page.previousOrdersTitle.contains(
-            `Previous orders (${DateTime.now().minus({ year: 2 }).toFormat('MMMM yyyy')} to present)`,
+            `Previous orders (${DateTime.now().minus({ years: 2 }).toFormat('MMMM yyyy')} to present)`,
           )
           page.previousOrder('24 month CJA Community Order', previousTerminationDate, card =>
             card.summaryList(list => {

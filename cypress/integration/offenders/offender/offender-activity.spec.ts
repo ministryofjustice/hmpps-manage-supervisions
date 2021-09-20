@@ -32,7 +32,11 @@ class Fixture extends ViewOffenderFixture {
       page.filterLink('without-an-outcome').click()
     })
   }
-
+  whenClickingSystemContact(id: number) {
+    return this.shouldRenderOffenderTab('activity', page => {
+      page.entry(id).click()
+    })
+  }
   shouldRenderActivity({ notesType = 'plain', ...expected }: ExpectedAppointment) {
     return this.shouldRenderOffenderTab('activity', page => {
       page.group(expected.date, group =>
@@ -77,7 +81,12 @@ class Fixture extends ViewOffenderFixture {
   shouldRenderActivityWithId(id: number) {
     return this.shouldRenderOffenderTab('activity', page => page.entry(id).should('exist'))
   }
-
+  shouldRenderSystemContactWithId(id: number, title: string) {
+    return this.shouldRenderOffenderTab('activity', page => {
+      page.entry(id).should('exist')
+      page.systemContactTitle(id, title)
+    })
+  }
   shouldRenderAppointmentPage(title: string, assert: (page: OffenderActivityAppointmentPage) => void) {
     const page = new OffenderActivityAppointmentPage()
     page.pageTitle.contains(title)
@@ -166,7 +175,6 @@ context('Offender activity tab', () => {
           notesType: 'closed-detail',
           sensitive: true,
         })
-
         .shouldRenderActivity({
           id: 11,
           date: 'Friday 4 September 2020',
@@ -218,6 +226,7 @@ context('Offender activity tab', () => {
           title: 'Breach not proven',
           notes: 'No notes',
         })
+        .shouldRenderSystemContactWithId(9, 'System generated unknown contact')
     })
 
     it('displays attendance missing', () => {
@@ -231,7 +240,13 @@ context('Offender activity tab', () => {
         })
         .shouldDisplayExitPage('delius')
     })
-
+    it('displays system contact on activity log with link to delius', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('activity')
+        .whenClickingSystemContact(9)
+        .shouldDisplayExitPage('delius')
+    })
     it('displays appointment detail without outcome', () => {
       fixture
         .whenViewingOffender()
