@@ -1,6 +1,7 @@
 {% extends "partials/layout.njk" %}
 {% from 'components/summary-card.njk' import appSummaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% set pageTitle = ('Removed risk flag' if registration.removed else 'Risk flag') + ' – ' + registration.text + ' – ' + displayName %}
 
 {% block content %}
 <h1 class="govuk-heading-xl"><span class="govuk-caption-xl">{{ 'Removed risk flag' if registration.removed else 'Risk flag' }}</span> {{ registration.text }}</h1>
