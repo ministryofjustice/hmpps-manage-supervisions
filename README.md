@@ -13,7 +13,7 @@ Provides probation practitioners with a GDS UI for managing case load.
 
 ## Running
 
-To run locally with docker compose: 
+To run locally with docker compose:
 
 ```bash
 docker compose pull
@@ -32,6 +32,9 @@ Navigate to `http://localhost:3000` and login with:
 * [hmpps-auth](https://github.com/ministryofjustice/hmpps-auth) - authentication
 * [community-api](https://github.com/ministryofjustice/community-api) - Delius data access
 * [hmpps-assess-risks-and-needs](https://github.com/ministryofjustice/hmpps-assess-risks-and-needs) - OASys data access
+* node >= v14.x - running the frontend
+* npm >= v7.x - installing dependencies and starting the dev server
+* java >= 11 - for [generating API clients](#Generated-API-clients)
 
 ## Development
 
@@ -47,7 +50,7 @@ Or with real Community API:
 docker compose -f docker-compose.yml -f docker-compose.community-api.yml up redis hmpps-auth community-api
 ```
 
-Install dependencies using `npm install`, ensuring you are using >= `Node v14.x` & `npm v7.x`.
+Install dependencies using `npm install`.
 
 Confirm that the [API clients](#generated-api-clients) were generated successfully.
 
@@ -93,8 +96,6 @@ npm run seed -- --help
 Some of our API clients are generated via openapi tools.
 See [openapitools.json](./openapitools.json) for details.
 This is done on on the `postinstall` step of `npm install` or can be run manually via `npm run openapi-generate`.
-
-The openapi tools require Java 11+.
 
 ## Linting
 
@@ -147,6 +148,8 @@ npm run test:e2e
 # or to run with the cypress ui:
 npm run test:e2e-ui
 ```
+
+You should run the tests with Chrome because we have to set `"chromeWebSecurity": false` in [cypress.json](cypress.json).
 
 Once you have run the tests at least once, you can navigate to `http://localhost:3007` to use the app under test.
 
