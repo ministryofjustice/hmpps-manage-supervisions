@@ -1,5 +1,6 @@
 {% extends "../_layout.njk" %}
 {% set pageName = 'Activity log' %}
+{% set pageTitle = (filters[currentFilter].name | default(pageName)) + ' – ' + displayName %}
 {% from 'components/summary-card.njk' import appSummaryCard %}
 
 {% macro flatNotes(notes) -%}
