@@ -5,6 +5,7 @@ import { ViewCaseFixture } from './view-case.fixture'
 class Fixture extends ViewCaseFixture {
   shouldRenderRiskDetails(pageTitle: string, assert: (page: CaseRiskDetailPage) => void): this {
     const page = new CaseRiskDetailPage()
+    page.documentTitle.contains(pageTitle)
     page.pageTitle.contains(pageTitle)
     assert(page)
     return this
@@ -12,6 +13,7 @@ class Fixture extends ViewCaseFixture {
 
   shouldRenderRemovedRiskFlagPage(assert: (page: CaseRemovedRisksPage) => void): this {
     const page = new CaseRemovedRisksPage()
+    page.documentTitle.contains('Removed risk flags')
     page.pageTitle.contains('Removed risk flags')
     assert(page)
     return this
