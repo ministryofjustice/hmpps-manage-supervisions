@@ -1,14 +1,14 @@
 {%- from "moj/components/sub-navigation/macro.njk" import mojSubNavigation -%}
 
 {% extends "partials/layout.njk" %}
-{% set pageTitle = pageName + ' - ' + displayName %}
+{% set pageTitle = pageTitle | default(pageName + ' - ' + displayName) %}
 
 {% block content %}
     <h1 class="govuk-heading-l govuk-!-margin-bottom-4">
         <span class="govuk-caption-l"><abbr title="Case reference number">CRN</abbr>: {{ ids.crn }}</span>
         {{ displayName }}
     </h1>
-    
+
     {{ mojSubNavigation({
         attributes: { 'data-qa': 'offender/sub-nav' },
         items: [
