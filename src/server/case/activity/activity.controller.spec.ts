@@ -144,7 +144,7 @@ describe('ActivityController', () => {
           name: 'Warning letters',
         },
       },
-      title: null,
+      title: undefined,
       currentFilter: undefined,
     })
   })

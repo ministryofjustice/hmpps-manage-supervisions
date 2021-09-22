@@ -11,6 +11,7 @@ export enum BreadcrumbType {
   CasePreviousConvictions,
   Compliance,
   CaseActivityLog,
+  CaseActivityLogWithComplianceFilter,
   CaseSchedule,
   CaseRisk,
   NewAppointment,

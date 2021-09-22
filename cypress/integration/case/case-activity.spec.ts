@@ -104,6 +104,11 @@ class Fixture extends ViewCaseFixture {
     this.page.documentTitle.contains(title)
     return this
   }
+
+  shouldHaveCurrentBreadcrumb(content: string) {
+    this.page.currentBreadcrumb.contains(content)
+    return this
+  }
 }
 
 context('Case activity tab', () => {
@@ -351,6 +356,7 @@ context('Case activity tab', () => {
         .whenClickingSubNavTab('activity')
         .whenClickingFailuresToComplyFilter()
         .shouldHaveDocumentTitle('Failures to comply')
+        .shouldHaveCurrentBreadcrumb('Failures to comply')
         .shouldRenderActivityWithId(2)
         .shouldRenderActivityWithId(4)
         // a complied attended activity not returned by Wiremocked CAPI when the FTC filters are applied
@@ -365,6 +371,7 @@ context('Case activity tab', () => {
         .whenClickingSubNavTab('activity')
         .whenClickingWithoutAnOutcomeFilter()
         .shouldHaveDocumentTitle('Without an outcome')
+        .shouldHaveCurrentBreadcrumb('without an outcome')
         .shouldRenderActivityWithId(5)
         .shouldNotRenderActivityWithId(1)
         .shouldNotRenderActivityWithId(2)
