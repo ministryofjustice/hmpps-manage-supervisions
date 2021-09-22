@@ -384,7 +384,7 @@ context('Case activity tab', () => {
         .whenViewingOffender()
         .whenClickingSubNavTab('activity')
         .whenClickingRarActivityFilter()
-        .shouldHaveDocumentTitle('Appointments with an associated RAR requirement')
+        .shouldHaveDocumentTitle('RAR activity')
         .shouldRenderActivityWithId(4)
         .shouldNotRenderActivityWithId(1)
         .shouldNotRenderActivityWithId(2)
