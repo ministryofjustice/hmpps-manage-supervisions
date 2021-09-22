@@ -1,4 +1,4 @@
-import { ActivityComplianceFilter, ActivityLogEntryGroup } from './activity'
+import { ActivityComplianceFilter, CaseActivityLogGroup } from './activity'
 import { ComplianceDetails, ConvictionDetails } from './sentence'
 import { AppointmentListViewModel, NextAppointmentSummary } from './schedule'
 import { RiskRegistrations, Risks } from './risk'
@@ -66,7 +66,7 @@ export interface CaseScheduleViewModel extends CaseViewModelBase<CasePage.Schedu
 }
 
 export interface CaseActivityViewModel extends CaseViewModelBase<CasePage.Activity> {
-  groups: ActivityLogEntryGroup[]
+  groups: CaseActivityLogGroup[]
   pagination: {
     page?: number
     size?: number

@@ -19,16 +19,20 @@ context('Case overview tab', () => {
       ],
       contacts: [
         {
-          type: { code: 'ABNP', appointment: true },
-          outcome: { complied: true, attended: true },
-        },
-        {
-          type: { code: 'ABNP', appointment: true },
-          outcome: { complied: false, attended: false },
-        },
-        {
-          type: { code: 'ABNP', appointment: true },
-          outcome: null,
+          entries: [
+            {
+              type: { code: 'ABNP', appointment: true },
+              outcome: { complied: true, attended: true },
+            },
+            {
+              type: { code: 'ABNP', appointment: true },
+              outcome: { complied: false, attended: false },
+            },
+            {
+              type: { code: 'ABNP', appointment: true },
+              outcome: null,
+            },
+          ],
         },
       ],
       convictions: {

@@ -13,7 +13,8 @@ import {
   SystemMetaResult,
   WarningLetterMetaResult,
 } from './contact-mapping.types'
-import { ContactTypesService } from '../contact-types'
+
+export const COMMUNICATION_CATEGORY_CODE = 'LT'
 
 function isAppointmentType(value: any): value is AppointmentType {
   return 'contactType' in value
@@ -22,11 +23,11 @@ function isAppointmentType(value: any): value is AppointmentType {
 @Injectable()
 export class ContactMappingService {
   private readonly config: WellKnownContactTypeConfig
-  constructor(config: ConfigService<Config>, private readonly contactTypesService: ContactTypesService) {
+  constructor(config: ConfigService<Config>) {
     this.config = config.get<WellKnownContactTypeConfig>('contacts')
   }
 
-  async getTypeMeta(options: GetMetaOptions): Promise<GetMetaResult> {
+  getTypeMeta(options: GetMetaOptions): GetMetaResult {
     const { code, appointment } = isAppointmentType(options.type)
       ? { code: options.type.contactType.trim().toUpperCase(), appointment: true }
       : { code: options.type.code.trim().toUpperCase(), appointment: options.type.appointment || false }
@@ -35,8 +36,8 @@ export class ContactMappingService {
       this.appointment(code, appointment, options) ||
       this.getBreachMeta(code) ||
       this.warningLetter(code, options) ||
-      this.getSystemMeta(options) ||
-      (await this.communication(code, options)) || {
+      ContactMappingService.getSystemMeta(options) ||
+      this.communication(code, options) || {
         type: ContactTypeCategory.Other,
         name: options.type.description,
         value: null,
@@ -56,7 +57,7 @@ export class ContactMappingService {
       this.breach(code, ContactTypeCategory.BreachStart) || this.breach(code, ContactTypeCategory.BreachEnd) || null
     )
   }
-  private getSystemMeta({ type }: GetMetaOptions): SystemMetaResult | null {
+  private static getSystemMeta({ type }: GetMetaOptions): SystemMetaResult | null {
     return !isAppointmentType(type) && type.systemGenerated
       ? {
           type: ContactTypeCategory.System,
@@ -110,11 +111,17 @@ export class ContactMappingService {
       : null
   }
 
-  private async communication(code: string, { type }: GetMetaOptions): Promise<CommunicationMetaResult | null> {
-    const isCommunication = await this.contactTypesService.isCommunicationContactType(code)
-    if (!isCommunication) {
+  private communication(code: string, { type }: GetMetaOptions): CommunicationMetaResult | null {
+    if (isAppointmentType(type)) {
       return null
     }
+
+    if (type.categories?.every(x => x.code !== COMMUNICATION_CATEGORY_CODE)) {
+      // contact type is not in the communication contact type category
+      return null
+    }
+
+    // Check if it's well known
     const meta = Object.values(this.config[ContactTypeCategory.Communication]).find(x => x.code === code)
     return {
       type: ContactTypeCategory.Communication,

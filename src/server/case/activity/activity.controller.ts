@@ -1,5 +1,5 @@
 import { Controller, Get, Param, ParseIntPipe, Render } from '@nestjs/common'
-import { ActivityService, GetContactsOptions } from './activity.service'
+import { ActivityService } from './activity.service'
 import {
   ActivityComplianceFilter,
   AppointmentViewModel,
@@ -27,7 +27,7 @@ export class ActivityController {
   @Render('case/activity/activity')
   @CaseBreadcrumb({ page: CasePage.Activity, title: 'Activity log' })
   async getActivity(@Param('crn') crn: string): Promise<CaseActivityViewModel> {
-    return this.activityPageCommon(crn, {})
+    return this.activityPageCommon(crn)
   }
 
   @Get(':filter')
@@ -41,7 +41,7 @@ export class ActivityController {
     @Param('crn') crn: string,
     @Param('filter') complianceFilter: ActivityComplianceFilter,
   ): Promise<CaseActivityViewModel> {
-    return this.activityPageCommon(crn, { complianceFilter })
+    return this.activityPageCommon(crn, complianceFilter)
   }
 
   @Get('appointment/:id(\\d+)')
@@ -129,13 +129,16 @@ export class ActivityController {
     }
   }
 
-  private async activityPageCommon(crn: string, options: GetContactsOptions): Promise<CaseActivityViewModel> {
-    const [offender, convictionId] = await Promise.all([
+  private async activityPageCommon(
+    crn: string,
+    complianceFilter?: ActivityComplianceFilter,
+  ): Promise<CaseActivityViewModel> {
+    const [offender, conviction] = await Promise.all([
       this.offender.getOffenderSummary(crn),
-      this.sentence.getConvictionId(crn),
+      this.sentence.getCurrentConvictionSummary(crn),
     ])
-    const contacts = await this.activity.getActivityLogPage(crn, offender, { ...options, convictionId })
-    const complianceFilterDescription = options.complianceFilter && FilterLinks[options.complianceFilter].description
+    const contacts = await this.activity.getActivityLogPage(crn, offender, { complianceFilter, conviction })
+    const complianceFilterDescription = complianceFilter && FilterLinks[complianceFilter].description
 
     return this.offender.casePageOf<CaseActivityViewModel>(
       offender,
@@ -147,7 +150,7 @@ export class ActivityController {
           size: contacts.size,
         },
         filters: FilterLinks,
-        currentFilter: options.complianceFilter,
+        currentFilter: complianceFilter,
         title: complianceFilterDescription,
       },
       complianceFilterDescription && BreadcrumbType.CaseActivityLogWithComplianceFilter,

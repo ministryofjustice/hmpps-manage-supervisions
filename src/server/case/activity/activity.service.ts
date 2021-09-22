@@ -1,17 +1,19 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
-import { groupBy, orderBy } from 'lodash'
+import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import {
+  ActivityLogEntry,
+  ActivityLogGroup,
+  ContactAndAttendanceApiGetActivityLogByCrnUsingGETRequest,
   ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
-  ContactSummary,
   OffenderDetail,
 } from '../../community-api/client'
 import { CommunityApiService, ContactMappingService, Paginated } from '../../community-api'
 import {
   ActivityComplianceFilter,
-  ActivityLogEntry,
-  ActivityLogEntryGroup,
+  CaseActivityLogEntry,
+  CaseActivityLogGroup,
   AppointmentActivityLogEntry,
   CommunicationActivityLogEntry,
+  GetActivityLogOptions,
   UnknownActivityLogEntry,
 } from './activity.types'
 import { DateTime } from 'luxon'
@@ -19,17 +21,19 @@ import { ContactTypeCategory, WellKnownContactTypeConfig } from '../../config'
 import { ConfigService } from '@nestjs/config'
 import { BreachService } from '../../community-api/breach'
 import { Mutable } from '../../@types/mutable'
-import { ActivityLogEntryService } from './activity-log-entry.service'
+import { ActivityLogEntryService, DatedActivityLogEntry } from './activity-log-entry.service'
 
 export const PAGE_SIZE = 1000
 
-export type GetContactsOptions = Omit<
-  ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
-  'crn' | 'contactDateTo' | 'page' | 'pageSize'
-> & { complianceFilter?: ActivityComplianceFilter }
+type ContactApiRequest = Mutable<
+  | ContactAndAttendanceApiGetActivityLogByCrnUsingGETRequest
+  | ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest
+>
 
 @Injectable()
 export class ActivityService {
+  private readonly logger = new Logger(ActivityService.name)
+
   constructor(
     private readonly community: CommunityApiService,
     private readonly contacts: ContactMappingService,
@@ -41,26 +45,38 @@ export class ActivityService {
   async getActivityLogPage(
     crn: string,
     offender: OffenderDetail,
-    options: GetContactsOptions = {},
-  ): Promise<Paginated<ActivityLogEntryGroup>> {
-    const resolvedOptions = await this.constructContactFilter(crn, options)
-    const {
-      data: { content: contacts = [] },
-    } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET({
-      ...resolvedOptions,
-      // TODO pagination is disabled
-      page: 0,
-      pageSize: PAGE_SIZE,
+    { conviction, complianceFilter }: GetActivityLogOptions,
+  ): Promise<Paginated<CaseActivityLogGroup>> {
+    const filter = this.getCommonFilter(
+      crn,
+      // pagination is disabled in the design
+      0,
+      PAGE_SIZE,
+      complianceFilter,
+    ) as Mutable<ContactAndAttendanceApiGetActivityLogByCrnUsingGETRequest>
+
+    if (complianceFilter) {
+      filter.convictionId = conviction.id
+      await this.setComplianceFromDate(filter)
+    } else {
+      filter.convictionDatesOf = conviction.id
+    }
+
+    const { data: result } = await this.community.contactAndAttendance.getActivityLogByCrnUsingGET(filter)
+    if (!result.last) {
+      this.logger.error('activity log has been truncated', { crn, convictionId: conviction.id })
+    }
+
+    const today = DateTime.now().startOf('day')
+    const groups: CaseActivityLogGroup[] = result.content.map(grp => {
+      const date = DateTime.fromISO(grp.date)
+      return {
+        date,
+        isToday: date.equals(today),
+        entries: grp.entries.map(entry => this.getActivityLogEntry(crn, grp, entry, offender)),
+      }
     })
 
-    const entries = await Promise.all(contacts.map(contact => this.getActivityLogEntry(crn, contact, offender)))
-    const today = DateTime.now().startOf('day')
-    const groups: ActivityLogEntryGroup[] = Object.entries(groupBy(entries, x => x.start.toISODate())).map(
-      ([key, entries]) => {
-        const date = DateTime.fromISO(key)
-        return { date, isToday: date.equals(today), entries: orderBy(entries, x => x.start) }
-      },
-    )
     return {
       totalPages: 1,
       first: true,
@@ -68,29 +84,34 @@ export class ActivityService {
       number: 0,
       size: groups.length,
       totalElements: groups.length,
-      content: orderBy(groups, x => x.date, 'desc'),
+      content: groups,
     }
   }
 
   async getActivityLogComplianceCount(
     crn: string,
     convictionId: number,
-    filter: ActivityComplianceFilter,
+    complianceFilter: ActivityComplianceFilter,
     from: DateTime | null,
   ) {
     // to get the appointment counts here we're using the totalElements property of the list api
     // but requesting a single item on a single page and discarding the result.
-    const resolvedOptions = await this.constructContactFilter(crn, {
-      convictionId,
-      complianceFilter: filter,
-      // we need to be careful to preserve a null contactDateFrom from a null lastRecentBreachEnd here
-      // as it has a special meaning: 'I already checked the last breach end date, dont check again'
-      contactDateFrom: from?.toISODate(),
-    })
-    const { data } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET({
-      ...resolvedOptions,
-      pageSize: 1, // we only need the count so a page size of 1 is fine.
-    })
+    const filter = this.getCommonFilter(
+      crn,
+      0,
+      1, // we only need the count so a page size of 1 is fine.
+      complianceFilter,
+    )
+
+    filter.convictionId = convictionId
+    filter.contactDateFrom = from === null ? null : from?.toISODate() // we need to be careful to preserve null here
+    await this.setComplianceFromDate(filter)
+
+    // RAR is a special case because it is deduplicated by day, so to count it we use the activity log api
+    const { data } =
+      complianceFilter === ActivityComplianceFilter.RarActivity
+        ? await this.community.contactAndAttendance.getActivityLogByCrnUsingGET(filter)
+        : await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET(filter)
     return data.totalElements
   }
 
@@ -100,7 +121,7 @@ export class ActivityService {
       appointmentId,
     })
 
-    const meta = await this.contacts.getTypeMeta(appointment)
+    const meta = this.contacts.getTypeMeta(appointment)
     if (meta.type !== ContactTypeCategory.Appointment) {
       throw new NotFoundException(`contact with id '${appointmentId}' is not an appointment`)
     }
@@ -117,7 +138,7 @@ export class ActivityService {
       crn,
       contactId,
     })
-    const meta = await this.contacts.getTypeMeta(contact)
+    const meta = this.contacts.getTypeMeta(contact)
     if (meta.type !== ContactTypeCategory.Communication) {
       throw new NotFoundException(`contact with id '${contactId}' is not a communication`)
     }
@@ -129,7 +150,7 @@ export class ActivityService {
       crn,
       contactId,
     })
-    const meta = await this.contacts.getTypeMeta(contact)
+    const meta = this.contacts.getTypeMeta(contact)
     if (meta.type === ContactTypeCategory.Appointment) {
       throw new NotFoundException(`contact with id '${contactId}' is not an appointment`)
     }
@@ -139,74 +160,99 @@ export class ActivityService {
     return this.entryService.getUnknownActivityLogEntry(crn, contact, meta)
   }
 
-  private async getActivityLogEntry(
+  private getActivityLogEntry(
     crn: string,
-    contact: ContactSummary,
+    group: ActivityLogGroup,
+    entry: ActivityLogEntry,
     offender: OffenderDetail,
-  ): Promise<ActivityLogEntry> {
-    const meta = await this.contacts.getTypeMeta(contact)
+  ): CaseActivityLogEntry {
+    const meta = this.contacts.getTypeMeta(entry)
+    const datedEntry: DatedActivityLogEntry = { ...entry, date: group.date }
     switch (meta.type) {
       case ContactTypeCategory.Appointment:
-        return this.entryService.getAppointmentActivityLogEntry(crn, contact, meta)
+        return this.entryService.getAppointmentActivityLogEntry(crn, datedEntry, meta)
       case ContactTypeCategory.Communication:
-        return this.entryService.getCommunicationActivityLogEntry(crn, contact, meta, offender)
+        return this.entryService.getCommunicationActivityLogEntry(crn, datedEntry, meta, offender)
       case ContactTypeCategory.System:
-        return this.entryService.getSystemActivityLogEntry(crn, contact, meta)
+        return this.entryService.getSystemActivityLogEntry(crn, datedEntry, meta)
       default:
-        return this.entryService.getUnknownActivityLogEntry(crn, contact, meta)
+        return this.entryService.getUnknownActivityLogEntry(crn, datedEntry, meta)
     }
   }
 
-  private async constructContactFilter(
-    crn: string,
-    { complianceFilter, ...options }: GetContactsOptions,
-  ): Promise<ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest> {
-    const defaultFilters: Mutable<ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest> = {
-      crn,
-      contactDateTo: DateTime.now().plus({ days: 1 }).toISODate(),
-      ...options,
+  private async setComplianceFromDate(filters: ContactApiRequest) {
+    if (filters.contactDateFrom) {
+      // a client service already ser the date from, we assume here that the service set the correct date and avoid the extra IO
+      return
     }
 
     // any compliance filter implies that the log is filtered by the latter of the last breach end or the last 12 months
-    if (complianceFilter && !defaultFilters.contactDateFrom) {
-      // so first attempt to get default 'contact from date' from last breach
-      // this is short circuited when contactDateFrom is null so client can specify not wanting to check last breach
-      if (defaultFilters.contactDateFrom !== null && defaultFilters.convictionId) {
-        const breaches = await this.breach.getBreaches(crn, defaultFilters.convictionId, { includeOutcome: false })
-        if (breaches?.lastRecentBreachEnd) {
-          defaultFilters.contactDateFrom = breaches.lastRecentBreachEnd.toISODate()
-        }
-      }
-
-      // otherwise fallback to the last 12 months
-      // regardless of provided contactDateFrom being null, we default it to the last 12 months here
-      if (!defaultFilters.contactDateFrom) {
-        defaultFilters.contactDateFrom = DateTime.now().minus({ years: 1 }).toISODate()
+    // an existing from date of null has a special meaning: 'I already checked the last breach end date, dont check again'
+    if (filters.contactDateFrom !== null && filters.convictionId) {
+      const breaches = await this.breach.getBreaches(filters.crn, filters.convictionId, {
+        includeOutcome: false,
+      })
+      if (breaches?.lastRecentBreachEnd) {
+        filters.contactDateFrom = breaches.lastRecentBreachEnd.toISODate()
       }
     }
 
-    const defaultAppointmentFilters = { ...defaultFilters, appointmentsOnly: true, nationalStandard: true }
+    if (!filters.contactDateFrom) {
+      // fallback to last 12 months
+      filters.contactDateFrom = DateTime.now().minus({ years: 1 }).toISODate()
+    }
+  }
+
+  private getCommonFilter(
+    crn: string,
+    page: number,
+    pageSize: number,
+    complianceFilter?: ActivityComplianceFilter,
+    contactDateFrom?: DateTime,
+  ): ContactApiRequest {
+    const request: ContactApiRequest = {
+      crn,
+      page,
+      pageSize,
+      contactDateFrom: contactDateFrom && contactDateFrom.toISODate(),
+      // all activity logs are filtered to today and earlier
+      contactDateTo: DateTime.now().plus({ days: 1 }).toISODate(),
+    }
+
+    function appointment(appointmentOptions: { outcome?: boolean; complied?: boolean; attended?: boolean }) {
+      request.appointmentsOnly = true
+      request.nationalStandard = true
+      request.outcome = appointmentOptions.outcome
+      request.complied = appointmentOptions.complied
+      request.attended = appointmentOptions.attended
+    }
 
     switch (complianceFilter) {
       case ActivityComplianceFilter.Appointments:
-        return defaultAppointmentFilters
+        appointment({})
+        break
       case ActivityComplianceFilter.WithoutOutcome:
-        return { ...defaultAppointmentFilters, outcome: false }
+        appointment({ outcome: false })
+        break
       case ActivityComplianceFilter.CompliedAppointments:
-        return { ...defaultAppointmentFilters, complied: true, attended: true }
-      case ActivityComplianceFilter.AcceptableAbsenceAppointments:
-        return { ...defaultAppointmentFilters, complied: true, attended: false }
+        appointment({ complied: true, attended: true })
+        break
       case ActivityComplianceFilter.FailedToComplyAppointments:
-        return { ...defaultAppointmentFilters, complied: false }
+        appointment({ complied: false })
+        break
+      case ActivityComplianceFilter.AcceptableAbsenceAppointments:
+        appointment({ complied: true, attended: false })
+        break
       case ActivityComplianceFilter.WarningLetters:
-        const contactTypes = Object.values(
+        request.contactTypes = Object.values(
           this.config.get<WellKnownContactTypeConfig>('contacts')[ContactTypeCategory.WarningLetter],
         )
-        return { ...defaultFilters, contactTypes }
+        break
       case ActivityComplianceFilter.RarActivity:
-        return { ...defaultAppointmentFilters, rarActivity: true }
-      default:
-        return defaultFilters
+        request.rarActivity = true
+        break
     }
+
+    return request
   }
 }

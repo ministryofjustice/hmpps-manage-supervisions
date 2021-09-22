@@ -11,6 +11,8 @@ import {
   ConvictionRequirement,
   ConvictionRequirementDetail,
   ConvictionRequirementType,
+  ConvictionSentenceDetail,
+  ConvictionSummary,
   PreviousConvictionSummary,
 } from './sentence.types'
 import { fake } from '../../util/util.fake'
@@ -83,8 +85,22 @@ export const fakeConvictionRequirement = fake<ConvictionRequirement, { isActive?
   }
 })
 
-export const fakeConvictionDetails = fake<ConvictionDetails>((options, partial = {}) => {
+export const fakeConvictionSentenceDetail = fake<ConvictionSentenceDetail>(() => {
   const startDate = DateTime.fromJSDate(faker.date.past())
+  return {
+    description: faker.company.bs(),
+    length: '12 months',
+    startDate,
+    endDate: startDate.plus({ years: 1 }),
+    convictionDate: startDate.plus({ weeks: 1 }),
+    elapsed: '1 month elapsed (of 12 months)',
+    responsibleCourt: faker.address.streetAddress(),
+    courtAppearance: faker.address.streetAddress(),
+    additionalSentences: [fakeAdditionalSentence()],
+  }
+})
+
+export const fakeConvictionDetails = fake<ConvictionDetails>((options, partial = {}) => {
   return {
     previousConvictions: {
       count: faker.datatype.number(),
@@ -92,17 +108,7 @@ export const fakeConvictionDetails = fake<ConvictionDetails>((options, partial =
       link: faker.internet.url(),
     },
     offence: fakeConvictionOffence(),
-    sentence: {
-      description: faker.company.bs(),
-      length: '12 months',
-      startDate,
-      endDate: startDate.plus({ years: 1 }),
-      convictionDate: startDate.plus({ weeks: 1 }),
-      elapsed: '1 month elapsed (of 12 months)',
-      responsibleCourt: faker.address.streetAddress(),
-      courtAppearance: faker.address.streetAddress(),
-      additionalSentences: [fakeAdditionalSentence()],
-    },
+    sentence: fakeConvictionSentenceDetail(),
     requirements: partial.requirements?.map(r => fakeConvictionRequirement(r)) || [fakeConvictionRequirement()],
   }
 })
@@ -146,4 +152,9 @@ export const fakePreviousConvictionSummary = fake<PreviousConvictionSummary>(() 
   name: faker.company.bs(),
   mainOffence: faker.company.bs(),
   endDate: DateTime.fromJSDate(faker.date.past()),
+}))
+
+export const fakeConvictionSummary = fake<ConvictionSummary>(() => ({
+  id: faker.datatype.number(),
+  sentence: fakeConvictionSentenceDetail(),
 }))

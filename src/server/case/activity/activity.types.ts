@@ -3,6 +3,12 @@ import { ContactTypeCategory } from '../../config'
 import { ViewModel } from '../../common'
 import { AppointmentRequirementDetail } from '../../community-api/client'
 import { GovUkUiTagColour } from '../../util/govuk-ui'
+import { ConvictionSummary } from '../sentence'
+
+export interface GetActivityLogOptions {
+  conviction: ConvictionSummary
+  complianceFilter?: ActivityComplianceFilter
+}
 
 export interface ActivityLogEntryLinks {
   view: string
@@ -59,16 +65,17 @@ export interface UnknownActivityLogEntry extends ActivityLogEntryBase<ContactTyp
   lastUpdatedBy: string
 }
 export type SystemActivityLogEntry = ActivityLogEntryBase<ContactTypeCategory.System>
-export type ActivityLogEntry =
+
+export type CaseActivityLogEntry =
   | AppointmentActivityLogEntry
   | CommunicationActivityLogEntry
   | UnknownActivityLogEntry
   | SystemActivityLogEntry
 
-export interface ActivityLogEntryGroup {
+export interface CaseActivityLogGroup {
   date: DateTime
   isToday: boolean
-  entries: ActivityLogEntry[]
+  entries: CaseActivityLogEntry[]
 }
 
 export interface AppointmentViewModel extends ViewModel {

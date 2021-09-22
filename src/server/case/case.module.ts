@@ -3,7 +3,7 @@ import { CommonModule } from '../common/common.module'
 import { CommunityApiModule } from '../community-api/community-api.module'
 import { AssessRisksAndNeedsApiModule } from '../assess-risks-and-needs-api/assess-risks-and-needs-api.module'
 import { CaseController } from './case.controller'
-import { OffenderService } from './offender/offender.service'
+import { OffenderService } from './offender'
 import { SentenceService } from './sentence'
 import { ScheduleService } from './schedule'
 import { ActivityService } from './activity'
@@ -12,8 +12,7 @@ import { PersonalController } from './personal/personal.controller'
 import { PersonalService } from './personal'
 import { ActivityController } from './activity/activity.controller'
 import { RequirementService } from './sentence/requirement.service'
-import { ContactTypesService } from '../community-api'
-import { ComplianceService } from './compliance/compliance.service'
+import { ComplianceService } from './compliance'
 import { RiskController } from './risk/risk.controller'
 import { SentenceController } from './sentence/sentence.controller'
 import { ExitController } from './exit/exit.controller'
@@ -41,7 +40,6 @@ import { ComplianceController } from './compliance/compliance.controller'
     RiskService,
     PersonalService,
     RequirementService,
-    ContactTypesService,
     ComplianceService,
     ActivityLogEntryService,
   ],

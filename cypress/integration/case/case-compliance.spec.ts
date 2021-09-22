@@ -1,6 +1,6 @@
 import { ViewCaseFixture } from './view-case.fixture'
 import { DateTime } from 'luxon'
-import { AppointmentOutcome, ContactSummary } from '../../../src/server/community-api/client'
+import { ActivityLogEntry, ActivityLogGroup, AppointmentOutcome } from '../../../src/server/community-api/client'
 
 class Fixture extends ViewCaseFixture {
   shouldRenderSentence({ breaches, breachesLabel = 'Breaches' }: { breaches: string; breachesLabel?: string }) {
@@ -57,16 +57,20 @@ function complianceAppointments({
   ftc: number
   absence: number
   noOutcome: number
-}) {
-  function withOutcome(outcome: DeepPartial<AppointmentOutcome>, n: number): DeepPartial<ContactSummary>[] {
+}): DeepPartial<ActivityLogGroup>[] {
+  function withOutcome(outcome: DeepPartial<AppointmentOutcome>, n: number): DeepPartial<ActivityLogEntry>[] {
     return [...Array(n)].map(() => ({ type: { code: 'APAT', appointment: true }, outcome }))
   }
 
   return [
-    ...withOutcome({ complied: true, attended: true }, complied),
-    ...withOutcome({ complied: false }, ftc),
-    ...withOutcome({ complied: true, attended: false }, absence),
-    ...withOutcome(null, noOutcome),
+    {
+      entries: [
+        ...withOutcome({ complied: true, attended: true }, complied),
+        ...withOutcome({ complied: false }, ftc),
+        ...withOutcome({ complied: true, attended: false }, absence),
+        ...withOutcome(null, noOutcome),
+      ],
+    },
   ]
 }
 
@@ -135,9 +139,15 @@ context('Case compliance tab', () => {
         },
         contacts: [
           {
-            contactStart: '2018-12-11T00:00:00+00:00',
-            type: { code: 'ABNP', appointment: true },
-            outcome: { complied: true, attended: true },
+            date: '2018-12-11',
+            entries: [
+              {
+                startTime: null,
+                endTime: null,
+                type: { code: 'ABNP', appointment: true },
+                outcome: { complied: true, attended: true },
+              },
+            ],
           },
         ],
       })

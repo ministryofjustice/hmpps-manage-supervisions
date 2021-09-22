@@ -1,7 +1,12 @@
 import { Test } from '@nestjs/testing'
 import { ActivityLogEntryService } from './activity-log-entry.service'
 import { MockLinksModule } from '../../common/links/links.mock'
-import { fakeAppointmentDetail, fakeContactSummary, fakeOffenderDetail } from '../../community-api/community-api.fake'
+import {
+  fakeActivityLogEntry,
+  fakeAppointmentDetail,
+  fakeContactSummary,
+  fakeOffenderDetail,
+} from '../../community-api/community-api.fake'
 import { ContactTypeCategory } from '../../config'
 import { DateTime } from 'luxon'
 import { BreadcrumbType } from '../../common/links'
@@ -79,16 +84,19 @@ describe('ActivityLogEntryService', () => {
   })
 
   it('gets non well known appointment log entry from contact summary', () => {
-    const contact = fakeContactSummary({
-      contactId: 1,
-      notes: 'some appointment notes',
-      type: { appointment: true, nationalStandard: false, description: 'some non well known appointment' },
-      outcome: { complied: false, attended: true, description: 'some outcome' },
-      sensitive: false,
-      rarActivity: false,
-      contactStart: '2020-01-01T12:00:00',
-      contactEnd: '2020-01-02T14:00:00',
-    })
+    const contact = {
+      ...fakeActivityLogEntry({
+        contactId: 1,
+        notes: 'some appointment notes',
+        type: { appointment: true, nationalStandard: false, description: 'some non well known appointment' },
+        outcome: { complied: false, attended: true, description: 'some outcome' },
+        sensitive: false,
+        rarActivity: null,
+        startTime: '12:00:00',
+        endTime: '14:00:00',
+      }),
+      date: '2020-01-01',
+    }
     const meta = fakeContactMeta(ContactTypeCategory.Appointment, false)
     const observed = subject.getAppointmentActivityLogEntry('some-crn', contact, meta)
 
@@ -107,7 +115,7 @@ describe('ActivityLogEntryService', () => {
       },
       requirement: null,
       start: DateTime.fromObject({ year: 2020, month: 1, day: 1, hour: 12 }),
-      end: DateTime.fromObject({ year: 2020, month: 1, day: 2, hour: 14 }),
+      end: DateTime.fromObject({ year: 2020, month: 1, day: 1, hour: 14 }),
       category: 'Previous appointment',
       isFuture: false,
       nationalStandard: false,

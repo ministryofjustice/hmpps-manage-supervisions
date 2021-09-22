@@ -3,14 +3,16 @@ import { ActivityService } from './activity.service'
 import { DateTime, Settings } from 'luxon'
 import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
 import {
+  ActivityLogEntry,
   AppointmentDetail,
-  ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest,
+  ContactAndAttendanceApiGetActivityLogByCrnUsingGETRequest,
   ContactSummary,
   OffenderDetail,
 } from '../../community-api/client'
 import { CommunityApiService, ContactMappingService, Paginated } from '../../community-api'
 import { ContactTypeCategory } from '../../config'
 import {
+  fakeActivityLogEntry,
   fakeAppointmentDetail,
   fakeContactSummary,
   fakeOffenderDetail,
@@ -19,8 +21,8 @@ import {
 import { fakeOkResponse } from '../../common/rest/rest.fake'
 import {
   ActivityComplianceFilter,
-  ActivityLogEntry,
-  ActivityLogEntryGroup,
+  CaseActivityLogEntry,
+  CaseActivityLogGroup,
   AppointmentActivityLogEntry,
   CommunicationActivityLogEntry,
 } from './activity.types'
@@ -29,7 +31,9 @@ import { FakeConfigModule } from '../../config/config.fake'
 import { BreachService } from '../../community-api/breach'
 import { ActivityLogEntryService } from './activity-log-entry.service'
 import { fakeContactMeta } from '../../community-api/contact-mapping/contact-mapping.fake'
-import { fakeActivityLogEntry } from './activity.fake'
+import { fakeCaseActivityLogEntry } from './activity.fake'
+import { ConvictionSummary } from '../sentence'
+import { fakeConvictionSummary } from '../sentence/sentence.fake'
 
 describe('ActivityService', () => {
   let subject: ActivityService
@@ -68,9 +72,9 @@ describe('ActivityService', () => {
       .resolves(fakeOkResponse(appointment))
 
     const meta = fakeContactMeta(ContactTypeCategory.Appointment)
-    contactMapping.getTypeMeta.withArgs(appointment).resolves(meta)
+    contactMapping.getTypeMeta.withArgs(appointment).returns(meta)
 
-    const entry = fakeActivityLogEntry() as AppointmentActivityLogEntry
+    const entry = fakeCaseActivityLogEntry() as AppointmentActivityLogEntry
     entryService.getAppointmentActivityLogEntry.withArgs('some-crn', appointment, meta).returns(entry)
 
     const observed = await subject.getAppointment('some-crn', 123)
@@ -86,7 +90,7 @@ describe('ActivityService', () => {
       .resolves(fakeOkResponse(appointment))
 
     const meta = fakeContactMeta(ContactTypeCategory.Communication)
-    contactMapping.getTypeMeta.withArgs(appointment).resolves(meta)
+    contactMapping.getTypeMeta.withArgs(appointment).returns(meta)
 
     await expect(() => subject.getAppointment('some-crn', 123)).rejects.toThrow(
       "contact with id '123' is not an appointment",
@@ -102,9 +106,9 @@ describe('ActivityService', () => {
       .resolves(fakeOkResponse(contact))
 
     const meta = fakeContactMeta(ContactTypeCategory.Communication)
-    contactMapping.getTypeMeta.withArgs(contact).resolves(meta)
+    contactMapping.getTypeMeta.withArgs(contact).returns(meta)
 
-    const entry = fakeActivityLogEntry() as CommunicationActivityLogEntry
+    const entry = fakeCaseActivityLogEntry() as CommunicationActivityLogEntry
     entryService.getCommunicationActivityLogEntry.withArgs('some-crn', contact, meta, offender).returns(entry)
 
     const observed = await subject.getCommunicationContact('some-crn', 123, offender)
@@ -121,188 +125,213 @@ describe('ActivityService', () => {
       .resolves(fakeOkResponse(contact))
 
     const meta = fakeContactMeta(ContactTypeCategory.Appointment)
-    contactMapping.getTypeMeta.withArgs(contact).resolves(meta)
+    contactMapping.getTypeMeta.withArgs(contact).returns(meta)
 
     await expect(() => subject.getCommunicationContact('some-crn', 123, offender)).rejects.toThrow(
       "contact with id '123' is not a communication",
     )
   })
 
-  function havingAppointmentEntry(contact: ContactSummary | AppointmentDetail) {
-    const entry = fakeActivityLogEntry({ type: ContactTypeCategory.Appointment })
+  function havingAppointmentEntry(contact: ActivityLogEntry | AppointmentDetail) {
+    const entry = fakeCaseActivityLogEntry({ type: ContactTypeCategory.Appointment })
     const meta = fakeContactMeta(ContactTypeCategory.Appointment)
-    contactMapping.getTypeMeta.withArgs(contact).resolves(meta)
-    entryService.getAppointmentActivityLogEntry.withArgs('some-crn', contact, meta).resolves(entry)
+    contactMapping.getTypeMeta.withArgs(contact).returns(meta)
+    entryService.getAppointmentActivityLogEntry.withArgs('some-crn', match(contact), meta).returns(entry as any)
     return entry
   }
 
-  function havingCommunicationEntry(contact: ContactSummary, offender: OffenderDetail) {
-    const entry = fakeActivityLogEntry({ type: ContactTypeCategory.Communication })
+  function havingCommunicationEntry(contact: ActivityLogEntry | ContactSummary, offender: OffenderDetail) {
+    const entry = fakeCaseActivityLogEntry({ type: ContactTypeCategory.Communication })
     const meta = fakeContactMeta(ContactTypeCategory.Communication)
-    contactMapping.getTypeMeta.withArgs(contact).resolves(meta)
-    entryService.getCommunicationActivityLogEntry.withArgs('some-crn', contact, meta, offender).resolves(entry)
+    contactMapping.getTypeMeta.withArgs(contact).returns(meta)
+    entryService.getCommunicationActivityLogEntry
+      .withArgs('some-crn', match(contact), meta, offender)
+      .returns(entry as any)
     return entry
   }
 
-  function havingUnknownEntry(contact: ContactSummary) {
-    const entry = fakeActivityLogEntry({ type: ContactTypeCategory.Other })
+  function havingUnknownEntry(contact: ActivityLogEntry | ContactSummary) {
+    const entry = fakeCaseActivityLogEntry({ type: ContactTypeCategory.Other })
     const meta = fakeContactMeta(ContactTypeCategory.Other)
-    contactMapping.getTypeMeta.withArgs(contact).resolves(meta)
-    entryService.getUnknownActivityLogEntry.withArgs('some-crn', contact, meta).resolves(entry)
+    contactMapping.getTypeMeta.withArgs(contact).returns(meta)
+    entryService.getUnknownActivityLogEntry.withArgs('some-crn', match(contact), meta).returns(entry as any)
     return entry
   }
 
   describe('activity log compliance filters', () => {
     let stub: ReturnType<typeof havingContacts>
     const offender = fakeOffenderDetail()
-    const appointment = fakeContactSummary()
-    const communication = fakeContactSummary()
-    const unknown = fakeContactSummary()
-    let appointmentEntry: ActivityLogEntry
-    let communicationEntry: ActivityLogEntry
-    let unknownEntry: ActivityLogEntry
+    const contacts = {
+      appointment: fakeActivityLogEntry(),
+      communication: fakeActivityLogEntry(),
+      unknown: fakeActivityLogEntry(),
+    }
+    let entries: Record<keyof typeof contacts, CaseActivityLogEntry>
+    let conviction: ConvictionSummary
 
     function havingContacts() {
-      return community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET.resolves(
-        fakeOkResponse(fakePaginated([appointment, communication, unknown])),
+      return community.contactAndAttendance.getActivityLogByCrnUsingGET.resolves(
+        fakeOkResponse(
+          fakePaginated([
+            {
+              date: '2021-03-01',
+              rarDay: false,
+              entries: [contacts.appointment, contacts.communication, contacts.unknown],
+            },
+          ]),
+        ),
       )
     }
 
-    function shouldHaveFilteredContacts(
-      expected: Omit<ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest, 'crn'>,
+    function shouldHaveFilteredConvictionLevelContacts(
+      expected: Omit<ContactAndAttendanceApiGetActivityLogByCrnUsingGETRequest, 'crn'>,
     ) {
       expect(stub.getCall(0).firstArg).toEqual({
+        convictionId: 1234,
         crn: 'some-crn',
         contactDateFrom: '2019-03-01',
         contactDateTo: '2020-03-02',
         page: 0,
         pageSize: 1000,
         ...expected,
-      } as ContactAndAttendanceApiGetOffenderContactSummariesByCrnUsingGETRequest)
+      } as ContactAndAttendanceApiGetActivityLogByCrnUsingGETRequest)
+    }
+
+    function shouldHaveFilteredOffenderLevelContacts(
+      expected: Omit<ContactAndAttendanceApiGetActivityLogByCrnUsingGETRequest, 'crn'>,
+    ) {
+      expect(stub.getCall(0).firstArg).toEqual({
+        convictionDatesOf: 1234,
+        crn: 'some-crn',
+        contactDateTo: '2020-03-02',
+        page: 0,
+        pageSize: 1000,
+        ...expected,
+      } as ContactAndAttendanceApiGetActivityLogByCrnUsingGETRequest)
     }
 
     function havingLastBreachEnd(value: DateTime | null) {
       breachService.getBreaches
-        .withArgs('some-crn', 1, match({ includeOutcome: false }))
+        .withArgs('some-crn', 1234, match({ includeOutcome: false }))
         .resolves({ breaches: [], lastRecentBreachEnd: value })
     }
 
     beforeEach(() => {
       stub = havingContacts()
-      appointmentEntry = havingAppointmentEntry(appointment)
-      communicationEntry = havingCommunicationEntry(communication, offender)
-      unknownEntry = havingUnknownEntry(unknown)
+      entries = {
+        appointment: havingAppointmentEntry(contacts.appointment),
+        communication: havingCommunicationEntry(contacts.communication, offender),
+        unknown: havingUnknownEntry(contacts.unknown),
+      }
+      conviction = fakeConvictionSummary({
+        id: 1234,
+        sentence: { startDate: DateTime.fromISO('2021-01-01'), endDate: DateTime.fromISO('2021-02-01') },
+      })
     })
 
-    it('maps & sorts entry groups', async () => {
-      appointmentEntry.start = DateTime.fromISO('2020-02-01T12:00:00')
-      unknownEntry.start = DateTime.fromISO('2020-02-01T13:00:00')
-      communicationEntry.start = now
-      const observed = await subject.getActivityLogPage('some-crn', offender, {})
+    it('maps entry groups', async () => {
+      const observed = await subject.getActivityLogPage('some-crn', offender, { conviction: fakeConvictionSummary() })
       expect(observed).toEqual({
         content: [
           {
-            date: now.startOf('day'),
-            isToday: true,
-            entries: [communicationEntry],
-          },
-          {
-            date: DateTime.fromObject({ year: 2020, month: 2, day: 1 }),
+            date: DateTime.fromISO('2021-03-01'),
             isToday: false,
-            entries: [appointmentEntry, unknownEntry],
+            entries: [entries.appointment, entries.communication, entries.unknown],
           },
         ],
         first: true,
         last: true,
         number: 0,
-        size: 2,
-        totalElements: 2,
+        size: 1,
+        totalElements: 1,
         totalPages: 1,
-      } as Paginated<ActivityLogEntryGroup>)
+      } as Paginated<CaseActivityLogGroup>)
     })
 
     it('does not apply any date from filters when not filtering for compliance', async () => {
-      await subject.getActivityLogPage('some-crn', offender, {})
-      shouldHaveFilteredContacts({ contactDateFrom: undefined })
+      await subject.getActivityLogPage('some-crn', offender, { conviction })
+      shouldHaveFilteredOffenderLevelContacts({ contactDateFrom: undefined })
     })
 
     it('gets unfiltered contacts & falls back to last 12 months when no breach', async () => {
       havingLastBreachEnd(null)
       await subject.getActivityLogPage('some-crn', offender, {
-        convictionId: 1,
+        conviction,
         complianceFilter: ActivityComplianceFilter.Appointments,
       })
-      shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true, convictionId: 1 })
+      shouldHaveFilteredConvictionLevelContacts({ appointmentsOnly: true, nationalStandard: true })
     })
 
     it('filters appointments', async () => {
       await subject.getActivityLogPage('some-crn', offender, {
+        conviction,
         complianceFilter: ActivityComplianceFilter.Appointments,
       })
-      shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true })
+      shouldHaveFilteredConvictionLevelContacts({ appointmentsOnly: true, nationalStandard: true })
     })
 
     it('filters complied appointments', async () => {
       await subject.getActivityLogPage('some-crn', offender, {
+        conviction,
         complianceFilter: ActivityComplianceFilter.CompliedAppointments,
       })
-      shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true, attended: true, complied: true })
+      shouldHaveFilteredConvictionLevelContacts({
+        appointmentsOnly: true,
+        nationalStandard: true,
+        attended: true,
+        complied: true,
+      })
     })
 
     it('filters acceptable absence appointments', async () => {
       await subject.getActivityLogPage('some-crn', offender, {
+        conviction,
         complianceFilter: ActivityComplianceFilter.AcceptableAbsenceAppointments,
       })
-      shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true, attended: false, complied: true })
+      shouldHaveFilteredConvictionLevelContacts({
+        appointmentsOnly: true,
+        nationalStandard: true,
+        attended: false,
+        complied: true,
+      })
     })
 
     it('filters failed to comply appointments', async () => {
       await subject.getActivityLogPage('some-crn', offender, {
+        conviction,
         complianceFilter: ActivityComplianceFilter.FailedToComplyAppointments,
       })
-      shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true, complied: false })
+      shouldHaveFilteredConvictionLevelContacts({ appointmentsOnly: true, nationalStandard: true, complied: false })
     })
 
     it('filters warning letter contacts', async () => {
       await subject.getActivityLogPage('some-crn', offender, {
+        conviction,
         complianceFilter: ActivityComplianceFilter.WarningLetters,
       })
-      shouldHaveFilteredContacts({ contactTypes: ['AWLI', 'AWL2', 'AWLF', 'AWLS', 'C040', 'CLBR', 'CBRC', 'CLOB'] })
+      shouldHaveFilteredConvictionLevelContacts({
+        contactTypes: ['AWLI', 'AWL2', 'AWLF', 'AWLS', 'C040', 'CLBR', 'CBRC', 'CLOB'],
+      })
     })
 
     it('filters rar activity appointments', async () => {
       await subject.getActivityLogPage('some-crn', offender, {
+        conviction,
         complianceFilter: ActivityComplianceFilter.RarActivity,
       })
-      shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true, rarActivity: true })
+      shouldHaveFilteredConvictionLevelContacts({ rarActivity: true })
     })
 
     it('filters appointments from last breach end', async () => {
       havingLastBreachEnd(DateTime.fromObject({ year: 2018, month: 5, day: 6 }))
       await subject.getActivityLogPage('some-crn', offender, {
+        conviction,
         complianceFilter: ActivityComplianceFilter.Appointments,
-        convictionId: 1,
       })
-      shouldHaveFilteredContacts({
+      shouldHaveFilteredConvictionLevelContacts({
         appointmentsOnly: true,
         nationalStandard: true,
         contactDateFrom: '2018-05-06',
-        convictionId: 1,
-      })
-    })
-
-    it('filters appointments from specified date', async () => {
-      havingLastBreachEnd(DateTime.fromObject({ year: 2018, month: 5, day: 6 }))
-      await subject.getActivityLogPage('some-crn', offender, {
-        complianceFilter: ActivityComplianceFilter.Appointments,
-        convictionId: 1,
-        contactDateFrom: '2018-04-05',
-      })
-      shouldHaveFilteredContacts({
-        appointmentsOnly: true,
-        nationalStandard: true,
-        contactDateFrom: '2018-04-05',
-        convictionId: 1,
       })
     })
   })

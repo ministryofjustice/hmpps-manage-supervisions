@@ -2,12 +2,12 @@ import { Test } from '@nestjs/testing'
 import { ActivityController } from './activity.controller'
 import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
 import { OffenderService } from '../offender'
-import { ActivityService, GetContactsOptions } from './activity.service'
+import { ActivityService } from './activity.service'
 import { MockLinksModule } from '../../common/links/links.mock'
 import { BreadcrumbType } from '../../common/links'
 import { fakeOffenderDetailSummary, fakePaginated } from '../../community-api/community-api.fake'
 import { getDisplayName } from '../../util'
-import { fakeActivityLogEntry, fakeActivityLogEntryGroup } from './activity.fake'
+import { fakeCaseActivityLogEntry, fakeCaseActivityLogGroup } from './activity.fake'
 import { ContactTypeCategory } from '../../config'
 import {
   ActivityComplianceFilter,
@@ -15,9 +15,11 @@ import {
   AppointmentViewModel,
   CommunicationActivityLogEntry,
   CommunicationViewModel,
+  GetActivityLogOptions,
 } from './activity.types'
 import { SentenceService } from '../sentence'
 import { CasePage } from '../case.types'
+import { fakeConvictionSummary } from '../sentence/sentence.fake'
 
 describe('ActivityController', () => {
   let subject: ActivityController
@@ -46,7 +48,7 @@ describe('ActivityController', () => {
   it('gets appointment', async () => {
     const offender = havingOffenderSummary()
 
-    const appointment = fakeActivityLogEntry(
+    const appointment = fakeCaseActivityLogEntry(
       { type: ContactTypeCategory.Appointment },
       { when: 'future' },
     ) as AppointmentActivityLogEntry
@@ -73,7 +75,9 @@ describe('ActivityController', () => {
   it('gets communication', async () => {
     const offender = havingOffenderSummary()
     const displayName = getDisplayName(offender)
-    const contact = fakeActivityLogEntry({ type: ContactTypeCategory.Communication }) as CommunicationActivityLogEntry
+    const contact = fakeCaseActivityLogEntry({
+      type: ContactTypeCategory.Communication,
+    }) as CommunicationActivityLogEntry
     activityService.getCommunicationContact.withArgs('some-crn', 111, offender).resolves(contact)
 
     const observed = await subject.getCommunication('some-crn', 111)
@@ -94,19 +98,11 @@ describe('ActivityController', () => {
     const offender = havingOffenderSummary()
     const viewModel: any = { page: CasePage.Activity }
     const stub = offenderService.casePageOf.withArgs(offender, match.any).returns(viewModel)
+    const contacts = fakePaginated([fakeCaseActivityLogGroup(), fakeCaseActivityLogGroup()])
+    const conviction = fakeConvictionSummary()
 
-    const contacts = fakePaginated([fakeActivityLogEntryGroup(), fakeActivityLogEntryGroup()])
-
-    sentenceService.getConvictionId.withArgs('some-crn').resolves(1234)
-    activityService.getActivityLogPage
-      .withArgs(
-        'some-crn',
-        offender,
-        match({
-          convictionId: 1234,
-        }),
-      )
-      .resolves(contacts)
+    sentenceService.getCurrentConvictionSummary.withArgs('some-crn').resolves(conviction)
+    activityService.getActivityLogPage.withArgs('some-crn', offender, match({ conviction })).resolves(contacts)
 
     const observed = await subject.getActivity('some-crn')
 
@@ -157,17 +153,15 @@ describe('ActivityController', () => {
     const offender = havingOffenderSummary()
     const viewModel: any = { page: CasePage.Activity }
     const stub = offenderService.casePageOf.withArgs(offender, match.any).returns(viewModel)
-    const contacts = fakePaginated([fakeActivityLogEntryGroup(), fakeActivityLogEntryGroup()])
+    const contacts = fakePaginated([fakeCaseActivityLogGroup(), fakeCaseActivityLogGroup()])
+    const conviction = fakeConvictionSummary()
 
-    sentenceService.getConvictionId.withArgs('some-crn').resolves(1234)
+    sentenceService.getCurrentConvictionSummary.withArgs('some-crn').resolves(conviction)
     activityService.getActivityLogPage
       .withArgs(
         'some-crn',
         offender,
-        match({
-          convictionId: 1234,
-          complianceFilter: ActivityComplianceFilter.CompliedAppointments,
-        } as GetContactsOptions),
+        match({ conviction, complianceFilter: ActivityComplianceFilter.CompliedAppointments } as GetActivityLogOptions),
       )
       .resolves(contacts)
 
