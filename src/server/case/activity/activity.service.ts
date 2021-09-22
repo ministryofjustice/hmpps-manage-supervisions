@@ -203,6 +203,8 @@ export class ActivityService {
           this.config.get<WellKnownContactTypeConfig>('contacts')[ContactTypeCategory.WarningLetter],
         )
         return { ...defaultFilters, contactTypes }
+      case ActivityComplianceFilter.RarActivity:
+        return { ...defaultAppointmentFilters, rarActivity: true }
       default:
         return defaultFilters
     }

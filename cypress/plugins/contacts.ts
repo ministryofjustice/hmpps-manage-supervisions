@@ -196,6 +196,9 @@ export function contacts(crn: string, partials: DeepPartial<ContactSummary>[] = 
       c => c.type.appointment && (c.outcome === null || c.outcome === undefined),
     )
 
+    // appointments with rar activity only
+    all({ appointmentsOnly: true, rarActivity: true }, c => c.type.appointment && c.rarActivity)
+
     // appointments only
     all({ appointmentsOnly: true }, c => c.type.appointment)
 

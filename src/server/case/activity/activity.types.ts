@@ -93,6 +93,7 @@ export enum ActivityComplianceFilter {
   FailedToComplyAppointments = 'failed-to-comply-appointments',
   AcceptableAbsenceAppointments = 'acceptable-absence-appointments',
   WarningLetters = 'warning-letters',
+  RarActivity = 'rar-activity',
 }
 
 export const FilterLinks: { [key: string]: ActivityFilterMeta } = {
@@ -111,6 +112,10 @@ export const FilterLinks: { [key: string]: ActivityFilterMeta } = {
     description: 'Acceptable abscences',
   },
   [ActivityComplianceFilter.WarningLetters]: { name: 'Warning letters', description: 'Warning letters' },
+  [ActivityComplianceFilter.RarActivity]: {
+    name: 'RAR activity',
+    description: 'Appointments with an associated RAR requirement',
+  },
 }
 
 export interface ActivityFilterMeta {

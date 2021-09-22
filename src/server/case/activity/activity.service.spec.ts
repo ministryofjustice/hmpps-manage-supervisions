@@ -270,6 +270,13 @@ describe('ActivityService', () => {
       shouldHaveFilteredContacts({ contactTypes: ['AWLI', 'AWL2', 'AWLF', 'AWLS', 'C040', 'CLBR', 'CBRC', 'CLOB'] })
     })
 
+    it('filters rar activity appointments', async () => {
+      await subject.getActivityLogPage('some-crn', offender, {
+        complianceFilter: ActivityComplianceFilter.RarActivity,
+      })
+      shouldHaveFilteredContacts({ appointmentsOnly: true, nationalStandard: true, rarActivity: true })
+    })
+
     it('filters appointments from last breach end', async () => {
       havingLastBreachEnd(DateTime.fromObject({ year: 2018, month: 5, day: 6 }))
       await subject.getActivityLogPage('some-crn', offender, {

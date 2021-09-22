@@ -32,6 +32,11 @@ class Fixture extends ViewCaseFixture {
       page.filterLink('without-an-outcome').click()
     })
   }
+  whenClickingRarActivityFilter() {
+    return this.shouldRenderOffenderTab('activity', page => {
+      page.filterLink('rar-activity').click()
+    })
+  }
   whenClickingSystemContact(id: number) {
     return this.shouldRenderOffenderTab('activity', page => {
       page.entry(id).click()
@@ -370,6 +375,21 @@ context('Case activity tab', () => {
         .shouldNotRenderActivityWithId(2)
         .shouldNotRenderActivityWithId(3)
         .shouldNotRenderActivityWithId(4)
+        .shouldNotRenderActivityWithId(10)
+        .shouldNotRenderActivityWithId(11)
+    })
+
+    it('displays activity log filtered by rar activity', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('activity')
+        .whenClickingRarActivityFilter()
+        .shouldHaveDocumentTitle('RAR activity')
+        .shouldRenderActivityWithId(4)
+        .shouldNotRenderActivityWithId(1)
+        .shouldNotRenderActivityWithId(2)
+        .shouldNotRenderActivityWithId(3)
+        .shouldNotRenderActivityWithId(5)
         .shouldNotRenderActivityWithId(10)
         .shouldNotRenderActivityWithId(11)
     })
