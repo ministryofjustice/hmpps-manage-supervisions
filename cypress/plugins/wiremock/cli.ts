@@ -13,7 +13,7 @@ import {
   CasesSeedOptions,
 } from '../seeds'
 import { WiremockClient } from './wiremock-client'
-import { deliusLdap, hmppsAuthStub } from '../hmpps-auth'
+import { deliusLdap, hmppsAuthStub, Role } from '../hmpps-auth'
 
 const { argv } = yargs
   .option('write-mappings', {
@@ -27,6 +27,14 @@ const { argv } = yargs
     type: 'boolean',
     default: false,
     description: 'stub hmpps-auth',
+    group: 'security',
+  })
+  .option('role', {
+    type: 'string',
+    choices: Object.values(Role),
+    default: Role.Write,
+    description: 'user role',
+    group: 'security',
   })
   .option('get-requests', {
     alias: 'm',
@@ -114,9 +122,9 @@ async function seed(args: CamelCased<typeof argv>) {
 
   const modules = [reset, referenceDataSeed(options), offenderSeed(options), contactsSeed(options), casesSeed(options)]
   if (args.hmppsAuth) {
-    modules.push(hmppsAuthStub())
+    modules.push(hmppsAuthStub({ role: args.role }))
   } else {
-    modules.push(deliusLdap())
+    modules.push(deliusLdap({ role: args.role }))
   }
   await wiremocker(modules, { writeMappings: args.writeMappings })
 }

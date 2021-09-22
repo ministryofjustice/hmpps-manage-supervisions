@@ -15,14 +15,13 @@ import {
 import { AppointmentWizardSession } from './dto/AppointmentWizardSession'
 import { AppointmentWizardService, getStepUrl } from './appointment-wizard.service'
 import { Controller, Get, Param, Post, Redirect, Render, Session } from '@nestjs/common'
-import { AuthenticatedUser, DynamicRedirect, RedirectResponse } from '../common'
-import { BodyClass } from '../common/meta/body-class.decorator'
+import { DynamicRedirect, RedirectResponse, BodyClass } from '../common'
 import { DEFAULT_GROUP } from '../util/mapping'
 import { AppointmentTypeRequiresLocation, OffenderDetail, OffenderManager } from '../community-api/client'
 import { DateTime } from 'luxon'
 import { isActiveDateRange } from '../util'
 import { Breadcrumb, BreadcrumbType, LinksService } from '../common/links'
-import { Role, Roles } from '../security'
+import { Role, Roles, CurrentSecurityContext, SecurityContext } from '../security'
 
 type RenderOrRedirect = AppointmentWizardViewModel | RedirectResponse
 
@@ -51,13 +50,13 @@ export class ArrangeAppointmentController {
   async get(
     @Param('crn') crn: string,
     @Session() session: AppointmentWizardSession,
-    @AuthenticatedUser() user: User,
+    @CurrentSecurityContext() security: SecurityContext,
   ): Promise<RedirectResponse> {
     const response = this.wizard.reset(session, crn)
 
     const offender = await this.service.getOffenderDetails(crn)
 
-    const offenderManager = this.getOffenderManager(offender, user)
+    const offenderManager = this.getOffenderManager(offender, security)
 
     const conviction = await this.service.getOffenderConviction(crn)
     const rarRequirement = await this.service.getConvictionRarRequirement(crn, conviction.convictionId)
@@ -574,8 +573,8 @@ export class ArrangeAppointmentController {
     }
   }
 
-  private getOffenderManager(offender: OffenderDetail, user: User): OffenderManager {
-    const offenderManager = offender.offenderManagers.find(om => om.staff.code == user.staffCode)
+  private getOffenderManager(offender: OffenderDetail, security: SecurityContext): OffenderManager {
+    const offenderManager = offender.offenderManagers.find(om => om.staff.code == security.staffCode)
     if (!offenderManager) {
       throw new Error('Current user is not Offender Manager for this offender')
     }

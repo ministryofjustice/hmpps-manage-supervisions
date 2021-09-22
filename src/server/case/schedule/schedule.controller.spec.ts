@@ -8,6 +8,8 @@ import { fakeOffenderDetailSummary } from '../../community-api/community-api.fak
 import { CasePage } from '../case.types'
 import { fakeAppointmentListViewModel } from './schedule.fake'
 import { FeatureFlags } from '../../config'
+import { fakeSecurityContext } from '../../security/context/security-context.fake'
+import { Role } from '../../security'
 
 describe('ScheduleController', () => {
   let subject: ScheduleController
@@ -33,13 +35,15 @@ describe('ScheduleController', () => {
   it('gets schedule', async () => {
     const offender = fakeOffenderDetailSummary()
     offenderService.getOffenderSummary.withArgs('some-crn').resolves(offender)
+
     const viewModel: any = { page: CasePage.Schedule }
     const stub = offenderService.casePageOf.withArgs(offender, match.any).returns(viewModel)
 
     const appointments = [fakeAppointmentListViewModel()]
     scheduleService.getScheduledAppointments.withArgs('some-crn').resolves(appointments)
 
-    const observed = await subject.getSchedule('some-crn')
+    const context = fakeSecurityContext()
+    const observed = await subject.getSchedule('some-crn', context)
 
     expect(observed).toBe(viewModel)
     expect(stub.getCall(0).args[1]).toEqual({
@@ -47,5 +51,18 @@ describe('ScheduleController', () => {
       appointments,
       appointmentBookingEnabled: true,
     })
+  })
+
+  it('gets read only schedule', async () => {
+    const offender = fakeOffenderDetailSummary()
+    offenderService.getOffenderSummary.withArgs('some-crn').resolves(offender)
+
+    const stub = offenderService.casePageOf.withArgs(offender, match.any).returns({} as any)
+
+    const context = fakeSecurityContext({ authorities: [Role.ReadOnly] })
+    await subject.getSchedule('some-crn', context)
+
+    const { appointmentBookingEnabled }: any = stub.getCall(0).args[1]
+    expect(appointmentBookingEnabled).toBe(false)
   })
 })

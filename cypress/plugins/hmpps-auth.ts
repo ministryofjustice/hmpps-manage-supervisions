@@ -1,8 +1,25 @@
 import { ApiName, SeedFn, seedModule } from './wiremock'
 import * as jwt from 'jsonwebtoken'
 
+// must be upper case
 export const USERNAME = 'MANAGE_SUPERVISIONS'
-export const USER_ROLES = ['ROLE_MANAGE_SUPERVISIONS', 'ROLE_MANAGE_SUPERVISIONS_RO']
+
+interface MockRole {
+  authorities: string[]
+  deliusName: string
+}
+
+export enum Role {
+  None = 'none',
+  Read = 'read',
+  Write = 'write',
+}
+
+const ROLES: Record<Role, MockRole> = {
+  none: { authorities: [], deliusName: null },
+  read: { authorities: ['ROLE_MANAGE_SUPERVISIONS_RO'], deliusName: 'MASBT001' },
+  write: { authorities: ['ROLE_MANAGE_SUPERVISIONS_RO', 'ROLE_MANAGE_SUPERVISIONS'], deliusName: 'MASBT002' },
+}
 
 const AUTHORIZE_PATH = '/oauth/authorize'
 const TOKEN_PATH = '/oauth/token'
@@ -85,7 +102,7 @@ function requireBearerToken(api: ApiName, token: string): SeedFn {
 
 export interface StubHmppsAuthOptions {
   username?: string
-  roles?: string[]
+  role?: Role
 }
 
 /**
@@ -93,19 +110,19 @@ export interface StubHmppsAuthOptions {
  * Modify all community API & assess risks & needs API endpoints to require the client credentials bearer token.
  * This is only to be used where a real instance of hmpps-auth is unavailable or unpractical i.e. e2e tests.
  */
-export function hmppsAuthStub({ roles = USER_ROLES }: StubHmppsAuthOptions = {}) {
+export function hmppsAuthStub({ username = USERNAME, role = Role.Write }: StubHmppsAuthOptions = {}) {
   const SECRET = 'hmpps-auth-secret'
   const tokens = {
     deliusUser: jwt.sign(
       {
-        sub: USERNAME,
+        sub: username,
         client_id: 'api-client-id',
         user_id: '2500000001',
-        user_name: USERNAME,
+        user_name: username,
         auth_source: 'delius',
         name: 'Some User',
         scope: ['read', 'write'],
-        authorities: roles,
+        authorities: ROLES[role].authorities,
         iss: 'http://localhost:9091/hmpps-auth/issuer',
         iat: 1629150415,
         exp: 4784787795,
@@ -148,22 +165,18 @@ export function hmppsAuthStub({ roles = USER_ROLES }: StubHmppsAuthOptions = {})
  * These are used by the real hmpps-auth to authenticate delius users.
  * This is only to be used when a real hmpps-auth instance is available i.e. local development.
  */
-export function deliusLdap() {
+export function deliusLdap({ username = USERNAME, role = Role.Write }: StubHmppsAuthOptions = {}) {
   return seedModule({ title: 'Delius LDAP' }, context => {
     // TODO case insensitive
-    context.client.community.get(`/secure/users/${USERNAME}/details`).returns({
+    context.client.community.get(`/secure/users/${username}/details`).returns({
       userId: 2500000001,
       firstName: 'Gordon',
       surname: 'Smith',
       email: 'manage-supervisions@digital.justice.gov.uk',
       enabled: true,
-      // these role codes are mapped through hmpps-auth environment variables into our MANAGE_SUPERVISIONS roles
-      roles: [{ name: 'MASBT001' }, { name: 'MASBT002' }],
-      username: USERNAME,
+      roles: [{ name: ROLES[role].deliusName }].filter(x => x.name),
+      username: username,
     })
-    context.client.community
-      .post('/secure/authenticate')
-      .jsonBody({ username: USERNAME, password: 'password123456' })
-      .emptyOk()
+    context.client.community.post('/secure/authenticate').jsonBody({ username, password: 'password123456' }).emptyOk()
   })
 }
