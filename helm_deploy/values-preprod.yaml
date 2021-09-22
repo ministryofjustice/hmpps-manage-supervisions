@@ -17,7 +17,6 @@ generic-service:
     DELIUS_BASE_URL: https://ndelius.pre-prod.delius.probation.hmpps.dsd.io
     OASYS_BASE_URL: https://bridge-oasys.az.justice.gov.uk
     INGRESS_URL: https://hmpps-manage-supervisions-preprod.apps.live-1.cloud-platform.service.justice.gov.uk
-    ENABLE_APPOINTMENT_BOOKING: false
 
   allowlist:
     mojvpn: "81.134.202.29/32"

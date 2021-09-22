@@ -32,6 +32,14 @@ function mergePartials<T>(...items: T[]): T | null {
   }
 }
 
+function unwrapPartial<Faked>(partialOrPartials?: DeepPartial<Faked> | DeepPartial<Faked>[]): DeepPartial<Faked> {
+  return Array.isArray(partialOrPartials)
+    ? mergePartials(...partialOrPartials)
+    : partialOrPartials
+    ? cloneDeep(partialOrPartials)
+    : {}
+}
+
 export function fake<Faked, Options = any>(
   factory: (options?: Options, partial?: DeepPartial<Faked>) => Faked,
 ): FakeFn<Faked, Options> {
@@ -40,11 +48,7 @@ export function fake<Faked, Options = any>(
     if (typeof options !== 'object') {
       options = {} as any
     }
-    const partial: DeepPartial<Faked> = Array.isArray(partialOrPartials)
-      ? mergePartials(...partialOrPartials)
-      : partialOrPartials
-      ? cloneDeep(partialOrPartials)
-      : {}
+    const partial = unwrapPartial(partialOrPartials)
     const fake = factory(options, partial)
     return merge(fake, partial as Faked)
   }
@@ -52,14 +56,18 @@ export function fake<Faked, Options = any>(
 
 export function fakeClass<Faked, Options = ClassTransformOptions>(
   cls: ClassConstructor<Faked>,
-  factory: (options?: Options) => DeepNonFunctionPartial<Faked>,
+  factory: (options?: Options, partial?: DeepPartial<Faked>) => DeepNonFunctionPartial<Faked>,
   defaultOptions?: ClassTransformOptions,
 ): FakeFn<Faked> {
-  return (partial, options) =>
-    plainToClass(cls, merge(factory(options), partial), {
-      ...options,
-      ...defaultOptions,
-    })
+  return (partialOrPartials, options) => {
+    // passing the fake function by function reference in an array map will assign the array index to options
+    if (typeof options !== 'object') {
+      options = {} as any
+    }
+    const partial = unwrapPartial(partialOrPartials)
+    const fake = factory(options, partial)
+    return plainToClass(cls, merge(fake, partial), { ...options, ...defaultOptions })
+  }
 }
 
 export function fakeEnum<Enum>(cls: Enum): Enum[keyof Enum] {

@@ -1,1 +1,2 @@
-export * from './authenticated-user.decorator'
+export * from './body-class.decorator'
+export * from './class-transformer.pipe'

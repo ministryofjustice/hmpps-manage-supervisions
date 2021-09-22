@@ -1,6 +1,7 @@
 import { ViewCaseFixture } from './view-case.fixture'
 import { SCHEDULE_TABLE } from '../../pages/case/case.page'
 import { DateTime } from 'luxon'
+import { Role } from '../../plugins/hmpps-auth'
 
 class Fixture extends ViewCaseFixture {
   shouldRenderAppointmentTableFurniture(table: SCHEDULE_TABLE): this {
@@ -120,11 +121,21 @@ context('Case schedule tab', () => {
         })
         .shouldDisplayPageWithTitle('Home visit with Catherine Ellis')
     })
+
+    it('can arrange an appointment from offender schedule', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('schedule')
+        .shouldRenderOffenderTab('schedule', page => {
+          page.arrangeAppointmentButton.contains('Arrange an appointment').click()
+          cy.url().should('include', `/arrange-appointment/${fixture.crn}`)
+        })
+    })
   })
 
-  describe('empty schedule', () => {
+  describe('empty schedule with read-only role', () => {
     before(() => {
-      cy.seed({ appointments: [] })
+      cy.seed({ appointments: [], role: Role.Read })
     })
 
     it('displays empty offender schedule', () => {
@@ -135,14 +146,11 @@ context('Case schedule tab', () => {
         .shouldDisplayEmptyWarning('future', 'Future appointments', 'There are no future appointments scheduled.')
     })
 
-    it('can arrange an appointment from offender schedule', () => {
+    it('cannot arrange an appointment without write permission', () => {
       fixture
         .whenViewingOffender()
         .whenClickingSubNavTab('schedule')
-        .shouldRenderOffenderTab('schedule', page => {
-          page.arrangeAppointmentButton.contains('Arrange an appointment').click()
-          cy.url().should('include', `/arrange-appointment/${fixture.crn}`)
-        })
+        .shouldRenderOffenderTab('schedule', page => page.arrangeAppointmentButton.should('not.exist'))
     })
   })
 })

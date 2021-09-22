@@ -1,12 +1,13 @@
 import { ViewCasesFixture } from '../fixtures/view-cases.fixture'
 import { HmppsAuthPage, CasesPage } from '../pages'
+import { Role } from '../plugins/hmpps-auth'
 
 context('Cases', () => {
   const casesPage = new CasesPage()
   const authPage = new HmppsAuthPage()
   const fixture = new ViewCasesFixture()
 
-  describe('authorized user', () => {
+  describe('authorized user with cases', () => {
     before(() => {
       cy.seed()
     })
@@ -27,21 +28,22 @@ context('Cases', () => {
       cy.home()
       fixture.shouldRenderCasesHeader('Name and CRN').shouldRenderCasesRow(0, 'Liz Danger Haggis', 'X009923')
     })
+  })
 
-    describe('when no cases', () => {
-      before(() => {
-        cy.seed({ cases: [] })
-      })
-      it('should render the empty list message', () => {
-        cy.home()
-        fixture.shouldDisplayEmptyWarning('There are no suitable cases.')
-      })
+  describe('authorized user with no cases', () => {
+    before(() => {
+      cy.seed({ cases: [] })
+    })
+
+    it('should render the empty list message', () => {
+      cy.home()
+      fixture.shouldDisplayEmptyWarning('There are no suitable cases.')
     })
   })
 
   describe('unauthorized user', () => {
     before(() => {
-      cy.seed({ roles: ['SOME_ROLE'] })
+      cy.seed({ role: Role.None })
     })
 
     it('is unauthorized', () => {

@@ -5,6 +5,7 @@ import { CaseBreadcrumb } from '../case.decorators'
 import { OffenderService } from '../offender'
 import { ScheduleService } from './schedule.service'
 import { ConfigService } from '@nestjs/config'
+import { CurrentSecurityContext, Role, SecurityContext } from '../../security'
 
 @Controller('case/:crn(\\w+)/schedule')
 export class ScheduleController {
@@ -17,7 +18,10 @@ export class ScheduleController {
   @Get()
   @Render('case/schedule/schedule')
   @CaseBreadcrumb({ page: CasePage.Schedule, title: 'Schedule' })
-  async getSchedule(@Param('crn') crn: string): Promise<CaseScheduleViewModel> {
+  async getSchedule(
+    @Param('crn') crn: string,
+    @CurrentSecurityContext() security: SecurityContext,
+  ): Promise<CaseScheduleViewModel> {
     const [offender, appointments] = await Promise.all([
       this.offenderService.getOffenderSummary(crn),
       this.service.getScheduledAppointments(crn),
@@ -27,6 +31,7 @@ export class ScheduleController {
       page: CasePage.Schedule,
       appointments,
       appointmentBookingEnabled:
+        security.hasRole(Role.ReadWrite) &&
         this.config.get<ServerConfig>('server').features[FeatureFlags.EnableAppointmentBooking],
     })
   }
