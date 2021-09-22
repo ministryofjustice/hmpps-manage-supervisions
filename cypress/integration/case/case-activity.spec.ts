@@ -99,6 +99,11 @@ class Fixture extends ViewCaseFixture {
     assert(page)
     return this
   }
+
+  shouldHaveDocumentTitle(title: string) {
+    this.page.documentTitle.contains(title)
+    return this
+  }
 }
 
 context('Case activity tab', () => {
@@ -113,6 +118,7 @@ context('Case activity tab', () => {
       fixture
         .whenViewingOffender()
         .whenClickingSubNavTab('activity')
+        .shouldHaveDocumentTitle('Activity log')
         .shouldRenderOffenderTab('activity', page => {
           page.addToLogButton.contains('Add to log').click()
         })
@@ -344,6 +350,7 @@ context('Case activity tab', () => {
         .whenViewingOffender()
         .whenClickingSubNavTab('activity')
         .whenClickingFailuresToComplyFilter()
+        .shouldHaveDocumentTitle('Failures to comply')
         .shouldRenderActivityWithId(2)
         .shouldRenderActivityWithId(4)
         // a complied attended activity not returned by Wiremocked CAPI when the FTC filters are applied
@@ -357,6 +364,7 @@ context('Case activity tab', () => {
         .whenViewingOffender()
         .whenClickingSubNavTab('activity')
         .whenClickingWithoutAnOutcomeFilter()
+        .shouldHaveDocumentTitle('Without an outcome')
         .shouldRenderActivityWithId(5)
         .shouldNotRenderActivityWithId(1)
         .shouldNotRenderActivityWithId(2)
