@@ -370,7 +370,7 @@ context('Case activity tab', () => {
         .whenViewingOffender()
         .whenClickingSubNavTab('activity')
         .whenClickingWithoutAnOutcomeFilter()
-        .shouldHaveDocumentTitle('Without an outcome')
+        .shouldHaveDocumentTitle('without an outcome')
         .shouldHaveCurrentBreadcrumb('without an outcome')
         .shouldRenderActivityWithId(5)
         .shouldNotRenderActivityWithId(1)

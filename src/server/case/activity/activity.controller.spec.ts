@@ -124,11 +124,11 @@ describe('ActivityController', () => {
           name: 'Acceptable absences',
         },
         appointments: {
-          description: 'Appointments',
+          description: 'National Standard appointments',
           name: 'Appointments',
         },
         'without-an-outcome': {
-          description: 'Appointments without an outcome',
+          description: 'National Standard appointments without an outcome',
           name: 'Without an outcome',
         },
         'complied-appointments': {
@@ -183,11 +183,11 @@ describe('ActivityController', () => {
           name: 'Acceptable absences',
         },
         appointments: {
-          description: 'Appointments',
+          description: 'National Standard appointments',
           name: 'Appointments',
         },
         'without-an-outcome': {
-          description: 'Appointments without an outcome',
+          description: 'National Standard appointments without an outcome',
           name: 'Without an outcome',
         },
         'complied-appointments': {
