@@ -143,6 +143,10 @@ describe('ActivityController', () => {
           description: 'Warning letters',
           name: 'Warning letters',
         },
+        'rar-activity': {
+          description: 'Appointments with an associated RAR requirement',
+          name: 'RAR activity',
+        },
       },
       title: null,
       currentFilter: undefined,
@@ -201,6 +205,10 @@ describe('ActivityController', () => {
         'warning-letters': {
           description: 'Warning letters',
           name: 'Warning letters',
+        },
+        'rar-activity': {
+          description: 'Appointments with an associated RAR requirement',
+          name: 'RAR activity',
         },
       },
       title: 'Complied appointments',
