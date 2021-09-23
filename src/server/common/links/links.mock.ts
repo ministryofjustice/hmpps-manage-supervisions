@@ -12,6 +12,7 @@ class MockLinksService implements ILinksService {
     }
 
     const queryString = Object.entries(options)
+      .filter(([, v]) => v !== undefined)
       .map(([k, v]) => `${k}=${v}`)
       .sort()
       .join('&')

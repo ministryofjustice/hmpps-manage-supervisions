@@ -10,4 +10,8 @@ export abstract class PageBase {
   get logoutButton() {
     return cy.get('[data-qa=logout]')
   }
+
+  get currentBreadcrumb() {
+    return cy.get('.govuk-breadcrumbs [aria-current]')
+  }
 }

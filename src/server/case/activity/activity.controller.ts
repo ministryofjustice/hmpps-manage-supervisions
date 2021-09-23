@@ -32,6 +32,11 @@ export class ActivityController {
 
   @Get(':filter')
   @Render('case/activity/activity')
+  @Breadcrumb({
+    type: BreadcrumbType.CaseActivityLogWithComplianceFilter,
+    parent: BreadcrumbType.CaseActivityLog,
+    title: options => options.entityName,
+  })
   async getActivityFiltered(
     @Param('crn') crn: string,
     @Param('filter') complianceFilter: ActivityComplianceFilter,
@@ -130,17 +135,23 @@ export class ActivityController {
       this.sentence.getConvictionId(crn),
     ])
     const contacts = await this.activity.getActivityLogPage(crn, offender, { ...options, convictionId })
+    const complianceFilterDescription = options.complianceFilter && FilterLinks[options.complianceFilter].description
 
-    return this.offender.casePageOf<CaseActivityViewModel>(offender, {
-      page: CasePage.Activity,
-      groups: contacts.content,
-      pagination: {
-        page: contacts.number,
-        size: contacts.size,
+    return this.offender.casePageOf<CaseActivityViewModel>(
+      offender,
+      {
+        page: CasePage.Activity,
+        groups: contacts.content,
+        pagination: {
+          page: contacts.number,
+          size: contacts.size,
+        },
+        filters: FilterLinks,
+        currentFilter: options.complianceFilter,
+        title: complianceFilterDescription,
       },
-      filters: FilterLinks,
-      currentFilter: options.complianceFilter,
-      title: options.complianceFilter ? FilterLinks[options.complianceFilter].description : null,
-    })
+      complianceFilterDescription && BreadcrumbType.CaseActivityLogWithComplianceFilter,
+      complianceFilterDescription,
+    )
   }
 }

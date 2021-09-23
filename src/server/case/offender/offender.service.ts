@@ -22,10 +22,11 @@ export class OffenderService {
   casePageOf<Model extends CaseViewModel>(
     offender: OffenderDetailSummary,
     partial: Omit<Model, Exclude<keyof CaseViewModelBase<Model['page']>, 'page'>>,
+    breadcrumb = CASE_BREADCRUMBS[partial.page],
+    entityName?: string,
   ): Model {
     const crn = offender.otherIds.crn
-    const links = this.links.of({ crn, offenderName: getDisplayName(offender) })
-    const breadcrumb = CASE_BREADCRUMBS[partial.page]
+    const links = this.links.of({ crn, offenderName: getDisplayName(offender), entityName })
     return {
       ...partial,
       ids: {

@@ -97,10 +97,10 @@ export enum ActivityComplianceFilter {
 }
 
 export const FilterLinks: { [key: string]: ActivityFilterMeta } = {
-  [ActivityComplianceFilter.Appointments]: { name: 'Appointments', description: 'Appointments' },
+  [ActivityComplianceFilter.Appointments]: { name: 'Appointments', description: 'National Standard appointments' },
   [ActivityComplianceFilter.WithoutOutcome]: {
     name: 'Without an outcome',
-    description: 'Appointments without an outcome',
+    description: 'National Standard appointments without an outcome',
   },
   [ActivityComplianceFilter.CompliedAppointments]: { name: 'Complied', description: 'Complied appointments' },
   [ActivityComplianceFilter.FailedToComplyAppointments]: {
