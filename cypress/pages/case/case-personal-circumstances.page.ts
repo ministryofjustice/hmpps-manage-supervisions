@@ -1,6 +1,10 @@
 import { PageBase } from '../page'
 
 export class PersonalCircumstanceCard {
+  get previousCircumstance() {
+    return cy.get('[data-qa="circumstance-previous"]')
+  }
+
   cell(title: string) {
     return cy.get('dl[data-qa="circumstance-summary"] > div > dt').contains(title)
   }

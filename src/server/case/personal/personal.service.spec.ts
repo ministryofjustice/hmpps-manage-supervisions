@@ -288,6 +288,7 @@ describe('PersonalService', () => {
         name: 'Relationship: Married / Civil partnership',
         type: 'Relationship',
         subType: 'Married / Civil partnership',
+        previousCircumstanceCount: 0,
         startDate: DateTime.fromObject({ year: 2021, month: 7, day: 8 }),
         endDate: DateTime.fromObject({ year: 2021, month: 7, day: 9 }),
         verified: true,

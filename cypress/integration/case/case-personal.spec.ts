@@ -129,6 +129,9 @@ class Fixture extends ViewCaseFixture {
       card.value('Verified').contains(expected.verified ? 'Yes' : 'No')
       card.value('Notes').contains(expected.notes || 'No Notes')
       card.lastUpdated.contains(expected.lastUpdated)
+      if (expected.previous) {
+        card.previousCircumstance.contains('Previous circumstance')
+      }
     })
     return this
   }
@@ -171,6 +174,7 @@ interface ExpectedCircumstance {
   startDate: string
   endDate?: string
   verified: boolean
+  previous: boolean
   notes?: string
   lastUpdated: string
 }
@@ -312,6 +316,7 @@ context('Case personal details tab', () => {
         startDate: '1 April 2005',
         endDate: '2 July 2021',
         verified: true,
+        previous: true,
         notes: 'Divorced',
         lastUpdated: '2 July 2021',
       })

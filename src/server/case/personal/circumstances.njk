@@ -14,9 +14,20 @@
 
     {% for circumstance in circumstances %}
         {% set title %}
-            <span class="govuk-!-font-weight-regular govuk-!-font-size-19">{{ circumstance.type }}</span>
-            <br>
-            {{ circumstance.subType }}
+            <div class="app-summary-card__title-with-label">
+                <div>
+                    <span class="govuk-!-font-weight-regular govuk-!-font-size-19">{{ circumstance.type }}</span>
+                    <br>
+                    {{ circumstance.subType }}
+                </div>
+                {% if circumstance.endDate %}
+                    <strong data-qa="circumstance-previous" class="govuk-tag govuk-tag--purple">Previous circumstance
+                        {% if circumstance.previousCircumstanceCount > 1 %}
+                          <span class="govuk-visually-hidden">{{ circumstance.previousCircumstanceCount }}</span>
+                        {% endif %}
+                    </strong>
+                {% endif %}
+            </div>
         {% endset %}
         {% call appSummaryCard({
             titleHtml: title,

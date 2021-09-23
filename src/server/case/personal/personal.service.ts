@@ -129,6 +129,15 @@ export class PersonalService {
       data: { personalCircumstances = [] },
     } = await this.community.personalCircumstances.getOffenderPersonalCircumstancesByCrnUsingGET({ crn })
 
+    // If a circumstance subType appears more than once, we want the 2nd
+    // and onward circumstances to keep track which Nth circumstance of the
+    // same subType they are.
+    // We can do this with a dictionary that tracks the counts of appearances.
+    const circumstanceCounts: Record<string, number> = {}
+    const getPreviousCircumstanceCount = code => {
+      return code in circumstanceCounts ? ++circumstanceCounts[code] : (circumstanceCounts[code] = 0)
+    }
+
     return orderBy(
       personalCircumstances.map(x => ({
         name: `${x.personalCircumstanceType.description}: ${x.personalCircumstanceSubType.description}`,
@@ -139,6 +148,7 @@ export class PersonalService {
         verified: x.evidenced || false,
         notes: x.notes,
         lastUpdated: DateTime.fromISO(x.lastUpdatedDatetime),
+        previousCircumstanceCount: getPreviousCircumstanceCount(x.personalCircumstanceSubType.code),
       })),
       [x => x.startDate.toJSDate(), x => x.endDate?.toJSDate()],
       ['desc', 'desc'],
