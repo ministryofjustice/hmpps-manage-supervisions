@@ -17,7 +17,9 @@
   .app-summary-card__title {
     @include govuk-font($size: 19);
     margin: 0;
-    width: 100%;
+    &:only-child {
+      width: 100%;
+    }
   }
 
   .app-summary-card__actions {
