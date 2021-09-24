@@ -6,7 +6,7 @@
     <h1 class="govuk-heading-xl">Offences</h1>
 
     {% if offence %}
-        {% call appSummaryCard({ titleText: 'Main offence', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
+        {% call appSummaryCard({ titleText: 'Main offence', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6', headingLevel: 2 }) -%}
             {{ govukSummaryList({
                 rows: [
                     {

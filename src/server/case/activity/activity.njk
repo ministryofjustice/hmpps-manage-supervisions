@@ -50,7 +50,8 @@
         classes: 'govuk-!-margin-bottom-2',
         attributes: { 'data-qa': 'offender/activity/' + entry.id },
         actions: { items: [{ href: entry.links.recordMissingAttendance, text: "Record an outcome" }] } if not entry.outcome,
-        actionsHtml: govukTag({ text: entry.outcome.tag.name, classes: entry.outcome.tag.colour | tagClassName }) if entry.outcome
+        actionsHtml: govukTag({ text: entry.outcome.tag.name, classes: entry.outcome.tag.colour | tagClassName }) if entry.outcome,
+        headingLevel: 4
     }) -%}
         {% if entry.rarActivity %}
             {{ govukSummaryList({
@@ -73,7 +74,8 @@
     {% call appSummaryCard({
         titleHtml: title,
         classes: 'govuk-!-margin-bottom-2 app-summary-card--plain-header',
-        attributes: { 'data-qa': 'offender/activity/' + entry.id }
+        attributes: { 'data-qa': 'offender/activity/' + entry.id },
+        headingLevel: 4
     }) -%}
         {{ entryNotes(entry, open) }}
     {%- endcall %}

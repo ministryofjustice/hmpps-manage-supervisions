@@ -9,7 +9,8 @@
 {% if registration.removed %}
 {% call appSummaryCard({
     titleText: "Flag removed",
-    classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title'
+    classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
+    headingLevel: 2
 }) -%}
   {{ govukSummaryList({
     rows: [
@@ -44,7 +45,8 @@
         text: "Remove this flag on Delius"
       }
     ]
-  } if not registration.removed
+  } if not registration.removed,
+  headingLevel: 2
 }) -%}
 {{ govukSummaryList({
     rows: [

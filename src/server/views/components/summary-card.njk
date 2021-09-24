@@ -13,7 +13,7 @@
       {%- for attribute, value in params.attributes %} {{attribute}}="{{value}}"{% endfor %}>
         {% if params.titleHtml or params.titleText %}
             <header class="app-summary-card__header">
-                {% set headingLevel = params.headingLevel if params.headingLevel else 2 %}
+                {% set headingLevel = params.headingLevel if params.headingLevel else 3 %}
                 <h{{ headingLevel }} class="app-summary-card__title">
                     {{ params.titleHtml | safe if params.titleHtml else params.titleText }}
                 </h{{ headingLevel }}>
