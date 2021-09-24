@@ -95,12 +95,12 @@ export const CONTACT_DEFAULTS: WellKnownContactTypeConfig = {
     [WellKnownCommunicationType.EmailTextToOther]: {
       name: 'Email/Text to Other',
       code: 'CM3B',
-      description: 'Email or text message from a third party',
+      description: 'Email or text message to a third party',
     },
     [WellKnownCommunicationType.EmailTextFromOther]: {
       name: 'Email/Text from Other',
       code: 'CM3A',
-      description: 'Email or text message to a third party',
+      description: 'Email or text message from a third party',
     },
     [WellKnownCommunicationType.PhoneCallToOffender]: {
       name: 'Phone call to Offender',
