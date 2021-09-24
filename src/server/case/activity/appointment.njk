@@ -19,7 +19,7 @@
         </div>
     {% endif %}
 
-    {% call appSummaryCard({ titleText: 'Appointment details', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
+    {% call appSummaryCard({ titleText: 'Appointment details', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6', headingLevel: 2 }) -%}
     {{ govukSummaryList({
         attributes: {
             'data-qa': 'offender/activity/appointment'
@@ -55,7 +55,7 @@
     {%- endcall %}
 
     {% if appointment.outcome %}
-        {% call appSummaryCard({ titleText: 'Outcome details', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
+        {% call appSummaryCard({ titleText: 'Outcome details', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6', headingLevel: 2 }) -%}
         {{ govukSummaryList({
             attributes: {
                 'data-qa': 'offender/activity/outcome'

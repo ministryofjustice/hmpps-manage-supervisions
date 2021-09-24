@@ -49,8 +49,9 @@
                 classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
                 attributes: {
                     'data-qa': 'offender/disabilities/disability'
-                } })
-            -%}
+                },
+                headingLevel: 2
+            }) -%}
                 {{ govukSummaryList({
                     attributes: { 'data-qa': 'disability-summary' },
                     rows: [
