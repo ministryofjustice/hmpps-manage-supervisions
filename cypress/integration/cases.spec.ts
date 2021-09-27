@@ -20,6 +20,7 @@ context('Cases', () => {
 
     it('renders page furniture', () => {
       cy.home()
+      cy.testA11y()
       casesPage.pageTitle.contains('Your cases')
       casesPage.headerUserName.should('contain.text', 'J. Smith')
     })

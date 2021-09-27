@@ -188,6 +188,7 @@ context('Case personal details tab', () => {
     fixture
       .whenViewingOffender()
       .whenClickingSubNavTab('personal')
+      .shouldBeAccessible()
       .shouldDisplayCommonHeader()
       .shouldRenderOffenderTab('personal', page => {
         page.contactDetails(card => {
@@ -249,6 +250,7 @@ context('Case personal details tab', () => {
       .whenViewingOffender()
       .whenClickingSubNavTab('personal')
       .whenClickingViewAllAddresses()
+      .shouldBeAccessible()
       .shouldRenderAddress('main', {
         name: 'Main address - Since 16 July 2015',
         status: 'Main address',
@@ -279,6 +281,7 @@ context('Case personal details tab', () => {
       .whenViewingOffender()
       .whenClickingSubNavTab('personal')
       .whenClickingViewAllDisabilities()
+      .shouldBeAccessible()
       .shouldRenderDisability({
         name: 'Learning Difficulties',
         startDate: '1 February 2021',
@@ -303,6 +306,7 @@ context('Case personal details tab', () => {
       .whenViewingOffender()
       .whenClickingSubNavTab('personal')
       .whenClickingViewAllPersonalCircumstances()
+      .shouldBeAccessible()
       .shouldRenderPersonalCircumstance({
         type: 'Employment',
         subType: 'Temporary/casual work (30 or more hours per week)',
@@ -327,6 +331,7 @@ context('Case personal details tab', () => {
       .whenViewingOffender()
       .whenClickingSubNavTab('personal')
       .whenClickingViewPersonalContact('Pippa Wade – Wife')
+      .shouldBeAccessible()
       .shouldDisplayPersonalContact('Next of Kin Pippa Wade – Wife', page => {
         page.value('Name').contains('Pippa Wade')
         page.value('Relationship type').contains('Next of Kin')

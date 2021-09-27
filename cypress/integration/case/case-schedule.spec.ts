@@ -100,6 +100,7 @@ context('Case schedule tab', () => {
         .whenViewingOffender()
         .whenClickingSubNavTab('schedule')
         .shouldDisplayCommonHeader()
+        .shouldBeAccessible()
 
         .shouldRenderAppointmentTableFurniture('future')
         .shouldRenderAppointmentTableRow('future', 0, start, end, 'Some recent appointment')
@@ -119,6 +120,7 @@ context('Case schedule tab', () => {
         .shouldRenderOffenderTab('schedule', page => {
           page.tableData('future', 1, 'appointment').contains('Home visit with Catherine Ellis').click()
         })
+        .shouldBeAccessible()
         .shouldDisplayPageWithTitle('Home visit with Catherine Ellis')
     })
 
@@ -130,6 +132,7 @@ context('Case schedule tab', () => {
           page.arrangeAppointmentButton.contains('Arrange an appointment').click()
           cy.url().should('include', `/arrange-appointment/${fixture.crn}`)
         })
+        .shouldBeAccessible()
     })
   })
 

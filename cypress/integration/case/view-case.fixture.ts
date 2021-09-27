@@ -44,4 +44,9 @@ export class ViewCaseFixture {
     cy.go('back')
     return this
   }
+
+  shouldBeAccessible() {
+    cy.testA11y()
+    return this
+  }
 }

@@ -29,6 +29,7 @@ describe('Case exit pages', () => {
   it('renders delius exit page', () => {
     fixture
       .whenViewingExitPage('delius')
+      .shouldBeAccessible()
       .shouldDisplayExitPage('delius', page => {
         page.delius.contactLogTitle.contains('Go directly to Liz Haggis on Delius')
         page.delius.contactLog
@@ -53,6 +54,7 @@ describe('Case exit pages', () => {
   it('renders oasys exit page', () => {
     fixture
       .whenViewingExitPage('oasys')
+      .shouldBeAccessible()
       .shouldDisplayExitPage('oasys', page => {
         page.oasys.homepageExplanation.contains('You can use the following information to find Liz Haggis on OASys')
         page.oasys.homepage

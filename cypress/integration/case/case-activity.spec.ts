@@ -128,6 +128,7 @@ context('Case activity tab', () => {
       fixture
         .whenViewingOffender()
         .whenClickingSubNavTab('activity')
+        .shouldBeAccessible()
         .shouldHaveDocumentTitle('Activity log')
         .shouldRenderOffenderTab('activity', page => {
           page.addToLogButton.contains('Add to log').click()
@@ -321,6 +322,7 @@ context('Case activity tab', () => {
         .whenViewingOffender()
         .whenClickingSubNavTab('activity')
         .whenClickingActivityEntry(7)
+        .shouldBeAccessible()
 
         .shouldRenderActivityDetailPage('Email or text message to Liz Danger Haggis', page => {
           page.detail(list => {

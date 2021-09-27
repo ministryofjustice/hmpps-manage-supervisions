@@ -52,6 +52,7 @@ context('Case overview tab', () => {
 
     fixture
       .whenViewingOffender()
+      .shouldBeAccessible()
       .shouldDisplayCommonHeader()
       .shouldRenderOffenderTab('overview', page => {
         page.schedule(card => {
