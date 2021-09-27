@@ -28,6 +28,11 @@ declare global {
        * Navigates to view case page & logs in.
        */
       viewCase: typeof viewCase
+
+      /**
+       * Checks accessibility of the currently open page using Axe.
+       */
+      testA11y: typeof testA11y
     }
   }
 }
@@ -59,3 +64,16 @@ function viewCase({ crn = CRN, path = '' }: { crn?: string; path?: string } = {}
   hmppsAuth.login()
 }
 Cypress.Commands.add('viewCase', viewCase)
+
+function testA11y() {
+  cy.injectAxe()
+  cy.configureAxe({
+    rules: [
+      { id: 'region', enabled: false },
+      { id: 'definition-list', enabled: false },
+      { id: 'aria-allowed-attr', enabled: false },
+    ],
+  })
+  cy.checkA11y()
+}
+Cypress.Commands.add('testA11y', testA11y)
