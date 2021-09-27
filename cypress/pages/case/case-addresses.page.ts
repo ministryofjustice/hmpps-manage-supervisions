@@ -4,7 +4,7 @@ export type ADDRESS = 'main' | 'other' | 'previous'
 
 export class CaseAddressesPage extends PageBase {
   addressTitle(table: ADDRESS) {
-    return cy.get(`[data-qa="offender/addresses/${table}"] h3`)
+    return cy.get(`[data-qa="offender/addresses/${table}"] h2`)
   }
 
   addressCell(table: ADDRESS, title: string) {

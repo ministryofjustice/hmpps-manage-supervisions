@@ -8,9 +8,10 @@
     titleText: address.name,
     classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
     attributes: {
-        'data-qa': 'offender/addresses/' + options.qa
-    } })
--%}
+      'data-qa': 'offender/addresses/' + options.qa
+    },
+    headingLevel: 2
+}) -%}
     {{ govukSummaryList({
         rows: [
             {
