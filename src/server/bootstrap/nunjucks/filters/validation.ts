@@ -1,9 +1,21 @@
 import { NunjucksFilter } from './types'
 import { ValidationError } from 'class-validator'
-import { flattenValidationErrors } from '../../../util/flattenValidationErrors'
+import { flattenValidationErrors, FlatValidationError } from '../../../util/flattenValidationErrors'
 
 export interface GdsErrorMessage {
   text: string
+  href?: string
+}
+
+export class ErrorSummary implements NunjucksFilter {
+  filter(errors: ValidationError[]): GdsErrorMessage[] {
+    return flattenValidationErrors(errors || []).map(
+      (error: FlatValidationError): GdsErrorMessage => ({
+        text: [...new Set(Object.values(error.constraints))].join(', '),
+        href: `#${error.path}`,
+      }),
+    )
+  }
 }
 
 export class FindErrorMessages implements NunjucksFilter {

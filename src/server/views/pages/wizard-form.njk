@@ -1,5 +1,7 @@
 {% extends "../partials/layout.njk" %}
-{% block pageTitle %}{{ title }}{% endblock %}
+{% block pageTitle %}
+  {% if errors.length > 0 %}Error: {% endif %}{{ title }}
+{% endblock %}
 
 {% block pageNavigation %}
   {{ govukBackLink({
@@ -8,6 +10,13 @@
 {% endblock %}
 
 {% block content %}
+  {% if errors.length > 0 %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: errors | errorSummary
+    }) }}
+  {% endif %}
+
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       <form method="post" autocomplete="off" action="{{ action if action else paths.current }}">

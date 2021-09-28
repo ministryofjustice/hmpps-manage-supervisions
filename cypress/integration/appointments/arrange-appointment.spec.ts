@@ -359,6 +359,8 @@ context('Arrange appointment happy path & validation', () => {
   }
 
   function shouldRenderTypeValidationMessages(expected: { type?: string; other?: string }) {
+    page.documentTitle.contains('Error')
+    page.errorSummary.contains('There is a problem')
     for (const name of Object.keys(page.type.errorMessages)) {
       if (expected[name]) {
         page.type.errorMessages[name].contains(expected[name])
@@ -369,6 +371,8 @@ context('Arrange appointment happy path & validation', () => {
   }
 
   function shouldRenderLocationValidationMessages(expected: string) {
+    page.documentTitle.contains('Error')
+    page.errorSummary.contains('There is a problem')
     page.where.errorMessages.location.contains(expected)
   }
 
