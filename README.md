@@ -161,3 +161,29 @@ The `security` CircleCI workflow is run Mon-Fri @7am off of the `main` branch. I
 * [npm-audit](https://docs.npmjs.com/cli/v7/commands/npm-audit) - run a security audit on installed npm packages.
 * [trivy](https://github.com/aquasecurity/trivy) - scanner for vulnerabilities in container images, file systems, and Git repositories, as well as for configuration issues.
 * [veracode](https://www.veracode.com/products/binary-static-analysis-sast) - proprietary static analysis.
+
+## Debugging
+
+Modern IDEs (VSCode, Webstorm, IntelliJ) should work out of the box with the built in tools.
+
+If you don't use a modern IDE, start the web server with `--debug`:
+
+```bash
+$ npm run start:debug
+...
+Debugger listening on ws://127.0.0.1:9229/a6f408e2-8db2-48df-8ee6-ec3fab60709d
+For help, see: https://nodejs.org/en/docs/inspector
+```
+
+You can attach to the debugging session using Chrome dev tools, or `node inspect`:
+
+```bash
+# Get the PID of the running node process
+$ lsof -ti -i:3007 | tail -n 1
+12345
+$ node inspect -p 12345
+connecting to 127.0.0.1:9229 ... ok
+debug>
+```
+
+Then you can run `watch`, `exec variableName`, `cont`, `setBreakpoint`, and [the rest of the debugger commands](https://nodejs.org/api/debugger.html).
