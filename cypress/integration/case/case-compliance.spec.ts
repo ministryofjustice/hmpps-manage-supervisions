@@ -86,6 +86,7 @@ context('Case compliance tab', () => {
     fixture
       .whenViewingOffender()
       .whenClickingSubNavTab('compliance')
+      .shouldBeAccessible()
       .shouldDisplayCommonHeader()
       .shouldRenderOffenderTab('compliance', page => {
         page.startBreachLink.should('not.exist')

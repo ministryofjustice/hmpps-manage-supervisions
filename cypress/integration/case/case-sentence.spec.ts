@@ -30,6 +30,7 @@ context('Case sentence tab', () => {
         .whenViewingOffender()
 
         .whenClickingSubNavTab('sentence')
+        .shouldBeAccessible()
         .shouldDisplayCommonHeader()
         .shouldRenderOffenderTab('sentence', page => {
           page.noDetails.contains('Sentence details are unavailable.')
@@ -118,6 +119,7 @@ context('Case sentence tab', () => {
             card.value('Previous breaches').contains('1 previous breach')
           })
         })
+        .shouldBeAccessible()
     })
 
     it('displays previous convictions details', () => {
@@ -129,6 +131,7 @@ context('Case sentence tab', () => {
             card.value('Previous orders').contains('1 previous order').click()
           })
         })
+        .shouldBeAccessible()
         .shouldRenderPreviousOrdersPage(page => {
           page.previousOrdersTable(table => {
             table.cell(0, 1).contains('Ended on 1 December 2020')
@@ -148,6 +151,7 @@ context('Case sentence tab', () => {
             list.value('Additional offences').find('a').contains('View additional offence details').click()
           })
         })
+        .shouldBeAccessible()
         .shouldRenderOffencesPage(page => {
           page.mainOffence(list => {
             list

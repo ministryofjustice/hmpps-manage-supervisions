@@ -46,18 +46,28 @@ context('Arrange appointment happy path & validation', () => {
 
     cy.arrangeAppointment()
 
+    shouldBeAccessible()
+
     whenSelectingTypeRadio(test.type.name)
     whenSubmittingCurrentStep()
+
+    shouldBeAccessible()
 
     whenSelectingLocationRadio(test.location.name)
     whenSubmittingCurrentStep()
 
+    shouldBeAccessible()
+
     whenEnteringAppointmentDateAndTimes(test)
+
+    shouldBeAccessible()
 
     whenAskingToEnterNotes(test)
     whenEnteringNotes(test)
 
     whenSelectingSensitive(test)
+
+    shouldBeAccessible()
 
     shouldDisplayCorrectAppointmentSummary(test)
 
@@ -65,6 +75,8 @@ context('Arrange appointment happy path & validation', () => {
     shouldDisplayAppointmentBookingConfirmation(test)
 
     shouldHaveBookedAppointment(test)
+
+    shouldBeAccessible()
   })
 
   it('can book an "other" appointment by searching', () => {
@@ -115,6 +127,8 @@ context('Arrange appointment happy path & validation', () => {
     shouldRenderTypeValidationMessages({
       other: 'Select an appointment type',
     })
+
+    shouldBeAccessible()
   })
 
   it('validates location', () => {
@@ -131,6 +145,8 @@ context('Arrange appointment happy path & validation', () => {
     // nothing selected
     whenSubmittingCurrentStep()
     shouldRenderLocationValidationMessages('Select a location')
+
+    shouldBeAccessible()
   })
 
   it('validates time and dates', () => {
@@ -169,6 +185,8 @@ context('Arrange appointment happy path & validation', () => {
     whenSubmittingCurrentStep()
     aStartTimeErrorIsShown('Enter a time in the future')
     aEndTimeErrorIsShown('Enter an end time after the start time')
+
+    shouldBeAccessible()
   })
 
   it('validates selecting to add notes', () => {
@@ -203,6 +221,8 @@ context('Arrange appointment happy path & validation', () => {
     // yes goes to notes entry page
     whenAskingToEnterNotes({ ...test, addNotes: true })
     whenEnteringNotes(test)
+
+    shouldBeAccessible()
   })
 
   it('validates sensitive & sensitive help text', () => {
@@ -235,6 +255,8 @@ context('Arrange appointment happy path & validation', () => {
     // nothing selected
     whenSubmittingCurrentStep()
     page.sensitive.errorMessages.sensitive.contains('Select yes if the appointment contains sensitive information')
+
+    shouldBeAccessible()
   })
 
   function whenSubmittingCurrentStep() {
@@ -385,5 +407,9 @@ context('Arrange appointment happy path & validation', () => {
     page.when.preferredLaguageText.contains('Bengali')
     page.when.disabilitiesText.contains('Learning Difficulties')
     page.when.employmentText.contains('Temporary/casual work (30 or more hours per week)')
+  }
+
+  function shouldBeAccessible() {
+    cy.testA11y()
   }
 })

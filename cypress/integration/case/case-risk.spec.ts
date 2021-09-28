@@ -30,6 +30,7 @@ context('Case risk tab', () => {
       fixture
         .whenViewingOffender()
         .whenClickingSubNavTab('risk')
+        .shouldBeAccessible()
         .shouldDisplayCommonHeader()
         .shouldRenderOffenderTab('risk', page => {
           page.noActiveRegistrations.contains('There are no current risk flags. Add risk flags in Delius.')
@@ -119,6 +120,7 @@ context('Case risk tab', () => {
         .shouldRenderOffenderTab('risk', page => {
           page.whenClickingRiskRegistration(flagName)
         })
+        .shouldBeAccessible()
         .shouldRenderRiskDetails(flagName, page => {
           // These texts are long, so just check for a substring
           page.purposeText.contains('To distribute priority information/warning/alerts relating to an offender')
@@ -186,6 +188,7 @@ context('Case risk tab', () => {
         .shouldRenderRemovedRiskFlagPage(page => {
           page.whenClickingRiskRegistration(flagName)
         })
+        .shouldBeAccessible()
         .shouldRenderRiskDetails(flagName, page => {
           page.removalDetails(card => {
             card.value('Date removed').contains('19 July 2021 by Brian Peashoots')
