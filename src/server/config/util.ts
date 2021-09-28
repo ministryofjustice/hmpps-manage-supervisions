@@ -32,10 +32,6 @@ export function getWellKnownRequirementName(config: WellKnownRequirementTypeConf
     .replace(WellKnownRequirementTypePattern.SubCategory, requirement.requirementTypeSubCategory?.description || '')
     .replace(WellKnownRequirementTypePattern.Length, length)
     .replace(WellKnownRequirementTypePattern.Unit, unit)
-    .replace(
-      WellKnownRequirementTypePattern.Progress,
-      requirement.rarCount ? quantity(requirement.rarCount, 'days') : 'none',
-    )
 
   return safeCapitalize(result) + postfix
 }

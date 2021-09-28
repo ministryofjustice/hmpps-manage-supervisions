@@ -47,8 +47,8 @@ export const fakeAdditionalSentence = fake<AdditionalSentence>(() => ({
 
 const fakeConvictionRequirementDetail = fake<ConvictionRequirementDetail, { isActive?: boolean }>(
   ({ isActive = true } = {}) => ({
+    id: faker.datatype.number(),
     length: `${faker.datatype.number()} days`,
-    progress: `${faker.datatype.number()} days`,
     startDate: {
       value: DateTime.fromJSDate(faker.date.past()),
       expected: faker.datatype.boolean(),
@@ -139,7 +139,11 @@ export const fakeComplianceDetails = fake<ComplianceDetails>(() => ({
       alertLevel: faker.random.arrayElement(Object.values(ComplianceStatusAlertLevel)),
       breachSuggested: faker.datatype.boolean(),
     },
-    requirement: faker.company.bs(),
+    requirement: {
+      name: faker.company.bs(),
+      requirementCount: faker.datatype.number(),
+      totalRarCount: faker.datatype.number(),
+    },
   },
   previous: {
     convictions: [fakeComplianceConvictionSummary()],

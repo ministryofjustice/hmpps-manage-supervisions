@@ -109,9 +109,8 @@ context('Case sentence tab', () => {
 
           page.sentence(card => {
             card.value('Order').contains('12 month Community Order')
-            card.detailsList('Requirements', '44 days RAR, 29 completed (2 requirements)', list => {
+            card.detailsList('Requirements', '44 days RAR, 1 completed', list => {
               list.value('Length').contains('34 days')
-              list.value('Progress').contains('20 days completed')
               list.value('Start date').contains('1 August 2018')
               list.value('Termination date').contains('7 November 2021 (expected)')
               list.value('Notes').contains('No notes')

@@ -12,8 +12,10 @@ import {
   ConvictionDetails,
   ConvictionOffence,
   ConvictionRequirement,
+  ConvictionRequirementType,
   ConvictionSentenceDetail,
   ConvictionSummary,
+  CurrentComplianceConvictionSummary,
   PreviousConvictionSummary,
 } from './sentence.types'
 import { RequirementService } from './requirement.service'
@@ -76,6 +78,10 @@ export class SentenceService {
       return null
     }
 
+    const rar = await this.getRarRequirement(crn, current.convictionId, requirements)
+    if (rar) {
+      requirements.find(x => x.isRar).name = rar.name
+    }
     return {
       previousConvictions: previous.length
         ? {
@@ -114,8 +120,8 @@ export class SentenceService {
     const { requirements, current, previous } = await this.getConvictionsAndRequirements(crn, from)
 
     const [currentSummary, ...previousSummaries] = await Promise.all([
-      this.compliance.convictionSummary(crn, current),
-      ...previous.map(x => this.compliance.convictionSummary(crn, x)),
+      this.compliance.getComplianceSummary(crn, current),
+      ...previous.map(x => this.compliance.getComplianceSummary(crn, x)),
     ])
 
     let compliancePeriod = CompliancePeriod.Last12Months
@@ -226,7 +232,7 @@ export class SentenceService {
               ),
             },
             status: getCurrentStatus(),
-            requirement: requirements.find(r => r.isRar)?.name,
+            requirement: current ? await this.getRarRequirement(crn, current.convictionId, requirements) : null,
           }
         : null,
       previous: {
@@ -315,5 +321,27 @@ export class SentenceService {
   private static getElapsedOf(sentence: Sentence): string | null {
     const result = getElapsed(sentence.startDate, sentence.originalLength, sentence.originalLengthUnits)
     return result && `${result.elapsed} elapsed (of ${result.length})`
+  }
+
+  private async getRarRequirement(
+    crn: string,
+    convictionId: number,
+    requirements: ConvictionRequirement[],
+  ): Promise<CurrentComplianceConvictionSummary['requirement']> {
+    // there should only ever be a single RAR requirement in this set as teh requirement service aggregates them
+    const rarRequirement = requirements.find(r => r.isRar)
+    if (!rarRequirement) {
+      return null
+    }
+    const totalRarCount = await this.activity.getActivityLogComplianceCount(
+      crn,
+      convictionId,
+      ActivityComplianceFilter.RarActivity,
+    )
+    return {
+      name: `${rarRequirement.name}, ${totalRarCount === 0 ? 'none' : totalRarCount} completed`,
+      totalRarCount,
+      requirementCount: rarRequirement.type === ConvictionRequirementType.Unit ? 1 : rarRequirement.requirements.length,
+    }
   }
 }

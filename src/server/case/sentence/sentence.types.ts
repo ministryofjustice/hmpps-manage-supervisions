@@ -36,8 +36,8 @@ export interface GetConvictionRequirementsOptions {
 }
 
 export interface ConvictionRequirementDetail {
+  id: number
   length: string
-  progress?: string
   notes?: string
   startDate?: PotentiallyExpectedDateTime
   endDate?: PotentiallyExpectedDateTime
@@ -136,7 +136,11 @@ export enum CompliancePeriod {
   SinceLastBreach = 'since last breach',
 }
 export interface CurrentComplianceConvictionSummary extends ComplianceConvictionSummary {
-  requirement: string
+  requirement?: {
+    name: string
+    totalRarCount: number
+    requirementCount: number
+  }
   period: CompliancePeriod
   appointments: {
     total: ComplianceQuantity

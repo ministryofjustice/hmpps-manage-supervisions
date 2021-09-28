@@ -171,7 +171,6 @@ export enum WellKnownRequirementTypePattern {
   Length = '{length}',
   Unit = '{unit}',
   LengthAndUnit = '{length} {unit}',
-  Progress = '{progress}',
 }
 
 export interface RiskConfig {

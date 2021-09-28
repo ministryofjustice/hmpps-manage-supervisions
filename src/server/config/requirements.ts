@@ -20,8 +20,5 @@ export const requirements: WellKnownRequirementTypeConfig = Object.freeze({
       W03: `${WellKnownRequirementTypePattern.Length} additional ${WellKnownRequirementTypePattern.Unit} unpaid work`,
     },
   },
-  F: {
-    pattern: `${WellKnownRequirementTypePattern.LengthAndUnit} RAR (${WellKnownRequirementTypePattern.Progress} completed)`,
-    isRar: true,
-  },
+  F: { pattern: `${WellKnownRequirementTypePattern.LengthAndUnit} RAR`, isRar: true },
 })

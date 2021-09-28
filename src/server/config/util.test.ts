@@ -38,7 +38,7 @@ describe('config util', () => {
       expect(observed).toBe('Some requirement type: some requirement sub type')
     })
 
-    it('maps RAR without progress', () => {
+    it('maps RAR', () => {
       const requirement = fakeRequirement({
         requirementTypeMainCategory: { code: 'F' },
         length: 10,
@@ -46,19 +46,7 @@ describe('config util', () => {
         active: true,
       })
       const observed = getWellKnownRequirementName(requirements, requirement)
-      expect(observed).toBe('10 days RAR (none completed)')
-    })
-
-    it('maps RAR with progress', () => {
-      const requirement = fakeRequirement({
-        requirementTypeMainCategory: { code: 'F' },
-        length: 10,
-        rarCount: 5,
-        lengthUnit: 'Day',
-        active: true,
-      })
-      const observed = getWellKnownRequirementName(requirements, requirement)
-      expect(observed).toBe('10 days RAR (5 days completed)')
+      expect(observed).toBe('10 days RAR')
     })
 
     it('appends terminated when terminated', () => {

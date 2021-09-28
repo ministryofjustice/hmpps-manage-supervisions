@@ -25,17 +25,17 @@ describe('RequirementService', () => {
   it('should be defined', async () => {
     const options: GetConvictionRequirementsOptions = { crn: 'some-crn', convictionId: 100 }
     const rarRequirement1 = fakeRequirement({
+      requirementId: 1,
       length: 4,
       lengthUnit: 'Day',
-      rarCount: 2,
       requirementNotes: 'RAR 1',
       startDate: '2020-06-20',
       expectedEndDate: null,
     })
     const rarRequirement2 = fakeRequirement({
+      requirementId: 2,
       length: 5,
       lengthUnit: 'Day',
-      rarCount: 3,
       requirementNotes: 'RAR 2',
       startDate: null,
       expectedStartDate: '2020-12-20',
@@ -43,6 +43,7 @@ describe('RequirementService', () => {
     })
     const softDeletedRequirement = fakeRequirement({ softDeleted: true })
     const requirement = fakeRequirement({
+      requirementId: 3,
       length: 6,
       lengthUnit: 'Month',
       requirementTypeMainCategory: { code: 'M' },
@@ -52,6 +53,7 @@ describe('RequirementService', () => {
       expectedEndDate: null,
     })
     const terminated = fakeRequirement({
+      requirementId: 4,
       length: 1,
       lengthUnit: 'Year',
       requirementTypeMainCategory: { code: 'H' },
@@ -71,12 +73,12 @@ describe('RequirementService', () => {
     expect(observed).toEqual([
       {
         type: ConvictionRequirementType.Aggregate,
-        name: '9 days RAR, 5 completed (2 requirements)',
+        name: '9 days RAR',
         isRar: true,
         requirements: [
           {
+            id: 1,
             length: '4 days',
-            progress: '2 days completed',
             notes: 'RAR 1',
             startDate: {
               value: DateTime.fromObject({ year: 2020, month: 6, day: 20 }),
@@ -85,8 +87,8 @@ describe('RequirementService', () => {
             endDate: null,
           },
           {
+            id: 2,
             length: '5 days',
-            progress: '3 days completed',
             notes: 'RAR 2',
             startDate: {
               value: DateTime.fromObject({ year: 2020, month: 12, day: 20 }),
@@ -100,21 +102,21 @@ describe('RequirementService', () => {
         ],
       },
       {
+        id: 3,
         type: ConvictionRequirementType.Unit,
         name: '6 months curfew',
         isRar: false,
         length: '6 months',
-        progress: null,
         notes: 'Plain old requirement',
         startDate: null,
         endDate: null,
       },
       {
+        id: 4,
         type: ConvictionRequirementType.Unit,
         name: '1 year alcohol treatment (terminated)',
         isRar: false,
         length: '1 year',
-        progress: null,
         notes: 'Terminated requirement',
         startDate: {
           value: DateTime.fromObject({ year: 2021, month: 1, day: 1 }),

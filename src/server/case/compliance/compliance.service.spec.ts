@@ -24,7 +24,7 @@ describe('ComplianceService', () => {
 
   it('returns null when sentence is missing', async () => {
     const conviction: Conviction = {}
-    const observed = await subject.convictionSummary('some-crn', conviction)
+    const observed = await subject.getComplianceSummary('some-crn', conviction)
     expect(observed).toBeNull()
   })
 
@@ -47,7 +47,7 @@ describe('ComplianceService', () => {
       lastRecentBreachEnd: DateTime.fromObject({ year: 2018, month: 2, day: 1 }),
     })
 
-    const observed = await subject.convictionSummary('some-crn', conviction)
+    const observed = await subject.getComplianceSummary('some-crn', conviction)
 
     expect(observed).toEqual({
       mainOffence: 'Some offence (2 counts)',

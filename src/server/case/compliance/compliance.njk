@@ -108,7 +108,10 @@
                 {% set requirementTitle %}
                     <span class="govuk-!-font-size-19 govuk-!-font-weight-regular">Requirement</span>
                     <br>
-                    <span data-qa='offender/compliance/requirement-name'>{{ compliance.current.requirement }}</span>
+                    <span data-qa='offender/compliance/requirement-name'>
+                        {{ compliance.current.requirement.name }}
+                        {{ compliance.current.requirement.requirementCount | quantity('requirements') | brackets if compliance.current.requirement.requirementCount > 1 }}
+                    </span>
                     {% if compliance.current.period === 'since last breach' %}
                         <br>
                         <span class="govuk-!-font-size-19 govuk-!-font-weight-regular" data-qa='offender/compliance/compliance-since-last-breach'>
