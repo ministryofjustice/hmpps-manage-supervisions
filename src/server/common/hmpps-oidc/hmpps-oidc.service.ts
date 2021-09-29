@@ -17,6 +17,10 @@ export class HmppsOidcService {
 
   constructor(private readonly cache: CacheService, config: ConfigService) {
     this.config = config.get('apis.hmppsAuth')
+
+    custom.setHttpOptionsDefaults({
+      timeout: this.config.timeout,
+    })
   }
 
   public async getDeliusUserToken({ username }: User): Promise<string> {

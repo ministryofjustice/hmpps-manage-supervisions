@@ -324,7 +324,7 @@ export function configFactory(): Config {
         enabled: true,
         url: authUrl,
         externalUrl: url('HMPPS_AUTH_EXTERNAL_URL', fallback(authUrl.href)),
-        timeout: int('HMPPS_AUTH_TIMEOUT', fallback(10000)),
+        timeout: int('HMPPS_AUTH_TIMEOUT', fallback(5000)),
         apiClientCredentials: {
           id: string('API_CLIENT_ID', developmentOnly('interventions')),
           secret: string('API_CLIENT_SECRET', developmentOnly('clientsecret')),
@@ -346,12 +346,12 @@ export function configFactory(): Config {
       community: {
         enabled: true,
         url: url('COMMUNITY_API_URL', developmentOnly('http://localhost:9091/community-api')),
-        timeout: int('COMMUNITY_API_TIMEOUT', fallback(30000)),
+        timeout: int('COMMUNITY_API_TIMEOUT', fallback(10000)),
       },
       assessRisksAndNeeds: {
         enabled: true,
         url: url('ASSESS_RISKS_AND_NEEDS_API_URL', developmentOnly('http://localhost:9091/assess-risks-and-needs')),
-        timeout: int('ASSESS_RISKS_AND_NEEDS_API_TIMEOUT', fallback(30000)),
+        timeout: int('ASSESS_RISKS_AND_NEEDS_API_TIMEOUT', fallback(10000)),
       },
     },
     contacts: {
