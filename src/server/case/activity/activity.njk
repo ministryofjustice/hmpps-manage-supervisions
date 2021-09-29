@@ -92,12 +92,16 @@
                         'data-qa': 'offender/add-activity-button'
                     }
                 }) }}
+
+                {% if currentFilter %}
+                    <p><a href="{{links.activity}}">Remove all filters</a></p>
+                {% endif %}
+
                 <h3 class="govuk-heading-m">Compliance filters</h3>
 
                 <p> Filter the activity log by National Standard (NS) activities: </p>
 
                 <ul class="govuk-list govuk-!-margin-bottom-0">
-                <li><a {% if not currentFilter %}class="govuk-!-font-weight-bold" aria-current="page"{% endif %} href="{{links.activity}}">All activity</a></li>
 
                 {% for key, value in filters %}
                     <li><a {% if currentFilter == key %}class="govuk-!-font-weight-bold" aria-current="page"{% endif %} data-qa="offender/activity-filter-{{ key }}" href="{{links.activity}}/{{ key }}">{{ value.name }}</a></li>
