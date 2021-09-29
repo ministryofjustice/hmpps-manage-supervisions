@@ -1,26 +1,49 @@
-<header class="govuk-header govuk-!-display-none-print" role="banner" data-module="govuk-header" >
-  <div id="header-contents" class="govuk-width-container">
-    <a href="/" class="govuk-header__link govuk-header__link--homepage no-underline  govuk-!-padding-top-1 govuk-!-padding-bottom-1">
-      <div id="site-header-block">
-        <div id="logo">
-          <img src="/assets/images/crest.svg" alt="Ministry of Justice crest" />
-        </div>
-        <span id="hmpps-title">
-          HMPPS
-        </span>
-        <span id="main-title">{{applicationName}}</span>
-      </div>
-    </a>
+<header class="moj-header" role="banner">
+  <div class="moj-header__container">
+    <div class="moj-header__logo">
+      <img focusable="false" class="moj-header__logotype-crest" src="/assets/images/crest.svg" alt="Ministry of Justice crest" height="40" width="40"/>
+      <a class="moj-header__link moj-header__link--organisation-name" href="/">HMPPS</a>
+      <a class="moj-header__link moj-header__link--service-name" href="/">Manage supervisions</a>
+      <span class="app-header-phase-tag">
+        {{ govukTag({
+          text: 'Alpha',
+          classes: 'govuk-!-margin-left-1'
+        }) }}
+      </span>
+    </div>
 
     {% if user %}
-      <div id="user-block" class="govuk-!-padding-top-1 govuk-!-padding-bottom-1">
-        <div id="header-user-name" data-qa="header-user-name">
-          {{ user.displayName | initialiseName }}
-        </div>
-        <div class="govuk-!-padding-right-0">
-          <a data-qa="logout" href="/logout">Sign out</a>
-        </div>
+      <div class="moj-header__content">
+        <nav class="moj-header__navigation" aria-label="Account navigation">
+          <ul class="moj-header__navigation-list">
+            <li data-qa="header-user-name" class="moj-header__navigation-item">
+              {{ user.displayName | initialiseName }}
+            </li>
+            <li class="moj-header__navigation-item">
+              <a data-qa="logout" class="moj-header__navigation-link" href="/logout">Sign out</a>
+            </li>
+          </ul>
+        </nav>
       </div>
     {% endif %}
   </div>
 </header>
+
+{% if user %}
+  <div class="moj-primary-navigation">
+    <div class="moj-primary-navigation__container">
+      <div class="app-organisation-nav-title">
+        <span class="govuk-body-s"><strong><strong></span>
+      </div>
+      <div class="moj-primary-navigation__nav">
+        <nav class="moj-primary-navigation" aria-label="Primary navigation">
+          <ul class="moj-primary-navigation__list">
+            <li class="moj-primary-navigation__item">
+              <a class="moj-primary-navigation__link" {% if myCases %}aria-current="page"{% endif %} href="/">Your cases</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+{% endif %}
