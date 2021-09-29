@@ -142,7 +142,7 @@ context('Case activity tab', () => {
         .whenClickingSubNavTab('activity')
         .shouldDisplayCommonHeader()
         .shouldRenderOffenderTab('activity', page => {
-          page.emptyMessage.contains('There are no entries in the activity log.')
+          page.emptyMessage.contains('There has been no activity')
         })
     })
   })
