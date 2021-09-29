@@ -3,7 +3,7 @@ import * as faker from 'faker'
 import { ContactTypeCategory } from '../../config'
 import { DateTime } from 'luxon'
 import { CaseActivityLogEntry, CaseActivityLogGroup } from './activity.types'
-import { AppointmentRequirementDetail } from '../../community-api/client'
+import { GovUkUiTagColour } from '../../util/govuk-ui'
 
 export interface FakeCaseActivityLogEntryOptions {
   when?: 'past' | 'recent' | 'soon' | 'future'
@@ -36,21 +36,35 @@ export const fakeCaseActivityLogEntry = fake<CaseActivityLogEntry, FakeCaseActiv
           type,
           nationalStandard: faker.datatype.boolean(),
           end: base.start.plus({ hours: 1 }),
-          rarActivity: faker.datatype.boolean(),
-          requirement: {
-            requirementId: faker.datatype.number(),
-            isRar: true,
-            isActive: true,
-          } as AppointmentRequirementDetail,
+          rarActivity: { name: faker.company.bs() },
+          outcome: {
+            complied: true,
+            attended: true,
+            description: faker.company.bs(),
+            tag: { name: faker.company.bs(), colour: GovUkUiTagColour.Red },
+          },
         }
+
       case ContactTypeCategory.Other:
-      case ContactTypeCategory.Communication:
         return {
           ...base,
           type,
           lastUpdatedDateTime: DateTime.fromJSDate(faker.date[when]()),
           lastUpdatedBy: faker.datatype.string(),
         }
+
+      case ContactTypeCategory.Communication:
+        return {
+          ...base,
+          type,
+          lastUpdatedDateTime: DateTime.fromJSDate(faker.date[when]()),
+          lastUpdatedBy: faker.datatype.string(),
+          from: faker.name.findName(),
+          to: faker.name.findName(),
+        }
+
+      case ContactTypeCategory.System:
+        return { ...base, type }
     }
   },
 )

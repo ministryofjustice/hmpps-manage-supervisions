@@ -39,8 +39,8 @@
             },
             {
                 key: { text: "RAR activity" },
-                value: { text: appointment.requirement.isRar | yesNo }
-            },
+                value: { text: appointment.rarActivity.name or 'Yes' }
+            } if appointment.rarActivity,
             {
                 key: { text: "Appointment notes" },
                 value: { html: (appointment.notes | nl2br) if appointment.notes else 'No notes' },

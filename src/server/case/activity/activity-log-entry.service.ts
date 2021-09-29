@@ -51,23 +51,24 @@ export class ActivityLogEntryService {
     contact: AppointmentDetail | DatedActivityLogEntry,
     meta: AppointmentMetaResult,
   ): AppointmentActivityLogEntry {
-    const {
-      id,
-      start,
-      end,
-      requirement = null,
-    } = isAppointmentDetail(contact)
+    const { id, start, end, rarActivity } = isAppointmentDetail(contact)
       ? {
           id: contact.appointmentId,
           start: DateTime.fromISO(contact.appointmentStart),
           end: contact.appointmentEnd && DateTime.fromISO(contact.appointmentEnd),
-          requirement: contact.requirement,
+          rarActivity: contact.rarActivity ? { name: null } : null, // TODO get RAR category once in CAPI
         }
       : {
           id: contact.contactId,
           ...getDates(contact),
-          // HACK: contact summaries are rendered without extra requirement data
-          requirement: null,
+          rarActivity: contact.rarActivity
+            ? {
+                name:
+                  [contact.rarActivity.type?.description, contact.rarActivity.subtype?.description]
+                    .filter(x => x)
+                    .join(': ') || null,
+              }
+            : null,
         }
 
     const isFuture = start > DateTime.now()
@@ -92,8 +93,7 @@ export class ActivityLogEntryService {
           !contact.outcome && start <= DateTime.now() ? links.url(BreadcrumbType.ExitToDelius) : null,
         updateOutcome: links.url(BreadcrumbType.ExitToDelius),
       },
-      rarActivity: !!contact.rarActivity,
-      requirement,
+      rarActivity,
       outcome: contact.outcome
         ? {
             complied: contact.outcome.complied,

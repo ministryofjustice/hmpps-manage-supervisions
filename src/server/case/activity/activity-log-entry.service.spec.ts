@@ -40,11 +40,6 @@ describe('ActivityLogEntryService', () => {
       type: { nationalStandard: true },
       sensitive: true,
       rarActivity: true,
-      requirement: {
-        requirementId: 2,
-        isActive: true,
-        isRar: true,
-      },
     })
     const meta = fakeContactMeta(ContactTypeCategory.Appointment)
     const observed = subject.getAppointmentActivityLogEntry('some-crn', appointment, meta)
@@ -73,17 +68,12 @@ describe('ActivityLogEntryService', () => {
         description: 'some outcome',
         tag: { colour: 'green', name: 'complied' },
       },
-      rarActivity: true,
-      requirement: {
-        requirementId: 2,
-        isActive: true,
-        isRar: true,
-      },
+      rarActivity: { name: null },
       sensitive: true,
     } as AppointmentActivityLogEntry)
   })
 
-  it('gets non well known appointment log entry from contact summary', () => {
+  it('gets non well known appointment log entry from activity log entry', () => {
     const contact = {
       ...fakeActivityLogEntry({
         contactId: 1,
@@ -91,7 +81,7 @@ describe('ActivityLogEntryService', () => {
         type: { appointment: true, nationalStandard: false, description: 'some non well known appointment' },
         outcome: { complied: false, attended: true, description: 'some outcome' },
         sensitive: false,
-        rarActivity: null,
+        rarActivity: { type: { description: 'Some RAR type' }, subtype: { description: 'Some RAR subtype' } },
         startTime: '12:00:00',
         endTime: '14:00:00',
       }),
@@ -113,7 +103,6 @@ describe('ActivityLogEntryService', () => {
         recordMissingAttendance: null,
         updateOutcome: links.url(BreadcrumbType.ExitToDelius),
       },
-      requirement: null,
       start: DateTime.fromObject({ year: 2020, month: 1, day: 1, hour: 12 }),
       end: DateTime.fromObject({ year: 2020, month: 1, day: 1, hour: 14 }),
       category: 'Previous appointment',
@@ -125,7 +114,7 @@ describe('ActivityLogEntryService', () => {
         description: 'some outcome',
         tag: { colour: 'red', name: 'failed to comply' },
       },
-      rarActivity: false,
+      rarActivity: { name: 'Some RAR type: Some RAR subtype' },
       sensitive: false,
     } as AppointmentActivityLogEntry)
   })
