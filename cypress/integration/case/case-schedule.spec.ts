@@ -30,9 +30,8 @@ class Fixture extends ViewCaseFixture {
     })
   }
 
-  shouldDisplayEmptyWarning(table: SCHEDULE_TABLE, title: string, message: string): this {
+  shouldDisplayEmptyWarning(table: SCHEDULE_TABLE, message: string): this {
     return this.shouldRenderOffenderTab('schedule', page => {
-      page.emptyHeader(table).contains(title)
       page.emptyMessage(table).contains(message)
     })
   }
@@ -146,7 +145,7 @@ context('Case schedule tab', () => {
         .whenViewingOffender()
         .whenClickingSubNavTab('schedule')
         .shouldDisplayCommonHeader()
-        .shouldDisplayEmptyWarning('future', 'Future appointments', 'There are no future appointments scheduled.')
+        .shouldDisplayEmptyWarning('future', 'There are no appointments scheduled')
     })
 
     it('cannot arrange an appointment without write permission', () => {
