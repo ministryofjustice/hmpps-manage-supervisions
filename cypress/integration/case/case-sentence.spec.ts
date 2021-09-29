@@ -61,8 +61,15 @@ context('Case sentence tab', () => {
         },
         contacts: [
           {
-            contactStart: '2018-12-11T00:00:00+00:00',
-            type: { code: 'ABCF', appointment: true },
+            date: '2018-12-11',
+            rarDay: false,
+            entries: [
+              {
+                startTime: '12:00:00',
+                endTime: null,
+                type: { code: 'ABCF', appointment: true },
+              },
+            ],
           },
         ],
       })

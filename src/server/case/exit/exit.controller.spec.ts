@@ -11,6 +11,7 @@ import { FakeConfigModule } from '../../config/config.fake'
 import { MockLinksModule } from '../../common/links/links.mock'
 import { DateTime } from 'luxon'
 import { BreadcrumbType } from '../../common/links'
+import { fakeConvictionSummary } from '../sentence/sentence.fake'
 
 describe('ExitController', () => {
   let subject: ExitController
@@ -52,7 +53,8 @@ describe('ExitController', () => {
     })
     offenderService.getOffenderDetail.withArgs('some-crn').resolves(offender)
 
-    sentenceService.getConvictionId.withArgs('some-crn').resolves(1234)
+    const conviction = fakeConvictionSummary({ id: 1234 })
+    sentenceService.getCurrentConvictionSummary.withArgs('some-crn').resolves(conviction)
   })
 
   it('displays delius exit', async () => {
@@ -78,7 +80,7 @@ describe('ExitController', () => {
     } as DeliusExitViewModel)
   })
   it('displays delius exit link correctly when no conviction for a crn', async () => {
-    sentenceService.getConvictionId.withArgs('some-crn').resolves(undefined)
+    sentenceService.getCurrentConvictionSummary.withArgs('some-crn').resolves(undefined)
 
     const observed = await subject.getDeliusExit('some-crn')
 

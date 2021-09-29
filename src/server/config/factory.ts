@@ -13,6 +13,7 @@ import {
 } from './types'
 import { getApplicationInfo } from '../util'
 import { requirements } from './requirements'
+import { URL } from 'url'
 
 interface EnvironmentFallback<T> {
   value: T
@@ -50,7 +51,7 @@ function string(name: string, fallbackFn?: EnvironmentFallback<string>): string 
   return env(name, x => x, fallbackFn)
 }
 
-function url(name: string, fallbackFn?: EnvironmentFallback<string>) {
+function url(name: string, fallbackFn?: EnvironmentFallback<string>): URL {
   const value = string(name, fallbackFn)
   return value ? Object.freeze(new URL(value)) : null
 }

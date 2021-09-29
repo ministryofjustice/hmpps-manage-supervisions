@@ -29,6 +29,8 @@ import {
   ProbationArea,
   Team,
   StaffCaseloadEntry,
+  ActivityLogGroup,
+  ActivityLogEntry,
 } from './client'
 import * as faker from 'faker'
 import { DateTime } from 'luxon'
@@ -319,13 +321,19 @@ export const fakeAppointmentDetail = fake<AppointmentDetail, FakeAppointmentDeta
   }
 })
 
-export const fakeContactType = fake<ContactType>(() => ({
+export const fakeContactType = fake<ContactType>((options, partial = {}) => ({
   code: faker.datatype.uuid(),
   description: faker.company.bs(),
   shortDescription: faker.company.bs(),
   appointment: faker.datatype.boolean(),
   nationalStandard: false,
   systemGenerated: false,
+  categories: [
+    ...(partial.categories?.map(x => fakeKeyValue(x)) || partial.nationalStandard
+      ? [{ code: 'NS', description: 'National Standards/Compliance' }]
+      : []),
+    { code: 'AL', description: 'All/Always' },
+  ],
 }))
 
 export const fakeContactSummary = fake<ContactSummary, { when?: 'past' | 'recent' | 'soon' | 'future' }>(
@@ -348,6 +356,32 @@ export const fakeContactSummary = fake<ContactSummary, { when?: 'past' | 'recent
     }
   },
 )
+
+export const fakeActivityLogEntry = fake<ActivityLogEntry>(() => ({
+  contactId: faker.datatype.number(),
+  convictionId: faker.datatype.number(),
+  startTime: '12:00:00',
+  endTime: '13:00:00',
+  notes: faker.company.bs(),
+  outcome: fakeAppointmentOutcome(),
+  sensitive: faker.datatype.boolean(),
+  type: fakeContactType(),
+  staff: fakeStaffHuman(),
+  rarActivity: {
+    requirementId: faker.datatype.number(),
+    nsiId: faker.datatype.number(),
+    type: fakeKeyValue(),
+    subtype: fakeKeyValue(),
+  },
+  lastUpdatedDateTime: fakeIsoDate(),
+  lastUpdatedByUser: { forenames: faker.name.firstName(), surname: faker.name.lastName() },
+}))
+
+export const fakeActivityLogGroup = fake<ActivityLogGroup>((options, partial = {}) => ({
+  date: fakeIsoDate(),
+  rarDay: false,
+  entries: partial.entries?.map(x => fakeActivityLogEntry(x)) || [fakeActivityLogEntry()],
+}))
 
 export function fakePaginated<T>(content: T[], partial?: Partial<Omit<Paginated<T>, 'content'>>): Paginated<T> {
   return {

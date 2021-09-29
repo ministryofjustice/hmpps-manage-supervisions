@@ -2,14 +2,14 @@ import { fake, fakeEnum } from '../../util/util.fake'
 import * as faker from 'faker'
 import { ContactTypeCategory } from '../../config'
 import { DateTime } from 'luxon'
-import { ActivityLogEntry, ActivityLogEntryGroup } from './activity.types'
+import { CaseActivityLogEntry, CaseActivityLogGroup } from './activity.types'
 import { AppointmentRequirementDetail } from '../../community-api/client'
 
-export interface FakeActivityLogEntryOptions {
+export interface FakeCaseActivityLogEntryOptions {
   when?: 'past' | 'recent' | 'soon' | 'future'
 }
 
-export const fakeActivityLogEntry = fake<ActivityLogEntry, FakeActivityLogEntryOptions>(
+export const fakeCaseActivityLogEntry = fake<CaseActivityLogEntry, FakeCaseActivityLogEntryOptions>(
   ({ when = 'past' }, { type = fakeEnum(ContactTypeCategory) }) => {
     const base = {
       id: faker.datatype.number(),
@@ -55,8 +55,11 @@ export const fakeActivityLogEntry = fake<ActivityLogEntry, FakeActivityLogEntryO
   },
 )
 
-export const fakeActivityLogEntryGroup = fake<ActivityLogEntryGroup>((options, partial = {}) => ({
+export const fakeCaseActivityLogGroup = fake<CaseActivityLogGroup>((options, partial = {}) => ({
   date: DateTime.fromJSDate(faker.date.past()),
   isToday: faker.datatype.boolean(),
-  entries: partial.entries?.map(x => fakeActivityLogEntry(x)) || [fakeActivityLogEntry(), fakeActivityLogEntry()],
+  entries: partial.entries?.map(x => fakeCaseActivityLogEntry(x)) || [
+    fakeCaseActivityLogEntry(),
+    fakeCaseActivityLogEntry(),
+  ],
 }))

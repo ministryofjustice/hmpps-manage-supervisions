@@ -46,7 +46,7 @@ describe('ScheduleService', () => {
     )
 
     for (const apt of appointments) {
-      contactMapping.getTypeMeta.withArgs(apt).resolves({
+      contactMapping.getTypeMeta.withArgs(apt).returns({
         type: ContactTypeCategory.Appointment,
         value: { name: 'Some appointment', codes: { nonRar: 'SOME_CODE' } },
         name: 'some-appointment-type',
@@ -81,7 +81,7 @@ describe('ScheduleService', () => {
   it('gets appointment summary', async () => {
     const nextAppointment = fakeAppointmentDetail({ appointmentStart: '2100-10-03T12:30:00' })
 
-    contactMapping.getTypeMeta.resolves({
+    contactMapping.getTypeMeta.returns({
       type: ContactTypeCategory.Appointment,
       value: { name: 'Some appointment', codes: { nonRar: 'SOME_CODE' } },
       name: 'some-appointment-type',

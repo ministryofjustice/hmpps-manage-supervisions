@@ -19,20 +19,14 @@ export class ScheduleService {
       crn,
       from: now.toISODate(),
     })
-    let result: AppointmentListViewModel[] = await data.reduce(async (aggregate, apt) => {
-      const agg = await aggregate
-      const view: AppointmentListViewModel = {
-        start: DateTime.fromISO(apt.appointmentStart),
-        end: apt.appointmentEnd && DateTime.fromISO(apt.appointmentEnd),
-        name: (await this.contacts.getTypeMeta(apt)).name,
-        link: this.links.getUrl(BreadcrumbType.Appointment, { crn, id: apt.appointmentId }),
-        today: now.toISODate() === DateTime.fromISO(apt.appointmentStart).toISODate(),
-      }
-      agg.push(view)
-      return agg
-    }, Promise.resolve([]))
-    result = sortBy(result, [x => x.start.toJSDate(), x => x.end?.toJSDate()])
-    return result
+    const result: AppointmentListViewModel[] = data.map(apt => ({
+      start: DateTime.fromISO(apt.appointmentStart),
+      end: apt.appointmentEnd && DateTime.fromISO(apt.appointmentEnd),
+      name: this.contacts.getTypeMeta(apt).name,
+      link: this.links.getUrl(BreadcrumbType.Appointment, { crn, id: apt.appointmentId }),
+      today: now.toISODate() === DateTime.fromISO(apt.appointmentStart).toISODate(),
+    }))
+    return sortBy(result, [x => x.start.toJSDate(), x => x.end?.toJSDate()])
   }
 
   async getNextAppointment(crn: string): Promise<NextAppointmentSummary | null> {

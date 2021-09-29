@@ -12,6 +12,8 @@ import {
   ConvictionDetails,
   ConvictionOffence,
   ConvictionRequirement,
+  ConvictionSentenceDetail,
+  ConvictionSummary,
   PreviousConvictionSummary,
 } from './sentence.types'
 import { RequirementService } from './requirement.service'
@@ -74,8 +76,6 @@ export class SentenceService {
       return null
     }
 
-    const sentence = current.sentence
-
     return {
       previousConvictions: previous.length
         ? {
@@ -90,32 +90,23 @@ export class SentenceService {
           .filter(x => !x.active && x.proven).length,
       },
       offence: getConvictionOffence(current),
-      sentence: sentence
-        ? {
-            description: getSentenceName(sentence),
-            convictionDate: DateTime.fromISO(current.convictionDate),
-            startDate: DateTime.fromISO(sentence.startDate),
-            endDate: DateTime.fromISO(sentence.expectedSentenceEndDate),
-            elapsed: SentenceService.getElapsedOf(sentence),
-            courtAppearance: current.courtAppearance?.courtName,
-            responsibleCourt: current.responsibleCourt?.courtName,
-            additionalSentences:
-              current.sentence.additionalSentences?.map(x => ({
-                name: x.type.description,
-                length: x.length,
-                value: x.amount,
-                notes: x.notes,
-              })) || null,
-          }
-        : null,
+      sentence: SentenceService.getConvictionSentence(current),
       requirements,
     }
   }
 
-  async getConvictionId(crn: string): Promise<number> {
+  async getCurrentConvictionSummary(crn: string): Promise<ConvictionSummary | null> {
     const { data: convictions } = await this.community.offender.getConvictionsForOffenderByCrnUsingGET({ crn })
 
-    return SentenceService.getLatestConviction(convictions)?.convictionId
+    const conviction = SentenceService.getLatestConviction(convictions)
+    if (!conviction) {
+      return null
+    }
+
+    return {
+      id: conviction.convictionId,
+      sentence: SentenceService.getConvictionSentence(conviction),
+    }
   }
 
   async getSentenceComplianceDetails(crn: string): Promise<ComplianceDetails> {
@@ -296,6 +287,29 @@ export class SentenceService {
     })
 
     return { current, previous, requirements }
+  }
+
+  private static getConvictionSentence(conviction: Conviction): ConvictionSentenceDetail | null {
+    const sentence = conviction.sentence
+    if (!sentence) {
+      return null
+    }
+    return {
+      description: getSentenceName(sentence),
+      convictionDate: DateTime.fromISO(conviction.convictionDate),
+      startDate: DateTime.fromISO(sentence.startDate),
+      endDate: DateTime.fromISO(sentence.expectedSentenceEndDate),
+      elapsed: this.getElapsedOf(sentence),
+      courtAppearance: conviction.courtAppearance?.courtName,
+      responsibleCourt: conviction.responsibleCourt?.courtName,
+      additionalSentences:
+        conviction.sentence.additionalSentences?.map(x => ({
+          name: x.type.description,
+          length: x.length,
+          value: x.amount,
+          notes: x.notes,
+        })) || null,
+    }
   }
 
   private static getElapsedOf(sentence: Sentence): string | null {

@@ -26,15 +26,17 @@ export class ExitController {
     title: 'Continue on National Delius',
   })
   async getDeliusExit(@Param('crn') crn: string): Promise<DeliusExitViewModel> {
-    const [offender, convictionId] = await Promise.all([
+    const [offender, conviction] = await Promise.all([
       this.offender.getOffenderDetail(crn),
-      this.sentence.getConvictionId(crn),
+      this.sentence.getCurrentConvictionSummary(crn),
     ])
 
     const contactLog = new URL('/NDelius-war/delius/JSP/deeplink.jsp', this.config.get<DeliusConfig>('delius').baseUrl)
     contactLog.searchParams.set('component', 'ContactList')
     contactLog.searchParams.set('offenderId', offender.offenderId.toString())
-    if (convictionId) contactLog.searchParams.set('eventId', convictionId.toString())
+    if (conviction) {
+      contactLog.searchParams.set('eventId', conviction.id.toString())
+    }
 
     const homePage = new URL('/NDelius-war/delius/JSP/homepage.jsp', this.config.get<DeliusConfig>('delius').baseUrl)
 

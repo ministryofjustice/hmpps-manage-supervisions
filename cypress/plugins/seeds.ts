@@ -1,8 +1,8 @@
 import { SeedModule, seedModule } from './wiremock'
 import { SeedTeamOfficeLocationsOptions, teamOfficeLocations } from './teams'
 import {
+  ActivityLogGroup,
   AppointmentDetail,
-  ContactSummary,
   Conviction,
   Nsi,
   OffenderDetail,
@@ -16,7 +16,7 @@ import {
 import { appointmentTypes } from './appointment-types'
 import { staff } from './staff'
 import { get, set } from 'lodash'
-import { AllRoshRiskDto, AssessmentNeedsDto } from '../../src/server/assess-risks-and-needs-api/client'
+import { AssessmentNeedsDto, AllRoshRiskDtoAllRisksView } from '../../src/server/assess-risks-and-needs-api/client'
 import { CRN, offender } from './offender'
 import { ACTIVE_CONVICTION_ID, convictions, PREVIOUS_CONVICTION_IDS } from './convictions'
 import { personalContacts } from './personal-contacts'
@@ -26,7 +26,6 @@ import { risks } from './risks'
 import { requirements } from './requirements'
 import { appointments } from './appointments'
 import { contacts } from './contacts'
-import { contactTypes } from './contact-types'
 import { nsis } from './nsis'
 import * as faker from 'faker'
 import { needs } from './needs'
@@ -51,13 +50,7 @@ export interface ReferenceDataSeedOptions extends SeedTeamOfficeLocationsOptions
  * Seed reference data: contact types, appointment types, team office locations, staff details
  */
 export function referenceDataSeed(options: ReferenceDataSeedOptions = {}) {
-  return seedModule(
-    { title: 'Reference data' },
-    appointmentTypes,
-    contactTypes,
-    teamOfficeLocations(options),
-    staff(options.staff),
-  )
+  return seedModule({ title: 'Reference data' }, appointmentTypes, teamOfficeLocations(options), staff(options.staff))
 }
 
 function getOrSet<T>(object: any, path: string, value: T): T {
@@ -80,7 +73,7 @@ export interface OffenderSeedOptions {
   personalContacts?: DeepPartial<PersonalContact>[]
   personalCircumstances?: DeepPartial<PersonalCircumstance>[]
   registrations?: DeepPartial<Registration>[]
-  risks?: DeepPartial<AllRoshRiskDto>
+  risks?: DeepPartial<AllRoshRiskDtoAllRisksView>
   needs?: DeepPartial<AssessmentNeedsDto>
   convictions?: { active: ConvictionSeedOptions | null; previous?: ConvictionSeedOptions[] }
 }
@@ -153,7 +146,7 @@ export interface ContactSeedOptions {
   crn?: string
   activeConvictionId?: number
   appointments?: DeepPartial<AppointmentDetail>[]
-  contacts?: DeepPartial<ContactSummary>[]
+  contacts?: DeepPartial<ActivityLogGroup>[]
 }
 
 /**

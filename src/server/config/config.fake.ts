@@ -5,6 +5,7 @@ import { ApiConfig, ClientCredentials, Config, FeatureFlags, LogLevel } from './
 import { CONTACT_DEFAULTS } from './factory'
 import { requirements } from './requirements'
 import { fake } from '../util/util.fake'
+import { URL } from 'url'
 
 export const fakeApiConfig = fake<ApiConfig>(() => ({
   enabled: true,

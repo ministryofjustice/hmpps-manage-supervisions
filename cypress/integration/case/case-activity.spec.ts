@@ -177,6 +177,13 @@ context('Case activity tab', () => {
         })
 
         .shouldRenderActivity({
+          id: 100,
+          date: 'Friday 4 September 2020',
+          title: 'Some offender level contact',
+          notes: 'No notes',
+        })
+
+        .shouldRenderActivity({
           id: 7,
           date: 'Friday 4 September 2020',
           title: 'Email or text message to Liz Danger Haggis at 1pm',
@@ -192,6 +199,7 @@ context('Case activity tab', () => {
           notesType: 'closed-detail',
           sensitive: true,
         })
+
         .shouldRenderActivity({
           id: 11,
           date: 'Friday 4 September 2020',

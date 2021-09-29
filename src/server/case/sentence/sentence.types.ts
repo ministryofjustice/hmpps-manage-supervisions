@@ -95,6 +95,11 @@ export interface PreviousBreaches {
   count: number
 }
 
+export interface ConvictionSummary {
+  id: number
+  sentence?: ConvictionSentenceDetail
+}
+
 export interface ConvictionDetails {
   previousConvictions?: PreviousConvictions
   previousBreaches?: PreviousBreaches
