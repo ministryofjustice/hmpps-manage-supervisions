@@ -92,7 +92,7 @@ export class ActivityService {
     crn: string,
     convictionId: number,
     complianceFilter: ActivityComplianceFilter,
-    from: DateTime | null,
+    from?: DateTime,
   ) {
     // to get the appointment counts here we're using the totalElements property of the list api
     // but requesting a single item on a single page and discarding the result.
@@ -105,13 +105,15 @@ export class ActivityService {
 
     filter.convictionId = convictionId
     filter.contactDateFrom = from === null ? null : from?.toISODate() // we need to be careful to preserve null here
-    await this.setComplianceFromDate(filter)
 
-    // RAR is a special case because it is deduplicated by day, so to count it we use the activity log api
-    const { data } =
-      complianceFilter === ActivityComplianceFilter.RarActivity
-        ? await this.community.contactAndAttendance.getActivityLogByCrnUsingGET(filter)
-        : await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET(filter)
+    if (complianceFilter === ActivityComplianceFilter.RarActivity) {
+      // RAR is a special case because it is deduplicated by day and has nothing to do with breaches, so to count it we use the activity log api
+      const { data } = await this.community.contactAndAttendance.getActivityLogByCrnUsingGET(filter)
+      return data.totalElements
+    }
+
+    await this.setComplianceFromDate(filter)
+    const { data } = await this.community.contactAndAttendance.getOffenderContactSummariesByCrnUsingGET(filter)
     return data.totalElements
   }
 

@@ -11,7 +11,7 @@ import { ComplianceActiveBreachSummary, ComplianceConvictionSummary } from './co
 export class ComplianceService {
   constructor(private readonly breach: BreachService) {}
 
-  async convictionSummary(crn: string, conviction: Conviction): Promise<ComplianceConvictionSummary | null> {
+  async getComplianceSummary(crn: string, conviction: Conviction): Promise<ComplianceConvictionSummary | null> {
     if (!conviction?.sentence) {
       return null
     }

@@ -38,7 +38,7 @@ export class RequirementService {
         type: ConvictionRequirementType.Unit,
         name: getWellKnownRequirementName(this.config, r),
         isRar: false,
-        ...this.getRequirementDetail(r),
+        ...RequirementService.getRequirementDetail(r),
       })) || []
 
     if (groups['rar']) {
@@ -59,26 +59,19 @@ export class RequirementService {
         type: ConvictionRequirementType.Unit,
         name: getWellKnownRequirementName(this.config, requirement),
         isRar: true,
-        ...this.getRequirementDetail(requirement),
+        ...RequirementService.getRequirementDetail(requirement),
       }
     }
 
-    const { length, progress } = requirements
-      .map(r => ({
-        length: this.transformUnits(r.length || 0, r.lengthUnit || 'days', 'days'),
-        progress: r.rarCount || 0,
-      }))
-      .reduce((x, y) => ({ length: x.length + y.length, progress: x.progress + y.progress }))
+    const length = requirements
+      .map(r => this.transformUnits(r.length || 0, r.lengthUnit || 'days', 'days'))
+      .reduce((x, y) => x + y)
 
     return {
       type: ConvictionRequirementType.Aggregate,
-      name: [
-        `${quantity(length, 'days')} RAR,`,
-        `${progress === 0 ? 'none' : progress} completed`,
-        `(${requirements.length} requirements)`,
-      ].join(' '),
+      name: `${quantity(length, 'days')} RAR`,
       isRar: true,
-      requirements: requirements.map(r => this.getRequirementDetail(r)),
+      requirements: requirements.map(r => RequirementService.getRequirementDetail(r)),
     }
   }
 
@@ -104,14 +97,14 @@ export class RequirementService {
     }
   }
 
-  private getRequirementDetail(req: Requirement): ConvictionRequirementDetail {
+  private static getRequirementDetail(req: Requirement): ConvictionRequirementDetail {
     return {
+      id: req.requirementId,
       length: quantity(req.length, req.lengthUnit.toLowerCase()),
       notes: req.requirementNotes,
       startDate: getPotentiallyExpectedDateTime(req.startDate, req.expectedStartDate),
       endDate: getPotentiallyExpectedDateTime(req.terminationDate, req.expectedEndDate),
       terminationReason: req.terminationReason?.description,
-      progress: isRar(this.config, req) ? `${quantity(req.rarCount || 0, 'days')} completed` : null,
     }
   }
 }

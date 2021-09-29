@@ -27,7 +27,7 @@ class Fixture extends ViewCaseFixture {
     withoutAnOutcome: string
   }) {
     return this.shouldRenderOffenderTab('compliance', page => {
-      page.requirementName.contains('44 days RAR, 29 completed (2 requirements)')
+      page.requirementName.contains('44 days RAR, 1 completed (2 requirements)')
       if (options.sinceLastBreach) {
         page.sinceLastBreachMessage.contains('Showing compliance since previous breach')
       } else {

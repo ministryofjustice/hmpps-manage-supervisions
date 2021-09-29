@@ -83,6 +83,12 @@ describe('SentenceService', () => {
     return requirements
   }
 
+  function havingRarCount(convictionId: number, value: number) {
+    activityService.getActivityLogComplianceCount
+      .withArgs('some-crn', convictionId, ActivityComplianceFilter.RarActivity)
+      .resolves(value)
+  }
+
   it('gets sentence details', async () => {
     const sentenceDate = DateTime.now()
       .minus({ months: 6, days: 1 })
@@ -142,7 +148,8 @@ describe('SentenceService', () => {
     )
     havingBreaches('some-crn', 101)
     havingBreaches('some-crn', 102)
-    const requirements = havingRequirements(100, {})
+    const [rarRequirement] = havingRequirements(100, { isRar: true, name: '100 days RAR' })
+    havingRarCount(100, 10)
 
     const observed = await subject.getConvictionDetails('some-crn')
 
@@ -186,8 +193,10 @@ describe('SentenceService', () => {
           },
         ],
       },
-      requirements,
+      requirements: [rarRequirement],
     } as ConvictionDetails)
+
+    expect(rarRequirement.name).toBe('100 days RAR, 10 completed')
   })
 
   describe('offence detail', () => {
@@ -249,7 +258,7 @@ describe('SentenceService', () => {
   describe('compliance summary', () => {
     function havingComplianceSummary(conviction: Conviction, partial: DeepPartial<ComplianceConvictionSummary> = {}) {
       const summary = fakeComplianceConvictionSummary(partial)
-      complianceService.convictionSummary.withArgs('some-crn', conviction).resolves(summary)
+      complianceService.getComplianceSummary.withArgs('some-crn', conviction).resolves(summary)
       return summary
     }
 
@@ -276,8 +285,9 @@ describe('SentenceService', () => {
       havingRequirements(100, {
         type: ConvictionRequirementType.Unit,
         isRar: true,
-        name: 'Some RAR requirement',
+        name: '100 days RAR',
       })
+      havingRarCount(100, 10)
       const currentSummary = havingComplianceSummary(conviction)
       const previousSummary = havingComplianceSummary(previousConviction)
       havingAppointmentCounts(
@@ -296,7 +306,11 @@ describe('SentenceService', () => {
       expect(observed).toEqual({
         current: {
           ...currentSummary,
-          requirement: 'Some RAR requirement',
+          requirement: {
+            name: '100 days RAR, 10 completed',
+            requirementCount: 1,
+            totalRarCount: 10,
+          },
           appointments: {
             acceptableAbsences: {
               name: '3 acceptable absences',
