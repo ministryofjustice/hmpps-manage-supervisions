@@ -4,7 +4,6 @@ import { DateTime, Settings } from 'luxon'
 import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
 import {
   ActivityLogEntry,
-  AppointmentDetail,
   ContactAndAttendanceApiGetActivityLogByCrnUsingGETRequest,
   ContactSummary,
   OffenderDetail,
@@ -13,7 +12,6 @@ import { CommunityApiService, ContactMappingService, Paginated } from '../../com
 import { ContactTypeCategory } from '../../config'
 import {
   fakeActivityLogEntry,
-  fakeAppointmentDetail,
   fakeContactSummary,
   fakeOffenderDetail,
   fakePaginated,
@@ -65,10 +63,10 @@ describe('ActivityService', () => {
   })
 
   it('gets appointment', async () => {
-    const appointment = fakeAppointmentDetail()
+    const appointment = fakeContactSummary()
 
-    community.appointment.getOffenderAppointmentByCrnUsingGET
-      .withArgs(match({ crn: 'some-crn', appointmentId: 123 }))
+    community.contactAndAttendance.getOffenderContactSummaryByCrnUsingGET
+      .withArgs(match({ crn: 'some-crn', contactId: 123 }))
       .resolves(fakeOkResponse(appointment))
 
     const meta = fakeContactMeta(ContactTypeCategory.Appointment)
@@ -83,10 +81,10 @@ describe('ActivityService', () => {
   })
 
   it('fails to map non-appointment contact to appointment', async () => {
-    const appointment = fakeAppointmentDetail()
+    const appointment = fakeContactSummary()
 
-    community.appointment.getOffenderAppointmentByCrnUsingGET
-      .withArgs(match({ crn: 'some-crn', appointmentId: 123 }))
+    community.contactAndAttendance.getOffenderContactSummaryByCrnUsingGET
+      .withArgs(match({ crn: 'some-crn', contactId: 123 }))
       .resolves(fakeOkResponse(appointment))
 
     const meta = fakeContactMeta(ContactTypeCategory.Communication)
@@ -132,7 +130,7 @@ describe('ActivityService', () => {
     )
   })
 
-  function havingAppointmentEntry(contact: ActivityLogEntry | AppointmentDetail) {
+  function havingAppointmentEntry(contact: ActivityLogEntry | ContactSummary) {
     const entry = fakeCaseActivityLogEntry({ type: ContactTypeCategory.Appointment })
     const meta = fakeContactMeta(ContactTypeCategory.Appointment)
     contactMapping.getTypeMeta.withArgs(contact).returns(meta)

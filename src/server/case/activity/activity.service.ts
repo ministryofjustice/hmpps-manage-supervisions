@@ -117,15 +117,15 @@ export class ActivityService {
     return data.totalElements
   }
 
-  async getAppointment(crn: string, appointmentId: number): Promise<AppointmentActivityLogEntry> {
-    const { data: appointment } = await this.community.appointment.getOffenderAppointmentByCrnUsingGET({
+  async getAppointment(crn: string, contactId: number): Promise<AppointmentActivityLogEntry> {
+    const { data: appointment } = await this.community.contactAndAttendance.getOffenderContactSummaryByCrnUsingGET({
       crn,
-      appointmentId,
+      contactId,
     })
 
     const meta = this.contacts.getTypeMeta(appointment)
     if (meta.type !== ContactTypeCategory.Appointment) {
-      throw new NotFoundException(`contact with id '${appointmentId}' is not an appointment`)
+      throw new NotFoundException(`contact with id '${contactId}' is not an appointment`)
     }
 
     return this.entryService.getAppointmentActivityLogEntry(crn, appointment, meta)

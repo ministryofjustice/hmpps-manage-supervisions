@@ -212,7 +212,12 @@ export const ACTIVITY_LOG_GROUPS: DeepPartial<ActivityLogGroup>[] = [
         staff: { forenames: 'Robert', surname: 'Ohagan', unallocated: false },
         outcome: null,
         sensitive: false,
-        rarActivity: null,
+        rarActivity: {
+          nsiId: 111,
+          requirementId: 112,
+          type: { description: 'Finance, benefits and debt' },
+          subtype: null,
+        },
       },
     ],
   },
@@ -265,6 +270,7 @@ export function contacts(crn: string, partials = ACTIVITY_LOG_GROUPS): SeedFn {
           staff: e.staff,
           lastUpdatedDateTime: e.lastUpdatedDateTime,
           lastUpdatedByUser: e.lastUpdatedByUser,
+          rarActivityDetail: e.rarActivity,
         }),
       ),
     )

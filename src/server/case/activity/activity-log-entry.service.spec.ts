@@ -1,12 +1,7 @@
 import { Test } from '@nestjs/testing'
 import { ActivityLogEntryService } from './activity-log-entry.service'
 import { MockLinksModule } from '../../common/links/links.mock'
-import {
-  fakeActivityLogEntry,
-  fakeAppointmentDetail,
-  fakeContactSummary,
-  fakeOffenderDetail,
-} from '../../community-api/community-api.fake'
+import { fakeActivityLogEntry, fakeContactSummary, fakeOffenderDetail } from '../../community-api/community-api.fake'
 import { ContactTypeCategory } from '../../config'
 import { DateTime } from 'luxon'
 import { BreadcrumbType } from '../../common/links'
@@ -31,15 +26,15 @@ describe('ActivityLogEntryService', () => {
   })
 
   it('gets well known appointment activity log entry from appointment detail', () => {
-    const appointment = fakeAppointmentDetail({
-      appointmentId: 1,
+    const appointment = fakeContactSummary({
+      contactId: 1,
       notes: 'some appointment notes',
       outcome: { complied: true, attended: true, description: 'some outcome' },
-      appointmentStart: '2200-01-01T12:00:00',
-      appointmentEnd: '2200-01-02T14:00:00',
+      contactStart: '2200-01-01T12:00:00',
+      contactEnd: '2200-01-02T14:00:00',
       type: { nationalStandard: true },
       sensitive: true,
-      rarActivity: true,
+      rarActivityDetail: { type: { description: 'Some RAR type' }, subtype: { description: 'Some RAR subtype' } },
     })
     const meta = fakeContactMeta(ContactTypeCategory.Appointment)
     const observed = subject.getAppointmentActivityLogEntry('some-crn', appointment, meta)
@@ -68,7 +63,7 @@ describe('ActivityLogEntryService', () => {
         description: 'some outcome',
         tag: { colour: 'green', name: 'complied' },
       },
-      rarActivity: { name: null },
+      rarActivity: { name: 'Some RAR type: Some RAR subtype' },
       sensitive: true,
     } as AppointmentActivityLogEntry)
   })
