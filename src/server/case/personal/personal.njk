@@ -47,7 +47,9 @@
                     <li>No other addresses</li>
                 {% endif %}
             </ul>
-            <p><a href="{{ links.addressBook }}">View all addresses</a></p>
+            {% if contactDetails.otherAddresses.current or contactDetails.otherAddresses.previous %}
+                <p><a href="{{ links.addressBook }}">View all addresses</a></p>
+            {% endif %}
         {% endset %}
 
         {% if contactDetails.personalContacts.length %}
