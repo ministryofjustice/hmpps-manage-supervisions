@@ -143,7 +143,22 @@
 
             {% if groups.length === 0 %}
                 <p class='govuk-body' data-qa='offender/activity/empty'>
-                    There are no entries in the activity log.
+                    {% switch currentFilter %}
+                        {% case 'appointments' %}
+                            There are no National Standard appointments
+                        {% case 'without-an-outcome' %}
+                            There are no National Standard appointments needing an outcome
+                        {% case 'complied-appointments' %}
+                            There are no complied appointments
+                        {% case 'acceptable-absence-appointments' %}
+                            There have been no acceptable absences
+                        {% case 'failed-to-comply-appointments' %}
+                            There have been no failures to comply in the last 12 months
+                        {% case 'warning-letters' %}
+                            There have been no warning letters
+                        {% default %}
+                            There has been no activity
+                    {% endswitch %}
                 </p>
             {% endif %}
         </div>
