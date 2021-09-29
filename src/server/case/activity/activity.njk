@@ -56,7 +56,7 @@
         {% if entry.rarActivity %}
             {{ govukSummaryList({
                 classes: 'govuk-!-margin-bottom-0',
-                rows: [{ key: { text: 'RAR activity' }, value: { text: 'Yes' } }]
+                rows: [{ key: { text: 'RAR activity' }, value: { text: entry.rarActivity.name or 'Yes' } }]
             }) }}
             <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-1">
         {% endif %}

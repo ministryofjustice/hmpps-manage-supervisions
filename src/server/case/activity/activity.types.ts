@@ -1,7 +1,6 @@
 import { DateTime } from 'luxon'
 import { ContactTypeCategory } from '../../config'
 import { ViewModel } from '../../common'
-import { AppointmentRequirementDetail } from '../../community-api/client'
 import { GovUkUiTagColour } from '../../util/govuk-ui'
 import { ConvictionSummary } from '../sentence'
 
@@ -43,8 +42,7 @@ export interface AppointmentActivityLogEntry
   > {
   nationalStandard: boolean
   end?: DateTime
-  rarActivity: boolean
-  requirement?: AppointmentRequirementDetail
+  rarActivity: { name?: string }
   outcome?: {
     complied: boolean
     attended: boolean
