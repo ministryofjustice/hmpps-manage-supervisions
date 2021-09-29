@@ -76,6 +76,35 @@
         }) }}
     {% endif %}
 
+    {% set additionalSentences %}
+        {% for additionalSentences in conviction.sentence.additionalSentences %}
+            {{ govukDetails({
+                summaryText: additionalSentences.name,
+                classes: 'govuk-!-margin-top-2 govuk-!-margin-bottom-0',
+                html: govukSummaryList({
+                    rows: [
+                        {
+                            key: { text: "Sentence" },
+                            value: { text: additionalSentences.name }
+                        },
+                        {
+                            key: { text: "Value" },
+                            value: { text: additionalSentences.value }
+                        } if additionalSentences.value,
+                        {
+                            key: { text: "Length" },
+                            value: { text: additionalSentences.length }
+                        } if additionalSentences.length,
+                        {
+                            key: { text: "Notes" },
+                            value: { html: additionalSentences.notes | nl2br if additionalSentences.notes else 'No notes' }
+                        }
+                    ]
+                })
+            }) }}
+        {% endfor %}
+    {% endset %}
+
     {% if conviction.sentence %}
         {% call appSummaryCard({ titleText: 'Conviction', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
         {{ govukSummaryList({
@@ -91,39 +120,16 @@
                 {
                     key: { text: "Conviction date" },
                     value: { text: conviction.sentence.convictionDate | shortDate }
+                },
+                {
+                    key: { text: "Additional sentences" },
+                    value: {
+                        html: additionalSentences if conviction.sentence.additionalSentences else 'No additional sentences'
+                    }
                 }
             ]
         }) }}
         {%- endcall %}
-
-        {% set additionalSentences %}
-            {% for additionalSentences in conviction.sentence.additionalSentences %}
-                {{ govukDetails({
-                    summaryText: additionalSentences.name,
-                    classes: 'govuk-!-margin-top-2 govuk-!-margin-bottom-0',
-                    html: govukSummaryList({
-                        rows: [
-                            {
-                                key: { text: "Sentence" },
-                                value: { text: additionalSentences.name }
-                            },
-                            {
-                                key: { text: "Value" },
-                                value: { text: additionalSentences.value }
-                            } if additionalSentences.value,
-                            {
-                                key: { text: "Length" },
-                                value: { text: additionalSentences.length }
-                            } if additionalSentences.length,
-                            {
-                                key: { text: "Notes" },
-                                value: { html: additionalSentences.notes | nl2br if additionalSentences.notes else 'No notes' }
-                            }
-                        ]
-                    })
-                }) }}
-            {% endfor %}
-        {% endset %}
 
         {% set requirements %}
             {% for requirement in conviction.requirements %}
@@ -170,12 +176,6 @@
                 {
                     key: { text: "Time elapsed" },
                     value: { text: conviction.sentence.elapsed }
-                },
-                {
-                    key: { text: "Additional sentences" },
-                    value: {
-                        html: additionalSentences if conviction.sentence.additionalSentences else 'No additional sentences'
-                    }
                 }
             ]
         }) }}

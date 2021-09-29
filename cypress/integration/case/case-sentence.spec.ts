@@ -95,6 +95,16 @@ context('Case sentence tab', () => {
             card.value('Sentencing court').contains('Nottingham Crown Court')
             card.value('Responsible court').contains('Sheffield Magistrates Court')
             card.value('Conviction date').contains('5 February 2020')
+            card.detailsList('Additional sentences', 'Fine', list => {
+              list.value('Sentence').contains('Fine')
+              list.value('Value').contains('500')
+              list.value('Notes').contains('£500 fine')
+            })
+            card.detailsList('Additional sentences', 'Disqualified from Driving', list => {
+              list.value('Sentence').contains('Disqualified from Driving')
+              list.value('Length').contains('6')
+              list.value('Notes').contains('No notes')
+            })
           })
 
           page.sentence(card => {
@@ -109,16 +119,6 @@ context('Case sentence tab', () => {
             card.value('Start date').contains('17 February 2020')
             card.value('Expected end date').contains('16 February 2021')
             card.value('Time elapsed').contains('12 months elapsed (of 12 months)')
-            card.detailsList('Additional sentences', 'Fine', list => {
-              list.value('Sentence').contains('Fine')
-              list.value('Value').contains('500')
-              list.value('Notes').contains('£500 fine')
-            })
-            card.detailsList('Additional sentences', 'Disqualified from Driving', list => {
-              list.value('Sentence').contains('Disqualified from Driving')
-              list.value('Length').contains('6')
-              list.value('Notes').contains('No notes')
-            })
           })
 
           page.probationHistory(card => {
