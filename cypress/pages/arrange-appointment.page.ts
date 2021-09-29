@@ -217,4 +217,8 @@ export class ArrangeAppointmentPage extends PageBase {
       },
     }
   }
+
+  get errorSummary() {
+    return cy.get('#error-summary-title')
+  }
 }
