@@ -9,7 +9,7 @@ export class CasesController {
 
   @Get()
   @Render('cases/index')
-  @Breadcrumb({ type: BreadcrumbType.Cases, title: 'Cases' })
+  @Breadcrumb({ type: BreadcrumbType.Cases, title: 'Your cases' })
   async getCases(@CurrentSecurityContext() security: SecurityContext) {
     const cases = await this.casesService.getCases(security.username)
     return { cases }
