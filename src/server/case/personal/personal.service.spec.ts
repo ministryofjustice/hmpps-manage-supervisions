@@ -89,7 +89,7 @@ describe('PersonalService', () => {
   })
 
   const expectedMainAddress: AddressDetail = {
-    name: 'Main address - Since 1 January 2021',
+    name: 'Main address – Since 1 January 2021',
     lines: ['123 Some building Some street', 'Some town', 'Some county', 'Some postcode'],
     phone: '9876543210',
     type: 'Approved premises (verified)',

@@ -47,7 +47,7 @@ function getAddressViewModel(address: Address): AddressDetail {
     ? [startDate, endDate].map(x => x.toFormat('d MMMM yyyy')).join(' to ')
     : `Since ${startDate.toFormat('d MMMM yyyy')}`
   return {
-    name: `${status} - ${dateRange}`,
+    name: `${status} – ${dateRange}`,
     // addresses with an end date in the past are previous addresses
     // but previous addresses can also be classified by status regardless of end date...
     active:
