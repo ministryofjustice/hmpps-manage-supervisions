@@ -63,19 +63,20 @@ export class ActivityService {
     }
 
     const { data: result } = await this.community.contactAndAttendance.getActivityLogByCrnUsingGET(filter)
-    if (!result.last) {
+    if (result.totalElements > PAGE_SIZE) {
       this.logger.error('activity log has been truncated', { crn, convictionId: conviction.id })
     }
 
     const today = DateTime.now().startOf('day')
-    const groups: CaseActivityLogGroup[] = result.content.map(grp => {
-      const date = DateTime.fromISO(grp.date)
-      return {
-        date,
-        isToday: date.equals(today),
-        entries: grp.entries.map(entry => this.getActivityLogEntry(crn, grp, entry, offender)),
-      }
-    })
+    const groups: CaseActivityLogGroup[] =
+      result.content?.map(grp => {
+        const date = DateTime.fromISO(grp.date)
+        return {
+          date,
+          isToday: date.equals(today),
+          entries: grp.entries.map(entry => this.getActivityLogEntry(crn, grp, entry, offender)),
+        }
+      }) || []
 
     return {
       totalPages: 1,

@@ -4,6 +4,7 @@ import { DateTime, Settings } from 'luxon'
 import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
 import {
   ActivityLogEntry,
+  ActivityLogGroup,
   ContactAndAttendanceApiGetActivityLogByCrnUsingGETRequest,
   ContactSummary,
   OffenderDetail,
@@ -156,7 +157,7 @@ describe('ActivityService', () => {
     return entry
   }
 
-  describe('activity log compliance filters', () => {
+  describe('get activity log', () => {
     let stub: ReturnType<typeof havingContacts>
     const offender = fakeOffenderDetail()
     const contacts = {
@@ -166,19 +167,17 @@ describe('ActivityService', () => {
     }
     let entries: Record<keyof typeof contacts, CaseActivityLogEntry>
     let conviction: ConvictionSummary
+    let activityLogGroups: Paginated<ActivityLogGroup>
 
     function havingContacts() {
-      return community.contactAndAttendance.getActivityLogByCrnUsingGET.resolves(
-        fakeOkResponse(
-          fakePaginated([
-            {
-              date: '2021-03-01',
-              rarDay: false,
-              entries: [contacts.appointment, contacts.communication, contacts.unknown],
-            },
-          ]),
-        ),
-      )
+      activityLogGroups = fakePaginated([
+        {
+          date: '2021-03-01',
+          rarDay: false,
+          entries: [contacts.appointment, contacts.communication, contacts.unknown],
+        },
+      ])
+      return community.contactAndAttendance.getActivityLogByCrnUsingGET.resolves(fakeOkResponse(activityLogGroups))
     }
 
     function shouldHaveFilteredConvictionLevelContacts(
@@ -244,6 +243,12 @@ describe('ActivityService', () => {
         totalElements: 1,
         totalPages: 1,
       } as Paginated<CaseActivityLogGroup>)
+    })
+
+    it('handles empty content', async () => {
+      activityLogGroups.content = null
+      const observed = await subject.getActivityLogPage('some-crn', offender, { conviction: fakeConvictionSummary() })
+      expect(observed.content).toEqual([])
     })
 
     it('does not apply any date from filters when not filtering for compliance', async () => {
