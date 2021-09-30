@@ -16,6 +16,8 @@ interface ExpectedAppointment {
   summary?: Record<string, string>
 }
 
+const EXPECTED_LONG_CONTACT_NOTES = LONG_CONTACT_NOTES.replace(/\s+/g, ' ')
+
 class Fixture extends ViewCaseFixture {
   whenClickingActivityEntry(id: number) {
     return this.shouldRenderOffenderTab('activity', page => page.clickEntryLink(id))
@@ -57,7 +59,7 @@ class Fixture extends ViewCaseFixture {
             entry.actions.within(() => Tag.byNameAndColour(name, colour))
           }
 
-          entry.notes.contains(expected.notes.replace(/\s+/g, ' '))
+          entry.notes.contains(expected.notes)
           switch (notesType) {
             case 'closed-detail':
               entry.notesDetail(expected.sensitive, detail => detail.shouldBeClosed())
@@ -171,7 +173,7 @@ context('Case activity tab', () => {
           date: 'Friday 4 September 2020',
           title: 'Home visit with Catherine Ellis at 12pm',
           subTitle: 'National standard appointment',
-          notes: LONG_CONTACT_NOTES,
+          notes: EXPECTED_LONG_CONTACT_NOTES,
           notesType: 'open-detail', // long, not sensitive & in the first 3 entries
           action: { colour: 'green', name: 'complied' },
         })
@@ -221,7 +223,7 @@ context('Case activity tab', () => {
           date: 'Thursday 3 September 2020',
           title: 'Office visit at 11am',
           subTitle: 'Appointment',
-          notes: LONG_CONTACT_NOTES,
+          notes: EXPECTED_LONG_CONTACT_NOTES,
           notesType: 'closed-detail',
           action: { colour: 'green', name: 'acceptable absence' },
         })
@@ -231,7 +233,7 @@ context('Case activity tab', () => {
           date: 'Thursday 3 September 2020',
           title: 'Office visit at 11:30am',
           subTitle: 'Appointment',
-          notes: LONG_CONTACT_NOTES,
+          notes: EXPECTED_LONG_CONTACT_NOTES,
           notesType: 'closed-detail',
           action: { colour: 'red', name: 'unacceptable absence' },
           summary: { 'RAR activity': 'Attitudes, thinking and behaviour: Racially Motivated Offending' },
@@ -243,6 +245,7 @@ context('Case activity tab', () => {
           title: 'Not a well known appointment with Robert Ohagan at 11am',
           subTitle: 'Appointment',
           notes: 'Some unknown appointment',
+          summary: { 'RAR activity': 'Finance, benefits and debt' },
         })
 
         .shouldRenderActivity({
@@ -265,6 +268,7 @@ context('Case activity tab', () => {
         })
         .shouldDisplayExitPage('delius')
     })
+
     it('displays system contact on activity log with link to delius', () => {
       fixture
         .whenViewingOffender()
@@ -272,19 +276,23 @@ context('Case activity tab', () => {
         .whenClickingSystemContact(9)
         .shouldDisplayExitPage('delius')
     })
+
     it('displays appointment detail without outcome', () => {
       fixture
         .whenViewingOffender()
         .whenClickingSubNavTab('activity')
-        .whenClickingActivityEntry(1)
+        .whenClickingActivityEntry(5)
 
-        .shouldRenderAppointmentPage('National standard appointment Home visit with Catherine Ellis', page => {
-          page.detail('Type of appointment').contains('Home visit')
-          page.detail('Date').contains('2 January 2200')
-          page.detail('Time').contains('1:30pm to 2pm')
-          page.detail('Appointment notes').contains('Some home visit appointment')
-          page.detail('Sensitive').contains('Yes')
-          page.detail('RAR activity').contains('Yes')
+        .shouldRenderAppointmentPage('Appointment Not a well known appointment with Robert Ohagan', page => {
+          page.detail(list => {
+            list.value('Type of appointment').contains('Not a well known appointment')
+            list.value('Date').contains('2 September 2020')
+            list.value('Time').contains('11am to 1pm')
+            list.value('Appointment notes').contains('Some unknown appointment')
+            list.value('Sensitive').contains('No')
+            list.value('RAR activity').contains('Finance, benefits and debt')
+          })
+
           page.outcomeTable.should('not.exist')
         })
     })
@@ -293,16 +301,21 @@ context('Case activity tab', () => {
       fixture
         .whenViewingOffender()
         .whenClickingSubNavTab('activity')
-        .whenClickingActivityEntry(2)
+        .whenClickingActivityEntry(1)
 
-        .shouldRenderAppointmentPage('Some recent appointment', page => {
-          page.detail('Type of appointment').contains('Some recent appointment')
-          page.detail('Date').contains('3 February 2020')
-          page.detail('Time').contains('10am to 11am')
-          page.detail('RAR activity').contains('Yes')
-          page.outcome('Complied').contains('Yes')
-          page.outcome('Appointment notes').contains('Some unknown appointment type')
-          page.outcome('Sensitive').contains('Yes')
+        .shouldRenderAppointmentPage('National standard appointment Home visit with Catherine Ellis', page => {
+          page.detail(list => {
+            list.value('Type of appointment').contains('Home visit')
+            list.value('Date').contains('4 September 2020')
+            list.value('Time').contains('12pm to 1pm')
+            list.title('RAR activity').should('not.exist')
+          })
+
+          page.outcome(list => {
+            list.value('Complied').contains('Yes')
+            list.value('Appointment notes').contains(EXPECTED_LONG_CONTACT_NOTES)
+            list.value('Sensitive').contains('No')
+          })
         })
     })
 
@@ -404,10 +417,10 @@ context('Case activity tab', () => {
         .shouldHaveDocumentTitle('Appointments with an associated RAR requirement')
         .shouldHaveCurrentBreadcrumb('Appointments with an associated RAR requirement')
         .shouldRenderActivityWithId(4)
+        .shouldRenderActivityWithId(5)
         .shouldNotRenderActivityWithId(1)
         .shouldNotRenderActivityWithId(2)
         .shouldNotRenderActivityWithId(3)
-        .shouldNotRenderActivityWithId(5)
         .shouldNotRenderActivityWithId(10)
         .shouldNotRenderActivityWithId(11)
     })

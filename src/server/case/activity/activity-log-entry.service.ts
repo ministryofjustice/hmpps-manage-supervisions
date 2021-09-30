@@ -1,11 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import {
-  ActivityLogEntry,
-  ActivityLogGroup,
-  AppointmentDetail,
-  ContactSummary,
-  OffenderDetail,
-} from '../../community-api/client'
+import { ActivityLogEntry, ActivityLogGroup, ContactSummary, OffenderDetail } from '../../community-api/client'
 import { AppointmentMetaResult, CommunicationMetaResult, GetMetaResult, SystemMetaResult } from '../../community-api'
 import {
   CaseActivityLogEntry,
@@ -23,16 +17,14 @@ import { getDisplayName } from '../../util'
 type CommonActivityLogEntry = Pick<CaseActivityLogEntry, 'id' | 'start' | 'notes' | 'sensitive' | 'isFuture'>
 
 export type DatedActivityLogEntry = ActivityLogEntry & Pick<ActivityLogGroup, 'date'>
+export type Contact = ContactSummary | DatedActivityLogEntry
 
 function isContactSummary(value: any): value is ContactSummary {
+  // this is for differentiating ContactSummary from DatedActivityLogEntry so we can be very light.
   return 'contactStart' in value
 }
 
-function isAppointmentDetail(value: any): value is AppointmentDetail {
-  return 'appointmentStart' in value
-}
-
-function getDates(value: ContactSummary | DatedActivityLogEntry): { start: DateTime; end: DateTime } {
+function getDates(value: Contact): { start: DateTime; end: DateTime } {
   if (isContactSummary(value)) {
     return { start: DateTime.fromISO(value.contactStart), end: value.contactEnd && DateTime.fromISO(value.contactEnd) }
   }
@@ -48,27 +40,20 @@ export class ActivityLogEntryService {
 
   getAppointmentActivityLogEntry(
     crn: string,
-    contact: AppointmentDetail | DatedActivityLogEntry,
+    contact: Contact,
     meta: AppointmentMetaResult,
   ): AppointmentActivityLogEntry {
-    const { id, start, end, rarActivity } = isAppointmentDetail(contact)
+    const { id, start, end, rarActivity } = isContactSummary(contact)
       ? {
-          id: contact.appointmentId,
-          start: DateTime.fromISO(contact.appointmentStart),
-          end: contact.appointmentEnd && DateTime.fromISO(contact.appointmentEnd),
-          rarActivity: contact.rarActivity ? { name: null } : null, // TODO get RAR category once in CAPI
+          id: contact.contactId,
+          start: DateTime.fromISO(contact.contactStart),
+          end: contact.contactEnd && DateTime.fromISO(contact.contactEnd),
+          rarActivity: contact.rarActivityDetail,
         }
       : {
           id: contact.contactId,
           ...getDates(contact),
-          rarActivity: contact.rarActivity
-            ? {
-                name:
-                  [contact.rarActivity.type?.description, contact.rarActivity.subtype?.description]
-                    .filter(x => x)
-                    .join(': ') || null,
-              }
-            : null,
+          rarActivity: contact.rarActivity,
         }
 
     const isFuture = start > DateTime.now()
@@ -93,7 +78,11 @@ export class ActivityLogEntryService {
           !contact.outcome && start <= DateTime.now() ? links.url(BreadcrumbType.ExitToDelius) : null,
         updateOutcome: links.url(BreadcrumbType.ExitToDelius),
       },
-      rarActivity,
+      rarActivity: rarActivity
+        ? {
+            name: [rarActivity.type?.description, rarActivity.subtype?.description].filter(x => x).join(': ') || null,
+          }
+        : null,
       outcome: contact.outcome
         ? {
             complied: contact.outcome.complied,
@@ -112,7 +101,7 @@ export class ActivityLogEntryService {
 
   getCommunicationActivityLogEntry(
     crn: string,
-    contact: ContactSummary | DatedActivityLogEntry,
+    contact: Contact,
     meta: CommunicationMetaResult,
     offender: OffenderDetail,
   ): CommunicationActivityLogEntry {
@@ -135,11 +124,7 @@ export class ActivityLogEntryService {
     }
   }
 
-  getUnknownActivityLogEntry(
-    crn: string,
-    contact: ContactSummary | DatedActivityLogEntry,
-    meta: GetMetaResult,
-  ): UnknownActivityLogEntry {
+  getUnknownActivityLogEntry(crn: string, contact: Contact, meta: GetMetaResult): UnknownActivityLogEntry {
     const links = this.links.of({ id: contact.contactId, crn })
     return {
       ...ActivityLogEntryService.getCommonActivityLogEntryBase(contact),
@@ -156,11 +141,7 @@ export class ActivityLogEntryService {
     }
   }
 
-  getSystemActivityLogEntry(
-    crn: string,
-    contact: ContactSummary | DatedActivityLogEntry,
-    meta: SystemMetaResult,
-  ): SystemActivityLogEntry {
+  getSystemActivityLogEntry(crn: string, contact: Contact, meta: SystemMetaResult): SystemActivityLogEntry {
     const links = this.links.of({ id: contact.contactId, crn })
     return {
       ...ActivityLogEntryService.getCommonActivityLogEntryBase(contact),
@@ -174,9 +155,7 @@ export class ActivityLogEntryService {
     }
   }
 
-  private static getCommonActivityLogEntryBase(
-    contact: ContactSummary | DatedActivityLogEntry,
-  ): CommonActivityLogEntry {
+  private static getCommonActivityLogEntryBase(contact: Contact): CommonActivityLogEntry {
     const { start } = getDates(contact)
     return {
       id: contact.contactId,
