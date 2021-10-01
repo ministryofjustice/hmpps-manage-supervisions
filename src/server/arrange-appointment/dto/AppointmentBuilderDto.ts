@@ -136,12 +136,12 @@ export class AppointmentBuilderDto {
   date: AppointmentDateDto
 
   @ExposeDefault({ groups: [AppointmentWizardStep.When] })
-  @IsTime({ message: 'Enter a valid time', groups: [AppointmentWizardStep.When] })
+  @IsTime({ message: 'Enter a valid start time, such as 12:15pm', groups: [AppointmentWizardStep.When] })
   @IsFutureTime('date', { message: 'Enter a time in the future', groups: [AppointmentWizardStep.When] })
   startTime?: string
 
   @ExposeDefault({ groups: [AppointmentWizardStep.When] })
-  @IsTime({ message: 'Enter a valid time', groups: [AppointmentWizardStep.When] })
+  @IsTime({ message: 'Enter a valid end time, such as 12:30pm', groups: [AppointmentWizardStep.When] })
   @IsAfter('startTime', { message: 'Enter an end time after the start time', groups: [AppointmentWizardStep.When] })
   endTime?: string
 

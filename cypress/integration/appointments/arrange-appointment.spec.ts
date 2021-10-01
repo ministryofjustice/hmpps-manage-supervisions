@@ -165,14 +165,14 @@ context('Arrange appointment happy path & validation', () => {
     whenEnteringDateStrings('80', '20', '6')
     whenSubmittingCurrentStep()
     aDateErrorIsShown('Enter a valid date')
-    aStartTimeErrorIsShown('Enter a valid time')
-    aEndTimeErrorIsShown('Enter a valid time')
+    aStartTimeErrorIsShown('Enter a valid start time')
+    aEndTimeErrorIsShown('Enter a valid end time')
 
     whenEnteringDateStrings('15', '01', '2021')
     whenSubmittingCurrentStep()
     aDateErrorIsShown('Enter a date in the future')
-    aStartTimeErrorIsShown('Enter a valid time')
-    aEndTimeErrorIsShown('Enter a valid time')
+    aStartTimeErrorIsShown('Enter a valid start time')
+    aEndTimeErrorIsShown('Enter a valid end time')
 
     const now = DateTime.now()
 
