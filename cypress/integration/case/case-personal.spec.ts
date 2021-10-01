@@ -252,7 +252,7 @@ context('Case personal details tab', () => {
       .whenClickingViewAllAddresses()
       .shouldBeAccessible()
       .shouldRenderAddress('main', {
-        name: 'Main address - Since 16 July 2015',
+        name: 'Main address – Since 16 July 2015',
         status: 'Main address',
         address: '1 High Street Sheffield South Yorkshire S10 1AG',
         phone: '0123456789',
@@ -261,13 +261,13 @@ context('Case personal details tab', () => {
         notes: 'Sleeping on sofa',
       })
       .shouldRenderAddress('other', {
-        name: 'Secondary address - Since 8 January 2016',
+        name: 'Secondary address – Since 8 January 2016',
         status: 'Secondary address',
         address: '24 The Mill Sherbourne Street Birmingham West Midlands B16 8TP',
         startDate: '8 January 2016',
       })
       .shouldRenderAddress('previous', {
-        name: 'Main address - 16 July 2001 to 16 July 2015',
+        name: 'Main address – 16 July 2001 to 16 July 2015',
         status: 'Main address',
         address: 'No fixed abode Tent',
         type: 'Tent (not verified)',
