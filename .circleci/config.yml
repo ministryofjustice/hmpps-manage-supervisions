@@ -145,10 +145,21 @@ workflows:
             - build-test
             - integration_test
             - build_docker_publish
-      - approve_preprod:
+      - approve_postdev:
           type: approval
           requires:
             - deploy_dev
+      - hmpps/deploy_env:
+          name: deploy_pentest
+          env: "pentest-dev"
+          show_changelog: true
+          slack_notification: true
+          slack_channel_name: "manage-a-supervision-notifications-dev"
+          requires:
+            - approve_postdev
+          context:
+            - hmpps-common-vars
+            - hmpps-manage-supervisions-pentest-dev
       - hmpps/deploy_env:
           name: deploy_preprod
           env: "preprod"
@@ -156,10 +167,25 @@ workflows:
           slack_notification: true
           slack_channel_name: "manage-a-supervision-notifications-preprod"
           requires:
-            - approve_preprod
+            - approve_postdev
           context:
             - hmpps-common-vars
             - hmpps-manage-supervisions-preprod
+      - approve_production:
+          type: approval
+          requires:
+            - deploy_preprod
+      - hmpps/deploy_env:
+          name: deploy_prod
+          env: "prod"
+          show_changelog: true
+          slack_notification: true
+          slack_channel_name: "manage-a-supervision-notifications"
+          requires:
+            - approve_postdev
+          context:
+            - hmpps-common-vars
+            - hmpps-manage-supervisions-prod
 
   security:
     triggers:
