@@ -1,5 +1,20 @@
-# This is a YAML-formatted file.
 generic-service:
+
+  replicaCount: 2
+
+  ingress:
+    host: hmpps-manage-supervisions.apps.live-1.cloud-platform.service.justice.gov.uk
+
+  env:
+    DEPLOYMENT_ENV: prod
+    HMPPS_AUTH_URL: https://sign-in.hmpps.service.justice.gov.uk/auth
+    TOKEN_VERIFICATION_API_URL: https://token-verification-api.prison.service.justice.gov.uk
+    TOKEN_VERIFICATION_ENABLED: true
+    COMMUNITY_API_URL: https://community-api-secure.probation.service.justice.gov.uk
+    ASSESS_RISKS_AND_NEEDS_API_URL: https://assess-risks-and-needs.hmpps.service.justice.gov.uk
+    DELIUS_BASE_URL: https://ndelius.probation.service.justice.gov.uk
+    OASYS_BASE_URL: https://bridge-oasys.az.justice.gov.uk
+    INGRESS_URL: https://hmpps-manage-supervisions.apps.live-1.cloud-platform.service.justice.gov.uk
 
   allowlist:
     mojvpn: "81.134.202.29/32"
