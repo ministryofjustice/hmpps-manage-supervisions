@@ -57,6 +57,7 @@ describe('ActivityLogEntryService', () => {
       category: 'Future appointment',
       isFuture: true,
       nationalStandard: true,
+      enforcementAction: null,
       outcome: {
         attended: true,
         complied: true,
