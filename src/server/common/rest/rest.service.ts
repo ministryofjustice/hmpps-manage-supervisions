@@ -8,6 +8,7 @@ import { HmppsOidcService } from '../hmpps-oidc/hmpps-oidc.service'
 import { ContextualNestLoggerService, LoggerService } from '../../logger'
 
 export enum AuthenticationMethod {
+  None,
   PassThroughUserToken,
   ReissueForDeliusUser,
 }
@@ -64,11 +65,13 @@ export class RestService {
       },
     )
 
-    // authorization header
-    axios.interceptors.request.use(async config => {
-      const token = await this.getToken(user, authMethod)
-      return { ...config, headers: { ...config.headers, authorization: `Bearer ${token}` } }
-    })
+    if (authMethod !== AuthenticationMethod.None) {
+      // authorization header
+      axios.interceptors.request.use(async config => {
+        const token = await this.getToken(user, authMethod)
+        return { ...config, headers: { ...config.headers, authorization: `Bearer ${token}` } }
+      })
+    }
 
     // retry
     axios.defaults.raxConfig = {

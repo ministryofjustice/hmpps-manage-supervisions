@@ -53,6 +53,7 @@ export interface ApiConfig {
   enabled: boolean
   url: URL
   timeout: number
+  specVersion?: string
 }
 
 export interface ClientCredentials {

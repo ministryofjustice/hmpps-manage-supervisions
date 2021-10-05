@@ -6,18 +6,30 @@ const CopyPlugin = require('copy-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 const TerserPlugin = require('terser-webpack-plugin');
 const SentryPlugin = require("@sentry/webpack-plugin");
+const { readFile } = require('fs/promises')
 
 const { BUILD_NUMBER: buildNumber = null, GIT_REF: gitRef = null } = process.env;
 
-class WriteBuildInfo {
+async function getApiSpecVersions() {
+  const json = await readFile('openapitools.json', { encoding: 'utf8' })
+  const specs = await Promise.all(
+    Object.entries(JSON.parse(json)['generator-cli'].generators)
+      .map(async ([name, meta]) => ({ name, spec: await readFile(path.resolve(__dirname, meta.glob), { encoding: 'utf8' }) }))
+  )
+
+  return specs.reduce((agg, x) => ({ ...agg, [x.name]: JSON.parse(x.spec).info.version }), {})
+}
+
+class WriteBuildInfoPlugin {
   plugin = { name: 'WriteBuildInfo' };
 
   apply(compiler) {
     compiler.hooks.compilation.tap(this.plugin, compilation => {
-      compilation.hooks.processAssets.tap(
+      compilation.hooks.processAssets.tapPromise(
         { name: this.plugin.name, stage: Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL },
-        assets => {
-          const json = JSON.stringify({ buildNumber, gitRef });
+        async assets => {
+          const apiSpecVersions = await getApiSpecVersions()
+          const json = JSON.stringify({ buildNumber, gitRef, apiSpecVersions });
           assets['build-info.json'] = { source: () => json, size: () => json.length };
         },
       );
@@ -147,7 +159,7 @@ module.exports = function (options) {
           },
         ],
       }),
-      new WriteBuildInfo(),
+      new WriteBuildInfoPlugin(),
       new SentryPlugin({
         include: './dist',
         ignore: ['assets'],

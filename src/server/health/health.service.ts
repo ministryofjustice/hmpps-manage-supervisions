@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config'
 import { HealthResult } from './health.types'
 import { ApiConfig, Config, DependentApisConfig, ServerConfig } from '../config'
 import { urlJoin } from '../util'
+import { OpenApiVersionService } from './open-api-version'
 
 interface ServiceHealthResult {
   name: keyof DependentApisConfig
@@ -15,20 +16,29 @@ interface ServiceHealthResult {
 export class HealthService {
   private readonly logger = new Logger(HealthService.name)
 
-  constructor(private readonly config: ConfigService<Config>) {}
+  constructor(private readonly config: ConfigService<Config>, private readonly openApiVersion: OpenApiVersionService) {}
 
   async getHealth(): Promise<HealthResult> {
     const { version } = this.config.get<ServerConfig>('server')
-    const promises = Object.entries(this.config.get<DependentApisConfig>('apis'))
-      .filter(([, api]) => api.enabled)
-      .map(([name, api]) => this.service(name as keyof DependentApisConfig, api))
 
-    const results = await Promise.all(promises)
+    const servicesPromise = Promise.all(
+      Object.entries(this.config.get<DependentApisConfig>('apis'))
+        .filter(([, api]) => api.enabled)
+        .map(([name, api]) => this.service(name as keyof DependentApisConfig, api)),
+    )
+
+    const openApiPromise = Promise.all([
+      this.openApiVersion.versionReport('community'),
+      this.openApiVersion.versionReport('assessRisksAndNeeds'),
+    ])
+
+    const [[community, assessRisksAndNeeds], results] = await Promise.all([openApiPromise, servicesPromise])
     return {
       healthy: results.length === 0 || results.every(x => x.healthy),
       checks: results.reduce((agg, x) => ({ ...agg, [x.name]: x.result }), {}),
       uptime: process.uptime(),
       version,
+      services: { community, assessRisksAndNeeds },
     }
   }
 
