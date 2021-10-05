@@ -182,7 +182,7 @@ workflows:
           slack_notification: true
           slack_channel_name: "manage-a-supervision-notifications"
           requires:
-            - approve_postdev
+            - approve_production
           context:
             - hmpps-common-vars
             - hmpps-manage-supervisions-prod
