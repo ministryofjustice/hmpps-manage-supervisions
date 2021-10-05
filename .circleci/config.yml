@@ -91,7 +91,7 @@ jobs:
           command: 'npm --version'
       - run:
           name: Run check
-          command: 'npm outdated typescript govuk-frontend'
+          command: 'npm outdated @nestjs/core govuk-frontend'
 
 workflows:
   version: 2
