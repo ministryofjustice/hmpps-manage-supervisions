@@ -236,7 +236,10 @@ context('Case activity tab', () => {
           notes: EXPECTED_LONG_CONTACT_NOTES,
           notesType: 'closed-detail',
           action: { colour: 'red', name: 'unacceptable absence' },
-          summary: { 'RAR activity': 'Attitudes, thinking and behaviour: Racially Motivated Offending' },
+          summary: {
+            'RAR activity': 'Attitudes, thinking and behaviour: Racially Motivated Offending',
+            'Enforcement action': 'Warning letter requested',
+          },
         })
 
         .shouldRenderActivity({

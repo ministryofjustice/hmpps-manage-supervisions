@@ -43,7 +43,13 @@ export class ActivityLogEntryService {
     contact: Contact,
     meta: AppointmentMetaResult,
   ): AppointmentActivityLogEntry {
-    const { id, start, end, rarActivity } = isContactSummary(contact)
+    const {
+      id,
+      start,
+      end,
+      rarActivity,
+      enforcementAction = null,
+    } = isContactSummary(contact)
       ? {
           id: contact.contactId,
           start: DateTime.fromISO(contact.contactStart),
@@ -54,6 +60,7 @@ export class ActivityLogEntryService {
           id: contact.contactId,
           ...getDates(contact),
           rarActivity: contact.rarActivity,
+          enforcementAction: contact.enforcement?.enforcementAction.description,
         }
 
     const isFuture = start > DateTime.now()
@@ -67,6 +74,7 @@ export class ActivityLogEntryService {
       category: `${isFuture ? 'Future' : 'Previous'} appointment`,
       isFuture,
       nationalStandard: contact.type.nationalStandard,
+      enforcementAction,
       name: meta.name,
       typeName: meta.value?.name || contact.type.description,
       end,

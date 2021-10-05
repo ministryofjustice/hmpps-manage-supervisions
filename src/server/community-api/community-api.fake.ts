@@ -367,6 +367,9 @@ export const fakeActivityLogEntry = fake<ActivityLogEntry>(() => ({
   sensitive: faker.datatype.boolean(),
   type: fakeContactType(),
   staff: fakeStaffHuman(),
+  enforcement: {
+    enforcementAction: fakeKeyValue(),
+  },
   rarActivity: {
     requirementId: faker.datatype.number(),
     nsiId: faker.datatype.number(),

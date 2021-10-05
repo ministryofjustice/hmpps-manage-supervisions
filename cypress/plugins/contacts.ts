@@ -188,6 +188,7 @@ export const ACTIVITY_LOG_GROUPS: DeepPartial<ActivityLogGroup>[] = [
         notes: LONG_CONTACT_NOTES,
         staff: { forenames: 'Unallocated', surname: 'Staff', unallocated: true },
         outcome: { complied: false, attended: false },
+        enforcement: { enforcementAction: { code: 'WLS', description: 'Warning letter requested' } },
         rarActivity: {
           nsiId: 101,
           requirementId: 102,
