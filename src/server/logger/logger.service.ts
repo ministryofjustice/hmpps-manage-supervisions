@@ -6,6 +6,7 @@ import { Config, LogLevel, ServerConfig } from '../config'
 import { LOGGER_HOOK } from './logger.hook'
 import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry'
 import { Severity } from '@sentry/types'
+import { SanitisedAxiosError } from '../common/rest'
 
 function toWinstonLogLevel(level: NestLogLevel): LogLevel {
   switch (level) {
@@ -76,6 +77,11 @@ class NestWinstonWrapper implements ContextualNestLoggerService {
     function getMeta() {
       return args.find(x => typeof x === 'object')
     }
+    function getExceptionExtras(exception: Error) {
+      return exception instanceof SanitisedAxiosError
+        ? { message, request: exception.request, response: exception.response }
+        : { message }
+    }
     function addMeta(source: any) {
       const meta = getMeta()
       if (meta) {
@@ -103,7 +109,7 @@ class NestWinstonWrapper implements ContextualNestLoggerService {
       const exception = args.find(x => x && (x instanceof Error || (x.stack && x.message)))
       const sentry = this.sentry.instance()
       if (exception) {
-        sentry.captureException(exception, { extra: { message }, user: { id: store?.user } })
+        sentry.captureException(exception, { extra: getExceptionExtras(exception), user: { id: store?.user } })
       } else {
         sentry.captureMessage(message, { level: Severity.Error, user: { id: store?.user }, extra: getMeta() })
       }
