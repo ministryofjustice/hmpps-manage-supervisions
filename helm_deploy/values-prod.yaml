@@ -3,7 +3,8 @@ generic-service:
   replicaCount: 2
 
   ingress:
-    host: hmpps-manage-supervisions.apps.live-1.cloud-platform.service.justice.gov.uk
+    host: manage-supervisions.hmpps.service.justice.gov.uk
+    tlsSecretName: hmpps-manage-supervisions-cert
 
   env:
     DEPLOYMENT_ENV: prod
@@ -14,7 +15,7 @@ generic-service:
     ASSESS_RISKS_AND_NEEDS_API_URL: https://assess-risks-and-needs.hmpps.service.justice.gov.uk
     DELIUS_BASE_URL: https://ndelius.probation.service.justice.gov.uk
     OASYS_BASE_URL: https://bridge-oasys.az.justice.gov.uk
-    INGRESS_URL: https://hmpps-manage-supervisions.apps.live-1.cloud-platform.service.justice.gov.uk
+    INGRESS_URL: https://manage-supervisions.hmpps.service.justice.gov.uk
 
   allowlist:
     mojvpn: "81.134.202.29/32"
