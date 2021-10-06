@@ -12,7 +12,6 @@ generic-service:
   ingress:
     enabled: true
     host: app-hostname.local    # override per environment
-    cert_secret: hmpps-manage-supervisions-cert
     path: /
 
   livenessProbe:
