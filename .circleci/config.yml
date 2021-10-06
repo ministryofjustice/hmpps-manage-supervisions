@@ -149,17 +149,17 @@ workflows:
           type: approval
           requires:
             - deploy_dev
-      - hmpps/deploy_env:
-          name: deploy_pentest
-          env: "pentest-dev"
-          show_changelog: true
-          slack_notification: true
-          slack_channel_name: "manage-a-supervision-notifications-dev"
-          requires:
-            - approve_postdev
-          context:
-            - hmpps-common-vars
-            - hmpps-manage-supervisions-pentest-dev
+#      - hmpps/deploy_env:
+#          name: deploy_pentest
+#          env: "pentest-dev"
+#          show_changelog: true
+#          slack_notification: true
+#          slack_channel_name: "manage-a-supervision-notifications-dev"
+#          requires:
+#            - approve_postdev
+#          context:
+#            - hmpps-common-vars
+#            - hmpps-manage-supervisions-pentest-dev
       - hmpps/deploy_env:
           name: deploy_preprod
           env: "preprod"
