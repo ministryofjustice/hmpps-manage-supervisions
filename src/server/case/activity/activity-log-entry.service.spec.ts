@@ -57,6 +57,7 @@ describe('ActivityLogEntryService', () => {
       category: 'Future appointment',
       isFuture: true,
       nationalStandard: true,
+      enforcementAction: null,
       outcome: {
         attended: true,
         complied: true,
@@ -76,6 +77,12 @@ describe('ActivityLogEntryService', () => {
         type: { appointment: true, nationalStandard: false, description: 'some non well known appointment' },
         outcome: { complied: false, attended: true, description: 'some outcome' },
         sensitive: false,
+        enforcement: {
+          enforcementAction: {
+            code: 'WLS',
+            description: 'Enforcement Letter Requested',
+          },
+        },
         rarActivity: { type: { description: 'Some RAR type' }, subtype: { description: 'Some RAR subtype' } },
         startTime: '12:00:00',
         endTime: '14:00:00',
@@ -103,6 +110,7 @@ describe('ActivityLogEntryService', () => {
       category: 'Previous appointment',
       isFuture: false,
       nationalStandard: false,
+      enforcementAction: 'Enforcement Letter Requested',
       outcome: {
         attended: true,
         complied: false,

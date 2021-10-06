@@ -41,6 +41,7 @@ export interface AppointmentActivityLogEntry
     { recordMissingAttendance: string | null; updateOutcome: string }
   > {
   nationalStandard: boolean
+  enforcementAction?: string
   end?: DateTime
   rarActivity: { name?: string }
   outcome?: {
