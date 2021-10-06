@@ -208,7 +208,6 @@ export class PersonalService {
         },
         emailAddresses: offender.contactDetails.emailAddresses?.filter(x => x).sort() || [],
         personalContacts,
-        lastUpdated: addresses.mainAddress?.lastUpdated, // TODO determine logic for aggregating dates across addresses
       },
       personalDetails: {
         name: getDisplayName(offender),
@@ -222,6 +221,9 @@ export class PersonalService {
         previousName: offender.previousSurname,
         preferredLanguage: getLanguageSummary(offenderLanguages),
         currentCircumstances: personalCircumstances.filter(isActiveDateRange).map(x => x.name),
+        currentCircumstancesLastUpdated: personalCircumstances.length
+          ? personalCircumstances[personalCircumstances.length - 1].lastUpdated
+          : undefined,
         disabilities: offender.offenderProfile.disabilities
           ?.filter(isActiveDateRange)
           .map(x =>

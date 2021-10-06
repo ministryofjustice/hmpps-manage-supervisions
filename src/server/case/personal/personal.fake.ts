@@ -78,6 +78,7 @@ export const fakePersonalDetailsViewModel = fake<PersonalDetailsViewModel>(() =>
     'Employment: Full-time employed (30 or more hours per week)',
     'Accommodation: Friends/Family (settled)',
   ],
+  currentCircumstancesLastUpdated: DateTime.fromJSDate(faker.date.past()),
   disabilities: ['Mental Illness: Flex refreshment breaks', 'Visual Impairment: Colour/visibility marking'],
   criminogenicNeeds: ['Thinking and behaviour', 'Attitudes'],
   religion: 'Christian',

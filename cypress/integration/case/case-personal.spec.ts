@@ -217,6 +217,7 @@ context('Case personal details tab', () => {
           card.value('Previous name').contains('Scotland')
           card.value('Preferred language').contains('Bengali (interpreter required)')
           card.value('Current circumstances').contains('Employment: Temporary/casual work (30 or more hours per week)')
+          card.title('Current circumstances').contains('Last updated')
           card.value('Disabilities and adjustments').contains('Learning Difficulties: Other Speech Impairment: None')
           card.value('Criminogenic needs').contains('Accommodation Alcohol Misuse Drug Misuse')
           card.value('CRN').contains(fixture.crn)

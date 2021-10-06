@@ -165,9 +165,10 @@ describe('PersonalService', () => {
 
   it('gets offender personal details', () => {
     const personalContacts = [fakePersonalContactDetail()]
+    const currentCircumstancesLastUpdated = DateTime.fromJSDate(faker.date.past())
     const personalCircumstances = [
       fakePersonalCircumstanceDetail(
-        { name: 'Relationship: Married / Civil partnership' },
+        { name: 'Relationship: Married / Civil partnership', lastUpdated: currentCircumstancesLastUpdated },
         { name: 'Some expired circumstance', endDate: DateTime.fromJSDate(faker.date.past()) },
       ),
     ]
@@ -187,7 +188,6 @@ describe('PersonalService', () => {
         },
         emailAddresses: ['some.email@address.com', 'some.other.email@address.com'],
         personalContacts,
-        lastUpdated: DateTime.fromISO('2021-01-02T12:00:00'),
       },
       personalDetails: {
         name: 'Some Offender',
@@ -197,6 +197,7 @@ describe('PersonalService', () => {
         previousName: 'Some previous name',
         preferredLanguage: 'English (interpreter required)',
         currentCircumstances: ['Relationship: Married / Civil partnership'],
+        currentCircumstancesLastUpdated,
         disabilities: ['Some disability: None', 'Some other disability: Some provision'],
         criminogenicNeeds: ['Some criminogenic need'],
         religion: 'Christian',
