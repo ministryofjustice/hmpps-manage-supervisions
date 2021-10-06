@@ -10,7 +10,11 @@ export function getOffenceName(offence?: Offence): string {
 
 export function getSentenceName(sentence: Sentence) {
   // TODO HACK: building this is messy as the data is messy, we probably need a well known data source to clean it up.
-  const length = quantity(sentence.originalLength, sentence.originalLengthUnits.toLowerCase(), { emitPlural: false })
   const name = titleCase(sentence.sentenceType.description.replace('ORA', '').trim(), { ignoreAcronyms: true })
+  if (!sentence.originalLengthUnits) {
+    return name
+  }
+
+  const length = quantity(sentence.originalLength, sentence.originalLengthUnits.toLowerCase(), { emitPlural: false })
   return `${length} ${name}`
 }

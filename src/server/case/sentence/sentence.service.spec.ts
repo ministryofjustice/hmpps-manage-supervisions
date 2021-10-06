@@ -462,29 +462,53 @@ describe('SentenceService', () => {
     })
 
     it('gets previous convictions', async () => {
-      havingConvictions({
-        convictionId: 100,
-        active: false,
-        sentence: {
-          sentenceType: { description: 'ORA Community Order' },
-          originalLength: 12,
-          originalLengthUnits: 'Months',
-          terminationDate: '2021-08-25',
-        },
-        offences: [
-          {
-            mainOffence: true,
-            offenceCount: 2,
-            detail: { subCategoryDescription: 'Some offence' },
+      havingConvictions(
+        {
+          convictionId: 100,
+          active: false,
+          sentence: {
+            sentenceType: { description: 'ORA Community Order' },
+            originalLength: 12,
+            originalLengthUnits: 'Months',
+            terminationDate: '2021-08-25',
           },
-        ],
-      })
+          offences: [
+            {
+              mainOffence: true,
+              offenceCount: 2,
+              detail: { subCategoryDescription: 'Some offence' },
+            },
+          ],
+        },
+        {
+          convictionId: 101,
+          active: false,
+          sentence: {
+            sentenceType: { description: 'Fine' },
+            originalLength: 60,
+            originalLengthUnits: null,
+            terminationDate: '2021-07-25',
+          },
+          offences: [
+            {
+              mainOffence: true,
+              offenceCount: null,
+              detail: { subCategoryDescription: 'Some offence' },
+            },
+          ],
+        },
+      )
       const observed = await subject.getPreviousConvictions('some-crn')
       expect(observed).toEqual([
         {
           endDate: DateTime.fromObject({ year: 2021, month: 8, day: 25 }),
           mainOffence: 'Some offence (2 counts)',
           name: '12 month Community Order',
+        },
+        {
+          endDate: DateTime.fromObject({ year: 2021, month: 7, day: 25 }),
+          mainOffence: 'Some offence (1 count)',
+          name: 'Fine',
         },
       ] as PreviousConvictionSummary[])
     })
