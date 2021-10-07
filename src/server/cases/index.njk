@@ -12,14 +12,14 @@
       <p>Not all cases are suitable for the Manage supervisions pilot. We’re only listing your cases that have:</p>
       <ul class="govuk-list govuk-list--bullet">
         <li>a single community order</li>
-        <li>a RAR requirement, and no other requirements</li>
+        <li>a {{ 'RAR' | abbr | safe }} requirement, and no other requirements</li>
       </ul>
 
 {% if cases.length %}
       <table class="govuk-table" data-qa="cases/case-list">
         <thead class="govuk-table__head">
           <tr class="govuk-table__row">
-            <th class="govuk-table__header" data-qa="offender-details">Name and CRN</th>
+            <th class="govuk-table__header" data-qa="offender-details">Name and {{ 'CRN' | abbr | safe }}</th>
           </tr>
         </thead>
         <tbody class="govuk-table__body">

@@ -38,7 +38,7 @@
                 value: { text: appointment.start | timeRange(appointment.end) }
             },
             {
-                key: { text: "RAR activity" },
+                key: { html: 'RAR' | abbr + ' activity' },
                 value: { text: appointment.rarActivity.name or 'Yes' }
             } if appointment.rarActivity,
             {

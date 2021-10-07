@@ -13,11 +13,11 @@
                 value: { text: offender.dateOfBirth | dateFormat('dd/MM/yyyy') }
             } if offender.dateOfBirth,
             {
-                key: { text: 'CRN' },
+                key: { html: 'CRN' | abbr },
                 value: { text: offender.ids.crn }
             },
             {
-                key: { text: 'PNC' },
+                key: { html: 'PNC' | abbr },
                 value: { text: offender.ids.pnc }
             } if offender.ids.pnc
         ]

@@ -53,11 +53,11 @@
         }
       },
       {
-        key: { text: "RAR activity" },
+        key: { html: 'RAR' | abbr + ' activity' },
         value: { text: rarDetails.category if rarDetails and rarDetails.category else 'No' }
       },
       {
-        key: { text: "RAR activity subcategory" },
+        key: { html: 'RAR' | abbr + ' activity subcategory' },
         value: { text: rarDetails.subCategory }
       } if rarDetails and rarDetails.subCategory,
       {
