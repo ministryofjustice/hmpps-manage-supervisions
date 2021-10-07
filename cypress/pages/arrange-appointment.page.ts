@@ -107,7 +107,7 @@ export class ArrangeAppointmentPage extends PageBase {
   get addNotes() {
     return {
       get yesField() {
-        return cy.get('#addNotes-yes')
+        return cy.get('#addNotes')
       },
       get noField() {
         return cy.get('#addNotes-no')

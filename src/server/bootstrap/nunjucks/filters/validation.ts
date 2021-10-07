@@ -7,12 +7,16 @@ export interface GdsErrorMessage {
   href?: string
 }
 
+const parseHrefFromPath = (path: string) => {
+  return path === 'date' ? '#date.day' : `#${path}`
+}
+
 export class ErrorSummary implements NunjucksFilter {
   filter(errors: ValidationError[]): GdsErrorMessage[] {
     return flattenValidationErrors(errors || []).map(
       (error: FlatValidationError): GdsErrorMessage => ({
         text: [...new Set(Object.values(error.constraints))].join(', '),
-        href: `#${error.path}`,
+        href: parseHrefFromPath(error.path),
       }),
     )
   }
