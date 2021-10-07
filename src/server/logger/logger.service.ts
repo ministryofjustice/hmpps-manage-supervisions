@@ -1,7 +1,7 @@
 import { Injectable, LoggerService as NestLoggerService, LogLevel as NestLogLevel } from '@nestjs/common'
 import * as winston from 'winston'
 import { ConfigService } from '@nestjs/config'
-import { isEmpty, maxBy } from 'lodash'
+import { isEmpty, maxBy, omit } from 'lodash'
 import { Config, LogLevel, ServerConfig } from '../config'
 import { LOGGER_HOOK } from './logger.hook'
 import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry'
@@ -103,7 +103,8 @@ class NestWinstonWrapper implements ContextualNestLoggerService {
       const exception = args.find(x => x && (x instanceof Error || (x.stack && x.message)))
       const sentry = this.sentry.instance()
       if (exception) {
-        sentry.captureException(exception, { extra: { message }, user: { id: store?.user } })
+        const e = omit(exception, 'stack', 'message')
+        sentry.captureException(exception, { extra: { message, ...e }, user: { id: store?.user } })
       } else {
         sentry.captureMessage(message, { level: Severity.Error, user: { id: store?.user }, extra: getMeta() })
       }
