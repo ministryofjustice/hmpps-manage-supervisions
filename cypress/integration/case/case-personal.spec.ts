@@ -219,8 +219,8 @@ context('Case personal details tab', () => {
           card.value('Current circumstances').contains('Employment: Temporary/casual work (30 or more hours per week)')
           card.value('Disabilities and adjustments').contains('Learning Difficulties: Other Speech Impairment: None')
           card.value('Criminogenic needs').contains('Accommodation Alcohol Misuse Drug Misuse')
-          card.value('CRN').contains(fixture.crn)
-          card.value('PNC').contains('2012/123400000F')
+          card.valueAbbr('CRN').contains(fixture.crn)
+          card.valueAbbr('PNC').contains('2012/123400000F')
         })
 
         page.equalityMonitoring(card => {

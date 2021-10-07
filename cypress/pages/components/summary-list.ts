@@ -16,6 +16,10 @@ export class SummaryList {
     return this.title(title).siblings('dd.govuk-summary-list__value')
   }
 
+  valueAbbr(title: string) {
+    return this.title(title).parent().siblings('dd.govuk-summary-list__value')
+  }
+
   actions(title: string) {
     return this.title(title).siblings('dd.govuk-summary-list__actions')
   }
