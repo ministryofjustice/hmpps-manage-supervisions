@@ -43,18 +43,13 @@ export class ActivityLogEntryService {
     contact: Contact,
     meta: AppointmentMetaResult,
   ): AppointmentActivityLogEntry {
-    const {
-      id,
-      start,
-      end,
-      rarActivity,
-      enforcementAction = null,
-    } = isContactSummary(contact)
+    const { id, start, end, rarActivity, enforcementAction } = isContactSummary(contact)
       ? {
           id: contact.contactId,
           start: DateTime.fromISO(contact.contactStart),
           end: contact.contactEnd && DateTime.fromISO(contact.contactEnd),
           rarActivity: contact.rarActivityDetail,
+          enforcementAction: contact.enforcement?.enforcementAction.description,
         }
       : {
           id: contact.contactId,
