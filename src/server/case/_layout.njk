@@ -3,60 +3,67 @@
 {% extends "partials/layout.njk" %}
 {% set pageTitle = pageTitle | default(pageName + ' - ' + displayName) %}
 
+{% block beforeContent %}
+    {{ super() }}
+
+    <section class="govuk-!-padding-top-7">
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
+            <span class="govuk-caption-l"><abbr title="Case reference number">CRN</abbr>: {{ ids.crn }}</span>
+            {{ displayName }}
+        </h1>
+
+        {{ mojSubNavigation({
+            attributes: { 'data-qa': 'offender/sub-nav' },
+            classes: 'govuk-!-margin-bottom-0',
+            items: [
+                {
+                    text: 'Overview',
+                    href: links.overview,
+                    active: page == 'overview',
+                    attributes: { 'data-qa': 'overview' }
+                },
+                {
+                    text: 'Schedule',
+                    href: links.schedule,
+                    active: page == 'schedule',
+                    attributes: { 'data-qa': 'schedule' }
+                },
+                {
+                    text: 'Personal details',
+                    href: links.personal,
+                    active: page == 'personal',
+                    attributes: { 'data-qa': 'personal' }
+                },
+                {
+                    text: 'Risk',
+                    href: links.risk,
+                    active: page == 'risk',
+                    attributes: { 'data-qa': 'risk' }
+                },
+                {
+                    text: 'Sentence',
+                    href: links.sentence,
+                    active: page == 'sentence',
+                    attributes: { 'data-qa': 'sentence' }
+                },
+                {
+                    text: 'Activity log',
+                    href: links.activity,
+                    active: page == 'activity',
+                    attributes: { 'data-qa': 'activity' }
+                },
+                {
+                    text: 'Compliance',
+                    href: links.compliance,
+                    active: page == 'compliance',
+                    attributes: { 'data-qa': 'compliance' }
+                }
+            ]
+        }) }}
+    </section>
+{% endblock %}
+
 {% block content %}
-    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
-        <span class="govuk-caption-l"><abbr title="Case reference number">CRN</abbr>: {{ ids.crn }}</span>
-        {{ displayName }}
-    </h1>
-
-    {{ mojSubNavigation({
-        attributes: { 'data-qa': 'offender/sub-nav' },
-        items: [
-            {
-                text: 'Overview',
-                href: links.overview,
-                active: page == 'overview',
-                attributes: { 'data-qa': 'overview' }
-            },
-            {
-                text: 'Schedule',
-                href: links.schedule,
-                active: page == 'schedule',
-                attributes: { 'data-qa': 'schedule' }
-            },
-            {
-                text: 'Personal details',
-                href: links.personal,
-                active: page == 'personal',
-                attributes: { 'data-qa': 'personal' }
-            },
-            {
-                text: 'Risk',
-                href: links.risk,
-                active: page == 'risk',
-                attributes: { 'data-qa': 'risk' }
-            },
-            {
-                text: 'Sentence',
-                href: links.sentence,
-                active: page == 'sentence',
-                attributes: { 'data-qa': 'sentence' }
-            },
-            {
-                text: 'Activity log',
-                href: links.activity,
-                active: page == 'activity',
-                attributes: { 'data-qa': 'activity' }
-            },
-            {
-                text: 'Compliance',
-                href: links.compliance,
-                active: page == 'compliance',
-                attributes: { 'data-qa': 'compliance' }
-            }
-        ]
-    }) }}
-
     {% block pageHeader %}{% endblock %}
 
     <h2 class='govuk-heading-l govuk-!-margin-bottom-4'>{{ pageName }}</h2>
