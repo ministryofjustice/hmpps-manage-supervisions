@@ -322,6 +322,28 @@ context('Case activity tab', () => {
         })
     })
 
+    it('displays appointment detail with enforcement action', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('activity')
+        .whenClickingActivityEntry(4)
+
+        .shouldRenderAppointmentPage('Office visit', page => {
+          page.detail(list => {
+            list.value('Type of appointment').contains('Office visit')
+            list.value('Date').contains('3 September 2020')
+            list.value('Time').contains('11:30am to 12pm')
+          })
+
+          page.outcome(list => {
+            list.value('Complied').contains('No')
+            list.value('Enforcement action').contains('Warning letter requested')
+            list.value('Appointment notes').contains(EXPECTED_LONG_CONTACT_NOTES)
+            list.value('Sensitive').contains('No')
+          })
+        })
+    })
+
     it('displays phone call communication detail ', () => {
       fixture
         .whenViewingOffender()

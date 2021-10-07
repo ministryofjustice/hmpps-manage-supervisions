@@ -272,6 +272,7 @@ export function contacts(crn: string, partials = ACTIVITY_LOG_GROUPS): SeedFn {
           lastUpdatedDateTime: e.lastUpdatedDateTime,
           lastUpdatedByUser: e.lastUpdatedByUser,
           rarActivityDetail: e.rarActivity,
+          enforcement: e.enforcement,
         }),
       ),
     )

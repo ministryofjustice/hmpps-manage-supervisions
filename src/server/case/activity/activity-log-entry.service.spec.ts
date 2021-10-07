@@ -35,6 +35,11 @@ describe('ActivityLogEntryService', () => {
       type: { nationalStandard: true },
       sensitive: true,
       rarActivityDetail: { type: { description: 'Some RAR type' }, subtype: { description: 'Some RAR subtype' } },
+      enforcement: {
+        enforcementAction: {
+          description: 'Some enforcement action',
+        },
+      },
     })
     const meta = fakeContactMeta(ContactTypeCategory.Appointment)
     const observed = subject.getAppointmentActivityLogEntry('some-crn', appointment, meta)
@@ -57,7 +62,7 @@ describe('ActivityLogEntryService', () => {
       category: 'Future appointment',
       isFuture: true,
       nationalStandard: true,
-      enforcementAction: null,
+      enforcementAction: 'Some enforcement action',
       outcome: {
         attended: true,
         complied: true,
