@@ -14,8 +14,8 @@ class Fixture extends ViewCaseFixture {
       page.offenderDetails(list => {
         list.value('Name').contains('Liz Danger Haggis')
         list.value('Date of birth').contains('10/06/1980')
-        list.value('CRN').contains(this.crn)
-        list.value('PNC').contains('2012/123400000F')
+        list.valueAbbr('CRN').contains(this.crn)
+        list.valueAbbr('PNC').contains('2012/123400000F')
       })
     })
   }

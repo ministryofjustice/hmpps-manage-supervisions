@@ -57,7 +57,7 @@
             {{ govukSummaryList({
                 classes: 'govuk-!-margin-bottom-0',
                 rows: [
-                    { key: { text: 'RAR activity' }, value: { text: entry.rarActivity.name or 'Yes' } } if entry.rarActivity,
+                    { key: { html: 'RAR' | abbr + ' activity' }, value: { text: entry.rarActivity.name or 'Yes' } } if entry.rarActivity,
                     { key: { text: 'Enforcement action' }, value: { text: entry.enforcementAction } } if entry.enforcementAction
                 ]
             }) }}
