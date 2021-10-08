@@ -121,7 +121,11 @@
                     value: { text: personalDetails.preferredLanguage }
                 } if personalDetails.preferredLanguage,
                 {
-                    key: { text: "Current circumstances" },
+                    key: {
+                      html: (
+                        'Current circumstances<br><span class="govuk-!-font-size-16 govuk-!-font-weight-regular">Last updated ' + personalDetails.currentCircumstancesLastUpdated | shortDate +  '</span>'
+                      ) if personalDetails.currentCircumstances.length > 0 else 'Current circumstances'
+                    },
                     value: {
                         html: join(personalDetails.currentCircumstances, {
                                 linkText: 'View details and previous circumstances',
