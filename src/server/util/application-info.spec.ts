@@ -16,11 +16,15 @@ describe('application version', () => {
   })
 
   it('gets application version from build-info.json', async () => {
-    await writeFile(path.join(__dirname, 'build-info.json'), JSON.stringify({ buildNumber: 'v1.0.0' }))
+    await writeFile(
+      path.join(__dirname, 'build-info.json'),
+      JSON.stringify({ buildNumber: 'v1.0.0', apiSpecVersions: { community: '2021-10-04.6531.1680c86' } }),
+    )
     expect(getApplicationInfo()).toEqual({
       description: 'Some app',
       name: 'some-app',
       version: 'v1.0.0',
+      apiSpecVersions: { community: '2021-10-04.6531.1680c86' },
     })
   })
 
@@ -30,6 +34,7 @@ describe('application version', () => {
       description: 'Some app',
       name: 'some-app',
       version: 'v1.0.1',
+      apiSpecVersions: null,
     })
   })
 
@@ -38,6 +43,7 @@ describe('application version', () => {
       description: 'Some app',
       name: 'some-app',
       version: null,
+      apiSpecVersions: null,
     })
   })
 })

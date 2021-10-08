@@ -347,11 +347,13 @@ export function configFactory(): Config {
         enabled: true,
         url: url('COMMUNITY_API_URL', developmentOnly('http://localhost:9091/community-api')),
         timeout: int('COMMUNITY_API_TIMEOUT', fallback(10000)),
+        specVersion: (appInfo.apiSpecVersions && appInfo.apiSpecVersions['community-api']) || null,
       },
       assessRisksAndNeeds: {
         enabled: true,
         url: url('ASSESS_RISKS_AND_NEEDS_API_URL', developmentOnly('http://localhost:9091/assess-risks-and-needs')),
         timeout: int('ASSESS_RISKS_AND_NEEDS_API_TIMEOUT', fallback(10000)),
+        specVersion: (appInfo.apiSpecVersions && appInfo.apiSpecVersions['assess-risks-and-needs-api']) || null,
       },
     },
     contacts: {

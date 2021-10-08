@@ -306,6 +306,10 @@ class FluentWiremockContext {
     this.get(strict ? '/health/ping/' : '/health/ping').returns({ status: 'UP' })
   }
 
+  stubApiInfo(version: string) {
+    this.get('/info').returns({ app: { name: this.basePath }, build: { version } })
+  }
+
   resolveUrl(path: string): string {
     return urlJoin(this.helper.wiremockUrl, this.basePath, path)
   }
