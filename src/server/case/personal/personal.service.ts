@@ -108,6 +108,7 @@ export class PersonalService {
           startDate,
           endDate,
           notes: x.notes,
+          lastUpdatedDateTime: DateTime.fromISO(x.lastUpdatedDateTime),
           adjustments:
             x.provisions
               ?.map(provision => ({
@@ -195,6 +196,24 @@ export class PersonalService {
 
     const { offenderLanguages, religion, sexualOrientation, genderIdentity, selfDescribedGender } =
       offender.offenderProfile
+
+    const disabilities = offender.offenderProfile.disabilities?.filter(isActiveDateRange)
+    const formattedDisabilities = disabilities
+      .map(x =>
+        [
+          x.disabilityType.description,
+          x.provisions?.length ? x.provisions.map(p => p.provisionType.description).join(', ') : 'None',
+        ].join(': '),
+      )
+      .sort()
+
+    const disabilitiesLastUpdated = DateTime.fromISO(
+      disabilities
+        .map(d => d.lastUpdatedDateTime)
+        .sort()
+        .pop(),
+    )
+
     return {
       contactDetails: {
         address: addresses.mainAddress,
@@ -224,15 +243,8 @@ export class PersonalService {
         currentCircumstancesLastUpdated: personalCircumstances.length
           ? personalCircumstances[personalCircumstances.length - 1].lastUpdated
           : undefined,
-        disabilities: offender.offenderProfile.disabilities
-          ?.filter(isActiveDateRange)
-          .map(x =>
-            [
-              x.disabilityType.description,
-              x.provisions?.length ? x.provisions.map(p => p.provisionType.description).join(', ') : 'None',
-            ].join(': '),
-          )
-          .sort(),
+        disabilities: formattedDisabilities,
+        disabilitiesLastUpdated,
         criminogenicNeeds: criminogenicNeeds.map(x => x.name),
         religion,
         sex: offender.gender,

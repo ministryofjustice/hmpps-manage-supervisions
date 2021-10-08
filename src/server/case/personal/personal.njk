@@ -123,7 +123,7 @@
                 {
                     key: {
                       html: (
-                        'Current circumstances<br><span class="govuk-!-font-size-16 govuk-!-font-weight-regular">Last updated ' + personalDetails.currentCircumstancesLastUpdated | shortDate +  '</span>'
+                        'Current circumstances<br><span class="govuk-!-font-size-16 govuk-!-font-weight-regular">Last updated ' + personalDetails.currentCircumstancesLastUpdated | shortDate + '</span>'
                       ) if personalDetails.currentCircumstances.length > 0 else 'Current circumstances'
                     },
                     value: {
@@ -134,7 +134,12 @@
                     }
                 },
                 {
-                    key: { text: "Disabilities and adjustments" },
+                    key: { text: "Disabilities and adjustments" + personalDetails.disabilitiesLastUpdated },
+                    key: {
+                      html: (
+                        'Disabilities and adjustments<br><span class="govuk-!-font-size-16 govuk-!-font-weight-regular">Last updated ' + personalDetails.disabilitiesLastUpdated| shortDate + '</span>'
+                      ) if personalDetails.disabilities.length > 0 else 'Disabilities and adjustments'
+                    },
                     value: {
                         html: join(personalDetails.disabilities, {
                                 linkText: 'View details and notes',

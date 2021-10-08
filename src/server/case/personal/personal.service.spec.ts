@@ -70,12 +70,14 @@ describe('PersonalService', () => {
           notes: 'Some notes',
           disabilityType: { description: 'Some disability' },
           provisions: [],
+          lastUpdatedDateTime: '2021-04-01',
         },
         {
           startDate: '2021-02-02',
           notes: 'Some other notes',
           disabilityType: { description: 'Some other disability' },
           provisions: [{ startDate: '2021-02-03', provisionType: { description: 'Some provision' } }],
+          lastUpdatedDateTime: '2021-03-01',
         },
         {
           startDate: '2020-02-03',
@@ -83,6 +85,7 @@ describe('PersonalService', () => {
           notes: 'Some expired notes',
           disabilityType: { description: 'Some expired disability' },
           provisions: [],
+          lastUpdatedDateTime: '2021-02-01',
         },
       ],
     },
@@ -166,6 +169,7 @@ describe('PersonalService', () => {
   it('gets offender personal details', () => {
     const personalContacts = [fakePersonalContactDetail()]
     const currentCircumstancesLastUpdated = DateTime.fromJSDate(faker.date.past())
+    const disabilitiesLastUpdated = DateTime.fromISO('2021-04-01')
     const personalCircumstances = [
       fakePersonalCircumstanceDetail(
         { name: 'Relationship: Married / Civil partnership', lastUpdated: currentCircumstancesLastUpdated },
@@ -199,6 +203,7 @@ describe('PersonalService', () => {
         currentCircumstances: ['Relationship: Married / Civil partnership'],
         currentCircumstancesLastUpdated,
         disabilities: ['Some disability: None', 'Some other disability: Some provision'],
+        disabilitiesLastUpdated,
         criminogenicNeeds: ['Some criminogenic need'],
         religion: 'Christian',
         sex: 'Male',
@@ -240,6 +245,7 @@ describe('PersonalService', () => {
         name: 'Some other disability',
         notes: 'Some other notes',
         startDate: DateTime.fromISO('2021-02-02'),
+        lastUpdatedDateTime: DateTime.fromISO('2021-03-01'),
       },
       {
         active: true,
@@ -248,6 +254,7 @@ describe('PersonalService', () => {
         name: 'Some disability',
         notes: 'Some notes',
         startDate: DateTime.fromISO('2021-02-01'),
+        lastUpdatedDateTime: DateTime.fromISO('2021-04-01'),
       },
       {
         active: false,
@@ -256,6 +263,7 @@ describe('PersonalService', () => {
         endDate: DateTime.fromISO('2020-02-04'),
         notes: 'Some expired notes',
         name: 'Some expired disability',
+        lastUpdatedDateTime: DateTime.fromISO('2021-02-01'),
       },
     ])
   })
