@@ -35,7 +35,7 @@
     {% set title %}
         <span class="govuk-heading-s govuk-!-margin-bottom-0">
             <a href="{{ entry.links.view }}">{{ entry.name }}</a>
-            <span class="govuk-!-font-weight-regular">at {{ entry.start | time }}</span>
+            <span class="govuk-!-font-weight-regular">at&nbsp;{{ entry.start | time }}</span>
         </span>
         <span class='govuk-!-font-size-16' data-qa='sub-title'>
             {% if entry.nationalStandard %}
@@ -50,7 +50,7 @@
         classes: 'govuk-!-margin-bottom-2',
         attributes: { 'data-qa': 'offender/activity/' + entry.id },
         actions: { items: [{ href: entry.links.recordMissingAttendance, text: "Record an outcome" }] } if not entry.outcome,
-        actionsHtml: govukTag({ text: entry.outcome.tag.name, classes: entry.outcome.tag.colour | tagClassName }) if entry.outcome,
+        actionsHtml: govukTag({ text: entry.outcome.tag.name, classes: entry.outcome.tag.colour | tagClassName + ' govuk-!-margin-left-2' }) if entry.outcome,
         headingLevel: 4
     }) -%}
         {% if entry.rarActivity or entry.enforcementAction %}
@@ -71,7 +71,7 @@
     {% set title %}
         <a href="{{ entry.links.view }}">{{ entry.name }}</a>
         {% if options.time %}
-            <span class="govuk-!-font-weight-regular">at {{ entry.start | time }}</span>
+            <span class="govuk-!-font-weight-regular">at&nbsp;{{ entry.start | time }}</span>
         {% endif %}
     {% endset %}
     {% call appSummaryCard({
