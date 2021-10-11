@@ -22,7 +22,7 @@ export class LoggerMiddleware implements NestMiddleware {
 
         // we have to set the user here as the async hook doesnt get resolved in this callback.
         const meta = { user, method, url: originalUrl, statusCode, userAgent, ip }
-        const logLevel = statusCode < 400 ? 'log' : statusCode < 500 ? 'warn' : 'error'
+        const logLevel = statusCode < 400 ? 'log' : 'warn'
         this.logger[logLevel](`${method} ${originalUrl} => ${statusCode}`, meta)
       })
 
