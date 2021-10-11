@@ -59,6 +59,7 @@ export interface PersonalDetailsViewModel {
   currentCircumstances: string[]
   currentCircumstancesLastUpdated: DateTime
   disabilities: string[]
+  disabilitiesLastUpdated: DateTime
   criminogenicNeeds: string[]
   religion?: string
   sex?: string

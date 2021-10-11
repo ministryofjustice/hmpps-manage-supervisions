@@ -111,12 +111,14 @@ export const OFFENDER: DeepPartial<OffenderDetail> = {
             notes: 'Extra tuition',
           },
         ],
+        lastUpdatedDateTime: '2021-08-01',
       },
       {
         disabilityType: { description: 'Speech Impairment' },
         startDate: '2021-03-01',
         notes: 'Talks like a pirate',
         provisions: null,
+        lastUpdatedDateTime: '2021-07-01',
       },
       {
         disabilityType: { description: 'Dyslexia' },
@@ -124,6 +126,7 @@ export const OFFENDER: DeepPartial<OffenderDetail> = {
         endDate: '2020-05-01',
         notes: null,
         provisions: null,
+        lastUpdatedDateTime: '2021-06-01',
       },
     ],
   },

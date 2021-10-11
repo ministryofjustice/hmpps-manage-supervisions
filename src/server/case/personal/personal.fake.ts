@@ -80,6 +80,7 @@ export const fakePersonalDetailsViewModel = fake<PersonalDetailsViewModel>(() =>
   ],
   currentCircumstancesLastUpdated: DateTime.fromJSDate(faker.date.past()),
   disabilities: ['Mental Illness: Flex refreshment breaks', 'Visual Impairment: Colour/visibility marking'],
+  disabilitiesLastUpdated: DateTime.fromJSDate(faker.date.past()),
   criminogenicNeeds: ['Thinking and behaviour', 'Attitudes'],
   religion: 'Christian',
   sex: 'Male',
