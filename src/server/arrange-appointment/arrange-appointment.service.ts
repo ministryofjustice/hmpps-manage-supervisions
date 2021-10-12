@@ -5,26 +5,29 @@ import {
   AppointmentCreateRequest,
   AppointmentCreateResponse,
   AppointmentType,
-  Conviction,
   OffenderDetail,
   OfficeLocation,
   PersonalCircumstance,
-  Requirement,
 } from '../community-api/client'
 import {
   Config,
   WellKnownAppointmentType,
   ContactTypeCategory,
   WellKnownContactTypeConfig,
-  isRar,
-  WellKnownRequirementTypeConfig,
   ServerConfig,
   FeatureFlags,
 } from '../config'
 import { AvailableAppointmentTypes, FeaturedAppointmentType } from './dto/AppointmentWizardViewModel'
 import { ConfigService } from '@nestjs/config'
 import { isActiveDateRange } from '../util'
-import { CommunityApiService, EMPLOYMENT_TYPE_CODE } from '../community-api'
+import {
+  CommunityApiService,
+  ConvictionRequirementDetail,
+  ConvictionRequirementType,
+  ConvictionService,
+  EMPLOYMENT_TYPE_CODE,
+  RequirementService,
+} from '../community-api'
 
 @Injectable()
 export class ArrangeAppointmentService {
@@ -32,6 +35,8 @@ export class ArrangeAppointmentService {
     private readonly community: CommunityApiService,
     private readonly cache: CacheService,
     private readonly config: ConfigService<Config>,
+    private readonly conviction: ConvictionService,
+    private readonly requirement: RequirementService,
   ) {}
 
   async getAppointmentType(
@@ -88,11 +93,6 @@ export class ArrangeAppointmentService {
 
   async getOffenderDetails(crn: string): Promise<OffenderDetail> {
     const { data } = await this.community.offender.getOffenderDetailByCrnUsingGET({ crn })
-
-    if (!data.activeProbationManagedSentence) {
-      throw new Error('This offender does not have an active probation managed sentence')
-    }
-
     return data
   }
 
@@ -138,31 +138,34 @@ export class ArrangeAppointmentService {
     })
   }
 
-  async getOffenderConviction(crn: string): Promise<Conviction> {
-    const { data } = await this.community.offender.getConvictionsForOffenderByCrnUsingGET({ crn, activeOnly: true })
-    if (data.length == 1) {
-      return data[0]
-    } else {
-      throw new Error(`${data.length} convictions found`)
+  async getConvictionAndRarRequirement(crn: string) {
+    const { current } = await this.conviction.getConvictions(crn)
+    if (!current) {
+      throw new Error(`offender with crn '${crn}' has no active conviction`)
     }
-  }
-
-  async getConvictionRarRequirement(crn: string, convictionId: number): Promise<Requirement> {
-    const { data } = await this.community.requirement.getRequirementsByConvictionIdUsingGET({
+    const requirements = await this.requirement.getConvictionRequirements({
       crn,
-      convictionId,
+      convictionId: current.convictionId,
       activeOnly: true,
     })
-
-    // TODO determine best RAR requirement where there are multiple
-    const config = this.config.get<WellKnownRequirementTypeConfig>('requirements')
-    const rarRequirement = data.requirements.find(r => isRar(config, r))
-
-    // RAR requirements will only be found on ORA Community Order and ORA Suspended Sentence Order sentences
-    if (!rarRequirement) {
-      throw new Error(`No RAR requirements found for CRN ${crn} convictionId: ${convictionId}`)
+    const rar = requirements.find(x => x.isRar)
+    if (!rar) {
+      throw new Error(`offender with crn '${crn}' has no active RAR requirement`)
     }
-    return rarRequirement
+
+    let requirement: ConvictionRequirementDetail
+    switch (rar.type) {
+      case ConvictionRequirementType.Unit:
+        requirement = rar
+        break
+
+      case ConvictionRequirementType.Aggregate:
+        // TODO determine best RAR requirement where there are multiple, maybe where unallocated days?
+        requirement = rar.requirements.find(x => x)
+        break
+    }
+
+    return { conviction: current, requirement }
   }
 
   async getPersonalCircumstances(crn: string): Promise<Array<PersonalCircumstance>> {

@@ -14,13 +14,15 @@ import { TokenVerificationService } from './token-verification/token-verificatio
 import { setLocals, csp } from './middleware'
 import { LoginService } from './login/login.service'
 import { LogoutService } from './logout/logout.service'
+import { CommunityApiModule } from '../community-api/community-api.module'
+import { CaseloadGuard } from './caseload'
 
 /**
  * Applies HMPPS authentication to all routes via passport-oauth.
  * Routes are secured by default. To expose a public route, decorate with @Public().
  */
 @Module({
-  imports: [CommonModule, PassportModule.register({ session: true, defaultStrategy: 'hmpps' })],
+  imports: [CommonModule, PassportModule.register({ session: true, defaultStrategy: 'hmpps' }), CommunityApiModule],
   providers: [
     UserService,
     SessionSerializer,
@@ -38,6 +40,7 @@ import { LogoutService } from './logout/logout.service'
     TokenVerificationService,
     LoginService,
     LogoutService,
+    CaseloadGuard,
   ],
   controllers: [LoginController, LogoutController],
 })
