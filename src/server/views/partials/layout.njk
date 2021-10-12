@@ -53,6 +53,17 @@
 {% block bodyStart %}
 {% endblock %}
 
+{% block footer %}
+  {% set metaHtml %}
+    <h3 class="govuk-heading-m">Support</h3>
+    <p class="govuk-!-margin-bottom-8">
+      Email <a class="govuk-link govuk-footer__link" href="mailto:manage-supervisions-support@digital.justice.gov.uk">manage-supervisions-support<wbr>@digital.justice.gov.uk</a> for support.
+      <br />We will respond within 5 working days.
+    </p>
+  {% endset %}
+  {{ govukFooter({ meta: { html: metaHtml } }) }}
+{% endblock %}
+
 {% block bodyEnd %}
   <script src="/assets/client.js"></script>
 {% endblock %}
