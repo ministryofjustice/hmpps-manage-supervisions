@@ -1,12 +1,12 @@
 import { Test } from '@nestjs/testing'
 import { RequirementService } from './requirement.service'
-import { MockCommunityApiModule, MockCommunityApiService } from '../../community-api/community-api.mock'
+import { MockCommunityApiModule, MockCommunityApiService } from '../community-api.mock'
 import { FakeConfigModule } from '../../config/config.fake'
-import { fakeRequirement } from '../../community-api/community-api.fake'
-import { ConvictionRequirement, ConvictionRequirementType, GetConvictionRequirementsOptions } from './sentence.types'
+import { fakeRequirement } from '../community-api.fake'
 import { fakeOkResponse } from '../../common/rest/rest.fake'
-import { CommunityApiService } from '../../community-api'
+import { ConvictionRequirement, ConvictionRequirementType, GetConvictionRequirementsOptions } from './conviction.types'
 import { DateTime } from 'luxon'
+import { CommunityApiService } from '../community-api.service'
 
 describe('RequirementService', () => {
   let subject: RequirementService

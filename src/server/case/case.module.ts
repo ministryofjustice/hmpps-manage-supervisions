@@ -11,7 +11,6 @@ import { RiskService } from './risk'
 import { PersonalController } from './personal/personal.controller'
 import { PersonalService } from './personal'
 import { ActivityController } from './activity/activity.controller'
-import { RequirementService } from './sentence/requirement.service'
 import { ComplianceService } from './compliance'
 import { RiskController } from './risk/risk.controller'
 import { SentenceController } from './sentence/sentence.controller'
@@ -39,7 +38,6 @@ import { ComplianceController } from './compliance/compliance.controller'
     ActivityService,
     RiskService,
     PersonalService,
-    RequirementService,
     ComplianceService,
     ActivityLogEntryService,
   ],

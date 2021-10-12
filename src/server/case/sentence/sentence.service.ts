@@ -11,15 +11,17 @@ import {
   ComplianceStatusAlertLevel,
   ConvictionDetails,
   ConvictionOffence,
-  ConvictionRequirement,
-  ConvictionRequirementType,
   ConvictionSentenceDetail,
   ConvictionSummary,
   CurrentComplianceConvictionSummary,
   PreviousConvictionSummary,
 } from './sentence.types'
-import { RequirementService } from './requirement.service'
-import { CommunityApiService } from '../../community-api'
+import {
+  RequirementService,
+  ConvictionRequirement,
+  ConvictionRequirementType,
+  ConvictionService,
+} from '../../community-api'
 import { getOffenceName, getSentenceName } from './util'
 import { ComplianceService } from '../compliance'
 import { ActivityComplianceFilter, ActivityService } from '../activity'
@@ -52,7 +54,7 @@ function getConvictionOffence(conviction: Conviction): ConvictionOffence | null 
 @Injectable()
 export class SentenceService {
   constructor(
-    private readonly community: CommunityApiService,
+    private readonly conviction: ConvictionService,
     private readonly requirements: RequirementService,
     private readonly compliance: ComplianceService,
     private readonly activity: ActivityService,
@@ -102,16 +104,14 @@ export class SentenceService {
   }
 
   async getCurrentConvictionSummary(crn: string): Promise<ConvictionSummary | null> {
-    const { data: convictions } = await this.community.offender.getConvictionsForOffenderByCrnUsingGET({ crn })
-
-    const conviction = SentenceService.getLatestConviction(convictions)
-    if (!conviction) {
+    const { current } = await this.conviction.getConvictions(crn)
+    if (!current) {
       return null
     }
 
     return {
-      id: conviction.convictionId,
-      sentence: SentenceService.getConvictionSentence(conviction),
+      id: current.convictionId,
+      sentence: SentenceService.getConvictionSentence(current),
     }
   }
 
@@ -244,7 +244,7 @@ export class SentenceService {
   }
 
   async getPreviousConvictions(crn: string): Promise<PreviousConvictionSummary[]> {
-    const { previous } = await this.getConvictions(crn)
+    const { previous } = await this.conviction.getConvictions(crn)
     // TODO: when PreviousConvictionSummary gets more complex (eg includes breaches) then switch to mutating the result of ComplianceService::convictionSummary
     return previous.map(c => ({
       name: getSentenceName(c.sentence),
@@ -253,46 +253,21 @@ export class SentenceService {
     }))
   }
 
-  private static getLatestConviction(convictions: Conviction[]): Conviction {
-    // TODO we are assuming only a single active conviction per offender at this time
-    // TODO so in the case where we have multiple then just take the latest
-    return maxBy(
-      convictions.filter(x => x.active),
-      x => x.convictionDate,
-    )
-  }
-
-  private async getConvictions(
-    crn: string,
-    from?: DateTime,
-  ): Promise<{ current?: Conviction; previous: Conviction[] }> {
-    const { data: convictions } = await this.community.offender.getConvictionsForOffenderByCrnUsingGET({ crn })
-
-    const current = SentenceService.getLatestConviction(convictions)
-    const previous = convictions.filter(
-      c =>
-        !c.active && (!from || (c.sentence?.terminationDate && DateTime.fromISO(c.sentence.terminationDate) >= from)),
-    )
-
-    return { current, previous }
-  }
-
   private async getConvictionsAndRequirements(
     crn: string,
     from?: DateTime,
   ): Promise<{ current?: Conviction; previous: Conviction[]; requirements: ConvictionRequirement[] }> {
-    const { current, previous } = await this.getConvictions(crn, from)
+    const { current, previous } = await this.conviction.getConvictions(crn, from)
 
     if (!current) {
       return { previous, requirements: [] }
     }
 
-    const requirements = await this.requirements.getConvictionRequirements({
-      crn,
-      convictionId: current.convictionId,
-    })
-
-    return { current, previous, requirements }
+    return {
+      current,
+      previous,
+      requirements: await this.requirements.getConvictionRequirements({ crn, convictionId: current.convictionId }),
+    }
   }
 
   private static getConvictionSentence(conviction: Conviction): ConvictionSentenceDetail | null {

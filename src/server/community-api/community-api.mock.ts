@@ -14,24 +14,26 @@ import {
 
 export type MockCommunityApiService = { [P in keyof CommunityApiService]: SinonStubbedInstance<CommunityApiService[P]> }
 
+export function mockCommunityApiService(): MockCommunityApiService {
+  return {
+    appointment: createStubInstance(AppointmentsApi),
+    offender: createStubInstance(CoreOffenderApi),
+    team: createStubInstance(TeamsApi),
+    requirement: createStubInstance(SentenceRequirementsAndBreachApi),
+    staff: createStubInstance(StaffApi),
+    personalCircumstances: createStubInstance(PersonalCircumstancesApi),
+    contactAndAttendance: createStubInstance(ContactAndAttendanceApi),
+    risks: createStubInstance(RisksAndRegistrationsApi),
+    breach: createStubInstance(SentenceRequirementsAndBreachApi),
+  }
+}
+
 @Module({})
 export class MockCommunityApiModule {
   static register(): DynamicModule {
-    const stub: MockCommunityApiService = {
-      appointment: createStubInstance(AppointmentsApi),
-      offender: createStubInstance(CoreOffenderApi),
-      team: createStubInstance(TeamsApi),
-      requirement: createStubInstance(SentenceRequirementsAndBreachApi),
-      staff: createStubInstance(StaffApi),
-      personalCircumstances: createStubInstance(PersonalCircumstancesApi),
-      contactAndAttendance: createStubInstance(ContactAndAttendanceApi),
-      risks: createStubInstance(RisksAndRegistrationsApi),
-      breach: createStubInstance(SentenceRequirementsAndBreachApi),
-    }
-
     return {
       module: MockCommunityApiModule,
-      providers: [{ provide: CommunityApiService, useValue: stub }],
+      providers: [{ provide: CommunityApiService, useValue: mockCommunityApiService() }],
       exports: [CommunityApiService],
     }
   }

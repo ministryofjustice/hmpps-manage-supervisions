@@ -19,7 +19,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     return this.renderErrorPage(exception, host)
   }
 
-  private renderErrorPage(exception: Error, host: ArgumentsHost, status = 500) {
+  private renderErrorPage(exception: Error, host: ArgumentsHost, status = HttpStatus.INTERNAL_SERVER_ERROR) {
     const viewModel = { message: exception.message, status, stack: exception.stack }
     this.logger.error('unhandled exception', exception)
     return host.switchToHttp().getResponse<Response>().status(status).render('pages/error', viewModel)
@@ -31,7 +31,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         return this.renderErrorPage(exception, host, HttpStatus.NOT_FOUND)
 
       default:
-        return this.renderErrorPage(exception, host, 500)
+        return this.renderErrorPage(exception, host)
     }
   }
 
@@ -63,7 +63,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         if (typeof meta === 'object' && 'url' in meta) {
           return response.redirect(meta.url, status)
         }
-        return this.renderErrorPage(new Error('Invalid redirect'), host, 500)
+        return this.renderErrorPage(new Error('Invalid redirect'), host)
 
       default:
         return this.renderErrorPage(exception, host, status)

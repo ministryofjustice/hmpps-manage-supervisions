@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
-import { PotentiallyExpectedDateTime } from '../../util'
 import { ViewModel } from '../../common'
 import { ComplianceConvictionSummary } from '../compliance'
+import { ConvictionRequirement } from '../../community-api'
 
 export interface ConvictionAdditionalOffence {
   name: string
@@ -29,41 +29,6 @@ export interface ConvictionSentenceDetail {
   responsibleCourt?: string
   additionalSentences: AdditionalSentence[]
 }
-
-export interface GetConvictionRequirementsOptions {
-  crn: string
-  convictionId: number
-}
-
-export interface ConvictionRequirementDetail {
-  id: number
-  length: string
-  notes?: string
-  startDate?: PotentiallyExpectedDateTime
-  endDate?: PotentiallyExpectedDateTime
-  terminationReason?: string
-}
-
-export enum ConvictionRequirementType {
-  Unit = 'unit',
-  Aggregate = 'aggregate',
-}
-
-export interface ConvictionRequirementBase<Type extends ConvictionRequirementType> {
-  type: Type
-  name: string
-  isRar: boolean
-}
-
-export interface UnitConvictionRequirement
-  extends ConvictionRequirementBase<ConvictionRequirementType.Unit>,
-    ConvictionRequirementDetail {}
-
-export interface AggregateConvictionRequirement extends ConvictionRequirementBase<ConvictionRequirementType.Aggregate> {
-  requirements: ConvictionRequirementDetail[]
-}
-
-export type ConvictionRequirement = UnitConvictionRequirement | AggregateConvictionRequirement
 
 export interface PreviousConvictionSummary {
   name: string

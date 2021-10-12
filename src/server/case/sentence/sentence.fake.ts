@@ -8,9 +8,6 @@ import {
   ConvictionAdditionalOffence,
   ConvictionDetails,
   ConvictionOffence,
-  ConvictionRequirement,
-  ConvictionRequirementDetail,
-  ConvictionRequirementType,
   ConvictionSentenceDetail,
   ConvictionSummary,
   PreviousConvictionSummary,
@@ -19,6 +16,7 @@ import { fake } from '../../util/util.fake'
 import * as faker from 'faker'
 import { DateTime } from 'luxon'
 import { fakeComplianceConvictionSummary } from '../compliance/compliance.fake'
+import { ConvictionRequirement, ConvictionRequirementDetail, ConvictionRequirementType } from '../../community-api'
 
 export const fakeConvictionAdditionalOffence = fake<ConvictionAdditionalOffence>(() => ({
   name: faker.company.bs(),

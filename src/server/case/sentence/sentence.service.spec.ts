@@ -1,21 +1,21 @@
 import { Test } from '@nestjs/testing'
 import { SentenceService } from './sentence.service'
-import { MockCommunityApiModule, MockCommunityApiService } from '../../community-api/community-api.mock'
-import { CommunityApiService } from '../../community-api'
+import {
+  ConvictionRequirement,
+  ConvictionRequirementType,
+  ConvictionService,
+  RequirementService,
+} from '../../community-api'
 import { fakeConviction, fakeOffence } from '../../community-api/community-api.fake'
-import { fakeOkResponse } from '../../common/rest/rest.fake'
 import { DateTime } from 'luxon'
 import {
   ComplianceDetails,
   ComplianceStatusAlertLevel,
   ConvictionDetails,
-  ConvictionRequirement,
-  ConvictionRequirementType,
   CurrentComplianceConvictionSummary,
   PreviousConvictionSummary,
 } from './sentence.types'
 import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
-import { RequirementService } from './requirement.service'
 import { fakeConvictionRequirement } from './sentence.fake'
 import { Conviction } from '../../community-api/client'
 import { ComplianceConvictionSummary, ComplianceService } from '../compliance'
@@ -28,7 +28,7 @@ import { fakeComplianceConvictionSummary } from '../compliance/compliance.fake'
 
 describe('SentenceService', () => {
   let subject: SentenceService
-  let community: MockCommunityApiService
+  let convictionService: SinonStubbedInstance<ConvictionService>
   let requirementService: SinonStubbedInstance<RequirementService>
   let complianceService: SinonStubbedInstance<ComplianceService>
   let activityService: SinonStubbedInstance<ActivityService>
@@ -39,31 +39,32 @@ describe('SentenceService', () => {
     complianceService = createStubInstance(ComplianceService)
     activityService = createStubInstance(ActivityService)
     breachService = createStubInstance(BreachService)
+    convictionService = createStubInstance(ConvictionService)
     const module = await Test.createTestingModule({
       providers: [
         SentenceService,
+        { provide: ConvictionService, useValue: convictionService },
         { provide: RequirementService, useValue: requirementService },
         { provide: ComplianceService, useValue: complianceService },
         { provide: ActivityService, useValue: activityService },
         { provide: BreachService, useValue: breachService },
       ],
-      imports: [
-        MockCommunityApiModule.register(),
-        MockLinksModule.register({ [BreadcrumbType.CaseActivityLog]: '/case-activity-log' }),
-      ],
+      imports: [MockLinksModule.register({ [BreadcrumbType.CaseActivityLog]: '/case-activity-log' })],
     }).compile()
 
     subject = module.get(SentenceService)
-    community = module.get(CommunityApiService)
   })
 
-  function havingConvictions(...partials: DeepPartial<Conviction>[]) {
-    const convictions = partials.map(x => fakeConviction(x))
-    community.offender.getConvictionsForOffenderByCrnUsingGET
-      .withArgs({ crn: 'some-crn' })
-      .resolves(fakeOkResponse(convictions))
-    return convictions
+  function havingConvictions(
+    currentPartial: DeepPartial<Conviction> | null,
+    ...previousPartials: DeepPartial<Conviction>[]
+  ) {
+    const current = currentPartial ? fakeConviction(currentPartial) : null
+    const previous = previousPartials.map(x => fakeConviction(x))
+    convictionService.getConvictions.withArgs('some-crn').resolves({ current, previous })
+    return [current, ...previous]
   }
+
   function havingBreaches(crn: string, convictionId: number) {
     const activeBreach = fakeBreachSummary({ active: true })
     const inactiveBreaches = [fakeBreachSummary({ active: false, proven: true }), fakeBreachSummary({ active: false })]
@@ -201,7 +202,7 @@ describe('SentenceService', () => {
 
   describe('offence detail', () => {
     it('handles no current conviction', async () => {
-      havingConvictions()
+      havingConvictions(null)
       const observed = await subject.getOffenceDetails('some-crn')
       expect(observed).toBeNull()
     })
@@ -280,7 +281,6 @@ describe('SentenceService', () => {
       const [conviction, previousConviction] = havingConvictions(
         { convictionId: 100, active: true },
         { active: false, sentence: { terminationDate: previousConvictionDate.toISODate() } },
-        { active: false, sentence: { terminationDate: '2018-01-01', description: 'Really old conviction, ignored' } },
       )
       havingRequirements(100, {
         type: ConvictionRequirementType.Unit,
@@ -463,6 +463,7 @@ describe('SentenceService', () => {
 
     it('gets previous convictions', async () => {
       havingConvictions(
+        null,
         {
           convictionId: 100,
           active: false,

@@ -17,11 +17,12 @@ import { AppointmentWizardService, getStepUrl } from './appointment-wizard.servi
 import { Controller, Get, Param, Post, Redirect, Render, Session } from '@nestjs/common'
 import { DynamicRedirect, RedirectResponse, BodyClass } from '../common'
 import { DEFAULT_GROUP } from '../util/mapping'
-import { AppointmentTypeRequiresLocation, OffenderDetail, OffenderManager } from '../community-api/client'
+import { AppointmentTypeRequiresLocation } from '../community-api/client'
 import { DateTime } from 'luxon'
 import { isActiveDateRange } from '../util'
 import { Breadcrumb, BreadcrumbType, LinksService } from '../common/links'
 import { Role, Roles, CurrentSecurityContext, SecurityContext } from '../security'
+import { CaseloadOnly } from '../security/caseload'
 
 type RenderOrRedirect = AppointmentWizardViewModel | RedirectResponse
 
@@ -47,6 +48,7 @@ export class ArrangeAppointmentController {
     parent: BreadcrumbType.Case,
     title: 'New appointment',
   })
+  @CaseloadOnly()
   async get(
     @Param('crn') crn: string,
     @Session() session: AppointmentWizardSession,
@@ -54,18 +56,23 @@ export class ArrangeAppointmentController {
   ): Promise<RedirectResponse> {
     const response = this.wizard.reset(session, crn)
 
-    const offender = await this.service.getOffenderDetails(crn)
+    const [offender, { conviction, requirement }] = await Promise.all([
+      this.service.getOffenderDetails(crn),
+      this.service.getConvictionAndRarRequirement(crn),
+    ])
 
-    const offenderManager = this.getOffenderManager(offender, security)
-
-    const conviction = await this.service.getOffenderConviction(crn)
-    const rarRequirement = await this.service.getConvictionRarRequirement(crn, conviction.convictionId)
+    const offenderManager = offender.offenderManagers.find(om => om.staff.code == security.staffCode)
+    if (!offenderManager) {
+      throw new Error(
+        `current user with staff code '${security.staffCode}' is not an offender manager for offender with crn '${crn}'`,
+      )
+    }
 
     session.appointment.staffCode = offenderManager.staff.code
     session.appointment.teamCode = offenderManager.team.code
     session.appointment.providerCode = offenderManager.probationArea.code
     session.appointment.convictionId = conviction.convictionId
-    session.appointment.requirementId = rarRequirement.requirementId
+    session.appointment.requirementId = requirement.id
     return response
   }
 
@@ -94,7 +101,7 @@ export class ArrangeAppointmentController {
       return redirect
     }
 
-    const errors = await this.validateWithSession(body, session, AppointmentWizardStep.Type)
+    const errors = await ArrangeAppointmentController.validateWithSession(body, session, AppointmentWizardStep.Type)
     if (errors.length > 0) {
       return await this.getAppointmentTypeViewModel(session, body, errors)
     }
@@ -147,7 +154,7 @@ export class ArrangeAppointmentController {
       return redirect
     }
 
-    const errors = await this.validateWithSession(body, session, AppointmentWizardStep.Where)
+    const errors = await ArrangeAppointmentController.validateWithSession(body, session, AppointmentWizardStep.Where)
     const viewModel = await this.getAppointmentLocationViewModel(session, body, errors)
 
     if (errors.length > 0) {
@@ -191,7 +198,7 @@ export class ArrangeAppointmentController {
   ): Promise<RenderOrRedirect> {
     this.wizard.assertStep(session, AppointmentWizardStep.When, crn)
 
-    const errors = await this.validateWithSession(body, session, AppointmentWizardStep.When)
+    const errors = await ArrangeAppointmentController.validateWithSession(body, session, AppointmentWizardStep.When)
     if (errors.length > 0) {
       return await this.getAppointmentSchedulingViewModel(session, crn, body, errors)
     }
@@ -225,7 +232,7 @@ export class ArrangeAppointmentController {
   ): Promise<RenderOrRedirect> {
     this.wizard.assertStep(session, AppointmentWizardStep.AddNotes, crn)
 
-    const errors = await this.validateWithSession(body, session, AppointmentWizardStep.AddNotes)
+    const errors = await ArrangeAppointmentController.validateWithSession(body, session, AppointmentWizardStep.AddNotes)
     if (errors.length > 0) {
       return this.getAddNotesViewModel(session, body, errors)
     }
@@ -263,7 +270,7 @@ export class ArrangeAppointmentController {
       return redirect
     }
 
-    const errors = await this.validateWithSession(body, session, AppointmentWizardStep.Notes)
+    const errors = await ArrangeAppointmentController.validateWithSession(body, session, AppointmentWizardStep.Notes)
     if (errors.length > 0) {
       return this.getNotesViewModel(session, body, errors)
     }
@@ -301,7 +308,11 @@ export class ArrangeAppointmentController {
       return redirect
     }
 
-    const errors = await this.validateWithSession(body, session, AppointmentWizardStep.Sensitive)
+    const errors = await ArrangeAppointmentController.validateWithSession(
+      body,
+      session,
+      AppointmentWizardStep.Sensitive,
+    )
     if (errors.length > 0) {
       return this.getSensitiveViewModel(session, body, errors)
     }
@@ -391,7 +402,7 @@ export class ArrangeAppointmentController {
     }
   }
 
-  private async validateWithSession(
+  private static async validateWithSession(
     body: AppointmentBuilderDto,
     session: AppointmentWizardSession,
     step: AppointmentWizardStep,
@@ -571,13 +582,5 @@ export class ArrangeAppointmentController {
       errors,
       sensitive: body?.sensitive || appointment.sensitive,
     }
-  }
-
-  private getOffenderManager(offender: OffenderDetail, security: SecurityContext): OffenderManager {
-    const offenderManager = offender.offenderManagers.find(om => om.staff.code == security.staffCode)
-    if (!offenderManager) {
-      throw new Error('Current user is not Offender Manager for this offender')
-    }
-    return offenderManager
   }
 }

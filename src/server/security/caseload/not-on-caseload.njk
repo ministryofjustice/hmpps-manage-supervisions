@@ -1,0 +1,11 @@
+{% extends "partials/layout.njk" %}
+
+{% set pageTitle = applicationName + " - Offender not on your caseload" %}
+
+{% block content %}
+
+    <main class="app-container">
+        <h1>The offender with CRN '{{ crn }}' is not on your caseload</h1>
+    </main>
+
+{% endblock %}

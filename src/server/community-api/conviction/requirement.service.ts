@@ -1,17 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { Requirement } from '../../community-api/client'
+import { Requirement } from '../client'
 import { Duration, DurationUnit } from 'luxon'
+import { getPotentiallyExpectedDateTime, quantity } from '../../util'
+import { groupBy } from 'lodash'
+import { ConfigService } from '@nestjs/config'
+import { Config, getWellKnownRequirementName, isRar, WellKnownRequirementTypeConfig } from '../../config'
 import {
   ConvictionRequirement,
   ConvictionRequirementDetail,
   ConvictionRequirementType,
   GetConvictionRequirementsOptions,
-} from './sentence.types'
-import { getPotentiallyExpectedDateTime, quantity } from '../../util'
-import { groupBy } from 'lodash'
-import { ConfigService } from '@nestjs/config'
-import { Config, getWellKnownRequirementName, isRar, WellKnownRequirementTypeConfig } from '../../config'
-import { CommunityApiService } from '../../community-api'
+} from './conviction.types'
+import { CommunityApiService } from '../community-api.service'
 
 @Injectable()
 export class RequirementService {

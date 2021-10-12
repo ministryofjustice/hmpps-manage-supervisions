@@ -1,12 +1,12 @@
 import 'reflect-metadata'
-import { match } from 'sinon'
+import { match, createStubInstance, SinonStubbedInstance } from 'sinon'
 import { ArrangeAppointmentService } from './arrange-appointment.service'
 import { fakeAppointmentBuilderDto, fakeFeaturedAppointmentType } from './dto/arrange-appointment.fake'
 import * as faker from 'faker'
 import { MockCacheModule, MockCacheService } from '../common/cache/cache.mock'
 import { Test } from '@nestjs/testing'
 import { MockCommunityApiModule, MockCommunityApiService } from '../community-api/community-api.mock'
-import { CommunityApiService, EMPLOYMENT_TYPE_CODE } from '../community-api'
+import { CommunityApiService, ConvictionService, EMPLOYMENT_TYPE_CODE, RequirementService } from '../community-api'
 import {
   fakeAppointmentCreateResponse,
   fakeAppointmentType,
@@ -25,17 +25,27 @@ describe('ArrangeAppointmentService', () => {
   let cache: MockCacheService
   let subject: ArrangeAppointmentService
   let config: WellKnownContactTypeConfig
+  let requirementService: SinonStubbedInstance<RequirementService>
+  let convictionService: SinonStubbedInstance<ConvictionService>
 
   beforeEach(async () => {
+    requirementService = createStubInstance(RequirementService)
+    convictionService = createStubInstance(ConvictionService)
     const module = await Test.createTestingModule({
       imports: [MockCacheModule.register(), MockCommunityApiModule.register(), FakeConfigModule.register()],
-      providers: [ArrangeAppointmentService],
+      providers: [
+        ArrangeAppointmentService,
+        { provide: ConvictionService, useValue: convictionService },
+        { provide: RequirementService, useValue: requirementService },
+      ],
     }).compile()
 
     subject = module.get(ArrangeAppointmentService)
     community = module.get(CommunityApiService)
     cache = module.get(MockCacheService)
     config = module.get(ConfigService).get('contacts')
+    requirementService = module.get(RequirementService)
+    convictionService = module.get(ConvictionService)
   })
 
   it('creates appointment', async () => {
@@ -79,17 +89,6 @@ describe('ArrangeAppointmentService', () => {
     const returned = await subject.getOffenderDetails(crn)
 
     expect(returned).toBe(response)
-  })
-
-  it('getting offender details throws exception if no active probation managed sentence', async () => {
-    const response = fakeOffenderDetail({ activeProbationManagedSentence: false })
-    const crn = faker.datatype.uuid()
-
-    community.offender.getOffenderDetailByCrnUsingGET.withArgs(match({ crn })).resolves(fakeOkResponse(response))
-
-    await expect(async () => {
-      await subject.getOffenderDetails(crn)
-    }).rejects.toThrowError('This offender does not have an active probation managed sentence')
   })
 
   it('getting fresh appointment types', async () => {
