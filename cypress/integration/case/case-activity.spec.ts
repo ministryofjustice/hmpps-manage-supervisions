@@ -257,6 +257,12 @@ context('Case activity tab', () => {
           title: 'Breach not proven',
           notes: 'No notes',
         })
+        .shouldRenderActivity({
+          id: 12,
+          date: 'Friday 4 September 2020',
+          title: 'Letter to Liz Danger Haggis at 1pm',
+          notes: 'Letter sent to Liz.',
+        })
         .shouldRenderSystemContactWithId(9, 'System generated unknown contact')
     })
 

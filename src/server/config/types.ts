@@ -141,7 +141,6 @@ export enum WellKnownWarningLetterType {
   Withdrawn = 'withdrawn',
   BreachLetterSent = 'breach-letter-sent',
   BreachConfirmationSent = 'breach-confirmation-sent',
-  GenericLetterToOffender = 'generic-letter-to-offender',
   EnforcementLetterRequested = 'enforcement-letter-requested',
 }
 

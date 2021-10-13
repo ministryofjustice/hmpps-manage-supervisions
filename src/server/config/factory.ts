@@ -209,7 +209,6 @@ export const CONTACT_DEFAULTS: WellKnownContactTypeConfig = {
     [WellKnownWarningLetterType.Withdrawn]: 'C040',
     [WellKnownWarningLetterType.BreachLetterSent]: 'CLBR',
     [WellKnownWarningLetterType.BreachConfirmationSent]: 'CBRC',
-    [WellKnownWarningLetterType.GenericLetterToOffender]: 'CLOB',
   },
   [ContactTypeCategory.BreachStart]: [{ code: 'AIBR', name: 'Breach started' }],
   [ContactTypeCategory.BreachEnd]: [
