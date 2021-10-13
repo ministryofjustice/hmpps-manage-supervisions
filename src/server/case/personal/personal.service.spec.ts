@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing'
 import { match } from 'sinon'
 import { PersonalService } from './personal.service'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../community-api/community-api.mock'
-import { PersonalCircumstance, PhoneNumberType } from '../../community-api/client'
+import { OffenderDetail, PersonalCircumstance, PhoneNumberType } from '../../community-api/client'
 import {
   fakeIsoDate,
   fakeOffenderDetail,
@@ -23,73 +23,7 @@ describe('PersonalService', () => {
   let subject: PersonalService
   let community: MockCommunityApiService
 
-  const offender = fakeOffenderDetail({
-    firstName: 'Some',
-    surname: 'Offender',
-    preferredName: 'Some preferred name',
-    previousSurname: 'Some previous name',
-    dateOfBirth: '2001-05-06',
-    gender: 'Male',
-    contactDetails: {
-      addresses: [
-        {
-          addressNumber: '123',
-          buildingName: 'Some building',
-          streetName: 'Some street',
-          town: 'Some town',
-          county: 'Some county',
-          postcode: 'Some postcode',
-          noFixedAbode: false,
-          status: { code: WellKnownAddressTypes.Main, description: 'Main address' },
-          telephoneNumber: '9876543210',
-          from: '2021-01-01',
-          type: { description: 'Approved premises' },
-          typeVerified: true,
-          lastUpdatedDatetime: '2021-01-02T12:00:00',
-          notes: 'some address notes',
-        },
-        { status: { code: WellKnownAddressTypes.Secondary } }, // active, secondary
-        { status: { code: WellKnownAddressTypes.Previous } }, // active, previous
-        { status: { code: WellKnownAddressTypes.Main }, to: fakeIsoDate('past') }, // inactive, main
-      ],
-      phoneNumbers: [
-        { number: '0123456789', type: PhoneNumberType.Mobile },
-        { number: '9876543210', type: PhoneNumberType.Telephone },
-      ],
-      emailAddresses: ['some.email@address.com', 'some.other.email@address.com'],
-    },
-    offenderAliases: [
-      { firstName: 'A1', middleNames: ['A2'], surname: 'A3' },
-      { firstName: 'B1', middleNames: ['B2'], surname: 'B3' },
-    ],
-    offenderProfile: {
-      offenderLanguages: { primaryLanguage: 'English', requiresInterpreter: true },
-      disabilities: [
-        {
-          startDate: '2021-02-01',
-          notes: 'Some notes',
-          disabilityType: { description: 'Some disability' },
-          provisions: [],
-          lastUpdatedDateTime: '2021-04-01',
-        },
-        {
-          startDate: '2021-02-02',
-          notes: 'Some other notes',
-          disabilityType: { description: 'Some other disability' },
-          provisions: [{ startDate: '2021-02-03', provisionType: { description: 'Some provision' } }],
-          lastUpdatedDateTime: '2021-03-01',
-        },
-        {
-          startDate: '2020-02-03',
-          endDate: '2020-02-04',
-          notes: 'Some expired notes',
-          disabilityType: { description: 'Some expired disability' },
-          provisions: [],
-          lastUpdatedDateTime: '2021-02-01',
-        },
-      ],
-    },
-  })
+  let offender: OffenderDetail
 
   const expectedMainAddress: AddressDetail = {
     name: 'Main address – Since 1 January 2021',
@@ -113,6 +47,74 @@ describe('PersonalService', () => {
 
     subject = module.get(PersonalService)
     community = module.get(CommunityApiService)
+
+    offender = fakeOffenderDetail({
+      firstName: 'Some',
+      surname: 'Offender',
+      preferredName: 'Some preferred name',
+      previousSurname: 'Some previous name',
+      dateOfBirth: '2001-05-06',
+      gender: 'Male',
+      contactDetails: {
+        addresses: [
+          {
+            addressNumber: '123',
+            buildingName: 'Some building',
+            streetName: 'Some street',
+            town: 'Some town',
+            county: 'Some county',
+            postcode: 'Some postcode',
+            noFixedAbode: false,
+            status: { code: WellKnownAddressTypes.Main, description: 'Main address' },
+            telephoneNumber: '9876543210',
+            from: '2021-01-01',
+            type: { description: 'Approved premises' },
+            typeVerified: true,
+            lastUpdatedDatetime: '2021-01-02T12:00:00',
+            notes: 'some address notes',
+          },
+          { status: { code: WellKnownAddressTypes.Secondary } }, // active, secondary
+          { status: { code: WellKnownAddressTypes.Previous } }, // active, previous
+          { status: { code: WellKnownAddressTypes.Main }, to: fakeIsoDate('past') }, // inactive, main
+        ],
+        phoneNumbers: [
+          { number: '0123456789', type: PhoneNumberType.Mobile },
+          { number: '9876543210', type: PhoneNumberType.Telephone },
+        ],
+        emailAddresses: ['some.email@address.com', 'some.other.email@address.com'],
+      },
+      offenderAliases: [
+        { firstName: 'A1', middleNames: ['A2'], surname: 'A3' },
+        { firstName: 'B1', middleNames: ['B2'], surname: 'B3' },
+      ],
+      offenderProfile: {
+        offenderLanguages: { primaryLanguage: 'English', requiresInterpreter: true },
+        disabilities: [
+          {
+            startDate: '2021-02-01',
+            notes: 'Some notes',
+            disabilityType: { description: 'Some disability' },
+            provisions: [],
+            lastUpdatedDateTime: '2021-04-01',
+          },
+          {
+            startDate: '2021-02-02',
+            notes: 'Some other notes',
+            disabilityType: { description: 'Some other disability' },
+            provisions: [{ startDate: '2021-02-03', provisionType: { description: 'Some provision' } }],
+            lastUpdatedDateTime: '2021-03-01',
+          },
+          {
+            startDate: '2020-02-03',
+            endDate: '2020-02-04',
+            notes: 'Some expired notes',
+            disabilityType: { description: 'Some expired disability' },
+            provisions: [],
+            lastUpdatedDateTime: '2021-02-01',
+          },
+        ],
+      },
+    })
   })
 
   it('gets address detail', () => {
@@ -164,6 +166,12 @@ describe('PersonalService', () => {
         address: ['53327 Movies Conn Ridges', 'Mafaldaville', 'Avon', 'ABC 123'],
       } as PersonalContactDetail,
     ])
+  })
+
+  it('gets offender personal details without disabilities', async () => {
+    offender.offenderProfile.disabilities = null
+    const observed = subject.getPersonalDetails(offender, [], [], [])
+    expect(observed.personalDetails.disabilities).toEqual([])
   })
 
   it('gets offender personal details', () => {

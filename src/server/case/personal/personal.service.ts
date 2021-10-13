@@ -197,7 +197,7 @@ export class PersonalService {
     const { offenderLanguages, religion, sexualOrientation, genderIdentity, selfDescribedGender } =
       offender.offenderProfile
 
-    const disabilities = offender.offenderProfile.disabilities?.filter(isActiveDateRange)
+    const disabilities = offender.offenderProfile.disabilities?.filter(isActiveDateRange) || []
     const formattedDisabilities = disabilities
       .map(x =>
         [
