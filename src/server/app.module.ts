@@ -10,6 +10,7 @@ import { CommunityApiModule } from './community-api/community-api.module'
 import { CaseModule } from './case/case.module'
 import { LoggerModule } from './logger/logger.module'
 import { CasesModule } from './cases/cases.module'
+import { StaticModule } from './static/static.module'
 import { SentryModule } from '@ntegral/nestjs-sentry'
 
 @Module({
@@ -29,6 +30,7 @@ import { SentryModule } from '@ntegral/nestjs-sentry'
     ConfigModule.forRoot({ isGlobal: true, load: [configFactory] }),
     HealthModule,
     CasesModule,
+    StaticModule,
     SecurityModule,
     LoggerModule,
     ArrangeAppointmentModule,

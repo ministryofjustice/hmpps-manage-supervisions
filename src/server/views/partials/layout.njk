@@ -62,7 +62,14 @@
       <br />We will respond within 5 working days.
     </p>
   {% endset %}
-  {{ appFooter({ meta: { html: metaHtml } }) }}
+  {{ appFooter({
+    meta: {
+      html: metaHtml,
+      items: [
+        { href: '/accessibility-statement', text: 'Accessibility statement' }
+      ]
+    }
+  }) }}
 {% endblock %}
 
 {% block bodyEnd %}
