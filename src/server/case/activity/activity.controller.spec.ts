@@ -20,6 +20,7 @@ import {
 import { SentenceService } from '../sentence'
 import { CasePage } from '../case.types'
 import { fakeConvictionSummary } from '../sentence/sentence.fake'
+import { EligibilityService } from '../../community-api/eligibility'
 
 describe('ActivityController', () => {
   let subject: ActivityController
@@ -38,6 +39,7 @@ describe('ActivityController', () => {
         { provide: OffenderService, useValue: offenderService },
         { provide: ActivityService, useValue: activityService },
         { provide: SentenceService, useValue: sentenceService },
+        { provide: EligibilityService, useValue: null },
       ],
       imports: [MockLinksModule],
     }).compile()

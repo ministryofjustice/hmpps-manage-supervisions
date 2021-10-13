@@ -17,6 +17,12 @@ const CASES: DeepPartial<StaffCaseloadEntry>[] = [
 export function cases(partials: DeepPartial<StaffCaseloadEntry>[] = CASES): SeedFn {
   return context => {
     const cases = partials.map(p => fakeStaffCaseloadEntry(p))
-    context.client.community.get(`/secure/staff/username/${USERNAME}/cases`).returns(fakePaginated(cases))
+    context.client.community
+      .get(`/secure/staff/username/${USERNAME}/manage-supervisions-eligible-offenders`)
+      .returns(fakePaginated(cases))
+
+    for (const aCase of cases) {
+      context.client.community.get(`/secure/offenders/crn/${aCase.crn}/manage-supervisions-eligibility`).returns(aCase)
+    }
   }
 }

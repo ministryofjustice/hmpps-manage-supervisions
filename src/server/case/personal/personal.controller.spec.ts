@@ -19,6 +19,7 @@ import { OffenderDetail, OffenderDetailSummary } from '../../community-api/clien
 import { RiskService } from '../risk'
 import { CasePage } from '../case.types'
 import { fakeCriminogenicNeed } from '../risk/risk.fake'
+import { EligibilityService } from '../../community-api/eligibility'
 
 describe('PersonalController', () => {
   let subject: PersonalController
@@ -39,6 +40,7 @@ describe('PersonalController', () => {
         { provide: OffenderService, useValue: offenderService },
         { provide: PersonalService, useValue: personalService },
         { provide: RiskService, useValue: riskService },
+        { provide: EligibilityService, useValue: null },
       ],
     }).compile()
 

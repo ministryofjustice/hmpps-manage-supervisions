@@ -18,6 +18,7 @@ import { fakeNextAppointmentSummary } from './schedule/schedule.fake'
 import { MockLinksModule } from '../common/links/links.mock'
 import { PersonalService } from './personal'
 import { fakeRiskRegistrations, fakeRisks } from './risk/risk.fake'
+import { EligibilityService } from '../community-api/eligibility'
 
 describe('CaseController', () => {
   let subject: CaseController
@@ -43,6 +44,7 @@ describe('CaseController', () => {
         { provide: ScheduleService, useValue: scheduleService },
         { provide: RiskService, useValue: riskService },
         { provide: PersonalService, useValue: personalService },
+        { provide: EligibilityService, useValue: null },
       ],
     }).compile()
     subject = module.get(CaseController)

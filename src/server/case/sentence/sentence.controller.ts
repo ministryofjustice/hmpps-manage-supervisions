@@ -5,7 +5,7 @@ import { OffenderService } from '../offender'
 import { getDisplayName } from '../../util'
 import { SentenceService } from './sentence.service'
 import { CasePage, CaseSentenceViewModel } from '../case.types'
-import { CaseBreadcrumb } from '../case.decorators'
+import { CaseTabbedPage } from '../case-tabbed-page.decorators'
 
 @Controller('case/:crn(\\w+)/sentence')
 export class SentenceController {
@@ -17,7 +17,7 @@ export class SentenceController {
 
   @Get()
   @Render('case/sentence/sentence')
-  @CaseBreadcrumb({ page: CasePage.Sentence, title: 'Sentence' })
+  @CaseTabbedPage({ page: CasePage.Sentence, title: 'Sentence' })
   async getSentence(@Param('crn') crn: string): Promise<CaseSentenceViewModel> {
     const [offender, conviction] = await Promise.all([
       this.offender.getOffenderSummary(crn),

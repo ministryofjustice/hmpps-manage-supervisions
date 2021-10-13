@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Render } from '@nestjs/common'
 import { CaseComplianceViewModel, CasePage } from '../case.types'
-import { CaseBreadcrumb } from '../case.decorators'
+import { CaseTabbedPage } from '../case-tabbed-page.decorators'
 import { OffenderService } from '../offender'
 import { SentenceService } from '../sentence'
 
@@ -10,7 +10,7 @@ export class ComplianceController {
 
   @Get()
   @Render('case/compliance/compliance')
-  @CaseBreadcrumb({ page: CasePage.Compliance, title: 'Compliance' })
+  @CaseTabbedPage({ page: CasePage.Compliance, title: 'Compliance' })
   async getCompliance(@Param('crn') crn: string): Promise<CaseComplianceViewModel> {
     const [offender, compliance] = await Promise.all([
       this.offender.getOffenderSummary(crn),

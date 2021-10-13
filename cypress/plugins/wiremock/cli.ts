@@ -42,6 +42,12 @@ const { argv } = yargs
     description: 'get mappings for specified url and quit',
     group: 'client',
   })
+  .option('caseload', {
+    type: 'boolean',
+    description: 'the offender is on the caseload',
+    default: true,
+    group: 'cases',
+  })
   .option('current-conviction', {
     alias: 'cc',
     type: 'boolean',
@@ -118,6 +124,10 @@ async function seed(args: CamelCased<typeof argv>) {
 
   if (args.registrations === false) {
     options.registrations = []
+  }
+
+  if (args.caseload === false) {
+    options.cases = []
   }
 
   const modules = [reset, referenceDataSeed(options), offenderSeed(options), contactsSeed(options), casesSeed(options)]

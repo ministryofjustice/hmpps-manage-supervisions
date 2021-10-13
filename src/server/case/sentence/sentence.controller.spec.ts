@@ -10,6 +10,7 @@ import { PreviousConvictionsViewModel } from './sentence.types'
 import { BreadcrumbType } from '../../common/links'
 import { ViewModel } from '../../common'
 import { CasePage } from '../case.types'
+import { EligibilityService } from '../../community-api/eligibility'
 
 describe('SentenceController', () => {
   let subject: SentenceController
@@ -26,6 +27,7 @@ describe('SentenceController', () => {
       providers: [
         { provide: OffenderService, useValue: offenderService },
         { provide: SentenceService, useValue: sentenceService },
+        { provide: EligibilityService, useValue: null },
       ],
     }).compile()
 

@@ -7,7 +7,7 @@ import { OffenderDetailSummary } from '../../community-api/client'
 import { OffenderService } from '../offender'
 import { RedirectResponse } from '../../common'
 import { CasePage, CaseRiskViewModel } from '../case.types'
-import { CaseBreadcrumb } from '../case.decorators'
+import { CaseTabbedPage } from '../case-tabbed-page.decorators'
 
 @Controller('case/:crn(\\w+)/risk')
 export class RiskController {
@@ -19,7 +19,7 @@ export class RiskController {
 
   @Get()
   @Render('case/risk/risk')
-  @CaseBreadcrumb({ page: CasePage.Risk, title: 'Risk' })
+  @CaseTabbedPage({ page: CasePage.Risk, title: 'Risk' })
   async getRisk(@Param('crn') crn: string): Promise<CaseRiskViewModel> {
     const [offender, registrations, risks] = await Promise.all([
       this.offender.getOffenderSummary(crn),

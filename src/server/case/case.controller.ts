@@ -6,7 +6,8 @@ import { SentenceService } from './sentence'
 import { ScheduleService } from './schedule'
 import { RiskService } from './risk'
 import { PersonalService } from './personal'
-import { Breadcrumb, BreadcrumbType, LinksService } from '../common/links'
+import { BreadcrumbType, LinksService } from '../common/links'
+import { CaseTabbedPage } from './case-tabbed-page.decorators'
 
 @Controller('case/:crn(\\w+)')
 export class CaseController {
@@ -27,7 +28,7 @@ export class CaseController {
 
   @Get('overview')
   @Render('case/overview')
-  @Breadcrumb({ type: BreadcrumbType.Case, parent: BreadcrumbType.Cases, title: options => options.offenderName })
+  @CaseTabbedPage({ page: CasePage.Overview, title: options => options.offenderName })
   async getOverview(@Param('crn') crn: string): Promise<CaseOverviewViewModel> {
     const [offender, compliance, nextAppointment, risks, registrations, personalCircumstances] = await Promise.all([
       this.offenderService.getOffenderDetail(crn),

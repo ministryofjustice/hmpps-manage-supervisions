@@ -11,7 +11,7 @@ export class CasesService {
   async getCases(username: string): Promise<Case[]> {
     const {
       data: { content: cases },
-    } = await this.community.staff.getCasesUsingGET({
+    } = await this.community.staff.getManageSupervisionsEligibleOffendersUsingGET({
       username,
       unpaged: true,
     })

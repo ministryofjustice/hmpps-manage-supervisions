@@ -10,6 +10,8 @@ import { fakeAppointmentListViewModel } from './schedule.fake'
 import { FeatureFlags } from '../../config'
 import { fakeSecurityContext } from '../../security/context/security-context.fake'
 import { Role } from '../../security'
+import { EligibilityService } from '../../community-api/eligibility'
+import { LinksService } from '../../common/links'
 
 describe('ScheduleController', () => {
   let subject: ScheduleController
@@ -25,6 +27,8 @@ describe('ScheduleController', () => {
       providers: [
         { provide: OffenderService, useValue: offenderService },
         { provide: ScheduleService, useValue: scheduleService },
+        { provide: EligibilityService, useValue: null },
+        { provide: LinksService, useValue: null },
       ],
       imports: [FakeConfigModule.register({ server: { features: { [FeatureFlags.EnableAppointmentBooking]: true } } })],
     }).compile()

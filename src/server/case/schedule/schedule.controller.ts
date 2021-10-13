@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Render } from '@nestjs/common'
 import { CasePage, CaseScheduleViewModel } from '../case.types'
 import { Config, FeatureFlags, ServerConfig } from '../../config'
-import { CaseBreadcrumb } from '../case.decorators'
+import { CaseTabbedPage } from '../case-tabbed-page.decorators'
 import { OffenderService } from '../offender'
 import { ScheduleService } from './schedule.service'
 import { ConfigService } from '@nestjs/config'
@@ -17,7 +17,7 @@ export class ScheduleController {
 
   @Get()
   @Render('case/schedule/schedule')
-  @CaseBreadcrumb({ page: CasePage.Schedule, title: 'Schedule' })
+  @CaseTabbedPage({ page: CasePage.Schedule, title: 'Schedule' })
   async getSchedule(
     @Param('crn') crn: string,
     @CurrentSecurityContext() security: SecurityContext,
