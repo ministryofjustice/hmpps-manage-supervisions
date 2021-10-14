@@ -86,7 +86,7 @@ export class CasePage extends PageBase {
       },
 
       tableData(table: SCHEDULE_TABLE, row: number, column: SCHEDULE_COL) {
-        return cy.get(`table[data-qa="offender/schedule/${table}"] > tbody > tr:eq(${row}) > td[data-qa="${column}"]`)
+        return cy.get(`table[data-qa="offender/schedule/${table}"] > tbody > tr:eq(${row}) > [data-qa="${column}"]`)
       },
 
       emptyHeader(table: SCHEDULE_TABLE) {
