@@ -5,6 +5,7 @@ import {
   AppointmentCreateRequest,
   AppointmentCreateResponse,
   AppointmentType,
+  AppointmentTypeOrderTypes,
   OffenderDetail,
   OfficeLocation,
   PersonalCircumstance,
@@ -47,7 +48,7 @@ export class ArrangeAppointmentService {
       return null
     }
 
-    const { featured, other } = await this.getAppointmentTypes()
+    const { featured, other } = await this.getAppointmentTypes(builder.cja2003Order, builder.legacyOrder)
     if (selected.featured) {
       const type = featured.find(x => x.type === selected.value)
       if (!type) {
@@ -96,39 +97,46 @@ export class ArrangeAppointmentService {
     return data
   }
 
-  async getAppointmentTypes(): Promise<AvailableAppointmentTypes> {
-    return await this.cache.getOrSet('community:available-appointment-types', async () => {
-      const { data } = await this.community.appointment.getAllAppointmentTypesUsingGET()
+  async getAppointmentTypes(cja2003Order: boolean, legacyOrder: boolean): Promise<AvailableAppointmentTypes> {
+    return await this.cache.getOrSet(
+      `community:available-appointment-types-cja-${cja2003Order}-legacy-${legacyOrder}`,
+      async () => {
+        const data = (await this.community.appointment.getAllAppointmentTypesUsingGET()).data.filter(
+          x =>
+            (cja2003Order && x.orderTypes.includes(AppointmentTypeOrderTypes.Cja)) ||
+            (legacyOrder && x.orderTypes.includes(AppointmentTypeOrderTypes.Legacy)),
+        )
 
-      const config = this.config.get<WellKnownContactTypeConfig>('contacts')[ContactTypeCategory.Appointment]
-      const featured: FeaturedAppointmentType[] = Object.entries(config)
-        .map(([type, meta]) => {
-          const appointmentTypes = Object.values(meta.codes)
-            .map(code => data.find(x => x.contactType.toUpperCase() === code))
-            .filter(x => x)
+        const config = this.config.get<WellKnownContactTypeConfig>('contacts')[ContactTypeCategory.Appointment]
+        const featured: FeaturedAppointmentType[] = Object.entries(config)
+          .map(([type, meta]) => {
+            const appointmentTypes = Object.values(meta.codes)
+              .map(code => data.find(x => x.contactType.toUpperCase() === code))
+              .filter(x => x)
 
-          if (appointmentTypes.length === 0) {
-            return null
-          }
+            if (appointmentTypes.length === 0) {
+              return null
+            }
 
-          for (const appointmentType of appointmentTypes) {
-            data.splice(data.indexOf(appointmentType), 1)
-          }
+            for (const appointmentType of appointmentTypes) {
+              data.splice(data.indexOf(appointmentType), 1)
+            }
 
-          return {
-            type,
-            description: meta.name,
-            meta,
-            appointmentTypes,
-          } as FeaturedAppointmentType
-        })
-        .filter(x => x)
+            return {
+              type,
+              description: meta.name,
+              meta,
+              appointmentTypes,
+            } as FeaturedAppointmentType
+          })
+          .filter(x => x)
 
-      return {
-        value: { featured, other: data },
-        options: { durationSeconds: 600 },
-      }
-    })
+        return {
+          value: { featured, other: data },
+          options: { durationSeconds: 600 },
+        }
+      },
+    )
   }
 
   async getTeamOfficeLocations(teamCode: string): Promise<OfficeLocation[]> {
@@ -149,20 +157,20 @@ export class ArrangeAppointmentService {
       activeOnly: true,
     })
     const rar = requirements.find(x => x.isRar)
-    if (!rar) {
-      throw new Error(`offender with crn '${crn}' has no active RAR requirement`)
-    }
 
     let requirement: ConvictionRequirementDetail
-    switch (rar.type) {
-      case ConvictionRequirementType.Unit:
-        requirement = rar
-        break
 
-      case ConvictionRequirementType.Aggregate:
-        // TODO determine best RAR requirement where there are multiple, maybe where unallocated days?
-        requirement = rar.requirements.find(x => x)
-        break
+    if (rar) {
+      switch (rar.type) {
+        case ConvictionRequirementType.Unit:
+          requirement = rar
+          break
+
+        case ConvictionRequirementType.Aggregate:
+          // TODO determine best RAR requirement where there are multiple, maybe where unallocated days?
+          requirement = rar.requirements.find(x => x)
+          break
+      }
     }
 
     return { conviction: current, requirement }

@@ -53,6 +53,8 @@ export const ACTIVE_CONVICTION: DeepPartial<Conviction> = {
         notes: null,
       },
     ],
+    cja2003Order: true,
+    legacyOrder: false,
   },
   responsibleCourt: {
     courtName: 'Sheffield Magistrates Court',
@@ -75,6 +77,8 @@ export const PREVIOUS_CONVICTIONS: DeepPartial<Conviction>[] = [
       terminationDate: '2020-12-01',
       originalLength: 24,
       originalLengthUnits: 'Months',
+      cja2003Order: true,
+      legacyOrder: false,
     },
     offences: [{ mainOffence: true, offenceCount: 2, detail: { subCategoryDescription: 'Assault on Police Officer' } }],
   },

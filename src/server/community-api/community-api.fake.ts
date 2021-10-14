@@ -458,6 +458,8 @@ export const fakeConviction = fake<Conviction>((options, { active = true, inBrea
       },
       additionalSentences: [],
       failureToComplyLimit: 3,
+      cja2003Order: true,
+      legacyOrder: false,
     },
     latestCourtAppearanceOutcome: {
       code: faker.random.alphaNumeric(3),
