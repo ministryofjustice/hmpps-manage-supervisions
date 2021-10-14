@@ -133,6 +133,24 @@ export const ACTIVITY_LOG_GROUPS: DeepPartial<ActivityLogGroup>[] = [
         rarActivity: null,
       },
       {
+        contactId: 12,
+        convictionId: ACTIVE_CONVICTION_ID,
+        type: {
+          code: 'CLOB',
+          description: 'Letter/Fax to Offender',
+          appointment: false,
+          categories: COMMUNICATION_CATEGORIES,
+        },
+        startTime: '13:00:00',
+        endTime: null,
+        notes: 'Letter sent to Liz.',
+        outcome: null,
+        lastUpdatedDateTime: '2020-09-04T14:20:23+01:00',
+        lastUpdatedByUser: { forenames: 'John', surname: 'Smith' },
+        sensitive: false,
+        rarActivity: null,
+      },
+      {
         contactId: 100,
         convictionId: null,
         type: {

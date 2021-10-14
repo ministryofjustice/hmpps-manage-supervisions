@@ -313,7 +313,7 @@ describe('ActivityService', () => {
         complianceFilter: ActivityComplianceFilter.WarningLetters,
       })
       shouldHaveFilteredConvictionLevelContacts({
-        contactTypes: ['AWLI', 'AWL2', 'AWLF', 'AWLS', 'C040', 'CLBR', 'CBRC', 'CLOB'],
+        contactTypes: ['AWLI', 'AWL2', 'AWLF', 'AWLS', 'C040', 'CLBR', 'CBRC'],
       })
     })
 
