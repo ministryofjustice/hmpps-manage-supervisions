@@ -157,20 +157,20 @@ export class ArrangeAppointmentService {
       activeOnly: true,
     })
     const rar = requirements.find(x => x.isRar)
+    if (!rar) {
+      throw new Error(`offender with crn '${crn}' has no active RAR requirement`)
+    }
 
     let requirement: ConvictionRequirementDetail
+    switch (rar.type) {
+      case ConvictionRequirementType.Unit:
+        requirement = rar
+        break
 
-    if (rar) {
-      switch (rar.type) {
-        case ConvictionRequirementType.Unit:
-          requirement = rar
-          break
-
-        case ConvictionRequirementType.Aggregate:
-          // TODO determine best RAR requirement where there are multiple, maybe where unallocated days?
-          requirement = rar.requirements.find(x => x)
-          break
-      }
+      case ConvictionRequirementType.Aggregate:
+        // TODO determine best RAR requirement where there are multiple, maybe where unallocated days?
+        requirement = rar.requirements.find(x => x)
+        break
     }
 
     return { conviction: current, requirement }
