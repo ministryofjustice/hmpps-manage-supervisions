@@ -128,6 +128,12 @@ export class AppointmentBuilderDto {
   @ExposeDefault()
   locationDescription?: string
 
+  @ExposeDefault()
+  cja2003Order: boolean
+
+  @ExposeDefault()
+  legacyOrder: boolean
+
   @ExposeDefault({ groups: [AppointmentWizardStep.When] })
   @Type(() => AppointmentDateDto)
   @IsDateInput({ groups: [AppointmentWizardStep.When], message: 'Enter a valid date' })

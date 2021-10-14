@@ -346,7 +346,6 @@ context('Arrange appointment happy path & validation', () => {
       .then(apts => apts.find(a => a.contactType === type.code))
       .should('deep.eq', {
         providerCode: 'N07',
-        requirementId: 2500199144,
         staffCode: 'CRSSTAFF1',
         teamCode: 'N07UAT',
         appointmentStart: start.toISO(),

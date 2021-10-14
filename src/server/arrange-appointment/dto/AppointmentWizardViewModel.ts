@@ -48,7 +48,7 @@ export interface AppointmentTypeViewModel extends AppointmentWizardViewModelBase
   step: AppointmentWizardStep.Type
   types: AvailableAppointmentTypes
   type: string | null
-  other: string | null
+  otherType: string | null
 }
 
 export interface AppointmentLocationViewModel extends AppointmentWizardViewModelBase {

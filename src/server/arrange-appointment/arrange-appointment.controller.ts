@@ -56,7 +56,7 @@ export class ArrangeAppointmentController {
   ): Promise<RedirectResponse> {
     const response = this.wizard.reset(session, crn)
 
-    const [offender, { conviction, requirement }] = await Promise.all([
+    const [offender, { conviction }] = await Promise.all([
       this.service.getOffenderDetails(crn),
       this.service.getConvictionAndRarRequirement(crn),
     ])
@@ -72,7 +72,12 @@ export class ArrangeAppointmentController {
     session.appointment.teamCode = offenderManager.team.code
     session.appointment.providerCode = offenderManager.probationArea.code
     session.appointment.convictionId = conviction.convictionId
-    session.appointment.requirementId = requirement.id
+    // Book everything against the event, even if we have a RAR requirement, as we're not asking about RAR requirements yet.
+    // When RAR appointment functionality is added, the list of available appointment types will need to be filtered to those that
+    // can be used against the RAR requirement main category
+    // session.appointment.requirementId = requirement.id
+    session.appointment.cja2003Order = conviction.sentence.cja2003Order
+    session.appointment.legacyOrder = conviction.sentence.legacyOrder
     return response
   }
 
@@ -105,6 +110,9 @@ export class ArrangeAppointmentController {
     if (errors.length > 0) {
       return await this.getAppointmentTypeViewModel(session, body, errors)
     }
+
+    body.cja2003Order = session.appointment.cja2003Order
+    body.legacyOrder = session.appointment.legacyOrder
 
     const type = await this.service.getAppointmentType(body)
     if (!type) {
@@ -424,8 +432,13 @@ export class ArrangeAppointmentController {
       groups: [DEFAULT_GROUP],
       excludeExtraneousValues: true,
     })
-    const types = await this.service.getAppointmentTypes()
+
+    const types = await this.service.getAppointmentTypes(
+      session.appointment.cja2003Order,
+      session.appointment.legacyOrder,
+    )
     const currentType = await this.service.getAppointmentType(appointment)
+
     const [type, other] = currentType
       ? currentType.wellKnownType
         ? [currentType.wellKnownType, null]
@@ -441,7 +454,7 @@ export class ArrangeAppointmentController {
       },
       types,
       type: body?.type || type,
-      other: body?.otherType || other,
+      otherType: body?.otherType || other,
     }
   }
 

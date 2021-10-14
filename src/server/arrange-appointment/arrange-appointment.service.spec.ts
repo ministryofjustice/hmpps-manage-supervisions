@@ -53,7 +53,7 @@ describe('ArrangeAppointmentService', () => {
     const response = fakeAppointmentCreateResponse()
     const crn = faker.datatype.uuid()
     const type = fakeFeaturedAppointmentType({ type: WellKnownAppointmentType.OfficeVisit })
-    cache.cache['community:available-appointment-types'] = {
+    cache.cache['community:available-appointment-types-cja-true-legacy-false'] = {
       featured: [type],
       other: [],
     } as AvailableAppointmentTypes
@@ -95,7 +95,7 @@ describe('ArrangeAppointmentService', () => {
     const featured = fakeAppointmentType({ contactType: 'APAT' })
     const other = fakeAppointmentType()
     community.appointment.getAllAppointmentTypesUsingGET.resolves(fakeOkResponse([featured, other]))
-    const observed = await subject.getAppointmentTypes()
+    const observed = await subject.getAppointmentTypes(true, false)
     expect(observed).toEqual({
       featured: [
         {
@@ -110,10 +110,10 @@ describe('ArrangeAppointmentService', () => {
   })
 
   it('getting cached appointment types', async () => {
-    const types = (cache.cache['community:available-appointment-types'] = [
+    const types = (cache.cache['community:available-appointment-types-cja-true-legacy-false'] = [
       { ...fakeAppointmentType(), isFeatured: true },
     ])
-    const observed = await subject.getAppointmentTypes()
+    const observed = await subject.getAppointmentTypes(true, false)
     expect(observed).toBe(types)
   })
 

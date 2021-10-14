@@ -31,6 +31,8 @@ export const fakeAppointmentBuilderDto = fakeClass(
       staffCode: faker.datatype.uuid(),
       requirementId: faker.datatype.number(),
       convictionId: faker.datatype.number(),
+      cja2003Order: true,
+      legacyOrder: false,
     }
   },
   { groups: [DEFAULT_GROUP] },
