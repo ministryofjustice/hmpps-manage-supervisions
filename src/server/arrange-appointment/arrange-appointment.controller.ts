@@ -22,7 +22,7 @@ import { DateTime } from 'luxon'
 import { isActiveDateRange } from '../util'
 import { Breadcrumb, BreadcrumbType, LinksService } from '../common/links'
 import { Role, Roles, CurrentSecurityContext, SecurityContext } from '../security'
-import { CaseloadOnly } from '../security/caseload'
+import { EligibleCaseloadOnly } from '../security/eligibility'
 
 type RenderOrRedirect = AppointmentWizardViewModel | RedirectResponse
 
@@ -48,7 +48,7 @@ export class ArrangeAppointmentController {
     parent: BreadcrumbType.Case,
     title: 'New appointment',
   })
-  @CaseloadOnly()
+  @EligibleCaseloadOnly()
   async get(
     @Param('crn') crn: string,
     @Session() session: AppointmentWizardSession,

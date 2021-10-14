@@ -28,7 +28,9 @@ describe('CasesService', () => {
       { crn: 'J125347', firstName: 'Dan', middleNames: ['Archibald'], surname: 'Gotham', preferredName: 'Danny' },
     ]
 
-    const stub = community.staff.getCasesUsingGET.resolves(fakeOkResponse(fakePaginated(cases)))
+    const stub = community.staff.getManageSupervisionsEligibleOffendersUsingGET.resolves(
+      fakeOkResponse(fakePaginated(cases)),
+    )
 
     const observed = await subject.getCases('some-username')
 

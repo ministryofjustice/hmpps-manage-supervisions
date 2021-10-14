@@ -11,7 +11,7 @@ import { OffenderService } from '../offender'
 import { getDisplayName } from '../../util'
 import { Breadcrumb, BreadcrumbType, LinksService } from '../../common/links'
 import { CaseActivityViewModel, CasePage } from '../case.types'
-import { CaseBreadcrumb } from '../case.decorators'
+import { CaseTabbedPage } from '../case-tabbed-page.decorators'
 import { SentenceService } from '../sentence'
 
 @Controller('case/:crn(\\w+)/activity')
@@ -25,7 +25,7 @@ export class ActivityController {
 
   @Get()
   @Render('case/activity/activity')
-  @CaseBreadcrumb({ page: CasePage.Activity, title: 'Activity log' })
+  @CaseTabbedPage({ page: CasePage.Activity, title: 'Activity log' })
   async getActivity(@Param('crn') crn: string): Promise<CaseActivityViewModel> {
     return this.activityPageCommon(crn)
   }

@@ -7,6 +7,25 @@
     {{ super() }}
 
     <section class="govuk-!-padding-top-7">
+        {% if caseEligibility === false %}
+            {% set caseEligibilityWarning %}
+                <p class="govuk-notification-banner__heading">
+                    We’re not ready to handle this case
+                </p>
+
+                <p>You may find that:</p>
+
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>not all information is shown</li>
+                    <li>some information shows incorrectly</li>
+                </ul>
+            {% endset %}
+            {{ govukNotificationBanner({
+                attributes: { 'data-qa': 'offender/ineligible-case-warning' },
+                html: caseEligibilityWarning
+            }) }}
+        {% endif %}
+
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
             <span class="govuk-caption-l"><abbr title="Case reference number">CRN</abbr>: {{ ids.crn }}</span>
             {{ displayName }}

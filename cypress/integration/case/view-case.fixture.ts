@@ -1,6 +1,7 @@
 import { CasePage, TABS } from '../../pages/case/case.page'
 import { CRN } from '../../plugins/offender'
 import { CaseExitPage, ExitPageName } from '../../pages/case/case-exit.page'
+import { CaseIneligiblePage } from '../../pages/case/case-ineligible.page'
 
 export class ViewCaseFixture {
   crn = CRN
@@ -13,6 +14,11 @@ export class ViewCaseFixture {
 
   whenClickingSubNavTab(tab: TABS): this {
     this.page.subNavTab(tab).click()
+    return this
+  }
+
+  thenWhenReloadingPage() {
+    cy.reload()
     return this
   }
 
@@ -37,6 +43,18 @@ export class ViewCaseFixture {
 
   shouldDisplayPageWithTitle(title: string) {
     this.page.pageTitle.contains(title)
+    return this
+  }
+
+  shouldDisplayIneligibleCasePage(callback: (page: CaseIneligiblePage) => void) {
+    const page = new CaseIneligiblePage()
+    page.pageTitle.contains('We’re not ready to handle this case')
+    callback(page)
+    return this
+  }
+
+  shouldDisplayIneligibleCaseWarning() {
+    this.page.ineligibleCaseWarning.contains('We’re not ready to handle this case')
     return this
   }
 

@@ -6,6 +6,8 @@ import { SentenceService } from '../sentence'
 import { fakeOffenderDetailSummary } from '../../community-api/community-api.fake'
 import { CasePage } from '../case.types'
 import { fakeComplianceDetails } from '../sentence/sentence.fake'
+import { EligibilityService } from '../../community-api/eligibility'
+import { LinksService } from '../../common/links'
 
 describe('ComplianceController', () => {
   let subject: ComplianceController
@@ -21,6 +23,8 @@ describe('ComplianceController', () => {
       providers: [
         { provide: OffenderService, useValue: offenderService },
         { provide: SentenceService, useValue: sentenceService },
+        { provide: EligibilityService, useValue: null },
+        { provide: LinksService, useValue: null },
       ],
     }).compile()
 

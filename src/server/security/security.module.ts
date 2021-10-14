@@ -15,7 +15,7 @@ import { setLocals, csp } from './middleware'
 import { LoginService } from './login/login.service'
 import { LogoutService } from './logout/logout.service'
 import { CommunityApiModule } from '../community-api/community-api.module'
-import { CaseloadGuard } from './caseload'
+import { EligibleCaseloadGuard } from './eligibility'
 
 /**
  * Applies HMPPS authentication to all routes via passport-oauth.
@@ -40,7 +40,7 @@ import { CaseloadGuard } from './caseload'
     TokenVerificationService,
     LoginService,
     LogoutService,
-    CaseloadGuard,
+    EligibleCaseloadGuard,
   ],
   controllers: [LoginController, LogoutController],
 })

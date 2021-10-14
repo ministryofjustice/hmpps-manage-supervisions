@@ -43,8 +43,8 @@ export class CasePage extends PageBase {
     return cy.url().then(url => url.match(/\/case\/[A-Za-z0-9]+\/(\w+)\/?/)[1])
   }
 
-  get registrations() {
-    return cy.get('[data-qa="registration"]')
+  get ineligibleCaseWarning() {
+    return cy.get('[data-qa="offender/ineligible-case-warning"]')
   }
 
   get overview() {

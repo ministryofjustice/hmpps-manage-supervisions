@@ -12,6 +12,7 @@ import { OffenderDetail, OffenderDetailSummary } from '../../community-api/clien
 import { DateTime } from 'luxon'
 import { RedirectResponse } from '../../common'
 import { CasePage } from '../case.types'
+import { EligibilityService } from '../../community-api/eligibility'
 
 describe('RiskController', () => {
   let subject: RiskController
@@ -29,6 +30,7 @@ describe('RiskController', () => {
       providers: [
         { provide: OffenderService, useValue: offenderService },
         { provide: RiskService, useValue: riskService },
+        { provide: EligibilityService, useValue: null },
       ],
     }).compile()
 

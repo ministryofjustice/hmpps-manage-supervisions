@@ -12,7 +12,7 @@ import {
 import { getDisplayName } from '../../util'
 import { OffenderDetailSummary } from '../../community-api/client'
 import { CasePage, CasePersonalViewModel } from '../case.types'
-import { CaseBreadcrumb } from '../case.decorators'
+import { CaseTabbedPage } from '../case-tabbed-page.decorators'
 import { RiskService } from '../risk'
 
 @Controller('case/:crn(\\w+)/personal')
@@ -26,7 +26,7 @@ export class PersonalController {
 
   @Get()
   @Render('case/personal/personal')
-  @CaseBreadcrumb({ page: CasePage.Personal, title: 'Personal details' })
+  @CaseTabbedPage({ page: CasePage.Personal, title: 'Personal details' })
   async getPersonal(@Param('crn') crn: string): Promise<CasePersonalViewModel> {
     const [offender, personalContacts, personalCircumstances, criminogenicNeeds] = await Promise.all([
       this.offender.getOffenderDetail(crn),

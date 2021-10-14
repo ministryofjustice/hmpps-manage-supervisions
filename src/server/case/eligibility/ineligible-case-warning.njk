@@ -1,0 +1,34 @@
+{% extends "partials/layout.njk" %}
+
+{% set pageTitle = "We’re not ready to handle this case" %}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl">{{ pageTitle }}</h1>
+
+            <p>Not all cases are suitable for the Manage supervisions pilot.</p>
+
+            <p>To be suitable a case must have:</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>a single community order</li>
+                <li>a RAR requirement, and no other requirements</li>
+            </ul>
+
+            <h2 class="govuk-heading-m">You can still view this case here</h2>
+
+            <p>If you view this case you may find that:</p>
+
+            <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-5">
+                <li>not all information is shown</li>
+                <li>some information shows incorrectly</li>
+            </ul>
+
+            {{ govukButton({
+                attributes: { 'data-qa': 'ineligible-case-warning/continue' },
+                text: 'Continue to case',
+                href: links.continue
+            }) }}
+        </div>
+    </div>
+{% endblock %}

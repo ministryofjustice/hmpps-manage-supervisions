@@ -3,6 +3,21 @@ import { ViewCaseFixture } from './view-case.fixture'
 context('Case overview tab', () => {
   const fixture = new ViewCaseFixture()
 
+  it('displays ineligible case warning', () => {
+    cy.seed({ cases: [] })
+    fixture
+      .whenViewingOffender()
+      .shouldDisplayIneligibleCasePage(page => {
+        page.continueButton.click()
+      })
+      .shouldRenderOffenderTab('overview')
+      .shouldDisplayIneligibleCaseWarning()
+
+      // but not a second time
+      .thenWhenReloadingPage()
+      .shouldRenderOffenderTab('overview')
+  })
+
   it('displays offender overview', () => {
     const past = { appointmentStart: '2020-05-25T12:00:00+01:00', appointmentEnd: '2020-05-25T13:00:00+01:00' }
     cy.seed({
