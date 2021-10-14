@@ -9,11 +9,13 @@ import { useBodyParser, useGovUkUi, useRedisSession, useTrustProxy } from './boo
 import { ServerConfig } from './config'
 import { Settings } from 'luxon'
 import { LoggerModule } from './logger/logger.module'
+import { CrnInterceptor } from './common/crn-rewrite/crn.interceptor'
 
 Settings.defaultZone = 'Europe/London'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { bodyParser: false, bufferLogs: true })
+  app.useGlobalInterceptors(new CrnInterceptor())
   LoggerModule.useLogger(app)
 
   useBodyParser(app)
