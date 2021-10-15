@@ -1,11 +1,11 @@
 {% extends "partials/layout.njk" %}
 
-{% set pageTitle = applicationName + " - Unauthorized" %}
+{% set pageTitle = "Your Delius account needs permission to use this service" %}
 
 {% block content %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h1 class='govuk-heading-xl'>Your Delius account needs permission to use this service</h1>
+            <h1 class='govuk-heading-xl'>{{ pageTitle }}</h1>
 
             <p class='govuk-body'>
                 You need to contact the person who manages your Delius account so they can give you permission.
