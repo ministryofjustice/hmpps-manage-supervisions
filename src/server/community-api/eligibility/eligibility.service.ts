@@ -3,6 +3,12 @@ import { CommunityApiService } from '../community-api.service'
 import { SanitisedAxiosError } from '../../common/rest'
 import { Request } from 'express'
 
+export enum OffenderEligibilityResult {
+  Eligible,
+  Ineligible,
+  IneligibleDisplayWarning,
+}
+
 @Injectable()
 export class EligibilityService {
   constructor(private readonly community: CommunityApiService) {}
@@ -21,24 +27,20 @@ export class EligibilityService {
     return cases?.some(x => x.crn === crn) || false
   }
 
-  async isEligibleOffender(crn: string): Promise<boolean> {
+  async checkOffenderEligibility(session: Request['session'], crn: string): Promise<OffenderEligibilityResult> {
+    if (!session.eligibility) {
+      session.eligibility = {}
+    }
+
+    if (crn in session.eligibility) {
+      return session.eligibility[crn] ? OffenderEligibilityResult.Eligible : OffenderEligibilityResult.Ineligible
+    }
+
     const result = await SanitisedAxiosError.catchNotFound(() =>
       this.community.offender.getManageSupervisionsEligibilityUsingGET({ crn }),
     )
-    return !!result
-  }
-
-  shouldDisplayEligibilityWarning(session: Request['session'], crn: string): boolean {
-    if (!session.eligibility?.warningDisplayed) {
-      session.eligibility = { warningDisplayed: [crn] }
-      return true
-    }
-
-    if (!session.eligibility.warningDisplayed.includes(crn)) {
-      session.eligibility.warningDisplayed.push(crn)
-      return true
-    }
-
-    return false
+    return (session.eligibility[crn] = !!result)
+      ? OffenderEligibilityResult.Eligible
+      : OffenderEligibilityResult.IneligibleDisplayWarning
   }
 }

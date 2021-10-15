@@ -1,7 +1,7 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
-import { EligibilityService } from '../../community-api/eligibility'
+import { EligibilityService, OffenderEligibilityResult } from '../../community-api/eligibility'
 import { Reflector } from '@nestjs/core'
 import { CHECK_ELIGIBILITY_KEY, CheckEligibilityContext, IneligibilityCaseWarningRequired } from './eligibility.types'
 import { Request } from 'express'
@@ -27,11 +27,19 @@ export class CheckEligibilityInterceptor implements NestInterceptor {
       )
     }
 
-    const eligible = await this.eligibility.isEligibleOffender(crn)
-    if (!eligible && this.eligibility.shouldDisplayEligibilityWarning(request.session, crn)) {
-      throw new IneligibilityCaseWarningRequired(crn, page)
+    const eligibility = await this.eligibility.checkOffenderEligibility(request.session, crn)
+    let caseEligibility: boolean
+    switch (eligibility) {
+      case OffenderEligibilityResult.Eligible:
+        caseEligibility = true
+        break
+      case OffenderEligibilityResult.Ineligible:
+        caseEligibility = false
+        break
+      case OffenderEligibilityResult.IneligibleDisplayWarning:
+        throw new IneligibilityCaseWarningRequired(crn, page)
     }
 
-    return next.handle().pipe(map(x => ({ ...x, caseEligibility: eligible })))
+    return next.handle().pipe(map(x => ({ ...x, caseEligibility })))
   }
 }

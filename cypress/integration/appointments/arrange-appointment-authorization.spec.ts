@@ -19,6 +19,6 @@ context('Arrange appointment authorization', () => {
   it('is unauthorized for non-caseload offenders', () => {
     cy.seed({ cases: [] })
     cy.arrangeAppointment()
-    page.pageTitle.contains('Select a case on your caseload')
+    page.pageTitle.contains('You cannot perform this action')
   })
 })

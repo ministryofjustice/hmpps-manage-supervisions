@@ -4,14 +4,13 @@ import { LoginGuard } from './login.guard'
 import { URL } from 'url'
 import { LoginService } from './login.service'
 import { createStubInstance } from 'sinon'
+import { fakeExecutionContext } from '../../util/nest.fake'
 
 describe('LoginGuard', () => {
   let subject: LoginGuard
   const request: any = {}
 
-  const context: any = {
-    switchToHttp: () => ({ getRequest: () => request }),
-  }
+  const context = fakeExecutionContext({ request })
 
   beforeEach(async () => {
     const service = createStubInstance(LoginService)
