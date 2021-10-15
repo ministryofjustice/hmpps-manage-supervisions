@@ -9,4 +9,11 @@ context('Static pages', () => {
     cy.title().should('eq', 'Accessibility statement')
     cy.testA11y()
   })
+
+  it('Cookies policy renders correctly', () => {
+    cy.home()
+    cy.contains('Cookies').click()
+    cy.title().should('eq', 'Cookies')
+    cy.testA11y()
+  })
 })

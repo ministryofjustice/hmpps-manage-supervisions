@@ -12,4 +12,10 @@ export class StaticController {
     const { domain } = this.config.get<ServerConfig>('server')
     return { links: { domain } }
   }
+
+  @Get('cookies')
+  @Render('static/cookies')
+  async getCookies() {
+    // Do nothing.
+  }
 }
