@@ -18,4 +18,11 @@ export class StaticController {
   async getCookies() {
     // Do nothing.
   }
+
+  @Get('privacy')
+  @Render('static/privacy')
+  async getPrivacyNotice() {
+    const { domain } = this.config.get<ServerConfig>('server')
+    return { links: { domain } }
+  }
 }

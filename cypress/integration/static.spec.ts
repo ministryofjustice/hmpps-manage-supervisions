@@ -16,4 +16,11 @@ context('Static pages', () => {
     cy.title().should('eq', 'Cookies')
     cy.testA11y()
   })
+
+  it('Privacy notice renders correctly', () => {
+    cy.home()
+    cy.contains('Privacy').click()
+    cy.title().should('eq', 'Privacy notice')
+    cy.testA11y()
+  })
 })
