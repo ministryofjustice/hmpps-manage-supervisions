@@ -103,6 +103,7 @@ function requireBearerToken(api: ApiName, token: string): SeedFn {
 export interface StubHmppsAuthOptions {
   username?: string
   role?: Role
+  auth_source?: string
 }
 
 /**
@@ -110,7 +111,11 @@ export interface StubHmppsAuthOptions {
  * Modify all community API & assess risks & needs API endpoints to require the client credentials bearer token.
  * This is only to be used where a real instance of hmpps-auth is unavailable or unpractical i.e. e2e tests.
  */
-export function hmppsAuthStub({ username = USERNAME, role = Role.Write }: StubHmppsAuthOptions = {}) {
+export function hmppsAuthStub({
+  username = USERNAME,
+  role = Role.Write,
+  auth_source = 'delius',
+}: StubHmppsAuthOptions = {}) {
   const SECRET = 'hmpps-auth-secret'
   const tokens = {
     deliusUser: jwt.sign(
@@ -119,7 +124,7 @@ export function hmppsAuthStub({ username = USERNAME, role = Role.Write }: StubHm
         client_id: 'api-client-id',
         user_id: '2500000001',
         user_name: username,
-        auth_source: 'delius',
+        auth_source,
         name: 'Some User',
         scope: ['read', 'write'],
         authorities: ROLES[role].authorities,
