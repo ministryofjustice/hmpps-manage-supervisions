@@ -1,0 +1,15 @@
+{% extends "partials/layout.njk" %}
+
+{% set pageTitle = applicationName + " - Unauthorized, not delius user" %}
+
+{% block content %}
+
+    <h1 class='govuk-heading-xl'>You need a Delius account to use this service</h1>
+    <p class='govuk-body'>
+        Try signing in with your Delius account if you have one.
+    </p>
+    <p class='govuk-body'>
+        Contact the Manage supervisions support team if you require further assistance: <a href="mailto:manage-supervisions-support@digital.justice.gov.uk">manage-supervisions-support<wbr>@digital.justice.gov.uk</a>.
+    </p>
+
+{% endblock %}

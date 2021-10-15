@@ -2,6 +2,9 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logge
 import type { Request, Response } from 'express'
 import { SanitisedAxiosError } from './common/rest'
 import { LoginService } from './security/login/login.service'
+import { Config, ServerConfig } from './config'
+import { ConfigService } from '@nestjs/config'
+import { NotDeliusUserError } from './common/NotDeliusUserError'
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -15,20 +18,31 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if (exception instanceof SanitisedAxiosError) {
       return this.handleAxiosError(exception, host)
     }
-
+    if (exception instanceof NotDeliusUserError) {
+      return this.handleNotDeliusUserError(host)
+    }
     return this.renderErrorPage(exception, host)
   }
 
   private renderErrorPage(exception: Error, host: ArgumentsHost, status = HttpStatus.INTERNAL_SERVER_ERROR) {
-    const viewModel = { message: exception.message, status, stack: exception.stack }
+    const { isProduction } = this.config.get<ServerConfig>('server')
+    const viewModel = {
+      message: isProduction ? null : exception.message,
+      status,
+      stack: isProduction ? null : exception.stack,
+    }
     this.logger.error('unhandled exception', exception)
     return host.switchToHttp().getResponse<Response>().status(status).render('pages/error', viewModel)
+  }
+  private renderNotFoundPage(exception: Error, host: ArgumentsHost) {
+    this.logger.error('unhandled exception', exception)
+    return host.switchToHttp().getResponse<Response>().status(HttpStatus.NOT_FOUND).render('pages/not-found')
   }
 
   private handleAxiosError(exception: SanitisedAxiosError, host: ArgumentsHost) {
     switch (exception.response?.status) {
       case HttpStatus.NOT_FOUND:
-        return this.renderErrorPage(exception, host, HttpStatus.NOT_FOUND)
+        return this.renderNotFoundPage(exception, host)
 
       default:
         return this.renderErrorPage(exception, host)
@@ -68,5 +82,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
       default:
         return this.renderErrorPage(exception, host, status)
     }
+  }
+  constructor(private readonly config: ConfigService<Config>) {}
+
+  private handleNotDeliusUserError(host: ArgumentsHost) {
+    const http = host.switchToHttp()
+    const response = http.getResponse<Response>()
+    return response.status(HttpStatus.UNAUTHORIZED).render('pages/not-delius-user')
   }
 }
