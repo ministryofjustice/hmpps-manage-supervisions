@@ -11,10 +11,8 @@
                 Try again later.
             </p>
             <p class='govuk-body'>
-                If you continue to see this error contact the Manage supervisions support team: <a
-                        href="mailto:manage-supervisions-support@digital.justice.gov.uk">manage-supervisions-support
-                    <wbr>
-                    @digital.justice.gov.uk</a>.
+                If you continue to see this error contact the {{ applicationName }} support team:
+                {{ appEmail(supportEmail) }}.
             </p>
 
             {% if stack %}

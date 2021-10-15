@@ -35,6 +35,7 @@ export interface ServerConfig {
   features: Partial<Record<FeatureFlags, boolean>>
   logLevel: LogLevel
   sentryDsn?: string
+  supportEmail: string
 }
 
 export interface RedisConfig {

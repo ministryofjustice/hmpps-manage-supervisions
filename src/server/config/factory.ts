@@ -301,6 +301,7 @@ export function configFactory(): Config {
       features,
       logLevel: stringEnum(LogLevel, 'LOG_LEVEL', fallback(LogLevel.Info)),
       sentryDsn: string('SENTRY_DSN', developmentOnly(null)),
+      supportEmail: string('SUPPORT_EMAIL', fallback('manage-supervisions-support@digital.justice.gov.uk')),
     },
     redis: {
       host: string('REDIS_HOST', developmentOnly('localhost')),

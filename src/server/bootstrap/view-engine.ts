@@ -8,10 +8,13 @@ import { camelCase } from 'lodash'
 import * as filters from './nunjucks/filters'
 
 export function useGovUkUi(app: NestExpressApplication) {
-  const { description, isProduction, staticResourceCacheDuration } = app.get(ConfigService).get<ServerConfig>('server')
+  const { description, isProduction, staticResourceCacheDuration, supportEmail } = app
+    .get(ConfigService)
+    .get<ServerConfig>('server')
   const logger = new Logger('view-engine')
 
   app.setLocal('applicationName', description)
+  app.setLocal('supportEmail', supportEmail)
 
   const viewsPath = path.resolve(__dirname, 'views')
   const environment = nunjucks.configure([viewsPath], {

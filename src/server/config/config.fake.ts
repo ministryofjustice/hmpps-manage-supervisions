@@ -40,6 +40,7 @@ export const fakeConfig = fake<Config>(() => ({
     },
     logLevel: LogLevel.Info,
     sentryDsn: faker.internet.url(),
+    supportEmail: faker.internet.email(),
   },
   redis: {
     host: faker.internet.domainName(),
