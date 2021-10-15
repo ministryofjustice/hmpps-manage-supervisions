@@ -4,65 +4,58 @@ import { SinonStubbedInstance, createStubInstance, match } from 'sinon'
 import { TokenVerificationService } from '../token-verification/token-verification.service'
 import { fakeUser } from '../user/user.fake'
 import { PUBLIC_KEY } from './public.decorator'
-
-const handler = 'handler'
-const cls = 'cls'
+import { FAKE_CLASS, FAKE_HANDLER, fakeExecutionContext } from '../../util/nest.fake'
 
 describe('AuthenticatedGuard', () => {
   let subject: AuthenticatedGuard
   let reflector: SinonStubbedInstance<Reflector>
   let tokenVerification: SinonStubbedInstance<TokenVerificationService>
-  let user: User
-  let isAuthenticated: boolean
-  let locals: any
-  const context: any = {
-    switchToHttp: () => ({
-      getRequest: () => ({ user, isAuthenticated: () => isAuthenticated }),
-      getResponse: () => ({ locals }),
-    }),
-    getHandler: () => handler,
-    getClass: () => cls,
-  }
+  const user = fakeUser()
 
   beforeEach(async () => {
-    user = fakeUser()
-    isAuthenticated = true
-    locals = {}
     reflector = createStubInstance(Reflector)
     tokenVerification = createStubInstance(TokenVerificationService)
     subject = new AuthenticatedGuard(reflector as any, tokenVerification as any)
   })
 
+  function whenActivating(isAuthenticated: boolean, locals: any = {}) {
+    const context = fakeExecutionContext({
+      request: { user, isAuthenticated: () => isAuthenticated },
+      response: { locals },
+    })
+    return subject.canActivate(context)
+  }
+
   it('is public', async () => {
-    reflector.getAllAndOverride.withArgs(PUBLIC_KEY, match.array.deepEquals([handler, cls])).returns(true)
-    const result = await subject.canActivate(context)
+    reflector.getAllAndOverride.withArgs(PUBLIC_KEY, match.array.deepEquals([FAKE_HANDLER, FAKE_CLASS])).returns(true)
+    const locals: any = {}
+    const result = await whenActivating(false, locals)
     expect(result).toBe(true)
     expect(locals.isPublic).toBe(true)
   })
 
   it('is not authenticated', async () => {
-    isAuthenticated = false
-    const result = await subject.canActivate(context)
+    const result = await whenActivating(false)
     expect(result).toBe(false)
   })
 
   it('token verification is disabled', async () => {
     tokenVerification.isEnabled.returns(false)
-    const result = await subject.canActivate(context)
+    const result = await whenActivating(true)
     expect(result).toBe(true)
   })
 
   it('token is invalid', async () => {
     tokenVerification.isEnabled.returns(true)
     tokenVerification.verifyToken.withArgs(user).resolves(false)
-    const result = await subject.canActivate(context)
+    const result = await whenActivating(true)
     expect(result).toBe(false)
   })
 
   it('token is valid', async () => {
     tokenVerification.isEnabled.returns(true)
     tokenVerification.verifyToken.withArgs(user).resolves(true)
-    const result = await subject.canActivate(context)
+    const result = await whenActivating(true)
     expect(result).toBe(true)
   })
 })

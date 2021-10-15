@@ -1,17 +1,18 @@
 {% extends "partials/layout.njk" %}
 
-{% set pageTitle = "Select a case on your caseload" %}
+{% set pageTitle = 'You cannot perform this action' %}
 
 {% block content %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <h1 class="govuk-heading-xl">{{ pageTitle }}</h1>
 
-            <p class='govuk-!-margin-bottom-5'>
-                In order to perform this action, the case must be eligible for the pilot and be on your caseload.
-            </p>
+            <p>You do not have permission to do this on a case that’s not in your caseload.</p>
 
-            {{ govukButton({ text: 'Back to your cases', href: links.cases }) }}
+            <p>
+                Contact the Manage supervisions support team if you require further assistance:
+                <a href="mailto:manage-supervisions-support@digital.justice.gov.uk">manage-supervisions-support<wbr>@digital.justice.gov.uk</a>.
+            </p>
         </div>
     </div>
 {% endblock %}

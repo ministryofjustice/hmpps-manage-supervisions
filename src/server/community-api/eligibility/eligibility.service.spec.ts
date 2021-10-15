@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing'
-import { EligibilityService } from './eligibility.service'
+import { EligibilityService, OffenderEligibilityResult } from './eligibility.service'
 import { MockCommunityApiModule, MockCommunityApiService } from '../community-api.mock'
 import { CommunityApiService } from '../community-api.service'
 import { match } from 'sinon'
@@ -44,44 +44,37 @@ describe('EligibilityService', () => {
     })
   })
 
-  describe('is eligible offender', () => {
-    it('succeeds for eligible offender', async () => {
+  describe('check offender eligibility', () => {
+    it('is eligible from session', async () => {
+      const session: LocalSessionData = Object.freeze({ eligibility: { 'some-crn': true } })
+      const observed = await subject.checkOffenderEligibility(session as any, 'some-crn')
+      expect(observed).toBe(OffenderEligibilityResult.Eligible)
+    })
+
+    it('is ineligible from session', async () => {
+      const session: LocalSessionData = Object.freeze({ eligibility: { 'some-crn': false } })
+      const observed = await subject.checkOffenderEligibility(session as any, 'some-crn')
+      expect(observed).toBe(OffenderEligibilityResult.Ineligible)
+    })
+
+    it('is eligible from api', async () => {
       community.offender.getManageSupervisionsEligibilityUsingGET
         .withArgs(match({ crn: 'some-crn' }))
         .resolves(fakeOkResponse(fakeStaffCaseloadEntry()))
-      const result = await subject.isEligibleOffender('some-crn')
-      expect(result).toBe(true)
-    })
-
-    it('fails for ineligible offender', async () => {
-      community.offender.getManageSupervisionsEligibilityUsingGET
-        .withArgs(match({ crn: 'some-other-crn' }))
-        .throws(fakeRestError(HttpStatus.NOT_FOUND))
-      const result = await subject.isEligibleOffender('some-other-crn')
-      expect(result).toBe(false)
-    })
-  })
-
-  describe('should display eligibility warning', () => {
-    it('sets displayed crn when session empty', () => {
       const session: LocalSessionData = {}
-      const observed = subject.shouldDisplayEligibilityWarning(session as any, 'some-crn')
-      expect(observed).toBe(true)
-      expect(session).toEqual({ eligibility: { warningDisplayed: ['some-crn'] } } as LocalSessionData)
+      const observed = await subject.checkOffenderEligibility(session as any, 'some-crn')
+      expect(observed).toBe(OffenderEligibilityResult.Eligible)
+      expect(session).toEqual({ eligibility: { 'some-crn': true } })
     })
 
-    it('sets displayed crn when not displayed', () => {
-      const session: LocalSessionData = { eligibility: { warningDisplayed: ['some-other-crn'] } }
-      const observed = subject.shouldDisplayEligibilityWarning(session as any, 'some-crn')
-      expect(observed).toBe(true)
-      expect(session).toEqual({ eligibility: { warningDisplayed: ['some-other-crn', 'some-crn'] } } as LocalSessionData)
-    })
-
-    it('has no side effects when already displayed', () => {
-      const session: LocalSessionData = { eligibility: { warningDisplayed: ['some-crn'] } }
-      const observed = subject.shouldDisplayEligibilityWarning(session as any, 'some-crn')
-      expect(observed).toBe(false)
-      expect(session).toEqual({ eligibility: { warningDisplayed: ['some-crn'] } } as LocalSessionData)
+    it('is ineligible from api', async () => {
+      community.offender.getManageSupervisionsEligibilityUsingGET
+        .withArgs(match({ crn: 'some-crn' }))
+        .throws(fakeRestError(HttpStatus.NOT_FOUND))
+      const session: LocalSessionData = {}
+      const observed = await subject.checkOffenderEligibility(session as any, 'some-crn')
+      expect(observed).toBe(OffenderEligibilityResult.IneligibleDisplayWarning)
+      expect(session).toEqual({ eligibility: { 'some-crn': false } })
     })
   })
 })

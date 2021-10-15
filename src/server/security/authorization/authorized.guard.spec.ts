@@ -5,67 +5,57 @@ import { fakeUser } from '../user/user.fake'
 import { ROLES_KEY } from './roles.decorator'
 import { Role } from './authorization.types'
 import { UnauthorizedException } from '@nestjs/common'
-
-const handler = 'handler'
-const cls = 'cls'
+import { FAKE_CLASS, FAKE_HANDLER, fakeExecutionContext } from '../../util/nest.fake'
 
 describe('AuthorizedGuard', () => {
   let subject: AuthorizedGuard
   let reflector: SinonStubbedInstance<Reflector>
-  let user: User
-  let isAuthenticated: boolean
-  let locals: any
-  const context: any = {
-    switchToHttp: () => ({
-      getRequest: () => ({ user, isAuthenticated: () => isAuthenticated }),
-      getResponse: () => ({ locals }),
-    }),
-    getHandler: () => handler,
-    getClass: () => cls,
-  }
 
-  beforeEach(async () => {
-    user = fakeUser({ authorities: [Role.ReadOnly] })
-    isAuthenticated = true
-    locals = {}
+  beforeAll(async () => {
     reflector = createStubInstance(Reflector)
     subject = new AuthorizedGuard(reflector as any)
   })
 
+  function havingEndpointRoles(...roles: Role[]) {
+    reflector.getAllAndOverride.withArgs(ROLES_KEY, match.array.deepEquals([FAKE_HANDLER, FAKE_CLASS])).returns(roles)
+  }
+
+  function whenActivating(isAuthenticated: boolean, locals: any = {}) {
+    const context = fakeExecutionContext({
+      request: { user: fakeUser({ authorities: [Role.ReadOnly] }), isAuthenticated: () => isAuthenticated },
+      response: { locals },
+    })
+    return subject.canActivate(context)
+  }
+
   it('is always authorised when public', async () => {
-    locals.isPublic = true
-    const result = await subject.canActivate(context)
+    const result = whenActivating(false, { isPublic: true })
     expect(result).toBe(true)
   })
 
   it('is not authenticated', async () => {
-    isAuthenticated = false
-    await expect(() => subject.canActivate(context)).toThrow('authorization requires authentication')
+    await expect(() => whenActivating(false)).toThrow('authorization requires authentication')
   })
 
   it('is authorized for endpoint with no roles specified', async () => {
     havingEndpointRoles()
-    const result = await subject.canActivate(context)
+    const result = whenActivating(true)
     expect(result).toBe(true)
   })
 
   it('is authorized for endpoint with default behaviour', async () => {
-    const result = await subject.canActivate(context)
+    const result = whenActivating(true)
     expect(result).toBe(true)
   })
 
   it('is authorised when has specified role', async () => {
     havingEndpointRoles(Role.ReadOnly)
-    const result = await subject.canActivate(context)
+    const result = whenActivating(true)
     expect(result).toBe(true)
   })
 
   it('is not authorised when does not have specified role', async () => {
     havingEndpointRoles(Role.ReadWrite)
-    expect(() => subject.canActivate(context)).toThrow(UnauthorizedException)
+    expect(() => whenActivating(true)).toThrow(UnauthorizedException)
   })
-
-  function havingEndpointRoles(...roles: Role[]) {
-    reflector.getAllAndOverride.withArgs(ROLES_KEY, match.array.deepEquals([handler, cls])).returns(roles)
-  }
 })

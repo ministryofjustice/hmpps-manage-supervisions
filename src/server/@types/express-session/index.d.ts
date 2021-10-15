@@ -1,12 +1,10 @@
 import 'express-session'
 
 interface LocalSessionData {
-  eligibility?: {
-    /**
-     * Offender CRNs that have had the full-screen eligibility warning displayed.
-     */
-    warningDisplayed?: string[]
-  }
+  /**
+   * Map of offender CRNs to app eligibility.
+   */
+  eligibility?: Record<string, boolean>
 }
 
 declare module 'express-session' {
