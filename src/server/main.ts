@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config'
 import { Logger } from '@nestjs/common'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { AppModule } from './app.module'
-import { useBodyParser, useGovUkUi, useRedisSession, useTrustProxy } from './bootstrap'
+import { upperCaseCrns, useBodyParser, useGovUkUi, useRedisSession, useTrustProxy } from './bootstrap'
 import { ServerConfig } from './config'
 import { Settings } from 'luxon'
 import { LoggerModule } from './logger/logger.module'
@@ -20,6 +20,7 @@ async function bootstrap() {
   useTrustProxy(app)
   useRedisSession(app)
   useGovUkUi(app)
+  upperCaseCrns(app)
 
   const serverConfig = app.get(ConfigService).get<ServerConfig>('server')
   await app.listen(serverConfig.port)
