@@ -3,21 +3,26 @@
 {% set pageTitle = applicationName + " - Unauthorized" %}
 
 {% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class='govuk-heading-xl'>Your Delius account needs permission to use this service</h1>
 
-    <h1 class='govuk-heading-xl'>Your Delius account needs permission to use this service</h1>
-
-    <p class='govuk-body'>
-        You need to contact the person who manages your Delius account so they can give you permission.
-    </p>
-    <p class='govuk-body'>
-        They need to assign one of the following roles using Delius’s User Management Tool (UMT):
-    </p>
-    <ul class="govuk-list govuk-list--bullet">
-        <li>Manage Supervisions – MASBT002</li>
-        <li>View Supervisions – MASBT001</li>
-    </ul>
-    <p class='govuk-body'>
-        Contact the Manage supervisions support team if you require further assistance: <a href="mailto:manage-supervisions-support@digital.justice.gov.uk">manage-supervisions-support<wbr>@digital.justice.gov.uk</a>.
-    </p>
-
+            <p class='govuk-body'>
+                You need to contact the person who manages your Delius account so they can give you permission.
+            </p>
+            <p class='govuk-body'>
+                They need to assign one of the following roles using Delius’s User Management Tool (UMT):
+            </p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>Manage Supervisions – MASBT002</li>
+                <li>View Supervisions – MASBT001</li>
+            </ul>
+            <p class='govuk-body'>
+                Contact the Manage supervisions support team if you require further assistance: <a
+                        href="mailto:manage-supervisions-support@digital.justice.gov.uk">manage-supervisions-support
+                    <wbr>
+                    @digital.justice.gov.uk</a>.
+            </p>
+        </div>
+    </div>
 {% endblock %}

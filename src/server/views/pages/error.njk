@@ -3,18 +3,25 @@
 {% set pageTitle = applicationName + " - Service error" %}
 
 {% block content %}
-  <h1 class='govuk-heading-xl'>Sorry, there is a problem with the service</h1>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class='govuk-heading-xl'>Sorry, there is a problem with the service</h1>
 
-  <p class='govuk-body'>
-    Try again later.
-  </p>
-  <p class='govuk-body'>
-    If you continue to see this error contact the Manage supervisions support team: <a href="mailto:manage-supervisions-support@digital.justice.gov.uk">manage-supervisions-support<wbr>@digital.justice.gov.uk</a>.
-  </p>
+            <p class='govuk-body'>
+                Try again later.
+            </p>
+            <p class='govuk-body'>
+                If you continue to see this error contact the Manage supervisions support team: <a
+                        href="mailto:manage-supervisions-support@digital.justice.gov.uk">manage-supervisions-support
+                    <wbr>
+                    @digital.justice.gov.uk</a>.
+            </p>
 
-  {% if stack %}
-    <h1>{{ message }}</h1>
-    <h2>{{ status }}</h2>
-    <pre>{{ stack }}</pre>
-  {% endif %}
+            {% if stack %}
+                <h1>{{ message }}</h1>
+                <h2>{{ status }}</h2>
+                <pre>{{ stack }}</pre>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
