@@ -20,7 +20,7 @@
             <tbody class="govuk-table__body">
             {% for appointment in appointments %}
                 <tr class="govuk-table__row" >
-                    <td class="govuk-table__cell" data-qa='date'>
+                    <th class="govuk-table__cell" data-qa='date'>
                         {% if appointment.today %}
                             {% set insetToday %}
                                 <strong>Today</strong><br/>
@@ -33,11 +33,12 @@
                         {% else %}
                             {{ appointment.start | longDate }}
                         {% endif %}
-                    </td>
+                    </th>
                     <td class="govuk-table__cell" data-qa='time'>{{ appointment.start | timeRange(appointment.end) }}</td>
                     <td class="govuk-table__cell" data-qa='appointment'>
                     <a  href="{{ appointment.link }}">
-                        {{ appointment.name }}
+                      {{ appointment.name }}
+                      <span class="govuk-visually-hidden"> on {{ appointment.start | longDate }}</span>
                     </a>
                     </td>
                 </tr>
