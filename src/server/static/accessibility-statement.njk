@@ -5,8 +5,8 @@
 {% block content %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-l">Accessibility statement for Manage supervisions</h1>
-            <p class="govuk-body">This page only contains information about the Manage supervisions service, available at: <a href="{{ links.domain }}" class="govuk-link govuk-link--no-visited-state">{{ links.domain }}</a></p>
+            <h1 class="govuk-heading-l">Accessibility statement for {{ applicationName }}</h1>
+            <p class="govuk-body">This page only contains information about the {{ applicationName }} service, available at: <a href="{{ links.domain }}" class="govuk-link govuk-link--no-visited-state">{{ links.domain }}</a></p>
 
             <h2 class="govuk-heading-m">Using this service</h2>
             <p class="govuk-body">This service is run by HMPPS Digital Services. We want as many people as possible to be able to use this service. </p>
@@ -28,12 +28,12 @@
             </ul>
 
             <h2 class="govuk-heading-m">Feedback and contact information</h2>
-            <p class="govuk-body">If you have difficulty using this service, email: <a href="mailto:manage-supervisions-support@digital.justice.gov.uk" class="govuk-link govuk-link--no-visited-state">manage-supervisions-support@digital.justice.gov.uk</a> </p>
+            <p class="govuk-body">If you have difficulty using this service, email: {{ appEmail(supportEmail) }} </p>
             <p class="govuk-body">As part of providing this service, we may need to send you messages or documents.  We’ll ask you how you want us to send messages or documents to you, but contact us if you need them in a different format. For example large print, audio recording or braille.</p>
 
             <h2 class="govuk-heading-m">Reporting accessibility problems with this service</h2>
             <p class="govuk-body">We’re always looking to improve the accessibility of this service.</p>
-            <p class="govuk-body">If you find any problems that are not listed on this page or think we’re not meeting accessibility requirements, email: <a href="mailto:manage-supervisions-support@digital.justice.gov.uk" class="govuk-link govuk-link--no-visited-state">manage-supervisions-support@digital.justice.gov.uk</a> </p>
+            <p class="govuk-body">If you find any problems that are not listed on this page or think we’re not meeting accessibility requirements, email: {{ appEmail(supportEmail) }} </p>
 
             <h2 class="govuk-heading-m">Enforcement procedure</h2>
             <p class="govuk-body">The Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the ‘accessibility regulations’).</p>

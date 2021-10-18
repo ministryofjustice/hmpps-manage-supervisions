@@ -27,6 +27,7 @@
 {% from "govuk/components/breadcrumbs/macro.njk"      import govukBreadcrumbs %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "components/footer.njk" import appFooter %}
+{% from 'components/email.njk' import appEmail %}
 
 {% block head %}
   <link href="/assets/client.css?{{ version }}" rel="stylesheet"/>
@@ -58,7 +59,7 @@
   {% set metaHtml %}
     <h3 class="govuk-heading-m">Support</h3>
     <p class="govuk-footer__meta-custom govuk-list govuk-!-margin-bottom-8">
-      Email <a class="govuk-link govuk-footer__link" href="mailto:manage-supervisions-support@digital.justice.gov.uk">manage-supervisions-support<wbr>@digital.justice.gov.uk</a> for support.
+      Email {{ appEmail(supportEmail, { classes: 'govuk-link govuk-footer__link' }) }} for support.
       <br />We will respond within 5 working days.
     </p>
   {% endset %}

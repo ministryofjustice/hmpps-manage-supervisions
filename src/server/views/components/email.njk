@@ -1,0 +1,5 @@
+{%- macro appEmail(value, params) %}
+    <a {%- if params.classes %} class="{{ params.classes }}" {% endif %} href="mailto:{{ value }}">
+        {{ value | email | safe }}
+    </a>
+{% endmacro -%}
