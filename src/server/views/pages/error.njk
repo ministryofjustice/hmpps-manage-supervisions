@@ -1,11 +1,27 @@
 {% extends "../partials/layout.njk" %}
 
-{% set pageTitle = applicationName + " - Error" %}
+{% set pageTitle = "Sorry, there is a problem with the service" %}
 
 {% block content %}
-  <main class="app-container">
-    <h1>{{ message }}</h1>
-    <h2>{{ status }}</h2>
-    <pre>{{ stack }}</pre>
-  </main>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class='govuk-heading-xl'>{{ pageTitle }}</h1>
+
+            <p class='govuk-body'>
+                Try again later.
+            </p>
+            <p class='govuk-body'>
+                If you continue to see this error contact the Manage supervisions support team: <a
+                        href="mailto:manage-supervisions-support@digital.justice.gov.uk">manage-supervisions-support
+                    <wbr>
+                    @digital.justice.gov.uk</a>.
+            </p>
+
+            {% if stack %}
+                <h1>{{ message }}</h1>
+                <h2>{{ status }}</h2>
+                <pre>{{ stack }}</pre>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}

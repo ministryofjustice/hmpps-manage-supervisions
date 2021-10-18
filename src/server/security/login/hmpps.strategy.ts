@@ -7,6 +7,7 @@ import { UserService } from '../user/user.service'
 import { generateOauthClientToken } from '../../common'
 import { titleCase, urlJoin } from '../../util'
 import * as jwt from 'jsonwebtoken'
+import { NotDeliusUserError } from '../../common/NotDeliusUserError'
 
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
@@ -52,7 +53,7 @@ export class HmppsStrategy extends PassportStrategy(Strategy, 'hmpps') {
 
     if (claims.auth_source !== 'delius') {
       this.logger.log(`user '${claims.sub}' attempted login with auth_source '${claims.auth_source}'`)
-      return null
+      throw new NotDeliusUserError(claims.sub)
     }
 
     const user = {

@@ -49,7 +49,17 @@ context('Cases', () => {
 
     it('is unauthorized', () => {
       cy.home()
-      casesPage.pageTitle.contains('Access denied')
+      casesPage.pageTitle.contains('Your Delius account needs permission')
+    })
+  })
+  describe('non delius user', () => {
+    before(() => {
+      cy.seed({ auth_source: 'notDelius' })
+    })
+
+    it('is unauthorized', () => {
+      cy.home()
+      casesPage.pageTitle.contains('You need a Delius account')
     })
   })
 })

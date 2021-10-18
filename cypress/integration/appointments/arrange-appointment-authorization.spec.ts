@@ -7,13 +7,13 @@ context('Arrange appointment authorization', () => {
   it('is unauthorized for read only users', () => {
     cy.seed({ role: Role.Read })
     cy.arrangeAppointment()
-    page.pageTitle.contains('Access denied')
+    page.pageTitle.contains('Your Delius account needs permission')
   })
 
   it('is unauthorized for unknown users', () => {
     cy.seed({ role: Role.None })
     cy.arrangeAppointment()
-    page.pageTitle.contains('Access denied')
+    page.pageTitle.contains('Your Delius account needs permission')
   })
 
   it('is unauthorized for non-caseload offenders', () => {
