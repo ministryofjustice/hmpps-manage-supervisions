@@ -174,7 +174,7 @@ interface ExpectedCircumstance {
   startDate: string
   endDate?: string
   verified: boolean
-  previous: boolean
+  previous?: boolean
   notes?: string
   lastUpdated: string
 }
@@ -315,7 +315,6 @@ context('Case personal details tab', () => {
         startDate: '3 March 2021',
         verified: false,
         lastUpdated: '4 March 2021',
-        previous: true,
       })
       .shouldRenderPersonalCircumstance({
         type: 'Relationship',
