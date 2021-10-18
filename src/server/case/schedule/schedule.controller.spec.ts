@@ -7,7 +7,6 @@ import { FakeConfigModule } from '../../config/config.fake'
 import { fakeOffenderDetailSummary } from '../../community-api/community-api.fake'
 import { CasePage } from '../case.types'
 import { fakeAppointmentListViewModel } from './schedule.fake'
-import { FeatureFlags } from '../../config'
 import { fakeSecurityContext } from '../../security/context/security-context.fake'
 import { Role } from '../../security'
 import { EligibilityService } from '../../community-api/eligibility'
@@ -30,7 +29,7 @@ describe('ScheduleController', () => {
         { provide: EligibilityService, useValue: null },
         { provide: LinksService, useValue: null },
       ],
-      imports: [FakeConfigModule.register({ server: { features: { [FeatureFlags.EnableAppointmentBooking]: true } } })],
+      imports: [FakeConfigModule.register({ server: { features: {} } })],
     }).compile()
 
     subject = module.get(ScheduleController)

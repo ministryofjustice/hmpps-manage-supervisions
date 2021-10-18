@@ -1,8 +1,6 @@
 import { URL } from 'url'
 
-export enum FeatureFlags {
-  EnableAppointmentBooking = 'enable-appointment-booking',
-}
+export enum FeatureFlags {}
 
 /**
  * These align to a subset of npm log levels that are supported by winston.

@@ -315,6 +315,7 @@ context('Case personal details tab', () => {
         startDate: '3 March 2021',
         verified: false,
         lastUpdated: '4 March 2021',
+        previous: true,
       })
       .shouldRenderPersonalCircumstance({
         type: 'Relationship',

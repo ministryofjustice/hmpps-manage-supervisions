@@ -10,14 +10,7 @@ import {
   OfficeLocation,
   PersonalCircumstance,
 } from '../community-api/client'
-import {
-  Config,
-  WellKnownAppointmentType,
-  ContactTypeCategory,
-  WellKnownContactTypeConfig,
-  ServerConfig,
-  FeatureFlags,
-} from '../config'
+import { Config, WellKnownAppointmentType, ContactTypeCategory, WellKnownContactTypeConfig } from '../config'
 import { AvailableAppointmentTypes, FeaturedAppointmentType } from './dto/AppointmentWizardViewModel'
 import { ConfigService } from '@nestjs/config'
 import { isActiveDateRange } from '../util'
@@ -61,10 +54,6 @@ export class ArrangeAppointmentService {
   }
 
   async createAppointment(builder: AppointmentBuilderDto, crn: string): Promise<AppointmentCreateResponse> {
-    if (!this.config.get<ServerConfig>('server').features[FeatureFlags.EnableAppointmentBooking]) {
-      throw new Error('Appointment booking is currently disabled')
-    }
-
     const appointmentType = await this.getAppointmentType(builder)
     if (!appointmentType) {
       throw new Error('appointment type is not set')
