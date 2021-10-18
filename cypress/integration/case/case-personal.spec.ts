@@ -174,7 +174,7 @@ interface ExpectedCircumstance {
   startDate: string
   endDate?: string
   verified: boolean
-  previous: boolean
+  previous?: boolean
   notes?: string
   lastUpdated: string
 }

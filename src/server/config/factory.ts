@@ -225,9 +225,7 @@ export const CONTACT_DEFAULTS: WellKnownContactTypeConfig = {
   ],
 }
 
-const FEATURE_DEFAULTS: Record<FeatureFlags, boolean> = {
-  [FeatureFlags.EnableAppointmentBooking]: true,
-}
+const FEATURE_DEFAULTS: Record<FeatureFlags, boolean> = {}
 
 export function configFactory(): Config {
   const authUrl = url('HMPPS_AUTH_URL', developmentOnly('http://localhost:9090/auth'))
@@ -273,13 +271,13 @@ export function configFactory(): Config {
 
   const features = Object.values(FeatureFlags)
     .map(feature => {
-      const defaultCode = FEATURE_DEFAULTS[feature as FeatureFlags]
+      const defaultCode = FEATURE_DEFAULTS[feature as unknown as FeatureFlags]
       const key = toEnvVar(feature)
       return {
         [feature]: bool(key, fallback(defaultCode)),
       }
     })
-    .reduce((x, y) => ({ ...x, ...y })) as Record<FeatureFlags, boolean>
+    .reduce((x, y) => ({ ...x, ...y }), {}) as Record<FeatureFlags, boolean>
 
   const tokenVerificationEnabled = bool('TOKEN_VERIFICATION_ENABLED', fallback(false))
 
