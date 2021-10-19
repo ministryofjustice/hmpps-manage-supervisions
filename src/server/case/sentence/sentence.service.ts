@@ -88,7 +88,7 @@ export class SentenceService {
       previousConvictions: previous.length
         ? {
             count: previous.length,
-            lastEnded: DateTime.fromISO(maxBy(previous, x => x.convictionDate).convictionDate),
+            lastEnded: DateTime.fromISO(maxBy(previous, x => x.convictionDate)?.convictionDate),
           }
         : null,
       previousBreaches: {
