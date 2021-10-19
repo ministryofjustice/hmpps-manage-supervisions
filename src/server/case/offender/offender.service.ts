@@ -3,7 +3,17 @@ import { OffenderDetail, OffenderDetailSummary } from '../../community-api/clien
 import { CommunityApiService } from '../../community-api'
 import { CASE_BREADCRUMBS, CasePage, CasePageLinks, CaseViewModel, CaseViewModelBase } from '../case.types'
 import { getDisplayName } from '../../util'
-import { BreadcrumbType, LinksService } from '../../common/links'
+import { BreadcrumbType, LinksHelper, LinksService, ResolveBreadcrumbOptions } from '../../common/links'
+
+export type CasePageLinksOnly<Model extends CaseViewModel> = Omit<Model['links'], keyof CasePageLinks>
+
+export type CasePageOfOptions<Model extends CaseViewModel> = Omit<
+  Model,
+  Exclude<keyof CaseViewModelBase<Model['page'], {}>, 'page'>
+> & {
+  breadcrumb?: { type?: BreadcrumbType; options?: ResolveBreadcrumbOptions }
+  links?: (links: LinksHelper) => CasePageLinksOnly<Model>
+}
 
 @Injectable()
 export class OffenderService {
@@ -21,12 +31,14 @@ export class OffenderService {
 
   casePageOf<Model extends CaseViewModel>(
     offender: OffenderDetailSummary,
-    partial: Omit<Model, Exclude<keyof CaseViewModelBase<Model['page']>, 'page'>>,
-    breadcrumb = CASE_BREADCRUMBS[partial.page],
-    entityName?: string,
+    {
+      breadcrumb: { type: breadcrumb, options: breadcrumbOptions } = {},
+      links: linksFactory,
+      ...partial
+    }: CasePageOfOptions<Model>,
   ): Model {
     const crn = offender.otherIds.crn
-    const links = this.links.of({ crn, offenderName: getDisplayName(offender), entityName })
+    const links = this.links.of({ crn, offenderName: getDisplayName(offender), ...breadcrumbOptions })
     return {
       ...partial,
       ids: {
@@ -35,24 +47,14 @@ export class OffenderService {
       },
       displayName: getDisplayName(offender, { preferredName: true }),
       shortName: getDisplayName(offender, { middleNames: false, preferredName: false }),
-      breadcrumbs: links.breadcrumbs(breadcrumb),
+      breadcrumbs: links.breadcrumbs(breadcrumb || CASE_BREADCRUMBS[partial.page]),
       links: {
         ...Object.values(CasePage).reduce(
           (agg, x) => ({ ...agg, [x]: links.url(CASE_BREADCRUMBS[x]) }),
           {} as CasePageLinks,
         ),
-        arrangeAppointment: links.url(BreadcrumbType.NewAppointment),
-        addActivity: links.url(BreadcrumbType.ExitToDelius),
-        addressBook: links.url(BreadcrumbType.PersonalAddresses),
-        circumstances: links.url(BreadcrumbType.PersonalCircumstances),
-        disabilities: links.url(BreadcrumbType.PersonalDisabilities),
-        toDelius: links.url(BreadcrumbType.ExitToDelius),
-        toOASys: links.url(BreadcrumbType.ExitToOASys),
-        viewInactiveRegistrations: links.url(BreadcrumbType.RemovedRisksList),
-        previousConvictions: links.url(BreadcrumbType.CasePreviousConvictions),
-        startBreach: links.url(BreadcrumbType.ExitToDelius), // TODO: redirecting to delius interstitial for now
-        additionalOffences: links.url(BreadcrumbType.CaseSentenceOffences),
+        ...(linksFactory ? linksFactory(links) : {}),
       },
-    } as Model
+    } as any as Model
   }
 }

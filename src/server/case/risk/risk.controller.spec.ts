@@ -1,54 +1,40 @@
 import { Test } from '@nestjs/testing'
 import { RiskController } from './risk.controller'
 import { MockLinksModule } from '../../common/links/links.mock'
-import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
-import { OffenderService } from '../offender'
+import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { RiskService } from './risk.service'
-import { fakeOffenderDetailSummary } from '../../community-api/community-api.fake'
 import { fakeRegistrationDetails, fakeRiskRegistrations, fakeRisks } from './risk.fake'
 import { RemovedRisksListViewModel, RiskDetailsViewModel } from './risk.types'
-import { BreadcrumbType } from '../../common/links'
-import { OffenderDetail, OffenderDetailSummary } from '../../community-api/client'
+import { BreadcrumbType, UtmMedium } from '../../common/links'
 import { DateTime } from 'luxon'
 import { RedirectResponse } from '../../common'
-import { CasePage } from '../case.types'
+import { CasePage, CaseRiskViewModel } from '../case.types'
 import { EligibilityService } from '../../community-api/eligibility'
+import { MockOffenderModule, OffenderServiceFixture } from '../offender/offender.mock'
 
 describe('RiskController', () => {
   let subject: RiskController
-  let offenderService: SinonStubbedInstance<OffenderService>
+  let offenderFixture: OffenderServiceFixture
   let riskService: SinonStubbedInstance<RiskService>
-  let offender: OffenderDetail | OffenderDetailSummary
 
   beforeEach(async () => {
-    offenderService = createStubInstance(OffenderService)
     riskService = createStubInstance(RiskService)
 
     const module = await Test.createTestingModule({
       controllers: [RiskController],
-      imports: [MockLinksModule],
+      imports: [MockLinksModule, MockOffenderModule.register()],
       providers: [
-        { provide: OffenderService, useValue: offenderService },
         { provide: RiskService, useValue: riskService },
         { provide: EligibilityService, useValue: null },
       ],
     }).compile()
 
     subject = module.get(RiskController)
+    offenderFixture = module.get(OffenderServiceFixture)
   })
 
-  function havingOffenderSummary() {
-    offender = fakeOffenderDetailSummary({
-      firstName: 'Liz',
-      middleNames: ['Danger'],
-      surname: 'Haggis',
-      otherIds: { crn: 'some-crn' },
-    })
-    offenderService.getOffenderSummary.withArgs('some-crn').resolves(offender)
-  }
-
   it('gets removed risk list', async () => {
-    havingOffenderSummary()
+    offenderFixture.havingOffender()
 
     const risks = fakeRiskRegistrations()
     riskService.getRiskRegistrations.withArgs('some-crn').resolves(risks)
@@ -60,14 +46,11 @@ describe('RiskController', () => {
       displayName: 'Liz Danger Haggis',
       breadcrumbs: links.breadcrumbs(BreadcrumbType.RemovedRisksList),
       removedRisks: risks.inactive,
-      links: {
-        toDelius: links.url(BreadcrumbType.ExitToDelius),
-      },
     } as RemovedRisksListViewModel)
   })
 
   it('gets risk detail', async () => {
-    havingOffenderSummary()
+    offenderFixture.havingOffender()
 
     const details = fakeRegistrationDetails()
     riskService.getRiskRegistrationDetails.withArgs('some-crn', 1234).resolves(details)
@@ -79,14 +62,11 @@ describe('RiskController', () => {
       displayName: 'Liz Danger Haggis',
       breadcrumbs: links.breadcrumbs(BreadcrumbType.RiskDetails),
       registration: details,
-      links: {
-        toDelius: links.url(BreadcrumbType.ExitToDelius),
-      },
     } as RiskDetailsViewModel)
   })
 
   it('risk detail redirects to removed risk detail if is removed risk', async () => {
-    havingOffenderSummary()
+    offenderFixture.havingOffender()
 
     const details = fakeRegistrationDetails({
       removed: DateTime.fromObject({ year: 2018, month: 5, day: 2, hour: 10, minute: 23 }),
@@ -96,14 +76,11 @@ describe('RiskController', () => {
 
     const observed = await subject.getRiskDetails('some-crn', 1234)
 
-    expect(observed).toEqual({
-      statusCode: 302,
-      url: details.link,
-    } as RedirectResponse)
+    expect(observed).toEqual({ statusCode: 302, url: details.links.view } as RedirectResponse)
   })
 
   it('gets removed risk detail', async () => {
-    havingOffenderSummary()
+    offenderFixture.havingOffender()
 
     const details = fakeRegistrationDetails({
       removed: DateTime.fromObject({ year: 2018, month: 5, day: 2, hour: 10, minute: 23 }),
@@ -118,31 +95,22 @@ describe('RiskController', () => {
       displayName: 'Liz Danger Haggis',
       breadcrumbs: links.breadcrumbs(BreadcrumbType.RemovedRiskDetails),
       registration: details,
-      links: {
-        toDelius: links.url(BreadcrumbType.ExitToDelius),
-      },
     } as RiskDetailsViewModel)
   })
 
   it('removed risk detail redirects to risk detail if not removed', async () => {
-    havingOffenderSummary()
+    offenderFixture.havingOffender()
 
     const details = fakeRegistrationDetails()
     riskService.getRiskRegistrationDetails.withArgs('some-crn', 2345).resolves(details)
 
     const observed = await subject.getRemovedRiskDetails('some-crn', 2345)
 
-    expect(observed).toEqual({
-      statusCode: 302,
-      url: details.link,
-    } as RedirectResponse)
+    expect(observed).toEqual({ statusCode: 302, url: details.links.view } as RedirectResponse)
   })
 
   it('gets risks', async () => {
-    const offender = fakeOffenderDetailSummary()
-    offenderService.getOffenderSummary.withArgs('some-crn').resolves(offender)
-    const viewModel: any = { page: CasePage.Risk }
-    const stub = offenderService.casePageOf.withArgs(offender, match.any).returns(viewModel)
+    offenderFixture.havingOffender().havingCasePageOf()
 
     const risks = fakeRisks()
     riskService.getRisks.withArgs('some-crn').resolves(risks)
@@ -152,11 +120,26 @@ describe('RiskController', () => {
 
     const observed = await subject.getRisk('some-crn')
 
-    expect(observed).toBe(viewModel)
-    expect(stub.getCall(0).args[1]).toEqual({
+    expect(observed).toBe(offenderFixture.caseViewModel)
+    offenderFixture.shouldHaveCalledCasePageOf<CaseRiskViewModel>({
       page: CasePage.Risk,
       risks,
       registrations,
+      links: {
+        viewInactiveRegistrations: offenderFixture.links.url(BreadcrumbType.RemovedRisksList),
+        roshCommunity: offenderFixture.links.url(BreadcrumbType.ExitToOASys, {
+          utm: { medium: UtmMedium.Risk, campaign: 'rosh-community' },
+        }),
+        roshSelf: offenderFixture.links.url(BreadcrumbType.ExitToOASys, {
+          utm: { medium: UtmMedium.Risk, campaign: 'rosh-self' },
+        }),
+        noAssessment: offenderFixture.links.url(BreadcrumbType.ExitToOASys, {
+          utm: { medium: UtmMedium.Risk, campaign: 'no-assessment' },
+        }),
+        addRiskFlag: offenderFixture.links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.Risk, campaign: 'add-risk-flag' },
+        }),
+      },
     })
   })
 })

@@ -5,7 +5,7 @@ import {
   RiskDtoAllRisksViewPrevious,
 } from '../../assess-risks-and-needs-api/client'
 import { fakeOkResponse, fakeRestError } from '../../common/rest/rest.fake'
-import { RiskRegistrationDetails, CriminogenicNeed, RiskRegistrations, Risks } from './risk.types'
+import { CriminogenicNeed, RiskRegistrationDetails, RiskRegistrations, Risks } from './risk.types'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../community-api/community-api.mock'
 import { RiskService } from './risk.service'
 import {
@@ -23,6 +23,8 @@ import { HttpStatus } from '@nestjs/common'
 import { DateTime } from 'luxon'
 import { GovUkUiTagColour } from '../../util/govuk-ui'
 import { AssessRisksAndNeedsApiService, NeedsAssessmentSection } from '../../assess-risks-and-needs-api'
+import { MockLinksModule } from '../../common/links/links.mock'
+import { BreadcrumbType, UtmMedium } from '../../common/links'
 
 const IGNORED_REGISTRATION = 'some-ignored-registration-type'
 
@@ -38,6 +40,7 @@ describe('RiskService', () => {
         MockCommunityApiModule.register(),
         MockAssessRisksAndNeedsApiModule.register(),
         FakeConfigModule.register({ risk: { ignoredRegistrationTypes: [IGNORED_REGISTRATION] } }),
+        MockLinksModule,
       ],
     }).compile()
 
@@ -206,13 +209,19 @@ describe('RiskService', () => {
       const stub = community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({ registrations }))
       const observed = await subject.getRiskRegistrations('some-crn')
 
+      const links = MockLinksModule.of({ crn: 'some-crn' })
       expect(observed).toEqual({
         active: [
-          { text: 'Alpha', notes: null, link: 'risk/44879', reviewDue: null },
+          {
+            text: 'Alpha',
+            notes: null,
+            links: { view: links.url(BreadcrumbType.RiskDetails, { id: 44879 }) },
+            reviewDue: null,
+          },
           {
             text: 'Beta',
             notes: 'Some notes',
-            link: 'risk/44878',
+            links: { view: links.url(BreadcrumbType.RiskDetails, { id: 44878 }) },
             reviewDue: DateTime.fromObject({ day: 2, month: 3, year: 2021 }),
           },
         ],
@@ -246,19 +255,20 @@ describe('RiskService', () => {
       community.risks.getOffenderRegistrationsByCrnUsingGET.resolves(fakeOkResponse({ registrations }))
       const observed = await subject.getRiskRegistrations('some-crn')
 
+      const links = MockLinksModule.of({ crn: 'some-crn' })
       expect(observed).toEqual({
         active: [],
         inactive: [
           {
             text: 'Alpha',
             notes: null,
-            link: 'removed-risk/1235',
+            links: { view: links.url(BreadcrumbType.RemovedRiskDetails, { id: 1235 }) },
             removed: DateTime.fromObject({ day: 1, month: 7, year: 2021 }),
           },
           {
             text: 'Beta',
             notes: 'Some notes',
-            link: 'removed-risk/1234',
+            links: { view: links.url(BreadcrumbType.RemovedRiskDetails, { id: 1234 }) },
             removed: DateTime.fromObject({ day: 2, month: 3, year: 2021 }),
           },
         ],
@@ -298,10 +308,23 @@ describe('RiskService', () => {
 
       const observed = await subject.getRiskRegistrationDetails('some-crn', 1234)
 
+      const links = MockLinksModule.of({ crn: 'some-crn' })
+      function exitToDelius(campaign: string) {
+        return links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.Risk, campaign, content: { registrationId: registration.registrationId } },
+        })
+      }
+
       expect(observed).toEqual({
         added: DateTime.fromObject({ day: 16, month: 5, year: 2020 }),
         addedBy: 'Paul Dryburgh',
-        link: 'risk/44878',
+        links: {
+          view: links.url(BreadcrumbType.RiskDetails, { id: 44878 }),
+          addReview: exitToDelius('add-risk-flag-review'),
+          delete: exitToDelius('delete-risk-flag'),
+          updateNotes: exitToDelius('update-risk-flag-notes'),
+          viewLastReview: exitToDelius('view-risk-flag-review'),
+        },
         notes: 'Some notes',
         text: 'Alert Notice',
         removed: null,

@@ -11,5 +11,6 @@ export const fakeBreachSummary = fake<BreachSummary>((options, { active = true, 
     outcome: active ? null : faker.random.arrayElement(['Breach not proven', 'Breach not proven', 'Breach withdrawn']),
     status: faker.random.arrayElement(['Breach Initiated', 'Breach Information Pack Requested', 'Warrant Issued']),
     proven,
+    link: faker.internet.url(),
   }
 })

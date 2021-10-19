@@ -1,16 +1,19 @@
-import { Controller, Get, Param, Render } from '@nestjs/common'
+import { Controller, Get, Logger, Param, Render } from '@nestjs/common'
 import { OffenderService } from '../offender'
 import { SentenceService } from '../sentence'
 import { ConfigService } from '@nestjs/config'
 import { Config, DeliusConfig, OASysConfig } from '../../config'
-import { Breadcrumb, BreadcrumbType, LinksService } from '../../common/links'
+import { Breadcrumb, BreadcrumbType, LinksService, Utm } from '../../common/links'
 import { DeliusExitViewModel, ExitViewModel, OASysExitViewModel } from './exit.types'
 import { getDisplayName } from '../../util'
 import { DateTime } from 'luxon'
 import { OffenderDetail } from '../../community-api/client'
+import { UtmTags } from '../../common'
 
 @Controller('case/:crn(\\w+)')
 export class ExitController {
+  private readonly exitTrackingLogger = new Logger('ExitTracking')
+
   constructor(
     private readonly offender: OffenderService,
     private readonly sentence: SentenceService,
@@ -24,8 +27,11 @@ export class ExitController {
     type: BreadcrumbType.ExitToDelius,
     parent: BreadcrumbType.Case,
     title: 'Continue on National Delius',
+    requiresUtm: true,
   })
-  async getDeliusExit(@Param('crn') crn: string): Promise<DeliusExitViewModel> {
+  async getDeliusExit(@Param('crn') crn: string, @UtmTags() utm: Utm): Promise<DeliusExitViewModel> {
+    this.exitTrackingLogger.log('delius exit', { crn, utm, exit: 'delius' })
+
     const [offender, conviction] = await Promise.all([
       this.offender.getOffenderDetail(crn),
       this.sentence.getCurrentConvictionSummary(crn),
@@ -55,8 +61,11 @@ export class ExitController {
     type: BreadcrumbType.ExitToOASys,
     parent: BreadcrumbType.Case,
     title: 'Continue on OASys',
+    requiresUtm: true,
   })
-  async getOASysExit(@Param('crn') crn: string): Promise<OASysExitViewModel> {
+  async getOASysExit(@Param('crn') crn: string, @UtmTags() utm: Utm): Promise<OASysExitViewModel> {
+    this.exitTrackingLogger.log('oasys exit', { crn, utm, exit: 'oasys' })
+
     const offender = await this.offender.getOffenderDetail(crn)
     return {
       ...this.getBase(offender, BreadcrumbType.ExitToOASys),

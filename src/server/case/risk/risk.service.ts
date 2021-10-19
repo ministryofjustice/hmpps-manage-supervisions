@@ -11,9 +11,9 @@ import {
 import {
   CriminogenicNeed,
   FlatRiskToSelf,
-  RiskRegistration,
   RiskLevel,
   RiskLevelMeta,
+  RiskRegistration,
   RiskRegistrationDetails,
   RiskRegistrations,
   Risks,
@@ -27,6 +27,8 @@ import { DateTime } from 'luxon'
 import { GovUkUiTagColour } from '../../util/govuk-ui'
 import { riskReferenceData } from './registration-reference-data'
 import { AssessRisksAndNeedsApiService } from '../../assess-risks-and-needs-api'
+import { Registration } from '../../community-api/client'
+import { BreadcrumbType, LinksHelper, LinksService, ResolveBreadcrumbOptions, UtmMedium } from '../../common/links'
 
 @Injectable()
 export class RiskService {
@@ -36,6 +38,7 @@ export class RiskService {
     private readonly community: CommunityApiService,
     private readonly assessRisksAndNeeds: AssessRisksAndNeedsApiService,
     private readonly config: ConfigService<Config>,
+    private readonly links: LinksService,
   ) {}
 
   async getRisks(crn: string): Promise<Risks | null> {
@@ -94,6 +97,7 @@ export class RiskService {
       x => x.active,
     )
 
+    const links = this.links.of({ crn })
     return {
       active:
         filtered['true']
@@ -101,7 +105,7 @@ export class RiskService {
             text: r.type.description,
             notes: r.notes,
             reviewDue: r.nextReviewDate && DateTime.fromISO(r.nextReviewDate),
-            link: `risk/${r.registrationId}`,
+            links: { view: RiskService.getRegistrationUrl(links, r) },
           }))
           .sort((a, b) => a.text.localeCompare(b.text)) || [],
       inactive:
@@ -110,7 +114,7 @@ export class RiskService {
             text: r.type.description,
             notes: r.deregisteringNotes,
             removed: r.endDate && DateTime.fromISO(r.endDate),
-            link: `removed-risk/${r.registrationId}`,
+            links: { view: RiskService.getRegistrationUrl(links, r) },
           }))
           .sort((a, b) => a.text.localeCompare(b.text)) || [],
     }
@@ -126,6 +130,13 @@ export class RiskService {
       ?.sort((a, b) => (DateTime.fromISO(a.reviewDate) > DateTime.fromISO(b.reviewDate) ? 1 : -1))
       .find(r => r.completed == true)
 
+    const links = this.links.of({ crn })
+    function exitToDelius(campaign: string) {
+      return links.url(BreadcrumbType.ExitToDelius, {
+        utm: { medium: UtmMedium.Risk, campaign, content: { registrationId: registration.registrationId } },
+      })
+    }
+
     return {
       text: registration.type.description,
       notes: registration.notes,
@@ -140,7 +151,13 @@ export class RiskService {
         `${registration.deregisteringOfficer.forenames} ${registration.deregisteringOfficer.surname}`,
       removedNotes: registration.endDate && registration.deregisteringNotes,
       typeInfo: riskReferenceData[registration.type.code],
-      link: `${registration.active ? 'risk' : 'removed-risk'}/${registration.registrationId}`,
+      links: {
+        view: RiskService.getRegistrationUrl(links, registration),
+        addReview: exitToDelius('add-risk-flag-review'),
+        delete: exitToDelius('delete-risk-flag'),
+        updateNotes: exitToDelius('update-risk-flag-notes'),
+        viewLastReview: exitToDelius('view-risk-flag-review'),
+      },
     }
   }
 
@@ -163,6 +180,13 @@ export class RiskService {
         })),
       x => x.name,
     )
+  }
+
+  private static getRegistrationUrl(links: LinksHelper, registration: Registration) {
+    const options: ResolveBreadcrumbOptions = { id: registration.registrationId }
+    return registration.active
+      ? links.url(BreadcrumbType.RiskDetails, options)
+      : links.url(BreadcrumbType.RemovedRiskDetails, options)
   }
 }
 

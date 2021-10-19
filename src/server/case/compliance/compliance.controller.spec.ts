@@ -1,51 +1,62 @@
 import { Test } from '@nestjs/testing'
 import { ComplianceController } from './compliance.controller'
-import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
-import { OffenderService } from '../offender'
+import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { SentenceService } from '../sentence'
-import { fakeOffenderDetailSummary } from '../../community-api/community-api.fake'
-import { CasePage } from '../case.types'
+import { CaseComplianceViewModel, CasePage } from '../case.types'
 import { fakeComplianceDetails } from '../sentence/sentence.fake'
 import { EligibilityService } from '../../community-api/eligibility'
-import { LinksService } from '../../common/links'
+import { BreadcrumbType, LinksService, UtmMedium } from '../../common/links'
+import { MockOffenderModule, OffenderServiceFixture } from '../offender/offender.mock'
 
 describe('ComplianceController', () => {
   let subject: ComplianceController
-  let offenderService: SinonStubbedInstance<OffenderService>
+  let offenderFixture: OffenderServiceFixture
   let sentenceService: SinonStubbedInstance<SentenceService>
 
   beforeEach(async () => {
-    offenderService = createStubInstance(OffenderService)
     sentenceService = createStubInstance(SentenceService)
 
     const module = await Test.createTestingModule({
       controllers: [ComplianceController],
       providers: [
-        { provide: OffenderService, useValue: offenderService },
         { provide: SentenceService, useValue: sentenceService },
         { provide: EligibilityService, useValue: null },
         { provide: LinksService, useValue: null },
       ],
+      imports: [MockOffenderModule.register()],
     }).compile()
 
     subject = module.get(ComplianceController)
+    offenderFixture = module.get(OffenderServiceFixture)
   })
 
   it('gets compliance', async () => {
-    const offender = fakeOffenderDetailSummary()
-    offenderService.getOffenderSummary.withArgs('some-crn').resolves(offender)
-    const viewModel: any = { page: CasePage.Compliance }
-    const stub = offenderService.casePageOf.withArgs(offender, match.any).returns(viewModel)
+    offenderFixture.havingOffender().havingCasePageOf()
 
     const compliance = fakeComplianceDetails()
     sentenceService.getSentenceComplianceDetails.withArgs('some-crn').resolves(compliance)
 
     const observed = await subject.getCompliance('some-crn')
 
-    expect(observed).toBe(viewModel)
-    expect(stub.getCall(0).args[1]).toEqual({
+    expect(observed).toBe(offenderFixture.caseViewModel)
+    offenderFixture.shouldHaveCalledCasePageOf<CaseComplianceViewModel>({
       page: CasePage.Compliance,
       compliance,
+      links: {
+        startBreach: offenderFixture.links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.Compliance, campaign: 'start-breach' },
+        }),
+        multipleBreachDetail: offenderFixture.links.url(BreadcrumbType.ExitToDelius, {
+          utm: {
+            medium: UtmMedium.Compliance,
+            campaign: 'multiple-breach-detail',
+            content: { convictionId: compliance.current?.id },
+          },
+        }),
+        viewAllOrders: offenderFixture.links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.Compliance, campaign: 'view-all-orders' },
+        }),
+      },
     })
   })
 })

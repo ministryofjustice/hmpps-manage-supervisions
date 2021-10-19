@@ -17,14 +17,13 @@ import { GovUkUiTagColour } from '../../util/govuk-ui'
 export const fakeRegistrationFlag = fake<RiskRegistration>(() => ({
   text: faker.lorem.sentence(),
   notes: faker.lorem.sentence(),
-  link: faker.internet.url(),
   reviewDue: DateTime.fromJSDate(faker.date.past()).set({ hour: 0, minute: 0, second: 0, millisecond: 0 }),
+  links: { view: faker.internet.url() },
 }))
 
 export const fakeRegistrationDetails = fake<RiskRegistrationDetails>(() => ({
   text: faker.lorem.sentence(),
   notes: faker.lorem.sentence(),
-  link: faker.internet.url(),
   reviewDue: DateTime.fromJSDate(faker.date.past()).set({ hour: 0, minute: 0, second: 0, millisecond: 0 }),
   added: DateTime.fromJSDate(faker.date.past()).set({ hour: 0, minute: 0, second: 0, millisecond: 0 }),
   addedBy: faker.name.findName(),
@@ -34,6 +33,13 @@ export const fakeRegistrationDetails = fake<RiskRegistrationDetails>(() => ({
     furtherInformation: faker.lorem.sentence(),
     suggestedReviewFrequency: faker.datatype.number(),
     termination: faker.lorem.sentence(),
+  },
+  links: {
+    view: faker.internet.url(),
+    viewLastReview: faker.internet.url(),
+    updateNotes: faker.internet.url(),
+    delete: faker.internet.url(),
+    addReview: faker.internet.url(),
   },
 }))
 

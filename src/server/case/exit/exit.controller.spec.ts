@@ -2,13 +2,13 @@ import { Test } from '@nestjs/testing'
 import { URL } from 'url'
 import { ExitController } from './exit.controller'
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
-import { OffenderService } from '../offender/offender.service'
+import { OffenderService } from '../offender'
 import { SentenceService } from '../sentence'
 import { fakeOffenderDetail } from '../../community-api/community-api.fake'
 import { DeliusExitViewModel, OASysExitViewModel } from './exit.types'
 import { OffenderDetail } from '../../community-api/client'
 import { FakeConfigModule } from '../../config/config.fake'
-import { MockLinksModule } from '../../common/links/links.mock'
+import { fakeUtm, MockLinksModule } from '../../common/links/links.mock'
 import { DateTime } from 'luxon'
 import { BreadcrumbType } from '../../common/links'
 import { fakeConvictionSummary } from '../sentence/sentence.fake'
@@ -58,7 +58,7 @@ describe('ExitController', () => {
   })
 
   it('displays delius exit', async () => {
-    const observed = await subject.getDeliusExit('some-crn')
+    const observed = await subject.getDeliusExit('some-crn', fakeUtm())
 
     const links = MockLinksModule.of({ crn: 'some-crn', offenderName: 'Liz Danger Haggis' })
     expect(observed).toEqual({
@@ -82,14 +82,14 @@ describe('ExitController', () => {
   it('displays delius exit link correctly when no conviction for a crn', async () => {
     sentenceService.getCurrentConvictionSummary.withArgs('some-crn').resolves(undefined)
 
-    const observed = await subject.getDeliusExit('some-crn')
+    const observed = await subject.getDeliusExit('some-crn', fakeUtm())
 
     expect(observed.links.deliusContactLog).toEqual(
       'https://delius/NDelius-war/delius/JSP/deeplink.jsp?component=ContactList&offenderId=84520',
     )
   })
   it('displays oasys exit', async () => {
-    const observed = await subject.getOASysExit('some-crn')
+    const observed = await subject.getOASysExit('some-crn', fakeUtm())
 
     const links = MockLinksModule.of({ crn: 'some-crn', offenderName: 'Liz Danger Haggis' })
     expect(observed).toEqual({

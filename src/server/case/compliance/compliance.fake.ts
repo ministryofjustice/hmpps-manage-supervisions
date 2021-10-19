@@ -11,6 +11,8 @@ export const fakeComplianceConvictionSummary = fake<ComplianceConvictionSummary>
   }) as ComplianceActiveBreachSummary
   const previousBreaches = (partial.previousBreaches || [{}]).map(x => fakeBreachSummary({ active: false, ...x }))
   return {
+    id: faker.datatype.number(),
+    link: faker.internet.url(),
     name: '12 month Community Order',
     startDate: DateTime.fromJSDate(faker.date.past()),
     length: '12 months',

@@ -7,6 +7,8 @@ export interface ComplianceActiveBreachSummary extends BreachSummary {
 }
 
 export interface ComplianceConvictionSummary {
+  id: number
+  link: string
   name: string
   progress?: string
   mainOffence: string

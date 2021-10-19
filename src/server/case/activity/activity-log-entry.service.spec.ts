@@ -4,7 +4,7 @@ import { MockLinksModule } from '../../common/links/links.mock'
 import { fakeActivityLogEntry, fakeContactSummary, fakeOffenderDetail } from '../../community-api/community-api.fake'
 import { ContactTypeCategory } from '../../config'
 import { DateTime } from 'luxon'
-import { BreadcrumbType } from '../../common/links'
+import { BreadcrumbType, UtmMedium } from '../../common/links'
 import {
   AppointmentActivityLogEntry,
   CommunicationActivityLogEntry,
@@ -53,9 +53,13 @@ describe('ActivityLogEntryService', () => {
       notes: 'some appointment notes',
       links: {
         view: links.url(BreadcrumbType.Appointment),
-        addNotes: links.url(BreadcrumbType.ExitToDelius),
+        addNotes: links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.ActivityLog, campaign: 'add-appointment-notes', content: { contactId: 1 } },
+        }),
         recordMissingAttendance: null,
-        updateOutcome: links.url(BreadcrumbType.ExitToDelius),
+        updateOutcome: links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.ActivityLog, campaign: 'update-appointment-outcome', content: { contactId: 1 } },
+        }),
       },
       start: DateTime.fromObject({ year: 2200, month: 1, day: 1, hour: 12 }),
       end: DateTime.fromObject({ year: 2200, month: 1, day: 2, hour: 14 }),
@@ -80,7 +84,7 @@ describe('ActivityLogEntryService', () => {
         contactId: 1,
         notes: 'some appointment notes',
         type: { appointment: true, nationalStandard: false, description: 'some non well known appointment' },
-        outcome: { complied: false, attended: true, description: 'some outcome' },
+        outcome: null,
         sensitive: false,
         enforcement: {
           enforcementAction: {
@@ -106,9 +110,19 @@ describe('ActivityLogEntryService', () => {
       notes: 'some appointment notes',
       links: {
         view: links.url(BreadcrumbType.Appointment),
-        addNotes: links.url(BreadcrumbType.ExitToDelius),
-        recordMissingAttendance: null,
-        updateOutcome: links.url(BreadcrumbType.ExitToDelius),
+        addNotes: links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.ActivityLog, campaign: 'add-appointment-notes', content: { contactId: 1 } },
+        }),
+        recordMissingAttendance: links.url(BreadcrumbType.ExitToDelius, {
+          utm: {
+            medium: UtmMedium.ActivityLog,
+            campaign: 'create-appointment-outcome',
+            content: { contactId: 1 },
+          },
+        }),
+        updateOutcome: links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.ActivityLog, campaign: 'update-appointment-outcome', content: { contactId: 1 } },
+        }),
       },
       start: DateTime.fromObject({ year: 2020, month: 1, day: 1, hour: 12 }),
       end: DateTime.fromObject({ year: 2020, month: 1, day: 1, hour: 14 }),
@@ -116,12 +130,7 @@ describe('ActivityLogEntryService', () => {
       isFuture: false,
       nationalStandard: false,
       enforcementAction: 'Enforcement Letter Requested',
-      outcome: {
-        attended: true,
-        complied: false,
-        description: 'some outcome',
-        tag: { colour: 'red', name: 'failed to comply' },
-      },
+      outcome: null,
       rarActivity: { name: 'Some RAR type: Some RAR subtype' },
       sensitive: false,
     } as AppointmentActivityLogEntry)
@@ -156,7 +165,13 @@ describe('ActivityLogEntryService', () => {
       lastUpdatedDateTime: DateTime.fromObject({ year: 2020, month: 1, day: 2, hour: 14 }),
       links: {
         view: links.url(BreadcrumbType.Communication),
-        addNotes: links.url(BreadcrumbType.ExitToDelius),
+        addNotes: links.url(BreadcrumbType.ExitToDelius, {
+          utm: {
+            medium: UtmMedium.ActivityLog,
+            campaign: 'add-communication-notes',
+            content: { contactId: 1 },
+          },
+        }),
       },
       name: 'some communication with Liz Haggis',
       from: 'from Liz Haggis',
@@ -196,7 +211,13 @@ describe('ActivityLogEntryService', () => {
       lastUpdatedDateTime: DateTime.fromObject({ year: 2020, month: 1, day: 2, hour: 14 }),
       links: {
         view: links.url(BreadcrumbType.Communication),
-        addNotes: links.url(BreadcrumbType.ExitToDelius),
+        addNotes: links.url(BreadcrumbType.ExitToDelius, {
+          utm: {
+            medium: UtmMedium.ActivityLog,
+            campaign: 'add-communication-notes',
+            content: { contactId: 1 },
+          },
+        }),
       },
       name: 'some communication',
       from: null,
@@ -232,7 +253,13 @@ describe('ActivityLogEntryService', () => {
       lastUpdatedDateTime: DateTime.fromObject({ year: 2020, month: 1, day: 2, hour: 14 }),
       links: {
         view: links.url(BreadcrumbType.OtherActivityLogEntry),
-        addNotes: links.url(BreadcrumbType.ExitToDelius),
+        addNotes: links.url(BreadcrumbType.ExitToDelius, {
+          utm: {
+            medium: UtmMedium.ActivityLog,
+            campaign: 'add-unknown-contact-notes',
+            content: { contactId: 1 },
+          },
+        }),
       },
       name: 'some unknown contact',
       notes: 'some unknown contact notes',
@@ -259,7 +286,13 @@ describe('ActivityLogEntryService', () => {
       isFuture: false,
       start: DateTime.fromObject({ year: 2020, month: 1, day: 1, hour: 12 }),
       links: {
-        view: links.url(BreadcrumbType.ExitToDelius),
+        view: links.url(BreadcrumbType.ExitToDelius, {
+          utm: {
+            medium: UtmMedium.ActivityLog,
+            campaign: 'view-system-generated-contact',
+            content: { contactId: 1 },
+          },
+        }),
         addNotes: null,
       },
       name: 'some system contact',

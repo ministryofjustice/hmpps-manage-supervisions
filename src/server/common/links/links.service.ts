@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common'
 import { PATH_METADATA } from '@nestjs/common/constants'
 import { DiscoveryService, MetadataScanner, Reflector } from '@nestjs/core'
-import { BreadcrumbMeta, BreadcrumbType, ResolveBreadcrumbOptions } from './types'
+import { BreadcrumbMeta, BreadcrumbType, RawUtm, ResolveBreadcrumbOptions, UtmMedium, UtmSource } from './links.types'
 import { BreadcrumbValue } from '../types'
+import { stringify } from 'qs'
+import { isEmpty, merge, pick, pickBy } from 'lodash'
 
 interface PathToken {
   value?: string
@@ -24,7 +26,7 @@ function getRoute(root: string, path: string): PathToken[] {
 function resolveTitle(meta: BreadcrumbActionMeta, options: ResolveBreadcrumbOptions) {
   const title = typeof meta.title === 'function' ? meta.title(options) : meta.title
   if (!title) {
-    throw new Error(`cannot resolve title for breadcrumb ${BreadcrumbType[meta.type]}`)
+    throw new Error(`cannot resolve title for breadcrumb '${BreadcrumbType[meta.type]}'`)
   }
   return title
 }
@@ -36,12 +38,61 @@ function resolveUrl(meta: BreadcrumbActionMeta, options: ResolveBreadcrumbOption
     }
     const value = options[x.data]
     if (!value) {
-      throw new Error(`cannot resolve ${BreadcrumbType[meta.type]} breadcrumb without ${x.data}`)
+      throw new Error(`cannot resolve '${BreadcrumbType[meta.type]}' breadcrumb without '${x.data}'`)
     }
     return value
   })
 
-  return `/${resolved.join('/')}`
+  const utm = resolveUtmTags(meta, options)
+
+  return '/' + resolved.join('/') + stringify(utm, { addQueryPrefix: true })
+}
+
+function resolveUtmTags(meta: BreadcrumbActionMeta, options: ResolveBreadcrumbOptions) {
+  if (!options.utm) {
+    if (meta.requiresUtm === true) {
+      throw new Error(`links to '${BreadcrumbType[meta.type]}' require utm`)
+    }
+    return {}
+  }
+
+  const query: RawUtm = {
+    utm_source: options.utm.source || UtmSource.App,
+    utm_medium: options.utm.medium,
+    utm_campaign: options.utm.campaign,
+  }
+
+  const utmContent = pickBy({ ...pick(options, 'crn'), ...options.utm.content }, x => x)
+  if (!isEmpty(utmContent)) {
+    query.utm_content = stringifyUtmContent(utmContent)
+  }
+
+  return query
+}
+
+function stringifyUtmContent(content: Record<string, string>): string {
+  return Object.entries(content)
+    .map(([k, v]) => `${k}_${v}`)
+    .join('.')
+}
+
+export function parseUtmContent(raw: string) {
+  if (!raw) {
+    return null
+  }
+  return raw
+    .split('.')
+    .filter(x => x)
+    .map(x => {
+      const tokens = x.split('_').filter(x => x)
+      if (tokens.length !== 2) {
+        return null
+      }
+      const [k, v] = tokens
+      return { [k]: v }
+    })
+    .filter(x => x)
+    .reduce((agg, x) => ({ ...agg, ...x }), {})
 }
 
 type BreadcrumbActionMeta = { route: PathToken[] } & BreadcrumbMeta
@@ -49,14 +100,14 @@ type BreadcrumbActionMeta = { route: PathToken[] } & BreadcrumbMeta
 export interface ILinksService {
   of(options: ResolveBreadcrumbOptions): LinksHelper
   getUrl(type: BreadcrumbType, options: ResolveBreadcrumbOptions): string
-  resolveAll(type: BreadcrumbType, options: ResolveBreadcrumbOptions): BreadcrumbValue[]
+  resolveAll(type: BreadcrumbType, options: Omit<ResolveBreadcrumbOptions, 'utm'>): BreadcrumbValue[]
 }
 
 export class LinksHelper {
   constructor(private readonly service: ILinksService, private readonly options: ResolveBreadcrumbOptions) {}
 
-  url(type: BreadcrumbType): string {
-    return this.service.getUrl(type, this.options)
+  url(type: BreadcrumbType, options: ResolveBreadcrumbOptions = {}): string {
+    return this.service.getUrl(type, merge(options, this.options))
   }
 
   breadcrumbs(type: BreadcrumbType): BreadcrumbValue[] {
@@ -94,7 +145,7 @@ export class LinksService implements ILinksService {
     return resolveUrl(this.getMeta(type), options)
   }
 
-  resolveAll(type: BreadcrumbType, options: ResolveBreadcrumbOptions): BreadcrumbValue[] {
+  resolveAll(type: BreadcrumbType, options: Omit<ResolveBreadcrumbOptions, 'utm'>): BreadcrumbValue[] {
     let meta = this.getMeta(type)
     const result: BreadcrumbValue[] = [{ text: resolveTitle(meta, options) }] // the current breadcrumb has no link
     const visited = [type]
@@ -106,9 +157,15 @@ export class LinksService implements ILinksService {
       }
       visited.push(parent)
       meta = this.getMeta(parent)
+
+      const urlOptions: ResolveBreadcrumbOptions = { ...options }
+      if (meta.requiresUtm) {
+        // only add breadcrumb utm where utm is required by the endpoint
+        urlOptions.utm = { source: UtmSource.App, medium: UtmMedium.Breadcrumb, campaign: BreadcrumbType[type] }
+      }
       result.unshift({
         text: resolveTitle(meta, options),
-        href: resolveUrl(meta, options),
+        href: resolveUrl(meta, urlOptions),
       })
     }
 

@@ -154,6 +154,7 @@ export const fakePreviousConvictionSummary = fake<PreviousConvictionSummary>(() 
   name: faker.company.bs(),
   mainOffence: faker.company.bs(),
   endDate: DateTime.fromJSDate(faker.date.past()),
+  link: faker.internet.url(),
 }))
 
 export const fakeConvictionSummary = fake<ConvictionSummary>(() => ({

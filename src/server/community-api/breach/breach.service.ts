@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common'
 import { CommunityApiService } from '../community-api.service'
 import { ContactMappingService } from '../contact-mapping'
-import { GetBreachesOptions, GetBreachesResult } from './breach.types'
+import { BreachSummary, GetBreachesOptions, GetBreachesResult } from './breach.types'
 import { NsiType } from '../well-known'
 import { DateTime } from 'luxon'
 import { maxBy, minBy, orderBy } from 'lodash'
 import { ContactTypeCategory } from '../../config'
+import { BreadcrumbType, LinksService, UtmMedium } from '../../common/links'
 
 @Injectable()
 export class BreachService {
   constructor(
     private readonly community: CommunityApiService,
     private readonly contactMapping: ContactMappingService,
+    private readonly links: LinksService,
   ) {}
 
   async getBreaches(
@@ -65,7 +67,8 @@ export class BreachService {
           )
         : []
 
-    const breaches = startedBreachRequests.map(nsi => {
+    const links = this.links.of({ crn })
+    const breaches: BreachSummary[] = startedBreachRequests.map(nsi => {
       // assumption is made here that breach periods do not overlap ie the first breach end contact that we find is the end of the current breach nsi
       const breachOutcome = nsi.actualEndDate
         ? breachOutcomes.find(x => x.date >= nsi.actualStartDate && x.date <= nsi.actualEndDate)
@@ -77,6 +80,9 @@ export class BreachService {
         outcome: breachOutcome?.name || nsi.nsiOutcome?.description, // fall back to poor quality outcome field if present
         status: nsi.nsiStatus.description,
         proven: breachOutcome?.type === ContactTypeCategory.BreachEnd ? breachOutcome.value.proven : false,
+        link: links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.Compliance, campaign: 'view-breach', content: { nsiId: nsi.nsiId, convictionId } },
+        }),
       }
     })
 

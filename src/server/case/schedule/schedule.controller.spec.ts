@@ -1,46 +1,40 @@
 import { Test } from '@nestjs/testing'
 import { ScheduleController } from './schedule.controller'
-import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
-import { OffenderService } from '../offender'
+import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { ScheduleService } from './schedule.service'
-import { FakeConfigModule } from '../../config/config.fake'
-import { fakeOffenderDetailSummary } from '../../community-api/community-api.fake'
-import { CasePage } from '../case.types'
+import { CasePage, CaseScheduleViewModel } from '../case.types'
 import { fakeAppointmentListViewModel } from './schedule.fake'
 import { fakeSecurityContext } from '../../security/context/security-context.fake'
 import { Role } from '../../security'
 import { EligibilityService } from '../../community-api/eligibility'
-import { LinksService } from '../../common/links'
+import { BreadcrumbType, LinksService } from '../../common/links'
+import { MockOffenderModule, OffenderServiceFixture } from '../offender/offender.mock'
+import { MockLinksModule } from '../../common/links/links.mock'
 
 describe('ScheduleController', () => {
   let subject: ScheduleController
-  let offenderService: SinonStubbedInstance<OffenderService>
+  let offenderFixture: OffenderServiceFixture
   let scheduleService: SinonStubbedInstance<ScheduleService>
 
   beforeEach(async () => {
-    offenderService = createStubInstance(OffenderService)
     scheduleService = createStubInstance(ScheduleService)
 
     const module = await Test.createTestingModule({
       controllers: [ScheduleController],
       providers: [
-        { provide: OffenderService, useValue: offenderService },
         { provide: ScheduleService, useValue: scheduleService },
         { provide: EligibilityService, useValue: null },
         { provide: LinksService, useValue: null },
       ],
-      imports: [FakeConfigModule.register({ server: { features: {} } })],
+      imports: [MockOffenderModule.register()],
     }).compile()
 
     subject = module.get(ScheduleController)
+    offenderFixture = module.get(OffenderServiceFixture)
   })
 
   it('gets schedule', async () => {
-    const offender = fakeOffenderDetailSummary()
-    offenderService.getOffenderSummary.withArgs('some-crn').resolves(offender)
-
-    const viewModel: any = { page: CasePage.Schedule }
-    const stub = offenderService.casePageOf.withArgs(offender, match.any).returns(viewModel)
+    offenderFixture.havingOffender().havingCasePageOf()
 
     const appointments = [fakeAppointmentListViewModel()]
     scheduleService.getScheduledAppointments.withArgs('some-crn').resolves(appointments)
@@ -48,24 +42,25 @@ describe('ScheduleController', () => {
     const context = fakeSecurityContext()
     const observed = await subject.getSchedule('some-crn', context)
 
-    expect(observed).toBe(viewModel)
-    expect(stub.getCall(0).args[1]).toEqual({
+    const links = MockLinksModule.of({ crn: 'some-crn' })
+    expect(observed).toBe(offenderFixture.caseViewModel)
+    offenderFixture.shouldHaveCalledCasePageOf<CaseScheduleViewModel>({
       page: CasePage.Schedule,
       appointments,
       appointmentBookingEnabled: true,
+      links: {
+        arrangeAppointment: links.url(BreadcrumbType.NewAppointment),
+      },
     })
   })
 
   it('gets read only schedule', async () => {
-    const offender = fakeOffenderDetailSummary()
-    offenderService.getOffenderSummary.withArgs('some-crn').resolves(offender)
-
-    const stub = offenderService.casePageOf.withArgs(offender, match.any).returns({} as any)
+    offenderFixture.havingOffender().havingCasePageOf()
 
     const context = fakeSecurityContext({ authorities: [Role.ReadOnly] })
     await subject.getSchedule('some-crn', context)
 
-    const { appointmentBookingEnabled }: any = stub.getCall(0).args[1]
+    const { appointmentBookingEnabled } = offenderFixture.theCasePageOfOptions
     expect(appointmentBookingEnabled).toBe(false)
   })
 })

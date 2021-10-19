@@ -27,6 +27,10 @@ export class SentenceController {
     return this.offender.casePageOf<CaseSentenceViewModel>(offender, {
       page: CasePage.Sentence,
       conviction,
+      links: links => ({
+        previousConvictions: links.url(BreadcrumbType.CasePreviousConvictions),
+        additionalOffences: links.url(BreadcrumbType.CaseSentenceOffences),
+      }),
     })
   }
 
@@ -71,7 +75,6 @@ export class SentenceController {
       displayName,
       breadcrumbs: links.breadcrumbs(BreadcrumbType.CasePreviousConvictions),
       previousConvictions,
-      links: { toDelius: links.url(BreadcrumbType.ExitToDelius) },
     }
   }
 }

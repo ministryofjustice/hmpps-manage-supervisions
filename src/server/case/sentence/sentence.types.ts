@@ -34,14 +34,12 @@ export interface PreviousConvictionSummary {
   name: string
   mainOffence: string
   endDate: DateTime
+  link: string
 }
 
 export interface PreviousConvictionsViewModel extends ViewModel {
   displayName: string
   previousConvictions: PreviousConvictionSummary[]
-  links: {
-    toDelius: string
-  }
 }
 
 export interface PreviousConvictions {

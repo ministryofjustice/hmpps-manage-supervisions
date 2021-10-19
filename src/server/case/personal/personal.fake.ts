@@ -41,7 +41,6 @@ export const fakePersonalContactDetail = fake<PersonalContactDetail>(() => ({
   id: faker.datatype.number(),
   description: `${faker.name.findName()} - Father`,
   type: 'Family Member',
-  link: faker.internet.url(),
   startDate: DateTime.fromJSDate(faker.date.past()),
   phone: faker.phone.phoneNumber(),
   notes: faker.lorem.sentence(),
@@ -49,6 +48,10 @@ export const fakePersonalContactDetail = fake<PersonalContactDetail>(() => ({
   address: [faker.address.streetAddress(), faker.address.city(), faker.address.zipCode()],
   displayName: faker.name.findName(),
   relationship: 'Father',
+  links: {
+    view: faker.internet.url(),
+    update: faker.internet.url(),
+  },
 }))
 
 export const fakeContactDetailsViewModel = fake<ContactDetailsViewModel>(() => ({

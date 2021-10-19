@@ -11,6 +11,8 @@ import { ContactSummary, Nsi } from '../client'
 import { DateTime, Settings } from 'luxon'
 import { GetBreachesResult } from './breach.types'
 import { ContactTypeCategory } from '../../config'
+import { MockLinksModule } from '../../common/links/links.mock'
+import { BreadcrumbType, UtmMedium } from '../../common/links'
 
 describe('BreachService', () => {
   let subject: BreachService
@@ -25,7 +27,7 @@ describe('BreachService', () => {
 
     const module = await Test.createTestingModule({
       providers: [BreachService, { provide: ContactMappingService, useValue: contactMapping }],
-      imports: [MockCommunityApiModule.register()],
+      imports: [MockCommunityApiModule.register(), MockLinksModule],
     }).compile()
 
     subject = module.get(BreachService)
@@ -41,10 +43,16 @@ describe('BreachService', () => {
   })
 
   it('gets active breach', async () => {
-    havingBreachRequests({ active: true, actualStartDate: '2021-01-01', nsiStatus: { description: 'Some status' } })
+    havingBreachRequests({
+      nsiId: 1,
+      active: true,
+      actualStartDate: '2021-01-01',
+      nsiStatus: { description: 'Some status' },
+    })
 
     const observed = await subject.getBreaches('some-crn', 100)
 
+    const links = MockLinksModule.of({ crn: 'some-crn' })
     expect(observed).toEqual({
       breaches: [
         {
@@ -53,6 +61,13 @@ describe('BreachService', () => {
           endDate: null,
           status: 'Some status',
           proven: false,
+          link: links.url(BreadcrumbType.ExitToDelius, {
+            utm: {
+              medium: UtmMedium.Compliance,
+              campaign: 'view-breach',
+              content: { nsiId: 1, convictionId: 100 },
+            },
+          }),
         },
       ],
       lastRecentBreachEnd: null,
@@ -61,6 +76,7 @@ describe('BreachService', () => {
 
   it('gets inactive breach without breach end contact', async () => {
     havingBreachRequests({
+      nsiId: 1,
       active: false,
       actualStartDate: '2018-02-01',
       actualEndDate: '2018-03-01',
@@ -72,6 +88,8 @@ describe('BreachService', () => {
     const observed = await subject.getBreaches('some-crn', 100)
 
     shouldHaveRequestedCorrectContactRange('2018-02-01', '2018-03-02')
+
+    const links = MockLinksModule.of({ crn: 'some-crn' })
     expect(observed).toEqual({
       breaches: [
         {
@@ -81,6 +99,9 @@ describe('BreachService', () => {
           status: 'Some status',
           outcome: 'Some outcome',
           proven: false,
+          link: links.url(BreadcrumbType.ExitToDelius, {
+            utm: { medium: UtmMedium.Compliance, campaign: 'view-breach', content: { nsiId: 1, convictionId: 100 } },
+          }),
         },
       ],
       lastRecentBreachEnd: DateTime.fromObject({ year: 2018, month: 3, day: 1 }),
@@ -89,6 +110,7 @@ describe('BreachService', () => {
 
   it('gets inactive breach with breach end contact', async () => {
     havingBreachRequests({
+      nsiId: 1,
       active: false,
       actualStartDate: '2016-01-01',
       actualEndDate: '2016-02-01',
@@ -105,6 +127,8 @@ describe('BreachService', () => {
     const observed = await subject.getBreaches('some-crn', 100)
 
     shouldHaveRequestedCorrectContactRange('2016-01-01', '2016-02-02')
+
+    const links = MockLinksModule.of({ crn: 'some-crn' })
     expect(observed).toEqual({
       breaches: [
         {
@@ -114,6 +138,9 @@ describe('BreachService', () => {
           status: 'Some status',
           outcome: 'Some breach end contact',
           proven: true,
+          link: links.url(BreadcrumbType.ExitToDelius, {
+            utm: { medium: UtmMedium.Compliance, campaign: 'view-breach', content: { nsiId: 1, convictionId: 100 } },
+          }),
         },
       ],
       lastRecentBreachEnd: null,

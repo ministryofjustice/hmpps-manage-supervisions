@@ -29,7 +29,7 @@
         {% call appSummaryCard({
             titleText: 'Risk of serious harm (ROSH) in the community',
             classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
-            actions: { items: [{ href: links.toOASys, text: "View OASys" }] }
+            actions: { items: [{ href: links.roshCommunity, text: "View OASys" }] }
         }) -%}
             {{ govukSummaryList({
                 rows: [
@@ -79,7 +79,7 @@
         {% call appSummaryCard({
             titleText: 'Risk of serious harm to themselves',
             classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
-            actions: { items: [{ href: links.toOASys, text: "View OASys" }] }
+            actions: { items: [{ href: links.roshSelf, text: "View OASys" }] }
         }) -%}
             {{ govukSummaryList({
                 rows: [
@@ -107,7 +107,7 @@
                 <li>Risk of serious harm to themselves</li>
             </ul>
             <p class='govuk-body'>
-                <a href='{{ links.toOASys }}'>View OASys</a>
+                <a href='{{ links.noAssessment }}'>View OASys</a>
             </p>
         {% endset %}
         {{ govukNotificationBanner({
@@ -119,7 +119,7 @@
     {% call appSummaryCard({
         titleText: 'Risk flags',
         classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
-        actions: { items: [{ href: links.toDelius, text: "Add a risk flag in Delius" }] }
+        actions: { items: [{ href: links.addRiskFlag, text: "Add a risk flag in Delius" }] }
     }) -%}
         {% if registrations.active.length === 0 %}
             <p class='govuk-body' data-qa='offender/risk/no-active-registrations'>
@@ -146,7 +146,7 @@
                     { text: 'Review due', classes: 'app-width-15pc' }
                 ],
                 rows: registrations.active | toTableRows([
-                    { type: 'link', path: 'text', href: 'link', classes: 'govuk-!-padding-top-3 govuk-!-padding-bottom-3' },
+                    { type: 'link', path: 'text', href: 'links.view', classes: 'govuk-!-padding-top-3 govuk-!-padding-bottom-3' },
                     { type: 'text', path: 'notes', defaultValue: 'No notes', classes: 'govuk-!-padding-top-3 govuk-!-padding-bottom-3' },
                     { type: 'short-date', path: 'reviewDue', defaultValue: 'None', classes: 'govuk-!-padding-top-3 govuk-!-padding-bottom-3' }
                 ])

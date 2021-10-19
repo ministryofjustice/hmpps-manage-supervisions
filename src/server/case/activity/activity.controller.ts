@@ -9,7 +9,7 @@ import {
 } from './activity.types'
 import { OffenderService } from '../offender'
 import { getDisplayName } from '../../util'
-import { Breadcrumb, BreadcrumbType, LinksService } from '../../common/links'
+import { Breadcrumb, BreadcrumbType, LinksService, UtmMedium } from '../../common/links'
 import { CaseActivityViewModel, CasePage } from '../case.types'
 import { CaseTabbedPage } from '../case-tabbed-page.decorators'
 import { SentenceService } from '../sentence'
@@ -140,21 +140,25 @@ export class ActivityController {
     const contacts = await this.activity.getActivityLogPage(crn, offender, { complianceFilter, conviction })
     const complianceFilterDescription = complianceFilter && FilterLinks[complianceFilter].description
 
-    return this.offender.casePageOf<CaseActivityViewModel>(
-      offender,
-      {
-        page: CasePage.Activity,
-        groups: contacts.content,
-        pagination: {
-          page: contacts.number,
-          size: contacts.size,
-        },
-        filters: FilterLinks,
-        currentFilter: complianceFilter,
-        title: complianceFilterDescription,
+    return this.offender.casePageOf<CaseActivityViewModel>(offender, {
+      page: CasePage.Activity,
+      groups: contacts.content,
+      pagination: {
+        page: contacts.number,
+        size: contacts.size,
       },
-      complianceFilterDescription && BreadcrumbType.CaseActivityLogWithComplianceFilter,
-      complianceFilterDescription,
-    )
+      filters: FilterLinks,
+      currentFilter: complianceFilter,
+      title: complianceFilterDescription,
+      breadcrumb: complianceFilterDescription && {
+        type: BreadcrumbType.CaseActivityLogWithComplianceFilter,
+        options: { entityName: complianceFilterDescription },
+      },
+      links: links => ({
+        addActivity: links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.ActivityLog, campaign: 'add-activity' },
+        }),
+      }),
+    })
   }
 }

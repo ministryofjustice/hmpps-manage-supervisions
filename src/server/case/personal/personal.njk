@@ -57,7 +57,7 @@
                 {% for personalContact in contactDetails.personalContacts %}
                     <p>
                         {{ personalContact.type }}:<br>
-                        <a href="{{ personalContact.link }}">{{ personalContact.description }}</a>
+                        <a href="{{ personalContact.links.view }}">{{ personalContact.description }}</a>
                     </p>
                 {% endfor %}
             {% endset %}
@@ -152,7 +152,7 @@
                     value: {
                         html: join(personalDetails.criminogenicNeeds, {
                                 linkText: 'View sentence plan in OASys',
-                                link: links.toOASys
+                                link: links.criminogenicNeeds
                             }) if personalDetails.criminogenicNeeds.length > 0 else 'None'
                     }
                 },
@@ -195,7 +195,7 @@
         }) }}
 
         <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0">
-            <a href='{{ links.toDelius }}'>View more on Delius</a>
+            <a href='{{ links.viewEquality }}'>View more on Delius</a>
         </p>
     {%- endcall %}
 {% endblock %}

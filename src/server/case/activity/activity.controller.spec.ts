@@ -1,11 +1,10 @@
 import { Test } from '@nestjs/testing'
 import { ActivityController } from './activity.controller'
 import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
-import { OffenderService } from '../offender'
 import { ActivityService } from './activity.service'
 import { MockLinksModule } from '../../common/links/links.mock'
-import { BreadcrumbType } from '../../common/links'
-import { fakeOffenderDetailSummary, fakePaginated } from '../../community-api/community-api.fake'
+import { BreadcrumbType, UtmMedium } from '../../common/links'
+import { fakePaginated } from '../../community-api/community-api.fake'
 import { getDisplayName } from '../../util'
 import { fakeCaseActivityLogEntry, fakeCaseActivityLogGroup } from './activity.fake'
 import { ContactTypeCategory } from '../../config'
@@ -18,43 +17,43 @@ import {
   GetActivityLogOptions,
 } from './activity.types'
 import { SentenceService } from '../sentence'
-import { CasePage } from '../case.types'
+import { CaseActivityViewModel, CasePage } from '../case.types'
 import { fakeConvictionSummary } from '../sentence/sentence.fake'
 import { EligibilityService } from '../../community-api/eligibility'
+import { MockOffenderModule, OffenderServiceFixture } from '../offender/offender.mock'
 
 describe('ActivityController', () => {
   let subject: ActivityController
-  let offenderService: SinonStubbedInstance<OffenderService>
+  let offenderServiceFixture: OffenderServiceFixture
   let activityService: SinonStubbedInstance<ActivityService>
   let sentenceService: SinonStubbedInstance<SentenceService>
 
   beforeEach(async () => {
-    offenderService = createStubInstance(OffenderService)
     activityService = createStubInstance(ActivityService)
     sentenceService = createStubInstance(SentenceService)
 
     const module = await Test.createTestingModule({
       controllers: [ActivityController],
       providers: [
-        { provide: OffenderService, useValue: offenderService },
         { provide: ActivityService, useValue: activityService },
         { provide: SentenceService, useValue: sentenceService },
         { provide: EligibilityService, useValue: null },
       ],
-      imports: [MockLinksModule],
+      imports: [MockLinksModule, MockOffenderModule.register()],
     }).compile()
 
     subject = module.get(ActivityController)
+    offenderServiceFixture = module.get(OffenderServiceFixture)
   })
 
   it('gets appointment', async () => {
-    const offender = havingOffenderSummary()
+    offenderServiceFixture.havingOffender()
 
     const appointment = fakeCaseActivityLogEntry(
       { type: ContactTypeCategory.Appointment },
       { when: 'future' },
     ) as AppointmentActivityLogEntry
-    const displayName = getDisplayName(offender)
+    const displayName = getDisplayName(offenderServiceFixture.offender)
     activityService.getAppointment.withArgs('some-crn', 111).resolves(appointment)
 
     const observed = await subject.getAppointment('some-crn', 111)
@@ -75,12 +74,12 @@ describe('ActivityController', () => {
   })
 
   it('gets communication', async () => {
-    const offender = havingOffenderSummary()
-    const displayName = getDisplayName(offender)
+    offenderServiceFixture.havingOffender()
+    const displayName = getDisplayName(offenderServiceFixture.offender)
     const contact = fakeCaseActivityLogEntry({
       type: ContactTypeCategory.Communication,
     }) as CommunicationActivityLogEntry
-    activityService.getCommunicationContact.withArgs('some-crn', 111, offender).resolves(contact)
+    activityService.getCommunicationContact.withArgs('some-crn', 111, offenderServiceFixture.offender).resolves(contact)
 
     const observed = await subject.getCommunication('some-crn', 111)
     const links = MockLinksModule.of({
@@ -97,19 +96,20 @@ describe('ActivityController', () => {
   })
 
   it('gets activity', async () => {
-    const offender = havingOffenderSummary()
-    const viewModel: any = { page: CasePage.Activity }
-    const stub = offenderService.casePageOf.withArgs(offender, match.any).returns(viewModel)
+    offenderServiceFixture.havingOffender().havingCasePageOf()
+
     const contacts = fakePaginated([fakeCaseActivityLogGroup(), fakeCaseActivityLogGroup()])
     const conviction = fakeConvictionSummary()
 
     sentenceService.getCurrentConvictionSummary.withArgs('some-crn').resolves(conviction)
-    activityService.getActivityLogPage.withArgs('some-crn', offender, match({ conviction })).resolves(contacts)
+    activityService.getActivityLogPage
+      .withArgs('some-crn', offenderServiceFixture.offender, match({ conviction }))
+      .resolves(contacts)
 
     const observed = await subject.getActivity('some-crn')
 
-    expect(observed).toBe(viewModel)
-    expect(stub.getCall(0).args[1]).toEqual({
+    expect(observed).toBe(offenderServiceFixture.caseViewModel)
+    offenderServiceFixture.shouldHaveCalledCasePageOf<CaseActivityViewModel>({
       page: CasePage.Activity,
       groups: contacts.content,
       pagination: {
@@ -146,15 +146,17 @@ describe('ActivityController', () => {
           name: 'RAR activity',
         },
       },
-      title: undefined,
-      currentFilter: undefined,
+      links: {
+        addActivity: offenderServiceFixture.links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.ActivityLog, campaign: 'add-activity' },
+        }),
+      },
     })
   })
 
   it('gets filtered activity list', async () => {
-    const offender = havingOffenderSummary()
-    const viewModel: any = { page: CasePage.Activity }
-    const stub = offenderService.casePageOf.withArgs(offender, match.any).returns(viewModel)
+    offenderServiceFixture.havingOffender().havingCasePageOf()
+
     const contacts = fakePaginated([fakeCaseActivityLogGroup(), fakeCaseActivityLogGroup()])
     const conviction = fakeConvictionSummary()
 
@@ -162,15 +164,15 @@ describe('ActivityController', () => {
     activityService.getActivityLogPage
       .withArgs(
         'some-crn',
-        offender,
+        offenderServiceFixture.offender,
         match({ conviction, complianceFilter: ActivityComplianceFilter.CompliedAppointments } as GetActivityLogOptions),
       )
       .resolves(contacts)
 
     const observed = await subject.getActivityFiltered('some-crn', ActivityComplianceFilter.CompliedAppointments)
 
-    expect(observed).toBe(viewModel)
-    expect(stub.getCall(0).args[1]).toEqual({
+    expect(observed).toBe(offenderServiceFixture.caseViewModel)
+    offenderServiceFixture.shouldHaveCalledCasePageOf<CaseActivityViewModel>({
       page: CasePage.Activity,
       groups: contacts.content,
       pagination: {
@@ -209,18 +211,15 @@ describe('ActivityController', () => {
       },
       title: 'Complied appointments',
       currentFilter: ActivityComplianceFilter.CompliedAppointments,
+      links: {
+        addActivity: offenderServiceFixture.links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.ActivityLog, campaign: 'add-activity' },
+        }),
+      },
+      breadcrumb: {
+        type: BreadcrumbType.CaseActivityLogWithComplianceFilter,
+        options: { entityName: 'Complied appointments' },
+      },
     })
   })
-
-  function havingOffenderSummary() {
-    const offender = fakeOffenderDetailSummary({
-      otherIds: { crn: 'some-crn', pncNumber: 'some-pnc' },
-      firstName: 'Liz',
-      middleNames: ['Danger'],
-      surname: 'Haggis',
-      preferredName: 'Bob',
-    })
-    offenderService.getOffenderSummary.withArgs('some-crn').resolves(offender)
-    return offender
-  }
 })

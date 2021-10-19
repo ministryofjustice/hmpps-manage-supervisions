@@ -6,10 +6,11 @@ import { DateTime } from 'luxon'
 import { getOffenceName, getSentenceName } from '../sentence/util'
 import { BreachService } from '../../community-api/breach'
 import { ComplianceActiveBreachSummary, ComplianceConvictionSummary } from './compliance.types'
+import { BreadcrumbType, LinksService, UtmMedium } from '../../common/links'
 
 @Injectable()
 export class ComplianceService {
-  constructor(private readonly breach: BreachService) {}
+  constructor(private readonly breach: BreachService, private readonly links: LinksService) {}
 
   async getComplianceSummary(crn: string, conviction: Conviction): Promise<ComplianceConvictionSummary | null> {
     if (!conviction?.sentence) {
@@ -35,7 +36,18 @@ export class ComplianceService {
             additionalActiveBreaches: Math.max(0, activeBreaches.length - 1),
           }
 
+    const links = this.links.of({ crn, id: conviction.convictionId })
     return {
+      id: conviction.convictionId,
+      link: conviction.sentence.terminationDate
+        ? links.url(BreadcrumbType.ExitToDelius, {
+            utm: {
+              medium: UtmMedium.Compliance,
+              campaign: 'view-previous-conviction',
+              content: { convictionId: conviction.convictionId },
+            },
+          })
+        : links.url(BreadcrumbType.CaseSentence),
       name: getSentenceName(conviction.sentence),
       progress: elapsed?.elapsed,
       startDate: DateTime.fromISO(conviction.sentence.startDate),
