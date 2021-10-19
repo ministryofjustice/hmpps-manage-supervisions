@@ -11,7 +11,7 @@ import { LogoutController } from './logout/logout.controller'
 import { AuthenticatedGuard } from './authentication'
 import { AuthorizedGuard } from './authorization'
 import { TokenVerificationService } from './token-verification/token-verification.service'
-import { setLocals, csp } from './middleware'
+import { setLocals, csp, secureCacheBust } from './middleware'
 import { LoginService } from './login/login.service'
 import { LogoutService } from './logout/logout.service'
 import { CommunityApiModule } from '../community-api/community-api.module'
@@ -46,6 +46,6 @@ import { EligibleCaseloadGuard } from './eligibility'
 })
 export class SecurityModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(passport.initialize(), passport.session(), csp(), csurf(), setLocals).forRoutes('*')
+    consumer.apply(passport.initialize(), passport.session(), csp(), csurf(), setLocals, secureCacheBust).forRoutes('*')
   }
 }
