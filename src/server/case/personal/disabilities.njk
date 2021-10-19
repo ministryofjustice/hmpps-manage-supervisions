@@ -10,7 +10,7 @@
         {% for disability in disabilities %}
             {% set adjustmentDetails %}
                 {% if disability.adjustments.length === 0 %}
-                    None
+                    No adjustments
                 {% endif %}
 
                 {% for adjustment in disability.adjustments %}
