@@ -1,6 +1,7 @@
-import { Type } from 'class-transformer'
+import { Transform, Type } from 'class-transformer'
 import { DateTime } from 'luxon'
 import { IsBoolean, IsIn, IsInt, IsNotEmpty, IsPositive, IsString, ValidateIf, ValidateNested } from 'class-validator'
+import striptags = require('striptags')
 import { AppointmentWizardStep } from './AppointmentWizardViewModel'
 import { DateInput, IsAfter, IsDateInput, IsFutureTime, ValidationGroup, IsFutureDate, IsTime } from '../../validators'
 import { getDateTime } from '../../util'
@@ -162,21 +163,8 @@ export class AppointmentBuilderDto {
   addNotes?: boolean
 
   @ExposeDefault({ groups: [AppointmentWizardStep.Notes] })
+  @Transform(({ value }) => striptags(value))
   notes?: string
-
-  /*
-  getAppointmentType(available: AvailableAppointmentTypes): null | (AppointmentType & { featured: boolean }) {
-    if (!this.type) {
-      return null
-    }
-
-    if (this.type !== 'other') {
-      const featured = available.featured.find(x => x.type === this.type)
-      // TODO select the correct appointment type here based on rar etc
-      return { ...featured.appointmentTypes[0], featured: true }
-    }
-    return { ...available.other.find(x => x.contactType === this.otherType), featured: false }
-  }*/
 
   get appointmentType(): null | { value: WellKnownAppointmentType | string; featured: boolean } {
     if (!this.type) {
