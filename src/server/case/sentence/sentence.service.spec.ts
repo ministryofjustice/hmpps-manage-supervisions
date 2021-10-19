@@ -23,7 +23,7 @@ import { ActivityComplianceFilter, ActivityService } from '../activity'
 import { BreachService } from '../../community-api/breach'
 import { fakeBreachSummary } from '../../community-api/breach/breach.fake'
 import { MockLinksModule } from '../../common/links/links.mock'
-import { BreadcrumbType } from '../../common/links'
+import { BreadcrumbType, UtmMedium } from '../../common/links'
 import { fakeComplianceConvictionSummary } from '../compliance/compliance.fake'
 
 describe('SentenceService', () => {
@@ -500,16 +500,32 @@ describe('SentenceService', () => {
         },
       )
       const observed = await subject.getPreviousConvictions('some-crn')
+
+      const links = MockLinksModule.of({ crn: 'some-crn' })
       expect(observed).toEqual([
         {
           endDate: DateTime.fromObject({ year: 2021, month: 8, day: 25 }),
           mainOffence: 'Some offence (2 counts)',
           name: '12 month Community Order',
+          link: links.url(BreadcrumbType.ExitToDelius, {
+            utm: {
+              medium: UtmMedium.Sentence,
+              campaign: 'view-previous-conviction',
+              content: { convictionId: 100 },
+            },
+          }),
         },
         {
           endDate: DateTime.fromObject({ year: 2021, month: 7, day: 25 }),
           mainOffence: 'Some offence (1 count)',
           name: 'Fine',
+          link: links.url(BreadcrumbType.ExitToDelius, {
+            utm: {
+              medium: UtmMedium.Sentence,
+              campaign: 'view-previous-conviction',
+              content: { convictionId: 101 },
+            },
+          }),
         },
       ] as PreviousConvictionSummary[])
     })

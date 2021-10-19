@@ -4,7 +4,7 @@ import { ViewModel } from '../../common'
 export interface PersonalViewModel extends ViewModel {
   displayName: string
   links: {
-    toDelius: string
+    addMainAddress: string
   }
 }
 
@@ -20,7 +20,10 @@ export interface PersonalContactDetail {
   phone?: string
   emailAddress?: string
   notes?: string
-  link: string
+  links: {
+    view: string
+    update: string
+  }
 }
 
 export interface ContactDetailsViewModel {

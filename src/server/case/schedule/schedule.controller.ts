@@ -4,6 +4,7 @@ import { CaseTabbedPage } from '../case-tabbed-page.decorators'
 import { OffenderService } from '../offender'
 import { ScheduleService } from './schedule.service'
 import { CurrentSecurityContext, Role, SecurityContext } from '../../security'
+import { BreadcrumbType } from '../../common/links'
 
 @Controller('case/:crn(\\w+)/schedule')
 export class ScheduleController {
@@ -25,6 +26,7 @@ export class ScheduleController {
       page: CasePage.Schedule,
       appointments,
       appointmentBookingEnabled: security.hasRole(Role.ReadWrite),
+      links: links => ({ arrangeAppointment: links.url(BreadcrumbType.NewAppointment) }),
     })
   }
 }

@@ -1,7 +1,10 @@
 import { ILinksService, LinksHelper, LinksService } from './links.service'
-import { BreadcrumbType, ResolveBreadcrumbOptions } from './types'
+import { BreadcrumbType, ResolveBreadcrumbOptions, Utm, UtmMedium, UtmSource } from './links.types'
 import { BreadcrumbValue } from '../types'
 import { DynamicModule, Module, ModuleMetadata } from '@nestjs/common'
+import * as flatten from 'flat'
+import * as faker from 'faker'
+import { fake, fakeEnum } from '../../util/util.fake'
 
 class MockLinksService implements ILinksService {
   constructor(private readonly customUrls: Partial<Record<BreadcrumbType, string>> = {}) {}
@@ -11,7 +14,7 @@ class MockLinksService implements ILinksService {
       return this.customUrls[type]
     }
 
-    const queryString = Object.entries(options)
+    const queryString = Object.entries(flatten(options))
       .filter(([, v]) => v !== undefined)
       .map(([k, v]) => `${k}=${v}`)
       .sort()
@@ -56,3 +59,10 @@ export class MockLinksModule {
     return INSTANCE.of(options)
   }
 }
+
+export const fakeUtm = fake<Utm>(() => ({
+  source: fakeEnum(UtmSource),
+  medium: fakeEnum(UtmMedium),
+  campaign: faker.company.bs(),
+  content: { id: faker.datatype.uuid() },
+}))

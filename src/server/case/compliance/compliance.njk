@@ -15,7 +15,7 @@
         {% set multipleBreachWarning %}
             There are multiple breach NSIs in progress on Delius.<br>
             Use Delius to check and correct any problems.<br>
-            <a href='{{ links.toDelius }}'>Go to Delius</a>
+            <a href='{{ links.multipleBreachDetail }}'>Go to Delius</a>
         {% endset %}
         {{ govukWarningText({
             html: multipleBreachWarning,
@@ -46,7 +46,7 @@
                 <ul class='govuk-list'>
                 {% for breach in compliance.current.previousBreaches %}
                     <li>
-                    <a href='{{ links.toDelius }}'>{{ breach.outcome if breach.outcome else 'Outcome unknown' }}</a>
+                    <a href='{{ breach.link }}'>{{ breach.outcome if breach.outcome else 'Outcome unknown' }}</a>
                     <br>
                     {% if breach.endDate %}
                         Resolved {{ breach.endDate | shortDate }}
@@ -175,7 +175,7 @@
             {% call appSummaryCard({
                 titleText: previous.name + (' (Ended ' + previous.endDate | shortDate + ')' if previous.endDate),
                 classes: 'govuk-!-margin-bottom-6',
-                actions: { items: [{ href: links.toDelius, text: "View order" }] }
+                actions: { items: [{ href: previous.link, text: "View order" }] }
             }) -%}
             {{ govukSummaryList({
                 rows: [
@@ -208,6 +208,6 @@
     {% endif %}
 
     <p class='govuk-body'>
-        <a href="{{ links.toDelius }}" data-qa='offender/compliance/view-all-orders'>View all orders</a>
+        <a href="{{ links.viewAllOrders }}" data-qa='offender/compliance/view-all-orders'>View all orders</a>
     </p>
 {% endblock %}

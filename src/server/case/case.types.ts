@@ -29,7 +29,6 @@ export const CASE_BREADCRUMBS: Record<CasePage, BreadcrumbType> = Object.freeze(
 export type CasePageLinks = { [Page in CasePage]: string }
 
 export interface CaseLinks extends CasePageLinks {
-  arrangeAppointment: string
   addActivity: string
   addressBook: string
   circumstances: string
@@ -42,7 +41,7 @@ export interface CaseLinks extends CasePageLinks {
   additionalOffences: string
 }
 
-export interface CaseViewModelBase<Page extends CasePage> extends ViewModel {
+export interface CaseViewModelBase<Page extends CasePage, Links> extends ViewModel {
   page: Page
   ids: {
     crn: string
@@ -50,22 +49,30 @@ export interface CaseViewModelBase<Page extends CasePage> extends ViewModel {
   }
   displayName: string
   shortName: string
-  links: CaseLinks
+  links: CasePageLinks & Links
 }
 
-export interface CaseOverviewViewModel extends CaseViewModelBase<CasePage.Overview>, GetPersonalDetailsResult {
+export interface CaseOverviewViewModel extends CaseViewModelBase<CasePage.Overview, {}>, GetPersonalDetailsResult {
   compliance: ComplianceDetails
   nextAppointment?: NextAppointmentSummary
   risks: Risks
   registrations: RiskRegistrations
 }
 
-export interface CaseScheduleViewModel extends CaseViewModelBase<CasePage.Schedule> {
+export interface CaseScheduleLinks {
+  arrangeAppointment: string
+}
+
+export interface CaseScheduleViewModel extends CaseViewModelBase<CasePage.Schedule, CaseScheduleLinks> {
   appointments: AppointmentListViewModel[]
   appointmentBookingEnabled: boolean
 }
 
-export interface CaseActivityViewModel extends CaseViewModelBase<CasePage.Activity> {
+export interface CaseActivityLinks {
+  addActivity: string
+}
+
+export interface CaseActivityViewModel extends CaseViewModelBase<CasePage.Activity, CaseActivityLinks> {
   groups: CaseActivityLogGroup[]
   pagination: {
     page?: number
@@ -73,20 +80,49 @@ export interface CaseActivityViewModel extends CaseViewModelBase<CasePage.Activi
   }
   filters: {}
   currentFilter?: ActivityComplianceFilter
-  title: string
+  title?: string
 }
 
-export interface CasePersonalViewModel extends CaseViewModelBase<CasePage.Personal>, GetPersonalDetailsResult {}
+export interface CasePersonalLinks {
+  addressBook: string
+  circumstances: string
+  disabilities: string
+  criminogenicNeeds: string
+  viewEquality: string
+}
 
-export interface CaseSentenceViewModel extends CaseViewModelBase<CasePage.Sentence> {
+export interface CasePersonalViewModel
+  extends CaseViewModelBase<CasePage.Personal, CasePersonalLinks>,
+    GetPersonalDetailsResult {}
+
+export interface CaseSentenceLinks {
+  previousConvictions: string
+  additionalOffences: string
+}
+
+export interface CaseSentenceViewModel extends CaseViewModelBase<CasePage.Sentence, CaseSentenceLinks> {
   conviction?: ConvictionDetails
 }
 
-export interface CaseComplianceViewModel extends CaseViewModelBase<CasePage.Compliance> {
+export interface CaseComplianceLinks {
+  startBreach: string
+  multipleBreachDetail: string
+  viewAllOrders: string
+}
+
+export interface CaseComplianceViewModel extends CaseViewModelBase<CasePage.Compliance, CaseComplianceLinks> {
   compliance: ComplianceDetails
 }
 
-export interface CaseRiskViewModel extends CaseViewModelBase<CasePage.Risk> {
+export interface CaseRiskLinks {
+  viewInactiveRegistrations: string
+  roshCommunity: string
+  roshSelf: string
+  noAssessment: string
+  addRiskFlag: string
+}
+
+export interface CaseRiskViewModel extends CaseViewModelBase<CasePage.Risk, CaseRiskLinks> {
   risks: Risks
   registrations: RiskRegistrations
 }

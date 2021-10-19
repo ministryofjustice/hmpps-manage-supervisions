@@ -2,15 +2,15 @@ import { Injectable } from '@nestjs/common'
 import { ActivityLogEntry, ActivityLogGroup, ContactSummary, OffenderDetail } from '../../community-api/client'
 import { AppointmentMetaResult, CommunicationMetaResult, GetMetaResult, SystemMetaResult } from '../../community-api'
 import {
-  CaseActivityLogEntry,
   AppointmentActivityLogEntry,
+  CaseActivityLogEntry,
   CommunicationActivityLogEntry,
   SystemActivityLogEntry,
   UnknownActivityLogEntry,
 } from './activity.types'
 import { DateTime } from 'luxon'
 import { ContactTypeCategory } from '../../config'
-import { BreadcrumbType, LinksService } from '../../common/links'
+import { BreadcrumbType, LinksService, UtmMedium } from '../../common/links'
 import { GovUkUiTagColour } from '../../util/govuk-ui'
 import { getDisplayName } from '../../util'
 
@@ -75,11 +75,23 @@ export class ActivityLogEntryService {
       end,
       links: {
         view: links.url(BreadcrumbType.Appointment),
-        addNotes: links.url(BreadcrumbType.ExitToDelius),
+        addNotes: links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.ActivityLog, campaign: 'add-appointment-notes', content: { contactId: id } },
+        }),
         // user is prompted to record outcome for appointments in the past without an existing outcome
         recordMissingAttendance:
-          !contact.outcome && start <= DateTime.now() ? links.url(BreadcrumbType.ExitToDelius) : null,
-        updateOutcome: links.url(BreadcrumbType.ExitToDelius),
+          !contact.outcome && start <= DateTime.now()
+            ? links.url(BreadcrumbType.ExitToDelius, {
+                utm: {
+                  medium: UtmMedium.ActivityLog,
+                  campaign: 'create-appointment-outcome',
+                  content: { contactId: id },
+                },
+              })
+            : null,
+        updateOutcome: links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.ActivityLog, campaign: 'update-appointment-outcome', content: { contactId: id } },
+        }),
       },
       rarActivity: rarActivity
         ? {
@@ -118,7 +130,13 @@ export class ActivityLogEntryService {
       typeName: meta.value?.name || contact.type.description,
       links: {
         view: links.url(BreadcrumbType.Communication),
-        addNotes: links.url(BreadcrumbType.ExitToDelius),
+        addNotes: links.url(BreadcrumbType.ExitToDelius, {
+          utm: {
+            medium: UtmMedium.ActivityLog,
+            campaign: 'add-communication-notes',
+            content: { contactId: contact.contactId },
+          },
+        }),
       },
       lastUpdatedDateTime: DateTime.fromISO(contact.lastUpdatedDateTime),
       lastUpdatedBy: `${contact.lastUpdatedByUser.forenames} ${contact.lastUpdatedByUser.surname}`,
@@ -137,7 +155,13 @@ export class ActivityLogEntryService {
       typeName: meta.value && 'name' in meta.value ? meta.value.name : null,
       links: {
         view: links.url(BreadcrumbType.OtherActivityLogEntry),
-        addNotes: links.url(BreadcrumbType.ExitToDelius),
+        addNotes: links.url(BreadcrumbType.ExitToDelius, {
+          utm: {
+            medium: UtmMedium.ActivityLog,
+            campaign: 'add-unknown-contact-notes',
+            content: { contactId: contact.contactId },
+          },
+        }),
       },
       lastUpdatedDateTime: DateTime.fromISO(contact.lastUpdatedDateTime),
       lastUpdatedBy: `${contact.lastUpdatedByUser.forenames} ${contact.lastUpdatedByUser.surname}`,
@@ -152,7 +176,13 @@ export class ActivityLogEntryService {
       category: 'System contact',
       name: meta.name,
       links: {
-        view: links.url(BreadcrumbType.ExitToDelius),
+        view: links.url(BreadcrumbType.ExitToDelius, {
+          utm: {
+            medium: UtmMedium.ActivityLog,
+            campaign: 'view-system-generated-contact',
+            content: { contactId: contact.contactId },
+          },
+        }),
         addNotes: null,
       },
     }

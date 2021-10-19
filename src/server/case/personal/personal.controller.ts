@@ -1,5 +1,5 @@
 import { Controller, Get, NotFoundException, Param, ParseIntPipe, Render } from '@nestjs/common'
-import { Breadcrumb, BreadcrumbType, LinksService, ResolveBreadcrumbOptions } from '../../common/links'
+import { Breadcrumb, BreadcrumbType, LinksService, ResolveBreadcrumbOptions, UtmMedium } from '../../common/links'
 import { PersonalService } from './personal.service'
 import { OffenderService } from '../offender'
 import {
@@ -38,6 +38,17 @@ export class PersonalController {
     return this.offender.casePageOf<CasePersonalViewModel>(offender, {
       page: CasePage.Personal,
       ...this.personal.getPersonalDetails(offender, personalContacts, personalCircumstances, criminogenicNeeds),
+      links: links => ({
+        addressBook: links.url(BreadcrumbType.PersonalAddresses),
+        circumstances: links.url(BreadcrumbType.PersonalCircumstances),
+        disabilities: links.url(BreadcrumbType.PersonalDisabilities),
+        criminogenicNeeds: links.url(BreadcrumbType.ExitToOASys, {
+          utm: { medium: UtmMedium.Personal, campaign: 'criminogenic-needs' },
+        }),
+        viewEquality: links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.Personal, campaign: 'view-equality' },
+        }),
+      }),
     })
   }
 
@@ -133,7 +144,11 @@ export class PersonalController {
     return {
       displayName,
       breadcrumbs: links.breadcrumbs(breadcrumbType),
-      links: { toDelius: links.url(BreadcrumbType.ExitToDelius) },
+      links: {
+        addMainAddress: links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.Personal, campaign: 'add-main-address' },
+        }),
+      },
     }
   }
 }

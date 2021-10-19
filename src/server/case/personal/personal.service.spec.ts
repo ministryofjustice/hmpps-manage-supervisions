@@ -15,7 +15,7 @@ import { AddressDetail, GetPersonalDetailsResult, PersonalContactDetail } from '
 import * as faker from 'faker'
 import { fakePersonalCircumstanceDetail, fakePersonalContactDetail } from './personal.fake'
 import { MockLinksModule } from '../../common/links/links.mock'
-import { BreadcrumbType } from '../../common/links'
+import { BreadcrumbType, UtmMedium } from '../../common/links'
 import { CommunityApiService, WellKnownAddressTypes } from '../../community-api'
 import { fakeCriminogenicNeed } from '../risk/risk.fake'
 
@@ -158,12 +158,21 @@ describe('PersonalService', () => {
         description: 'Pippa Wade – Wife',
         displayName: 'Pippa Wade',
         relationship: 'Wife',
-        link: links.url(BreadcrumbType.PersonalContact),
         notes: 'Some notes',
         phone: '0123456789',
         startDate: DateTime.fromObject({ year: 2019, month: 10, day: 5 }),
         emailAddress: 'example@example.com',
         address: ['53327 Movies Conn Ridges', 'Mafaldaville', 'Avon', 'ABC 123'],
+        links: {
+          view: links.url(BreadcrumbType.PersonalContact),
+          update: links.url(BreadcrumbType.ExitToDelius, {
+            utm: {
+              medium: UtmMedium.Personal,
+              campaign: 'update-personal-contact',
+              content: { personalContactId: 1000 },
+            },
+          }),
+        },
       } as PersonalContactDetail,
     ])
   })

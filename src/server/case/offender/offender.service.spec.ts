@@ -54,9 +54,14 @@ describe('OffenderService', () => {
       page: CasePage.Personal,
       contactDetails,
       personalDetails,
+      breadcrumb: {
+        type: BreadcrumbType.PersonalAddresses,
+        options: { entityName: 'some entity' },
+      },
+      links: links => ({ addressBook: links.url(BreadcrumbType.PersonalAddresses) } as any),
     })
 
-    const links = MockLinksModule.of({ crn: 'some-crn', offenderName: 'Liz Danger Haggis' })
+    const links = MockLinksModule.of({ crn: 'some-crn', offenderName: 'Liz Danger Haggis', entityName: 'some entity' })
     expect(observed).toEqual({
       page: CasePage.Personal,
       contactDetails,
@@ -65,28 +70,18 @@ describe('OffenderService', () => {
         crn: 'SOME-CRN',
         pnc: 'some-pnc',
       },
-      breadcrumbs: links.breadcrumbs(BreadcrumbType.PersonalDetails),
+      breadcrumbs: links.breadcrumbs(BreadcrumbType.PersonalAddresses),
       displayName: 'Liz Danger Haggis (Bob)',
       shortName: 'Liz Haggis',
       links: {
-        arrangeAppointment: links.url(BreadcrumbType.NewAppointment),
-        addActivity: links.url(BreadcrumbType.ExitToDelius),
-        addressBook: links.url(BreadcrumbType.PersonalAddresses),
-        circumstances: links.url(BreadcrumbType.PersonalCircumstances),
-        disabilities: links.url(BreadcrumbType.PersonalDisabilities),
         overview: links.url(BreadcrumbType.Case),
         personal: links.url(BreadcrumbType.PersonalDetails),
         schedule: links.url(BreadcrumbType.CaseSchedule),
         sentence: links.url(BreadcrumbType.CaseSentence),
-        additionalOffences: links.url(BreadcrumbType.CaseSentenceOffences),
         activity: links.url(BreadcrumbType.CaseActivityLog),
         compliance: links.url(BreadcrumbType.Compliance),
         risk: links.url(BreadcrumbType.CaseRisk),
-        toDelius: links.url(BreadcrumbType.ExitToDelius),
-        toOASys: links.url(BreadcrumbType.ExitToOASys),
-        viewInactiveRegistrations: links.url(BreadcrumbType.RemovedRisksList),
-        previousConvictions: links.url(BreadcrumbType.CasePreviousConvictions),
-        startBreach: links.url(BreadcrumbType.ExitToDelius),
+        addressBook: links.url(BreadcrumbType.PersonalAddresses),
       },
     })
   })

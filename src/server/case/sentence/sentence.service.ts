@@ -17,16 +17,16 @@ import {
   PreviousConvictionSummary,
 } from './sentence.types'
 import {
-  RequirementService,
   ConvictionRequirement,
   ConvictionRequirementType,
   ConvictionService,
+  RequirementService,
 } from '../../community-api'
 import { getOffenceName, getSentenceName } from './util'
 import { ComplianceService } from '../compliance'
 import { ActivityComplianceFilter, ActivityService } from '../activity'
 import { BreachService } from '../../community-api/breach'
-import { BreadcrumbType, LinksService } from '../../common/links'
+import { BreadcrumbType, LinksService, UtmMedium } from '../../common/links'
 
 function getConvictionOffence(conviction: Conviction): ConvictionOffence | null {
   const mainOffence = conviction.offences.find(x => x.mainOffence)
@@ -245,11 +245,19 @@ export class SentenceService {
 
   async getPreviousConvictions(crn: string): Promise<PreviousConvictionSummary[]> {
     const { previous } = await this.conviction.getConvictions(crn)
+    const links = this.links.of({ crn })
     // TODO: when PreviousConvictionSummary gets more complex (eg includes breaches) then switch to mutating the result of ComplianceService::convictionSummary
     return previous.map(c => ({
       name: getSentenceName(c.sentence),
       endDate: DateTime.fromISO(c.sentence.terminationDate),
       mainOffence: getOffenceName(c.offences.find(x => x.mainOffence)),
+      link: links.url(BreadcrumbType.ExitToDelius, {
+        utm: {
+          medium: UtmMedium.Sentence,
+          campaign: 'view-previous-conviction',
+          content: { convictionId: c.convictionId },
+        },
+      }),
     }))
   }
 

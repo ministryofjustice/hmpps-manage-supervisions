@@ -1,5 +1,5 @@
 import { Controller, Get, Param, ParseIntPipe, Render } from '@nestjs/common'
-import { Breadcrumb, BreadcrumbType, LinksService, ResolveBreadcrumbOptions } from '../../common/links'
+import { Breadcrumb, BreadcrumbType, LinksService, ResolveBreadcrumbOptions, UtmMedium } from '../../common/links'
 import { RiskService } from './risk.service'
 import { RemovedRisksListViewModel, RiskDetailsViewModel, RiskViewModel } from './risk.types'
 import { getDisplayName } from '../../util'
@@ -31,6 +31,21 @@ export class RiskController {
       page: CasePage.Risk,
       risks,
       registrations,
+      links: links => ({
+        viewInactiveRegistrations: links.url(BreadcrumbType.RemovedRisksList),
+        roshCommunity: links.url(BreadcrumbType.ExitToOASys, {
+          utm: { medium: UtmMedium.Risk, campaign: 'rosh-community' },
+        }),
+        roshSelf: links.url(BreadcrumbType.ExitToOASys, {
+          utm: { medium: UtmMedium.Risk, campaign: 'rosh-self' },
+        }),
+        noAssessment: links.url(BreadcrumbType.ExitToOASys, {
+          utm: { medium: UtmMedium.Risk, campaign: 'no-assessment' },
+        }),
+        addRiskFlag: links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.Risk, campaign: 'add-risk-flag' },
+        }),
+      }),
     })
   }
 
@@ -69,7 +84,7 @@ export class RiskController {
     ])
 
     if (!registration.removed) {
-      return RedirectResponse.found(registration.link)
+      return RedirectResponse.found(registration.links.view)
     }
 
     return {
@@ -97,7 +112,7 @@ export class RiskController {
     ])
 
     if (registration.removed) {
-      return RedirectResponse.found(registration.link)
+      return RedirectResponse.found(registration.links.view)
     }
 
     return {
@@ -119,9 +134,6 @@ export class RiskController {
     return {
       displayName,
       breadcrumbs: links.breadcrumbs(breadcrumbType),
-      links: {
-        toDelius: links.url(BreadcrumbType.ExitToDelius),
-      },
     }
   }
 }

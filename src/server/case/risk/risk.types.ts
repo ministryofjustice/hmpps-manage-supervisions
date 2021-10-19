@@ -50,7 +50,9 @@ export interface RiskRegistration {
   notes?: string
   reviewDue?: DateTime
   removed?: DateTime
-  link: string
+  links: {
+    view: string
+  }
 }
 
 export interface FlatRiskToSelf {
@@ -68,9 +70,6 @@ export interface RiskDetailsViewModel extends RiskViewModel {
 
 export interface RiskViewModel extends ViewModel {
   displayName: string
-  links: {
-    toDelius: string
-  }
 }
 
 export interface RiskRegistrationDetails extends RiskRegistration {
@@ -81,6 +80,13 @@ export interface RiskRegistrationDetails extends RiskRegistration {
   removedBy?: string
   removedNotes?: string
   typeInfo?: RiskTypeInformation
+  links: {
+    view: string
+    delete: string
+    updateNotes: string
+    viewLastReview: string
+    addReview: string
+  }
 }
 
 export interface RiskTypeInformation {

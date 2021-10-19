@@ -16,6 +16,7 @@ export interface BreachSummary {
   status?: string
   outcome?: string
   proven: boolean
+  link: string
 }
 
 export interface GetBreachesResult {

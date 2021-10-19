@@ -11,7 +11,7 @@ import {
   PersonalCircumstanceDetail,
   PersonalContactDetail,
 } from './personal.types'
-import { BreadcrumbType, LinksService } from '../../common/links'
+import { BreadcrumbType, LinksService, UtmMedium } from '../../common/links'
 import { CommunityApiService, WellKnownAddressTypes } from '../../community-api'
 import { CriminogenicNeed } from '../risk'
 
@@ -162,8 +162,9 @@ export class PersonalService {
     })
 
     return orderBy(
-      personalContacts.filter(isActiveDateRange).map(x => {
+      personalContacts.filter(isActiveDateRange).map<PersonalContactDetail>(x => {
         const displayName = getDisplayName(x)
+        const links = this.links.of({ crn, id: x.personalContactId })
         return {
           id: x.personalContactId,
           description: [displayName, titleCase(x.relationship)].filter(x => x).join(' – '),
@@ -171,10 +172,16 @@ export class PersonalService {
           relationship: x.relationship,
           displayName,
           address: x.address && getAddressLines(x.address),
-          link: this.links.getUrl(BreadcrumbType.PersonalContact, {
-            crn,
-            id: x.personalContactId,
-          }),
+          links: {
+            view: links.url(BreadcrumbType.PersonalContact),
+            update: links.url(BreadcrumbType.ExitToDelius, {
+              utm: {
+                medium: UtmMedium.Personal,
+                campaign: 'update-personal-contact',
+                content: { personalContactId: x.personalContactId },
+              },
+            }),
+          },
           emailAddress: x.emailAddress,
           startDate: DateTime.fromISO(x.startDate),
           endDate: x.endDate && DateTime.fromISO(x.endDate),

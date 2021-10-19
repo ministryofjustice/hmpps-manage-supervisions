@@ -1,10 +1,8 @@
 import { Test } from '@nestjs/testing'
 import { PersonalController } from './personal.controller'
 import { MockLinksModule } from '../../common/links/links.mock'
-import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
-import { OffenderService } from '../offender'
+import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { PersonalService } from './personal.service'
-import { fakeOffenderDetail, fakeOffenderDetailSummary } from '../../community-api/community-api.fake'
 import {
   fakeContactDetailsViewModel,
   fakeDisabilityDetail,
@@ -14,30 +12,27 @@ import {
   fakePersonalDetailsViewModel,
 } from './personal.fake'
 import { PersonalAddressesViewModel, PersonalContactViewModel, PersonalDisabilitiesViewModel } from './personal.types'
-import { BreadcrumbType } from '../../common/links'
-import { OffenderDetail, OffenderDetailSummary } from '../../community-api/client'
+import { BreadcrumbType, UtmMedium } from '../../common/links'
 import { RiskService } from '../risk'
-import { CasePage } from '../case.types'
+import { CasePage, CasePersonalViewModel } from '../case.types'
 import { fakeCriminogenicNeed } from '../risk/risk.fake'
 import { EligibilityService } from '../../community-api/eligibility'
+import { MockOffenderModule, OffenderServiceFixture } from '../offender/offender.mock'
 
 describe('PersonalController', () => {
   let subject: PersonalController
-  let offenderService: SinonStubbedInstance<OffenderService>
   let personalService: SinonStubbedInstance<PersonalService>
   let riskService: SinonStubbedInstance<RiskService>
-  let offender: OffenderDetail | OffenderDetailSummary
+  let offenderFixture: OffenderServiceFixture
 
   beforeEach(async () => {
-    offenderService = createStubInstance(OffenderService)
     personalService = createStubInstance(PersonalService)
     riskService = createStubInstance(RiskService)
 
     const module = await Test.createTestingModule({
       controllers: [PersonalController],
-      imports: [MockLinksModule],
+      imports: [MockLinksModule, MockOffenderModule.register()],
       providers: [
-        { provide: OffenderService, useValue: offenderService },
         { provide: PersonalService, useValue: personalService },
         { provide: RiskService, useValue: riskService },
         { provide: EligibilityService, useValue: null },
@@ -45,33 +40,14 @@ describe('PersonalController', () => {
     }).compile()
 
     subject = module.get(PersonalController)
+    offenderFixture = module.get(OffenderServiceFixture)
   })
 
-  function havingOffender() {
-    offender = fakeOffenderDetail({
-      firstName: 'Liz',
-      middleNames: ['Danger'],
-      surname: 'Haggis',
-      otherIds: { crn: 'some-crn' },
-    })
-    offenderService.getOffenderDetail.withArgs('some-crn').resolves(offender)
-  }
-
-  function havingOffenderSummary() {
-    offender = fakeOffenderDetailSummary({
-      firstName: 'Liz',
-      middleNames: ['Danger'],
-      surname: 'Haggis',
-      otherIds: { crn: 'some-crn' },
-    })
-    offenderService.getOffenderSummary.withArgs('some-crn').resolves(offender)
-  }
-
   it('gets addresses', async () => {
-    havingOffender()
+    offenderFixture.havingOffenderDetail()
 
     const details = fakeGetAddressDetailResult()
-    personalService.getAddressDetail.withArgs(offender).returns(details)
+    personalService.getAddressDetail.withArgs(offenderFixture.offender).returns(details)
 
     const observed = await subject.getAddresses('some-crn')
 
@@ -80,15 +56,19 @@ describe('PersonalController', () => {
       ...details,
       displayName: 'Liz Danger Haggis',
       breadcrumbs: links.breadcrumbs(BreadcrumbType.PersonalAddresses),
-      links: { toDelius: links.url(BreadcrumbType.ExitToDelius) },
+      links: {
+        addMainAddress: links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.Personal, campaign: 'add-main-address' },
+        }),
+      },
     } as PersonalAddressesViewModel)
   })
 
   it('gets disabilities', async () => {
-    havingOffender()
+    offenderFixture.havingOffenderDetail()
 
     const disabilities = [fakeDisabilityDetail()]
-    personalService.getDisabilities.withArgs(offender).returns(disabilities)
+    personalService.getDisabilities.withArgs(offenderFixture.offender).returns(disabilities)
 
     const observed = await subject.getDisabilities('some-crn')
 
@@ -97,12 +77,16 @@ describe('PersonalController', () => {
       disabilities,
       displayName: 'Liz Danger Haggis',
       breadcrumbs: links.breadcrumbs(BreadcrumbType.PersonalDisabilities),
-      links: { toDelius: links.url(BreadcrumbType.ExitToDelius) },
+      links: {
+        addMainAddress: links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.Personal, campaign: 'add-main-address' },
+        }),
+      },
     } as PersonalDisabilitiesViewModel)
   })
 
   it('gets personal contact', async () => {
-    havingOffenderSummary()
+    offenderFixture.havingOffender()
 
     const personalContact = fakePersonalContactDetail({ id: 100, description: 'Some personal contact' })
     const otherPersonalContact = fakePersonalContactDetail({ id: 101 })
@@ -120,7 +104,11 @@ describe('PersonalController', () => {
       personalContact,
       displayName: 'Liz Danger Haggis',
       breadcrumbs: links.breadcrumbs(BreadcrumbType.PersonalContact),
-      links: { toDelius: links.url(BreadcrumbType.ExitToDelius) },
+      links: {
+        addMainAddress: links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.Personal, campaign: 'add-main-address' },
+        }),
+      },
       ids: {
         crn: 'some-crn',
       },
@@ -128,10 +116,7 @@ describe('PersonalController', () => {
   })
 
   it('gets personal', async () => {
-    havingOffender()
-    offenderService.getOffenderDetail.withArgs('some-crn').resolves(offender)
-    const viewModel: any = { page: CasePage.Personal }
-    const stub = offenderService.casePageOf.withArgs(offender, match.any).returns(viewModel)
+    offenderFixture.havingOffenderDetail().havingCasePageOf()
 
     const personalContacts = [fakePersonalContactDetail()]
     personalService.getPersonalContacts.withArgs('some-crn').resolves(personalContacts)
@@ -145,16 +130,27 @@ describe('PersonalController', () => {
     const contactDetails = fakeContactDetailsViewModel()
     const personalDetails = fakePersonalDetailsViewModel()
     personalService.getPersonalDetails
-      .withArgs(offender, personalContacts, circumstances, needs)
+      .withArgs(offenderFixture.offender, personalContacts, circumstances, needs)
       .returns({ contactDetails, personalDetails })
 
     const observed = await subject.getPersonal('some-crn')
 
-    expect(observed).toBe(viewModel)
-    expect(stub.getCall(0).args[1]).toEqual({
+    expect(observed).toBe(offenderFixture.caseViewModel)
+    offenderFixture.shouldHaveCalledCasePageOf<CasePersonalViewModel>({
       page: CasePage.Personal,
       contactDetails,
       personalDetails,
+      links: {
+        addressBook: offenderFixture.links.url(BreadcrumbType.PersonalAddresses),
+        circumstances: offenderFixture.links.url(BreadcrumbType.PersonalCircumstances),
+        disabilities: offenderFixture.links.url(BreadcrumbType.PersonalDisabilities),
+        criminogenicNeeds: offenderFixture.links.url(BreadcrumbType.ExitToOASys, {
+          utm: { medium: UtmMedium.Personal, campaign: 'criminogenic-needs' },
+        }),
+        viewEquality: offenderFixture.links.url(BreadcrumbType.ExitToDelius, {
+          utm: { medium: UtmMedium.Personal, campaign: 'view-equality' },
+        }),
+      },
     })
   })
 })

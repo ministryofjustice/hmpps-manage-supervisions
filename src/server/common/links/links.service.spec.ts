@@ -3,7 +3,7 @@ import { LinksService } from './links.service'
 import { DiscoveryModule } from '@nestjs/core'
 import { Breadcrumb } from './breadcrumb.decorator'
 import { Controller, Get } from '@nestjs/common'
-import { BreadcrumbType } from './types'
+import { BreadcrumbType, UtmMedium } from './links.types'
 
 @Controller()
 class HomeController {
@@ -31,6 +31,7 @@ class OffenderController {
     type: BreadcrumbType.PersonalDetails,
     parent: BreadcrumbType.Case,
     title: 'Personal details',
+    requiresUtm: true,
   })
   getPersonal() {
     throw new Error('not implemented')
@@ -50,7 +51,7 @@ class OffenderController {
 describe('LinksService', () => {
   let subject: LinksService
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module = await Test.createTestingModule({
       imports: [DiscoveryModule],
       providers: [LinksService],
@@ -65,6 +66,26 @@ describe('LinksService', () => {
     expect(observed).toEqual('/offender/some-crn/overview')
   })
 
+  it('gets url with utm', () => {
+    const observed = subject.getUrl(BreadcrumbType.Case, {
+      crn: 'some-crn',
+      utm: { medium: UtmMedium.Sentence, campaign: 'some-campaign', content: { some: 'content' } },
+    })
+    expect(observed).toEqual(
+      '/offender/some-crn/overview?utm_source=app&utm_medium=sentence&utm_campaign=some-campaign&utm_content=crn_some-crn.some_content',
+    )
+  })
+
+  it('requires utm', () => {
+    expect(() => subject.getUrl(BreadcrumbType.PersonalDetails, { crn: 'some-crn' })).toThrow(
+      "links to 'PersonalDetails' require utm",
+    )
+  })
+
+  it('requires all url params', () => {
+    expect(() => subject.getUrl(BreadcrumbType.Case, {})).toThrow("cannot resolve 'Case' breadcrumb without 'crn'")
+  })
+
   it('gets breadcrumb', () => {
     const observed = subject.resolveAll(BreadcrumbType.PersonalAddresses, {
       crn: 'some-crn',
@@ -73,7 +94,10 @@ describe('LinksService', () => {
     expect(observed).toEqual([
       { text: 'Cases', href: '/' },
       { text: 'Liz Haggis', href: '/offender/some-crn/overview' },
-      { text: 'Personal details', href: '/offender/some-crn/personal' },
+      {
+        text: 'Personal details',
+        href: '/offender/some-crn/personal?utm_source=app&utm_medium=breadcrumb&utm_campaign=PersonalAddresses&utm_content=crn_some-crn',
+      },
       { text: 'Addresses' },
     ])
   })
@@ -88,7 +112,10 @@ describe('LinksService', () => {
     })
     expect(observed).toEqual([
       { text: 'Cases', href: '/' },
-      { text: 'Personal details', href: '/offender/some-crn/personal' },
+      {
+        text: 'Personal details',
+        href: '/offender/some-crn/personal?utm_source=app&utm_medium=breadcrumb&utm_campaign=PersonalAddresses&utm_content=crn_some-crn',
+      },
       { text: 'Addresses' },
     ])
   })
