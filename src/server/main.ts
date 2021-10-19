@@ -14,6 +14,7 @@ Settings.defaultZone = 'Europe/London'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { bodyParser: false, bufferLogs: true })
+  app.disable('x-powered-by')
   LoggerModule.useLogger(app)
 
   useBodyParser(app)
