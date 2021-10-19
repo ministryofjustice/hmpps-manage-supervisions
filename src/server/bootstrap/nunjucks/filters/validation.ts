@@ -11,7 +11,7 @@ const parseHrefFromPath = (path: string) => {
   return path === 'date' ? '#date.day' : `#${path}`
 }
 
-export class ErrorSummary implements NunjucksFilter {
+export class ErrorSummary extends NunjucksFilter {
   filter(errors: ValidationError[]): GdsErrorMessage[] {
     return flattenValidationErrors(errors || []).map(
       (error: FlatValidationError): GdsErrorMessage => ({
@@ -22,7 +22,7 @@ export class ErrorSummary implements NunjucksFilter {
   }
 }
 
-export class FindErrorMessages implements NunjucksFilter {
+export class FindErrorMessages extends NunjucksFilter {
   filter(errors: ValidationError[], ...paths: string[]): GdsErrorMessage {
     const flattened = flattenValidationErrors(errors || [])
 

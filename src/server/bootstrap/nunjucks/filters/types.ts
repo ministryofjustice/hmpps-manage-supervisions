@@ -1,4 +1,8 @@
-export interface NunjucksFilter {
-  filter(...args: any[]): any
+import { Environment } from 'nunjucks'
+
+export abstract class NunjucksFilter {
+  public constructor(protected readonly environment: Environment) {}
+
+  abstract filter(...args: any[]): any
   async?: boolean
 }

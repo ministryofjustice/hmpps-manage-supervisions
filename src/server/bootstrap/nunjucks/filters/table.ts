@@ -85,7 +85,7 @@ export interface TimeRangeColumn extends ColumnBase<'from'> {
 
 export type Column = TextColumn | LinkColumn | ShortDateColumn | LongDateColumn | TimeRangeColumn
 
-export class ToTableRows implements NunjucksFilter {
+export class ToTableRows extends NunjucksFilter {
   filter(data: any[], columns: Column[]): TableColumn[][] {
     return data.map(x =>
       columns.map(col => ({

@@ -4,7 +4,7 @@
 {% from 'components/summary-card.njk' import appSummaryCard %}
 
 {% macro flatNotes(notes) -%}
-    <p class="govuk-!-margin-bottom-0" data-qa='notes'>{{ notes | nl2br | safe }}</p>
+    <p class="govuk-!-margin-bottom-0" data-qa='notes'>{{ notes | nl2BrSafe }}</p>
 {%- endmacro %}
 {% macro systemContact(entry) -%}
     <div class="govuk-hint govuk-!-margin-bottom-2 govuk-!-margin-left-3">
