@@ -9,6 +9,7 @@ export function csp() {
         scriptSrc: ["'self'", "'sha256-+6WnXIl4mbFTCARd8N3COQmT3bJJmo32N8q8ZSQAIcU='"],
         styleSrc: ["'self'"],
         fontSrc: ["'self'"],
+        objectSrc: ["'none'"],
       },
     },
   })
