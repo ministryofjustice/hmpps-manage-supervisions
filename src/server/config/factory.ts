@@ -309,7 +309,7 @@ export function configFactory(): Config {
     },
     session: {
       secret: string('SESSION_SECRET', developmentOnly('app-insecure-default-session')),
-      expiryMinutes: int('WEB_SESSION_TIMEOUT_IN_MINUTES', fallback(120)),
+      expiryMinutes: int('WEB_SESSION_TIMEOUT_IN_MINUTES', fallback(60 * 12 - 5)),
     },
     delius: {
       baseUrl: url('DELIUS_BASE_URL', developmentOnly('http://localhost:8082/delius')),
