@@ -23,6 +23,7 @@ context('Cases', () => {
       cy.testA11y()
       casesPage.pageTitle.contains('Your cases')
       casesPage.headerUserName.should('contain.text', 'J. Smith')
+      casesPage.headerProviderName.should('contain.text', 'NPS Yorkshire and The Humber')
     })
 
     it('renders case list', () => {

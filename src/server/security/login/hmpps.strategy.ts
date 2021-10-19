@@ -79,6 +79,7 @@ export class HmppsStrategy extends PassportStrategy(Strategy, 'hmpps') {
         ...profile,
         displayName: titleCase(profile.name),
         staffCode: staff.staffCode,
+        providerDisplayName: staff?.probationArea?.description,
       }
     } catch (err) {
       this.logger.error(`cannot retrieve user profile for delius user '${user.username}'`, err)

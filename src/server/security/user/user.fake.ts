@@ -17,4 +17,5 @@ export const fakeUser = fake<User>((options, partial = {}) => ({
   displayName: faker.name.findName(),
   authorities: partial.authorities || ['ROLE_PROBATION', 'ROLE_MANAGE_SUPERVISIONS_RO', 'ROLE_MANAGE_SUPERVISIONS'],
   scope: ['read', 'write'],
+  providerDisplayName: faker.company.companyName(),
 }))
