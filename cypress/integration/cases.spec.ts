@@ -39,7 +39,7 @@ context('Cases', () => {
 
     it('should render the empty list message', () => {
       cy.home()
-      fixture.shouldDisplayEmptyWarning('There are no suitable cases.')
+      fixture.shouldDisplayEmptyWarning('None of the cases you manage meet the criteria for this pilot.')
     })
   })
 
