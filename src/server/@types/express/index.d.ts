@@ -13,6 +13,7 @@ interface User {
   userId: string
   uuid: string
   staffCode?: string
+  providerDisplayName: string
 }
 
 declare namespace Express {

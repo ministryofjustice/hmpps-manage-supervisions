@@ -5,6 +5,10 @@ export class CasesPage extends PageBase {
     return cy.get('[data-qa=header-user-name]')
   }
 
+  get headerProviderName() {
+    return cy.get('[data-qa=header-provider-name]')
+  }
+
   tableHeader() {
     return cy.get(`table[data-qa="cases/case-list"] > thead > tr > th[data-qa="offender-details"]`)
   }

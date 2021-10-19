@@ -37,6 +37,10 @@ const STAFF: StaffDetails = {
       },
     },
   ],
+  probationArea: {
+    probationAreaId: 1,
+    description: 'NPS Yorkshire and The Humber',
+  },
 }
 
 export function staff(partial: DeepPartial<StaffDetails> = {}): SeedFn {
