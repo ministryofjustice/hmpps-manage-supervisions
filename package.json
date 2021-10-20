@@ -65,6 +65,7 @@
     "rimraf": "^3.0.2",
     "rxjs": "^7.3.1",
     "source-map-support": "^0.5.19",
+    "striptags": "^3.2.0",
     "winston": "^3.3.3"
   },
   "devDependencies": {

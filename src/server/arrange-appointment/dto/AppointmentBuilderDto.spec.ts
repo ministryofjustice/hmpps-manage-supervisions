@@ -84,10 +84,18 @@ describe('AppointmentBuilderDto validation & mapping', () => {
       startTime: '12:00pm',
       endTime: '1:00pm',
       typeDescription: 'some type description',
+      notes: 'some notes not rendered as a link',
     }
 
     it('mapping with default group', () => {
-      const observed = plainToClass(AppointmentBuilderDto, plain, { groups: [DEFAULT_GROUP] })
+      const observed = plainToClass(
+        AppointmentBuilderDto,
+        {
+          ...plain,
+          notes: 'some notes<br /> <a href="#somewhere">not rendered as a link</a>',
+        },
+        { groups: [DEFAULT_GROUP] },
+      )
       expect(observed).toEqual(plain)
     })
 
