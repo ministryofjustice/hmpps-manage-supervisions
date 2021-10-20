@@ -108,7 +108,7 @@ class Fixture extends ViewCaseFixture {
       }
 
       if (expected.adjustments.length === 0) {
-        card.value('Adjustments').contains('None')
+        card.value('Adjustments').contains('No adjustments')
       }
     })
     return this
