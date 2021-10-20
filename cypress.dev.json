@@ -1,15 +1,19 @@
 {
   "chromeWebSecurity": false,
-  "baseUrl": "http://localhost:3007",
+  "baseUrl": "https://manage-supervisions-dev.hmpps.service.justice.gov.uk/",
   "reporter": "cypress-multi-reporters",
   "reporterOptions": {
     "configFile": "reporter-config.json"
   },
   "videoUploadOnPasses": false,
-  "taskTimeout": 5000,
+  "taskTimeout": 10000,
+  "retries": {
+    "runMode": 2,
+    "openMode": 0
+  },
   "video": false,
   "env": {
-    "DEPLOYMENT_ENV": "local"
+    "DEPLOYMENT_ENV": "dev"
   },
   "viewportWidth": 1920,
   "viewportHeight": 1080

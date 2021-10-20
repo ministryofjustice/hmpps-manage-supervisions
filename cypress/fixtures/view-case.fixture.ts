@@ -1,14 +1,25 @@
-import { CasePage, TABS } from '../../pages/case/case.page'
-import { CRN } from '../../plugins/offender'
-import { CaseExitPage, ExitPageName } from '../../pages/case/case-exit.page'
-import { CaseIneligiblePage } from '../../pages/case/case-ineligible.page'
+import { CasePage, TABS } from '../pages/case/case.page'
+import { CRN } from '../plugins/offender'
+import { CaseExitPage, ExitPageName } from '../pages/case/case-exit.page'
+import { CaseIneligiblePage } from '../pages/case/case-ineligible.page'
+
+interface CaseFixtureData {
+  crn: string
+  displayName: string
+}
+
+const LIZ_LOCAL: CaseFixtureData = {
+  crn: CRN,
+  displayName: 'Liz Danger Haggis (Bob)',
+}
 
 export class ViewCaseFixture {
-  crn = CRN
   page = new CasePage()
 
+  constructor(readonly data = LIZ_LOCAL) {}
+
   whenViewingOffender(): this {
-    cy.viewCase({ crn: this.crn })
+    cy.viewCase({ crn: this.data.crn })
     return this
   }
 
@@ -22,9 +33,19 @@ export class ViewCaseFixture {
     return this
   }
 
+  dismissEligibilityWarningIfPresent() {
+    const page = new CaseIneligiblePage()
+    page.pageTitle.then(title => {
+      if (title.text().includes('We’re not ready to handle this case')) {
+        page.continueButton.click()
+      }
+    })
+    return this
+  }
+
   shouldDisplayCommonHeader(): this {
-    this.page.pageTitle.contains(`CRN: ${this.crn}`)
-    this.page.pageTitle.contains('Liz Danger Haggis (Bob)')
+    this.page.pageTitle.contains(`CRN: ${this.data.crn}`)
+    this.page.pageTitle.contains(this.data.displayName)
     return this
   }
 

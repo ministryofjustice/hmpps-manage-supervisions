@@ -1,4 +1,4 @@
-import { ViewCaseFixture } from './view-case.fixture'
+import { ViewCaseFixture } from '../../fixtures/view-case.fixture'
 
 context('Case overview tab', () => {
   const fixture = new ViewCaseFixture()

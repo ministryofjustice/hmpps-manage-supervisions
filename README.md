@@ -153,6 +153,14 @@ You should run the tests with Chrome because we have to set `"chromeWebSecurity"
 
 Once you have run the tests at least once, you can navigate to `http://localhost:3007` to use the app under test.
 
+## Smoke tests
+
+Smoke tests are implemented as part of the cypress tests. To run on dev:
+
+```bash
+CYPRESS_HMPPS_USERNAME={YOUR_USERNAME} CYPRESS_HMPPS_PASSWORD={YOUR_PASSWORD} cypress run --config-file cypress.dev.json --spec 'cypress/integration/smoke/**/*.spec.ts'
+```
+
 ## Security workflow
 
 The `security` CircleCI workflow is run Mon-Fri @7am off of the `main` branch. It includes:

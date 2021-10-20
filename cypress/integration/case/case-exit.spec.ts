@@ -1,11 +1,11 @@
-import { ViewCaseFixture } from './view-case.fixture'
+import { ViewCaseFixture } from '../../fixtures/view-case.fixture'
 import { OFFENDER_ID } from '../../plugins/offender'
 import { ACTIVE_CONVICTION_ID } from '../../plugins/convictions'
 import { ExitPageName } from '../../pages/case/case-exit.page'
 
 class Fixture extends ViewCaseFixture {
   whenViewingExitPage(service: ExitPageName) {
-    cy.viewCase({ crn: this.crn, path: `/to-${service}` })
+    cy.viewCase({ crn: this.data.crn, path: `/to-${service}` })
     return this
   }
 
@@ -14,7 +14,7 @@ class Fixture extends ViewCaseFixture {
       page.offenderDetails(list => {
         list.value('Name').contains('Liz Danger Haggis')
         list.value('Date of birth').contains('10/06/1980')
-        list.valueAbbr('CRN').contains(this.crn)
+        list.valueAbbr('CRN').contains(this.data.crn)
         list.valueAbbr('PNC').contains('2012/123400000F')
       })
     })

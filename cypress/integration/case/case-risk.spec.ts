@@ -1,6 +1,6 @@
 import { CaseRemovedRisksPage } from '../../pages/case/case-removed-risks.page'
 import { CaseRiskDetailPage } from '../../pages/case/case-risk-detail.page'
-import { ViewCaseFixture } from './view-case.fixture'
+import { ViewCaseFixture } from '../../fixtures/view-case.fixture'
 
 class Fixture extends ViewCaseFixture {
   shouldRenderRiskDetails(pageTitle: string, assert: (page: CaseRiskDetailPage) => void): this {

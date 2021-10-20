@@ -1,4 +1,4 @@
-import { ViewCaseFixture } from './view-case.fixture'
+import { ViewCaseFixture } from '../../fixtures/view-case.fixture'
 import { CaseActivityAppointmentPage } from '../../pages'
 import { LONG_CONTACT_NOTES } from '../../plugins/contacts'
 import { CaseActivityDetailPage } from '../../pages/case/case-activity-detail.page'

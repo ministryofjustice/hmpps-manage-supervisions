@@ -1,4 +1,4 @@
-import { ViewCaseFixture } from './view-case.fixture'
+import { ViewCaseFixture } from '../../fixtures/view-case.fixture'
 import { CasePreviousOrdersPage } from '../../pages/case/case-previous-orders.page'
 import { CaseOffencesPage } from '../../pages/case/case-offences.page'
 

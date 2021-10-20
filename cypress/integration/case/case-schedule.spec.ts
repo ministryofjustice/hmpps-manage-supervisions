@@ -1,4 +1,4 @@
-import { ViewCaseFixture } from './view-case.fixture'
+import { ViewCaseFixture } from '../../fixtures/view-case.fixture'
 import { SCHEDULE_TABLE } from '../../pages/case/case.page'
 import { DateTime } from 'luxon'
 import { Role } from '../../plugins/hmpps-auth'
@@ -129,7 +129,7 @@ context('Case schedule tab', () => {
         .whenClickingSubNavTab('schedule')
         .shouldRenderOffenderTab('schedule', page => {
           page.arrangeAppointmentButton.contains('Arrange an appointment').click()
-          cy.url().should('include', `/arrange-appointment/${fixture.crn}`)
+          cy.url().should('include', `/arrange-appointment/${fixture.data.crn}`)
         })
         .shouldBeAccessible()
     })
