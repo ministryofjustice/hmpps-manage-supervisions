@@ -1,12 +1,27 @@
+import * as name from './name'
+import * as dates from './dates'
+import * as options from './options'
+import * as validation from './validation'
+import * as bool from './bool'
+import { ToTableRows } from './table'
+import * as math from './math'
+import * as govukui from './govuk-ui'
+import * as arrays from './arrays'
+import * as text from './text'
+import * as email from './email'
+
+export const filters = {
+  ...name,
+  ...dates,
+  ...options,
+  ...validation,
+  ...bool,
+  ToTableRows,
+  ...math,
+  ...govukui,
+  ...arrays,
+  ...text,
+  ...email,
+}
+
 export * from './types'
-export * from './name'
-export * from './dates'
-export * from './options'
-export * from './validation'
-export * from './bool'
-export { ToTableRows } from './table'
-export * from './math'
-export * from './govuk-ui'
-export * from './arrays'
-export * from './text'
-export * from './email'

@@ -1,25 +1,25 @@
 import { map, filter } from 'lodash'
 import { NunjucksFilter } from './types'
 
-export class ConcatArrays implements NunjucksFilter {
+export class ConcatArrays extends NunjucksFilter {
   filter(...arrays: any[][]): any[] {
     return arrays.filter(x => x?.length > 0).reduce((agg, x) => [...agg, ...x], [])
   }
 }
 
-export class Map implements NunjucksFilter {
+export class Map extends NunjucksFilter {
   filter(array: any[], path: string): any[] {
     return map(array, path)
   }
 }
 
-export class Filter implements NunjucksFilter {
+export class Filter extends NunjucksFilter {
   filter(array: any[], path: string): any[] {
     return filter(array, path)
   }
 }
 
-export class ArrayCoalesce implements NunjucksFilter {
+export class ArrayCoalesce extends NunjucksFilter {
   filter(array: any[], value: any): any {
     if (!array || array.length === 0) {
       return value

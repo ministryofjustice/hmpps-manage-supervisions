@@ -2,19 +2,19 @@ import { NunjucksFilter } from './types'
 import { DateTime } from 'luxon'
 import { PotentiallyExpectedDateTime, RawDate, safeGetDateTime } from '../../../util'
 
-export class ToIsoDate implements NunjucksFilter {
+export class ToIsoDate extends NunjucksFilter {
   filter(date: DateTime): string {
     return date.toISODate()
   }
 }
 
-export class DateFormat implements NunjucksFilter {
+export class DateFormat extends NunjucksFilter {
   filter(value: RawDate, format: string): string {
     return safeGetDateTime(value).toFormat(format)
   }
 }
 
-export class Time implements NunjucksFilter {
+export class Time extends NunjucksFilter {
   filter(value: RawDate): string {
     return Time.apply(value)
   }
@@ -29,7 +29,7 @@ export class Time implements NunjucksFilter {
   }
 }
 
-export class TimeRange implements NunjucksFilter {
+export class TimeRange extends NunjucksFilter {
   filter(from: RawDate, to?: RawDate): string {
     return TimeRange.apply(from, to)
   }
@@ -42,7 +42,7 @@ export class TimeRange implements NunjucksFilter {
   }
 }
 
-export class LongDate implements NunjucksFilter {
+export class LongDate extends NunjucksFilter {
   filter(value: RawDate): string {
     return LongDate.apply(value)
   }
@@ -57,7 +57,7 @@ export class LongDate implements NunjucksFilter {
   }
 }
 
-export class ShortDate implements NunjucksFilter {
+export class ShortDate extends NunjucksFilter {
   filter(value: RawDate): string {
     return ShortDate.apply(value)
   }
@@ -67,13 +67,13 @@ export class ShortDate implements NunjucksFilter {
   }
 }
 
-export class MonthDate implements NunjucksFilter {
+export class MonthDate extends NunjucksFilter {
   filter(value: RawDate): string {
     return safeGetDateTime(value).toFormat('MMMM yyyy')
   }
 }
 
-export class Dob implements NunjucksFilter {
+export class Dob extends NunjucksFilter {
   filter(value: RawDate): string {
     const date = safeGetDateTime(value)
     const age = DateTime.now().diff(date, 'years')
@@ -81,14 +81,14 @@ export class Dob implements NunjucksFilter {
   }
 }
 
-export class ExpectedDate implements NunjucksFilter {
+export class ExpectedDate extends NunjucksFilter {
   filter({ value, expected }: PotentiallyExpectedDateTime): string {
     const date = safeGetDateTime(value).toFormat('d MMMM yyyy')
     return expected ? `${date} (expected)` : date
   }
 }
 
-export class LongDateTime implements NunjucksFilter {
+export class LongDateTime extends NunjucksFilter {
   filter(value: RawDate): string {
     if (!value) {
       return ''

@@ -5,7 +5,7 @@ import * as path from 'path'
 import { ConfigService } from '@nestjs/config'
 import { ServerConfig } from '../config'
 import { camelCase } from 'lodash'
-import * as filters from './nunjucks/filters'
+import { filters, NunjucksFilter } from './nunjucks/filters'
 
 export function useGovUkUi(app: NestExpressApplication) {
   const { description, isProduction, staticResourceCacheDuration, supportEmail } = app
@@ -28,8 +28,8 @@ export function useGovUkUi(app: NestExpressApplication) {
   for (const Filter of Object.values(filters)) {
     const name = camelCase(Filter.name)
     filterNames.push(name)
-    const filter: filters.NunjucksFilter = new Filter()
-    environment.addFilter(name, filter.filter, filter.async)
+    const filter: NunjucksFilter = new Filter(environment)
+    environment.addFilter(name, (...args) => filter.filter(...args), filter.async)
   }
 
   logger.debug(`adding nunjucks filters ${filterNames.join(', ')}`)

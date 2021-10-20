@@ -14,7 +14,7 @@ export interface ToRadioListOptions {
   otherHtml?: string
 }
 
-export class ToRadioList implements NunjucksFilter {
+export class ToRadioList extends NunjucksFilter {
   /**
    * Maps an array of models to the item list required by govukRadios.
    * @param arr the array to map
@@ -55,7 +55,7 @@ export interface ToSelectListOptions {
   emptyValue?: boolean
 }
 
-export class ToSelectList implements NunjucksFilter {
+export class ToSelectList extends NunjucksFilter {
   /**
    * Maps an array of models to the item list required by govukSelect.
    * @param arr the array to map

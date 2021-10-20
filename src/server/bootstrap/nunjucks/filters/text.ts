@@ -1,7 +1,8 @@
 import { kebabCase } from 'lodash'
 import { NunjucksFilter } from './types'
+import { runtime } from 'nunjucks'
 
-export class FullStop implements NunjucksFilter {
+export class FullStop extends NunjucksFilter {
   filter(value: string): any {
     if (!value) {
       return value
@@ -12,7 +13,7 @@ export class FullStop implements NunjucksFilter {
   }
 }
 
-export class Brackets implements NunjucksFilter {
+export class Brackets extends NunjucksFilter {
   filter(value: string): any {
     if (!value) {
       return ''
@@ -21,7 +22,7 @@ export class Brackets implements NunjucksFilter {
   }
 }
 
-export class Slug implements NunjucksFilter {
+export class Slug extends NunjucksFilter {
   filter(value: string): any {
     if (!value) {
       return ''
@@ -36,10 +37,44 @@ enum Abbreviation {
   RAR = 'Rehabilitation activity requirement',
 }
 
-export class Abbr implements NunjucksFilter {
+export class Abbr extends NunjucksFilter {
   filter(value: Abbreviation): string {
     if (!Abbreviation[value]) throw new Error(`Undefined abbreviation: ${value}`)
 
     return `<abbr title="${Abbreviation[value]}">${value}</abbr>`
+  }
+}
+
+function unwrapString(value: any): string {
+  if (!value) {
+    return value
+  }
+  switch (typeof value) {
+    case 'string':
+      return value
+    case 'object':
+      return value instanceof runtime.SafeString ? value.val : value.toString()
+  }
+
+  return value.toString()
+}
+
+/**
+ * equivalent to:
+ * "foo\nbar" | striptags(true) | escape | nl2br | safe
+ */
+export class Nl2brSafe extends NunjucksFilter {
+  private readonly safe = this.environment.getFilter('safe')
+  private readonly nl2br = this.environment.getFilter('nl2br')
+  private readonly escape = this.environment.getFilter('escape')
+  private readonly striptags = this.environment.getFilter('striptags')
+
+  filter(value: any): any {
+    const s = unwrapString(value)
+    if (!s) {
+      return s
+    }
+
+    return this.safe(this.nl2br(this.escape(this.striptags(value, true))))
   }
 }

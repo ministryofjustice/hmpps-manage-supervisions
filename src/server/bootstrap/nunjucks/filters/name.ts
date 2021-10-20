@@ -1,6 +1,6 @@
 import { NunjucksFilter } from './types'
 
-export class InitialiseName implements NunjucksFilter {
+export class InitialiseName extends NunjucksFilter {
   filter(fullName: string): any {
     if (!fullName) {
       return null

@@ -42,7 +42,7 @@ export const ACTIVITY_LOG_GROUPS: DeepPartial<ActivityLogGroup>[] = [
         },
         startTime: '14:00:00',
         endTime: null,
-        notes: 'Some unknown communication',
+        notes: 'Some unknown communication\n<a href="#dont-click-this">this should not be a link</a>',
         outcome: null,
         lastUpdatedDateTime: '2020-09-04T15:20:23+01:00',
         lastUpdatedByUser: { forenames: 'John', surname: 'Rover' },

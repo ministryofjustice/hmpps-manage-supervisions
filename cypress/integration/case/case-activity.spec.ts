@@ -60,6 +60,10 @@ class Fixture extends ViewCaseFixture {
           }
 
           entry.notes.contains(expected.notes)
+
+          // only <br> tags should be rendered in the notes field
+          entry.notes.find(':not(br)').should('not.exist')
+
           switch (notesType) {
             case 'closed-detail':
               entry.notesDetail(expected.sensitive, detail => detail.shouldBeClosed())
@@ -197,7 +201,7 @@ context('Case activity tab', () => {
           id: 8,
           date: 'Friday 4 September 2020',
           title: 'Not a well known communication at 2pm',
-          notes: 'Some unknown communication',
+          notes: 'Some unknown communication this should not be a link',
           notesType: 'closed-detail',
           sensitive: true,
         })
