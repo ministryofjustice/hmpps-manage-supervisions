@@ -2,6 +2,13 @@
 
 {% set pageTitle = "Your cases" %}
 
+{% set requirementList %}
+      <ul class="govuk-list govuk-list--bullet">
+        <li>a single community order</li>
+        <li>a {{ 'RAR' | abbr | safe }} requirement, and no other requirements</li>
+      </ul>
+{% endset %}
+
 {% block content %}
   <h1 class="govuk-heading-xl">
     {{ pageTitle }}
@@ -9,13 +16,9 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <p>Not all cases are suitable for the {{ applicationName }} pilot. We’re only listing your cases that have:</p>
-      <ul class="govuk-list govuk-list--bullet">
-        <li>a single community order</li>
-        <li>a {{ 'RAR' | abbr | safe }} requirement, and no other requirements</li>
-      </ul>
-
 {% if cases.length %}
+      <p>Not all cases are suitable for the {{ applicationName }} pilot. We’re only listing your cases that have:</p>
+      {{ requirementList | safe }}
       <table class="govuk-table" data-qa="cases/case-list">
         <thead class="govuk-table__head">
           <tr class="govuk-table__row">
@@ -35,9 +38,10 @@
       </table>
 {% else %}
       <div data-qa='cases/case-list/empty'>
-          <p class='govuk-body'>
-              There are no suitable cases.
-          </p>
+        <p>None of the cases you manage meet the criteria for this pilot.</p> 
+        <p>To qualify for the pilot, your cases must have:</p> 
+        {{ requirementList | safe }}
+        <p>We'll let you know when some of your cases become suitable.</p>
       </div>
 
 {% endif %}
