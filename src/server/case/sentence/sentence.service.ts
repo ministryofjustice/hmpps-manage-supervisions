@@ -85,12 +85,13 @@ export class SentenceService {
       requirements.find(x => x.isRar).name = rar.name
     }
     return {
-      previousConvictions: previous.length
-        ? {
-            count: previous.length,
-            lastEnded: DateTime.fromISO(maxBy(previous, x => x.convictionDate)?.convictionDate),
-          }
-        : null,
+      previousConvictions:
+        previous.length && previous.filter(x => x.convictionDate).length
+          ? {
+              count: previous.length,
+              lastEnded: DateTime.fromISO(maxBy(previous, x => x.convictionDate)?.convictionDate),
+            }
+          : null,
       previousBreaches: {
         count: breachesResult
           .map(x => x.breaches)

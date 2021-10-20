@@ -199,7 +199,15 @@ describe('SentenceService', () => {
 
     expect(rarRequirement.name).toBe('100 days RAR, 10 completed')
   })
+  it('handles previous convictions without conviction date', async () => {
+    havingConvictions({ convictionId: 100, active: true }, { active: false, convictionDate: null, convictionId: 101 })
+    havingBreaches('some-crn', 101)
+    havingRequirements(100, { isRar: true, name: '100 days RAR' })
+    havingRarCount(100, 10)
 
+    const observed = await subject.getConvictionDetails('some-crn')
+    expect(observed.previousConvictions).toEqual(null)
+  })
   describe('offence detail', () => {
     it('handles no current conviction', async () => {
       havingConvictions(null)
