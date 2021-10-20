@@ -209,7 +209,7 @@ export class PersonalService {
       .map(x =>
         [
           x.disabilityType.description,
-          x.provisions?.length ? x.provisions.map(p => p.provisionType.description).join(', ') : 'None',
+          x.provisions?.length ? x.provisions.map(p => p.provisionType.description).join(', ') : 'No adjustments',
         ].join(': '),
       )
       .sort()

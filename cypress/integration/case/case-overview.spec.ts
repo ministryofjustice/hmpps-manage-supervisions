@@ -91,7 +91,7 @@ context('Case overview tab', () => {
               [
                 'Employment: Temporary/casual work (30 or more hours per week)',
                 'Learning Difficulties: Other',
-                'Speech Impairment: None',
+                'Speech Impairment: No adjustments',
               ].join(' '),
             )
         })

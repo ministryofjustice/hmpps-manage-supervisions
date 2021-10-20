@@ -219,7 +219,7 @@ describe('PersonalService', () => {
         preferredLanguage: 'English (interpreter required)',
         currentCircumstances: ['Relationship: Married / Civil partnership'],
         currentCircumstancesLastUpdated,
-        disabilities: ['Some disability: None', 'Some other disability: Some provision'],
+        disabilities: ['Some disability: No adjustments', 'Some other disability: Some provision'],
         disabilitiesLastUpdated,
         criminogenicNeeds: ['Some criminogenic need'],
         religion: 'Christian',
