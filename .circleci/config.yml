@@ -119,12 +119,14 @@ workflows:
       - hmpps/helm_lint:
           name: helm_lint
       - hmpps/build_docker:
-          name: build_docker_publish
+          # this is named to match up with the deployment-tools job
+          name: build_docker
           filters:
             branches:
               only:
                 - main
       - hmpps/build_docker:
+          name: build_docker_nopublish
           publish: false
           filters:
             branches:
@@ -144,7 +146,7 @@ workflows:
             - helm_lint
             - build-test
             - integration_test
-            - build_docker_publish
+            - build_docker
       - approve_postdev:
           type: approval
           requires:
