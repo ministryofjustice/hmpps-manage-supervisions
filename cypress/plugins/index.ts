@@ -1,18 +1,19 @@
 import { WiremockClient, wiremocker } from './wiremock'
 import {
-  reset,
-  ReferenceDataSeedOptions,
-  referenceDataSeed,
-  CasesSeedOptions,
   casesSeed,
-  offenderSeed,
-  OffenderSeedOptions,
+  CasesSeedOptions,
   ContactSeedOptions,
   contactsSeed,
+  offenderSeed,
+  OffenderSeedOptions,
+  referenceDataSeed,
+  ReferenceDataSeedOptions,
+  reset,
 } from './seeds'
 import { hmppsAuthStub, StubHmppsAuthOptions } from './hmpps-auth'
 import { CRN } from './offender'
 import { ACTIVE_CONVICTION_ID } from './convictions'
+import { DeploymentEnvironment } from '../util'
 
 export type SeedOptions = ReferenceDataSeedOptions &
   OffenderSeedOptions &
@@ -20,7 +21,7 @@ export type SeedOptions = ReferenceDataSeedOptions &
   CasesSeedOptions &
   StubHmppsAuthOptions
 
-const pluginConfig: Cypress.PluginConfig = on => {
+const pluginConfig: Cypress.PluginConfig = (on, config) => {
   on('task', {
     async resetSeed() {
       await wiremocker([reset], { silent: true })
@@ -28,6 +29,10 @@ const pluginConfig: Cypress.PluginConfig = on => {
     },
 
     async seed(options: SeedOptions = {}) {
+      if (config.env.DEPLOYMENT_ENV !== DeploymentEnvironment.Local) {
+        throw new Error(`seeding is unavailable in the ${config.env.DEPLOYMENT_ENV} deployment environment`)
+      }
+
       await wiremocker(
         [
           reset,

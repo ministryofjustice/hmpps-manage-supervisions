@@ -1,4 +1,4 @@
-import { ViewCaseFixture } from './view-case.fixture'
+import { ViewCaseFixture } from '../../fixtures/view-case.fixture'
 import { DateTime } from 'luxon'
 import { ActivityLogEntry, ActivityLogGroup, AppointmentOutcome } from '../../../src/server/community-api/client'
 

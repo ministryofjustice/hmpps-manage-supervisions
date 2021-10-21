@@ -38,11 +38,11 @@ const login: SeedFn = context =>
     .get(AUTHORIZE_PATH)
     .query({ response_type: 'code', client_id: 'api-client-id' })
     .queryMatches({ redirect_uri: '.+', state: '.+' }).html(`<html>
-       <body>
-         <h1>HMPPS Auth Login</h1>
-         <a href="{{ request.query.redirect_uri }}&code=${AUTHORIZATION_CODE}&state={{ request.query.state }}">Login</a>
-       </body>
-     </html>`)
+  <body>
+    <h1>Sign in</h1>
+    <a href="{{ request.query.redirect_uri }}&code=${AUTHORIZATION_CODE}&state={{ request.query.state }}">Sign in</a>
+  </body>
+</html>`)
 
 /**
  * Stub the token granted for subject authorization code flow.

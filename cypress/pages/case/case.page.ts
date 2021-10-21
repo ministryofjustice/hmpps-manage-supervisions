@@ -40,7 +40,7 @@ export class CasePage extends PageBase {
   }
 
   get currentTab() {
-    return cy.url().then(url => url.match(/\/case\/[A-Za-z0-9]+\/(\w+)\/?/)[1])
+    return cy.get('nav[data-qa="offender/sub-nav"] a[aria-current=page]').then(x => x.attr('data-qa'))
   }
 
   get ineligibleCaseWarning() {

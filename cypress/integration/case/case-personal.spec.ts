@@ -1,4 +1,4 @@
-import { ViewCaseFixture } from './view-case.fixture'
+import { ViewCaseFixture } from '../../fixtures/view-case.fixture'
 import { ADDRESS, CaseAddressesPage } from '../../pages/case/case-addresses.page'
 import { CaseDisabilitiesPage } from '../../pages/case/case-disabilities.page'
 import { CasePersonalCircumstancesPage } from '../../pages/case/case-personal-circumstances.page'
@@ -223,7 +223,7 @@ context('Case personal details tab', () => {
             .contains('Learning Difficulties: Other Speech Impairment: No adjustments')
           card.title('Disabilities and adjustments').contains('Last updated')
           card.value('Criminogenic needs').contains('Accommodation Alcohol Misuse Drug Misuse')
-          card.valueAbbr('CRN').contains(fixture.crn)
+          card.valueAbbr('CRN').contains(fixture.data.crn)
           card.valueAbbr('PNC').contains('2012/123400000F')
         })
 

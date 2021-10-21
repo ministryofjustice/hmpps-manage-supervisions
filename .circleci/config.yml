@@ -3,16 +3,22 @@ version: 2.1
 orbs:
   hmpps: ministryofjustice/hmpps@3.11
   cypress: cypress-io/cypress@1
+  slack: circleci/slack@4.1
 
 executors:
   integration-test:
     docker:
-      - image: cypress/base:14.16.0
+      - image: cypress/base:14.17.3
         environment:
           TZ: "Europe/London"
       - image: circleci/redis:buster
       - image: rodolpheche/wiremock
         command: ['/docker-entrypoint.sh', '--port', '9091', '--global-response-templating']
+
+  smoke-test:
+    docker:
+      - image: cypress/base:14.17.3
+
 
 commands:
   install-build-deps:
@@ -84,11 +90,8 @@ jobs:
       - restore_cache:
           key: dependencies-{{ checksum "package-lock.json" }}
       - run:
-          name: install-npm
+          name: install dependencies
           command: 'npm ci --no-audit'
-      - run:
-          name: Check version
-          command: 'npm --version'
       - run:
           name: Run check
           command: 'npm outdated @nestjs/core govuk-frontend'
@@ -189,6 +192,36 @@ workflows:
             - hmpps-common-vars
             - hmpps-manage-supervisions-prod
 
+  smoke_test:
+    triggers:
+      - schedule:
+          cron: "0 9-17 * * 1-5"
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - cypress/run:
+          name: smoke_test_dev
+          executor: smoke-test
+          config-file: cypress.dev.json
+          spec: cypress/integration/smoke/**/*.spec.ts
+          post-checkout:
+            - install-build-deps:
+                sudo: false
+          no-workspace: true
+          store_artifacts: true
+          post-steps:
+            - store_test_results:
+                path: test_results
+            - slack/notify:
+                channel: manage-a-supervision-notifications-dev
+                event: fail
+                template: basic_fail_1
+          context:
+            - hmpps-common-vars
+            - hmpps-manage-supervisions-smoke-test-dev
+
   security:
     triggers:
       - schedule:
@@ -200,15 +233,19 @@ workflows:
     jobs:
       - check_outdated
       - hmpps/npm_security_audit:
+          slack_channel: manage-a-supervision-notifications
           context:
             - hmpps-common-vars
       - hmpps/trivy_latest_scan:
+          slack_channel: manage-a-supervision-notifications
           context:
             - hmpps-common-vars
       - hmpps/veracode_pipeline_scan:
+          slack_channel: manage-a-supervision-notifications
           context:
             - veracode-credentials
             - hmpps-common-vars
+
   security-weekly:
     triggers:
       - schedule:
@@ -219,6 +256,7 @@ workflows:
                 - main
     jobs:
       - hmpps/veracode_policy_scan:
+          slack_channel: manage-a-supervision-notifications
           context:
             - veracode-credentials
             - hmpps-common-vars
