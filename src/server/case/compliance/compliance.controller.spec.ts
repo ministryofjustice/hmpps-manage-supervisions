@@ -53,7 +53,7 @@ describe('ComplianceController', () => {
             content: { convictionId: compliance.current?.id },
           },
         }),
-        viewAllOrders: offenderFixture.links.url(BreadcrumbType.ExitToDelius, {
+        viewAllOrders: offenderFixture.links.url(BreadcrumbType.CasePreviousConvictions, {
           utm: { medium: UtmMedium.Compliance, campaign: 'view-all-orders' },
         }),
       },

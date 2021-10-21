@@ -1,14 +1,7 @@
 import { ViewCaseFixture } from '../../fixtures/view-case.fixture'
-import { CasePreviousOrdersPage } from '../../pages/case/case-previous-orders.page'
 import { CaseOffencesPage } from '../../pages/case/case-offences.page'
 
 class Fixture extends ViewCaseFixture {
-  shouldRenderPreviousOrdersPage(callback: (page: CasePreviousOrdersPage) => void) {
-    const page = new CasePreviousOrdersPage()
-    page.pageTitle.contains('Previous orders')
-    callback(page)
-    return this
-  }
   shouldRenderOffencesPage(callback: (page: CaseOffencesPage) => void) {
     const page = new CaseOffencesPage()
     page.pageTitle.contains('Offences')

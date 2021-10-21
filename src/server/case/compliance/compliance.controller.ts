@@ -32,7 +32,7 @@ export class ComplianceController {
             content: { convictionId: compliance.current?.id },
           },
         }),
-        viewAllOrders: links.url(BreadcrumbType.ExitToDelius, {
+        viewAllOrders: links.url(BreadcrumbType.CasePreviousConvictions, {
           utm: { medium: UtmMedium.Compliance, campaign: 'view-all-orders' },
         }),
       }),
