@@ -29,6 +29,21 @@ describe('UtmTags', () => {
     } as Utm)
   })
 
+  it('ignores bad content', () => {
+    const observed = utmFactory({
+      utm_source: 'app',
+      utm_medium: 'risk',
+      utm_campaign: 'some-campaign',
+      utm_content: 'ba..d.u.t.m_._.**',
+    })
+    expect(observed).toEqual({
+      source: UtmSource.App,
+      medium: UtmMedium.Risk,
+      campaign: 'some-campaign',
+      content: {},
+    } as Utm)
+  })
+
   it('parses tags with content', () => {
     const observed = utmFactory({
       utm_source: 'app',
