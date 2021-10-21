@@ -218,7 +218,13 @@ context('Case compliance tab', () => {
         .whenViewingOffender()
         .whenClickingSubNavTab('compliance')
         .shouldRenderOffenderTab('compliance', page => page.viewAllOrdersLink.click())
-        .shouldDisplayExitPage('delius')
+        .shouldRenderPreviousOrdersPage(page => {
+          page.previousOrdersTable(table => {
+            table.cell(0, 1).contains('Ended on 20 November 2019')
+            table.cell(0, 0).contains('Common Assault and Battery (2 counts)')
+            table.cell(0, 0).contains('24 month CJA Community Order').click()
+          })
+        })
     })
 
     it('links to delius interstitial from start breach link', () => {
