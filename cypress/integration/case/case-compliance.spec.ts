@@ -213,14 +213,14 @@ context('Case compliance tab', () => {
         .shouldDisplayExitPage('delius')
     })
 
-    it('links to delius interstitial from view all orders link', () => {
+    it('links to previous orders page from view all orders link', () => {
       fixture
         .whenViewingOffender()
         .whenClickingSubNavTab('compliance')
         .shouldRenderOffenderTab('compliance', page => page.viewAllOrdersLink.click())
         .shouldRenderPreviousOrdersPage(page => {
           page.previousOrdersTable(table => {
-            table.cell(0, 1).contains('Ended on 20 November 2019')
+            table.cell(0, 1).contains('Ended on 21 November 2019')
             table.cell(0, 0).contains('Common Assault and Battery (2 counts)')
             table.cell(0, 0).contains('24 month CJA Community Order').click()
           })
