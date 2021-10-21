@@ -2,6 +2,7 @@ import { CasePage, TABS } from '../pages/case/case.page'
 import { CRN } from '../plugins/offender'
 import { CaseExitPage, ExitPageName } from '../pages/case/case-exit.page'
 import { CaseIneligiblePage } from '../pages/case/case-ineligible.page'
+import { CasePreviousOrdersPage } from '../pages/case/case-previous-orders.page'
 
 interface CaseFixtureData {
   crn: string
@@ -86,6 +87,12 @@ export class ViewCaseFixture {
 
   shouldBeAccessible() {
     cy.testA11y()
+    return this
+  }
+  shouldRenderPreviousOrdersPage(callback: (page: CasePreviousOrdersPage) => void) {
+    const page = new CasePreviousOrdersPage()
+    page.pageTitle.contains('Previous orders')
+    callback(page)
     return this
   }
 }
