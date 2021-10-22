@@ -103,7 +103,7 @@
                 rows: [
                     {
                         key: { text: 'Main offence' },
-                        value: { text: compliance.current.mainOffence }
+                        value: { text: compliance.current.mainOffence | striptags(true) | noOrphans | safe }
                     },
                     {
                         key: { text: 'Order' },
