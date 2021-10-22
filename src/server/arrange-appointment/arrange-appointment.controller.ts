@@ -138,8 +138,11 @@ export class ArrangeAppointmentController {
     if (type.requiresLocation === AppointmentTypeRequiresLocation.Optional) {
       const locations = await this.service.getTeamOfficeLocations(session.appointment.teamCode)
       session.appointment.locationsAvailableForTeam = locations.length > 0
-      session.appointment.location = UNSPECIFIED_LOCATION_CODE
-      session.appointment.locationDescription = UNSPECIFIED_LOCATION_DESCRIPTION
+
+      if (!session.appointment.locationsAvailableForTeam) {
+        session.appointment.location = UNSPECIFIED_LOCATION_CODE
+        session.appointment.locationDescription = UNSPECIFIED_LOCATION_DESCRIPTION
+      }
     }
 
     if (type.requiresLocation === AppointmentTypeRequiresLocation.NotRequired && session.appointment.location) {
