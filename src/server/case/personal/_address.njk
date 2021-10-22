@@ -40,8 +40,8 @@
             } if address.endDate,
             {
                 key: { text: "Notes" },
-                value: { html: address.notes | nl2br }
-            } if address.notes
+                value: { html: (address.notes | nl2br) if address.notes else 'No notes' }
+            }
         ]
     }) }}
 {%- endcall %}
