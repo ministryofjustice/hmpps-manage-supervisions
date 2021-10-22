@@ -53,7 +53,7 @@
                     value: { html: contactDetails.phoneNumbers.other }
                 } if contactDetails.phoneNumbers.other,
                 {
-                    key: { text: "Current circumstances and disabilities" },
+                    key: { text: "Current circumstances<br>and disabilities" | safe },
                     value: {
                         html: join(personalDetails.currentCircumstances | concatArrays(personalDetails.disabilities))
                             if personalDetails.currentCircumstances.length > 0 or personalDetails.disabilities.length > 0 else 'None'
