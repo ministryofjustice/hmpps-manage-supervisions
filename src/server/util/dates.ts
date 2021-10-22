@@ -1,5 +1,5 @@
 import { DateInput, DateTime, DurationUnit } from 'luxon'
-import { TIME_FORMAT } from '../validators'
+import { parseTime } from '../validators'
 import { quantity } from './math'
 
 export interface PotentiallyExpectedDateTime {
@@ -24,7 +24,7 @@ export function getDateTime(dateOrIso: RawDate, time?: string): DateTime {
 
   const date = safeGetDateTime(dateOrIso)
   return DateTime.fromObject({
-    ...DateTime.fromFormat(time, TIME_FORMAT).toObject(),
+    ...parseTime(time).toObject(),
     day: date.day,
     month: date.month,
     year: date.year,
