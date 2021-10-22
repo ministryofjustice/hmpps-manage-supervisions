@@ -1,6 +1,11 @@
 import { ArrangeAppointmentService } from './arrange-appointment.service'
 import { plainToClass } from 'class-transformer'
-import { AppointmentBuilderDto, MESSAGES } from './dto/AppointmentBuilderDto'
+import {
+  AppointmentBuilderDto,
+  MESSAGES,
+  UNSPECIFIED_LOCATION_CODE,
+  UNSPECIFIED_LOCATION_DESCRIPTION,
+} from './dto/AppointmentBuilderDto'
 import { validate, ValidationError } from 'class-validator'
 import {
   AppointmentAddNotesViewModel,
@@ -129,6 +134,14 @@ export class ArrangeAppointmentController {
     Object.assign(session.appointment, body)
     session.appointment.typeDescription = type.description
     session.appointment.requiresLocation = type.requiresLocation
+
+    if (type.requiresLocation === AppointmentTypeRequiresLocation.Optional) {
+      const locations = await this.service.getTeamOfficeLocations(session.appointment.teamCode)
+      session.appointment.locationsAvailableForTeam = locations.length > 0
+      session.appointment.location = UNSPECIFIED_LOCATION_CODE
+      session.appointment.locationDescription = UNSPECIFIED_LOCATION_DESCRIPTION
+    }
+
     if (type.requiresLocation === AppointmentTypeRequiresLocation.NotRequired && session.appointment.location) {
       session.appointment.location = null
       session.appointment.locationDescription = null
@@ -525,6 +538,11 @@ export class ArrangeAppointmentController {
       groups: [DEFAULT_GROUP],
       excludeExtraneousValues: true,
     })
+
+    if (session.appointment.requiresLocation == AppointmentTypeRequiresLocation.Optional) {
+      locations.push({ code: UNSPECIFIED_LOCATION_CODE, description: UNSPECIFIED_LOCATION_DESCRIPTION })
+    }
+
     return {
       step: AppointmentWizardStep.Where,
       appointment,
