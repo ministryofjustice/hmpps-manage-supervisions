@@ -1,4 +1,4 @@
-import { AppointmentBuilderDto } from './dto/AppointmentBuilderDto'
+import { AppointmentBuilderDto, UNSPECIFIED_LOCATION_CODE } from './dto/AppointmentBuilderDto'
 import { Injectable } from '@nestjs/common'
 import { CacheService } from '../common'
 import {
@@ -66,7 +66,7 @@ export class ArrangeAppointmentService {
       appointmentStart: builder.appointmentStart.toISO(),
       appointmentEnd: builder.appointmentEnd.toISO(),
       contactType: appointmentType.contactType,
-      officeLocationCode: builder.location,
+      officeLocationCode: builder.location == UNSPECIFIED_LOCATION_CODE ? null : builder.location,
       notes: builder.notes,
       sensitive: builder.sensitive,
     }

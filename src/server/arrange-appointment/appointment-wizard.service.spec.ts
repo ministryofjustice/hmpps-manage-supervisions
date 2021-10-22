@@ -19,6 +19,7 @@ describe('AppointmentWizardService', () => {
       completedSteps,
       appointment: {
         requiresLocation: AppointmentTypeRequiresLocation.Required,
+        locationsAvailableForTeam: true,
       },
     }
   }
@@ -84,11 +85,19 @@ describe('AppointmentWizardService', () => {
     shouldRedirectToStep(observed, SECOND_STEP)
   })
 
-  it('next step when location optional', () => {
+  it('next step when location optional and locations available', () => {
     const session = fakeSession()
     session.appointment.requiresLocation = AppointmentTypeRequiresLocation.Optional
     const observed = subject.nextStep(session, FIRST_STEP)
     shouldRedirectToStep(observed, SECOND_STEP)
+  })
+
+  it('next step when location optional and no locations available', () => {
+    const session = fakeSession()
+    session.appointment.requiresLocation = AppointmentTypeRequiresLocation.Optional
+    session.appointment.locationsAvailableForTeam = false
+    const observed = subject.nextStep(session, FIRST_STEP)
+    shouldRedirectToStep(observed, AppointmentWizardStep.When)
   })
 
   it('next step when location not required', () => {

@@ -28,6 +28,7 @@ const meta: {
     next(model?: AppointmentBuilderDto) {
       switch (model?.requiresLocation) {
         case AppointmentTypeRequiresLocation.Optional:
+          return model.locationsAvailableForTeam ? AppointmentWizardStep.Where : AppointmentWizardStep.When
         case AppointmentTypeRequiresLocation.Required:
           return AppointmentWizardStep.Where
         default:

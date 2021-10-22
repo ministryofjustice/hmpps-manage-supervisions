@@ -27,6 +27,9 @@ export const MESSAGES = {
   },
 }
 
+export const UNSPECIFIED_LOCATION_CODE = 'UNSPECIFIED_LOCATION'
+export const UNSPECIFIED_LOCATION_DESCRIPTION = 'No location'
+
 function IsAppointmentType(featured: boolean) {
   const decorators = [IsString, IsNotEmpty]
   if (featured) {
@@ -118,6 +121,9 @@ export class AppointmentBuilderDto {
 
   @ExposeDefault()
   requiresLocation?: AppointmentTypeRequiresLocation
+
+  @ExposeDefault()
+  locationsAvailableForTeam?: boolean
 
   @ExposeDefault({ groups: [AppointmentWizardStep.Where] })
   @ValidateIf(object => object?.requiresLocation === AppointmentTypeRequiresLocation.Required, {
