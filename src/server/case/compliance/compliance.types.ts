@@ -12,6 +12,7 @@ export interface ComplianceConvictionSummary {
   name: string
   progress?: string
   mainOffence: string
+  additionalOffencesCount: number
   startDate: DateTime
   endDate?: DateTime
   terminationReason?: string

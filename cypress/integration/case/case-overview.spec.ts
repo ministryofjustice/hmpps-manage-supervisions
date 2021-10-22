@@ -106,6 +106,7 @@ context('Case overview tab', () => {
           card
             .value('Main offence')
             .contains('Cheats at gambling or enables or assists person to cheat (Gambling Act 2005) (1 count)')
+          card.value('Main offence').contains('1 additional offence')
           card.value('Order').contains('12 month Community Order (12 months elapsed)')
           card.value('Requirements').contains('44 days RAR, 1 completed')
           card.value('Previous orders').contains('1 previous order (1 breach on a previous order)')

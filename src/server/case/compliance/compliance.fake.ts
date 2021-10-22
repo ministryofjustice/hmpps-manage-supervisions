@@ -18,6 +18,7 @@ export const fakeComplianceConvictionSummary = fake<ComplianceConvictionSummary>
     length: '12 months',
     progress: '6 months',
     mainOffence: faker.company.bs(),
+    additionalOffencesCount: 3,
     inBreach: true,
     activeBreach,
     previousBreaches,

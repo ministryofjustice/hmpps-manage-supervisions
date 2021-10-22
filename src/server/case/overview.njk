@@ -94,6 +94,15 @@
     {%- endcall %}
 
     {% if compliance.current %}
+        {% set mainOffence %}
+            {{ compliance.current.mainOffence | striptags(true) | noOrphans | safe }}
+            {% if compliance.current.additionalOffencesCount > 0 %}
+              <div class="govuk-!-margin-top-2">
+                {{ compliance.current.additionalOffencesCount }} additional {{ 'offences' if compliance.current.additionalOffencesCount > 1  else 'offence' }}
+              </div>
+            {% endif %}
+        {% endset %}
+
         {% call appSummaryCard({
             titleText: 'Sentence',
             classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
@@ -103,7 +112,7 @@
                 rows: [
                     {
                         key: { text: 'Main offence' },
-                        value: { text: compliance.current.mainOffence | striptags(true) | noOrphans | safe }
+                        value: { html: mainOffence }
                     },
                     {
                         key: { text: 'Order' },
