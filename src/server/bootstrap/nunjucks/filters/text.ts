@@ -78,3 +78,16 @@ export class Nl2brSafe extends NunjucksFilter {
     return this.safe(this.nl2br(this.escape(this.striptags(value, true))))
   }
 }
+
+export class NoOrphans extends NunjucksFilter {
+  filter(value: any): any {
+    const indexOflastSpace = value.lastIndexOf(' ')
+    if (indexOflastSpace === -1) {
+      return value
+    }
+
+    const begin = value.substring(0, indexOflastSpace)
+    const end = value.substring(indexOflastSpace + 1)
+    return `${begin}&nbsp;${end}`
+  }
+}
