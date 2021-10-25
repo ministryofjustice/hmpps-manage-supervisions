@@ -144,7 +144,7 @@ describe('SentenceService', () => {
           }),
         ],
       },
-      { active: false, convictionDate: '2019-01-02', convictionId: 101 },
+      { active: false, convictionDate: '2019-01-02', convictionId: 101, sentence: { terminationDate: '2019-06-07' } },
       { active: false, convictionDate: '2019-01-02', convictionId: 102 },
     )
     havingBreaches('some-crn', 101)
@@ -157,7 +157,7 @@ describe('SentenceService', () => {
     expect(observed).toEqual({
       previousConvictions: {
         count: 2,
-        lastEnded: DateTime.fromObject({ year: 2019, month: 1, day: 2 }),
+        lastEnded: DateTime.fromObject({ year: 2019, month: 6, day: 7 }),
       },
       previousBreaches: {
         count: 2,
