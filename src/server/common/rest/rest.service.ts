@@ -74,10 +74,13 @@ export class RestService {
         return r
       },
       err => {
-        // we are not logging failed responses as we are throwing the exception so would expect it to be logged further up the stack
         if (Axios.isAxiosError(err)) {
+          const responseTime = RestService.getResponseTime(err.config)
           const { retryCount } = err.config['axios-retry'] as any
-          throw new SanitisedAxiosError(err, apiMeta, retryCount || 0, RestService.getResponseTime(err.config))
+          const sanitized = new SanitisedAxiosError(err, apiMeta, retryCount || 0, responseTime)
+
+          logger.warn('request failed', sanitized)
+          throw sanitized
         }
         throw err
       },
