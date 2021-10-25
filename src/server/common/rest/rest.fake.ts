@@ -21,5 +21,7 @@ export function fakeRestError(status: HttpStatus): SanitisedAxiosError {
       stack: 'Some stack trace',
     },
     { name: 'community', baseUrl: 'https://community-api' },
+    1,
+    123,
   )
 }

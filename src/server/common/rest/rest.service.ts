@@ -1,11 +1,17 @@
 import { Injectable } from '@nestjs/common'
 import { Config, DependentApisConfig, ServerConfig } from '../../config'
-import Axios, { AxiosInstance } from 'axios'
+import Axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 import { ApiMeta, SanitisedAxiosError } from './SanitisedAxiosError'
-import * as rax from 'retry-axios'
+import axiosRetry from 'axios-retry'
 import { ConfigService } from '@nestjs/config'
 import { HmppsOidcService } from '../hmpps-oidc/hmpps-oidc.service'
 import { ContextualNestLoggerService, LoggerService } from '../../logger'
+
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    requestStarted?: number
+  }
+}
 
 export enum AuthenticationMethod {
   None,
@@ -16,6 +22,7 @@ export enum AuthenticationMethod {
 @Injectable()
 export class RestService {
   private readonly logger: ContextualNestLoggerService
+
   constructor(
     private readonly config: ConfigService<Config>,
     private readonly oidc: HmppsOidcService,
@@ -33,9 +40,26 @@ export class RestService {
     const { isProduction } = this.config.get<ServerConfig>('server')
     const axios = Axios.create({ baseURL: url.href, timeout })
     const apiMeta: ApiMeta = { name, baseUrl: url.href }
-    const logger = this.logger.child(apiMeta)
+    const logger = this.logger.child({ api: apiMeta })
 
-    // response logging
+    axios.interceptors.request.use(config => {
+      config.requestStarted = new Date().getTime()
+      return config
+    })
+
+    if (authMethod !== AuthenticationMethod.None) {
+      // authorization header
+      axios.interceptors.request.use(async config => {
+        const token = await this.getToken(user, authMethod)
+        config.headers.authorization = `Bearer ${token}`
+        return config
+      })
+    }
+
+    // retry GET requests with response codes >= 500, exactly once, without delay
+    axiosRetry(axios, { retries: 1 })
+
+    // log successful responses or sanitise error & add retry meta
     axios.interceptors.response.use(
       r => {
         logger.log('request successful', {
@@ -43,51 +67,17 @@ export class RestService {
           url: r.config.url,
           status: r.status,
           statusText: r.statusText,
+          responseTime: RestService.getResponseTime(r.config),
           // do not log bodies in production mode as they may contain PII
           ...(isProduction ? {} : { requestBody: r.config.data, responseBody: r.data }),
         })
         return r
       },
       err => {
+        // we are not logging failed responses as we are throwing the exception so would expect it to be logged further up the stack
         if (Axios.isAxiosError(err)) {
-          // on failed requests, log retries only - since we're re-throwing, we can expect the consumer service to log,
-          // or for the exception to bubble up to be unhandled where it will be logged by nest.
-          const { currentRetryAttempt, retry: totalRetryAttempts } = rax.getConfig(err)
-          if (currentRetryAttempt) {
-            logger.warn(
-              `request failed on retry ${currentRetryAttempt}/${totalRetryAttempts}`,
-              new SanitisedAxiosError(err, apiMeta),
-            )
-          }
-        }
-        // we have to re-throw as-is for the retry to work
-        throw err
-      },
-    )
-
-    if (authMethod !== AuthenticationMethod.None) {
-      // authorization header
-      axios.interceptors.request.use(async config => {
-        const token = await this.getToken(user, authMethod)
-        return { ...config, headers: { ...config.headers, authorization: `Bearer ${token}` } }
-      })
-    }
-
-    // retry
-    axios.defaults.raxConfig = {
-      instance: axios,
-      retry: 3,
-      backoffType: 'static',
-      retryDelay: 100,
-    }
-    rax.attach(axios)
-
-    // sanitise error
-    axios.interceptors.response.use(
-      r => r,
-      err => {
-        if (Axios.isAxiosError(err)) {
-          throw new SanitisedAxiosError(err, apiMeta)
+          const { retryCount } = err.config['axios-retry'] as any
+          throw new SanitisedAxiosError(err, apiMeta, retryCount || 0, RestService.getResponseTime(err.config))
         }
         throw err
       },
@@ -101,8 +91,12 @@ export class RestService {
       case AuthenticationMethod.PassThroughUserToken:
         return user.token
       case AuthenticationMethod.ReissueForDeliusUser:
-        // TODO assert this is really a delius user token?
         return await this.oidc.getDeliusUserToken(user)
     }
+  }
+
+  private static getResponseTime(config: AxiosRequestConfig) {
+    // including all retries
+    return config.requestStarted && new Date().getTime() - config.requestStarted
   }
 }

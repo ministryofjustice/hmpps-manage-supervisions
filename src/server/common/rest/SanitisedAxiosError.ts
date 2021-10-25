@@ -11,7 +11,12 @@ export interface ApiMeta {
  * Wraps an axios errors, that may contain sensitive request headers.
  */
 export class SanitisedAxiosError extends Error {
-  constructor(inner: AxiosError, public readonly api: ApiMeta) {
+  constructor(
+    inner: AxiosError,
+    public readonly api: ApiMeta,
+    public readonly retries: number,
+    public readonly responseTime: number,
+  ) {
     super(inner.message)
     this.stack = inner.stack
     this.name = SanitisedAxiosError.name
