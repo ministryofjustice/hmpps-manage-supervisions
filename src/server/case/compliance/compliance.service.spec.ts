@@ -117,4 +117,22 @@ describe('ComplianceService', () => {
       lastRecentBreachEnd: null,
     } as ComplianceConvictionSummary)
   })
+
+  it('gets conviction summary when length and units are null', async () => {
+    const conviction = fakeConviction({
+      sentence: {
+        originalLength: null,
+        originalLengthUnits: null,
+      },
+      offences: [],
+    })
+    breachService.getBreaches.withArgs('some-crn', conviction.convictionId).resolves({
+      breaches: [],
+      lastRecentBreachEnd: null,
+    })
+
+    const observed = await subject.getComplianceSummary('some-crn', conviction)
+
+    expect(observed.length).toEqual('')
+  })
 })
