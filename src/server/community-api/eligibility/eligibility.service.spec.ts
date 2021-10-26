@@ -8,7 +8,6 @@ import { fakePaginated, fakeStaffCaseloadEntry } from '../community-api.fake'
 import { fakeCase } from '../../cases/cases.fake'
 import { fakeUser } from '../../security/user/user.fake'
 import { HttpStatus } from '@nestjs/common'
-import { LocalSessionData } from '../../@types/express-session'
 
 describe('EligibilityService', () => {
   let subject: EligibilityService
@@ -46,13 +45,13 @@ describe('EligibilityService', () => {
 
   describe('check offender eligibility', () => {
     it('is eligible from session', async () => {
-      const session: LocalSessionData = Object.freeze({ eligibility: { 'some-crn': true } })
+      const session = Object.freeze({ eligibility: { 'some-crn': true } })
       const observed = await subject.checkOffenderEligibility(session as any, 'some-crn')
       expect(observed).toBe(OffenderEligibilityResult.Eligible)
     })
 
     it('is ineligible from session', async () => {
-      const session: LocalSessionData = Object.freeze({ eligibility: { 'some-crn': false } })
+      const session = Object.freeze({ eligibility: { 'some-crn': false } })
       const observed = await subject.checkOffenderEligibility(session as any, 'some-crn')
       expect(observed).toBe(OffenderEligibilityResult.Ineligible)
     })
@@ -61,7 +60,7 @@ describe('EligibilityService', () => {
       community.offender.getManageSupervisionsEligibilityUsingGET
         .withArgs(match({ crn: 'some-crn' }))
         .resolves(fakeOkResponse(fakeStaffCaseloadEntry()))
-      const session: LocalSessionData = {}
+      const session: any = {}
       const observed = await subject.checkOffenderEligibility(session as any, 'some-crn')
       expect(observed).toBe(OffenderEligibilityResult.Eligible)
       expect(session).toEqual({ eligibility: { 'some-crn': true } })
@@ -71,7 +70,7 @@ describe('EligibilityService', () => {
       community.offender.getManageSupervisionsEligibilityUsingGET
         .withArgs(match({ crn: 'some-crn' }))
         .throws(fakeRestError(HttpStatus.NOT_FOUND))
-      const session: LocalSessionData = {}
+      const session: any = {}
       const observed = await subject.checkOffenderEligibility(session as any, 'some-crn')
       expect(observed).toBe(OffenderEligibilityResult.IneligibleDisplayWarning)
       expect(session).toEqual({ eligibility: { 'some-crn': false } })

@@ -1,4 +1,4 @@
-import { SeedContext, SeedFn, SeedModule, SeedPrimitive } from './types'
+import { SeedContext, SeedFn, SeedModule, SeedPrimitive } from './seed.types'
 import { WiremockClient, WiremockClientOptions } from './wiremock-client'
 
 function isModule(x: SeedPrimitive): x is SeedModule {

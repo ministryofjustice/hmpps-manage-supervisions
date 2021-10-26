@@ -2,6 +2,7 @@ import { AssessmentNeedDtoSeverity, AssessmentNeedsDto } from '../../src/server/
 import { fakeAssessmentNeedsDto } from '../../src/server/assess-risks-and-needs-api/assess-risks-and-needs-api.fake'
 import { SeedFn } from './wiremock'
 import { NeedsAssessmentSection } from '../../src/server/assess-risks-and-needs-api'
+import { DeepPartial } from '../../src/server/app.types'
 
 export const NEEDS: DeepPartial<AssessmentNeedsDto> = {
   identifiedNeeds: [

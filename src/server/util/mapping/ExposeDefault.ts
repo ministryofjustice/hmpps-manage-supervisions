@@ -1,5 +1,4 @@
-import { ExposeOptions } from 'class-transformer/types/interfaces'
-import { Expose } from 'class-transformer'
+import { Expose, ExposeOptions } from 'class-transformer'
 
 export const DEFAULT_GROUP = 'default'
 

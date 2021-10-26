@@ -1,3 +1,3 @@
 export * from './wiremock-client'
-export * from './types'
+export * from './seed.types'
 export * from './runner'

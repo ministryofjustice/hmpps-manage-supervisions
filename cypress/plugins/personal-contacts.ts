@@ -1,6 +1,7 @@
 import { PersonalContact } from '../../src/server/community-api/client'
 import { SeedFn } from './wiremock'
 import { fakePersonalContact } from '../../src/server/community-api/community-api.fake'
+import { DeepPartial } from '../../src/server/app.types'
 
 export const PERSONAL_CONTACTS: DeepPartial<PersonalContact>[] = [
   {

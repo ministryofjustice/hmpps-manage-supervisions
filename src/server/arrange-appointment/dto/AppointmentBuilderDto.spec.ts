@@ -12,6 +12,7 @@ import { pick } from 'lodash'
 import { IS_AFTER, IS_DATE_INPUT, IS_FUTURE_DATE, IS_FUTURE_TIME, IS_TIME } from '../../validators'
 import { AppointmentTypeRequiresLocation } from '../../community-api/client'
 import { WellKnownAppointmentType } from '../../config'
+import { DeepPartial } from '../../app.types'
 
 type Assertion = (subject: AppointmentBuilderDto) => void
 

@@ -2,6 +2,7 @@ import { Registration, Registrations } from '../../src/server/community-api/clie
 import { SeedFn } from './wiremock'
 import { fakeRegistration } from '../../src/server/community-api/community-api.fake'
 import { riskReferenceData } from '../../src/server/case/risk/registration-reference-data'
+import { DeepPartial } from '../../src/server/app.types'
 
 const templateRegistration: DeepPartial<Registration> = {
   active: true,

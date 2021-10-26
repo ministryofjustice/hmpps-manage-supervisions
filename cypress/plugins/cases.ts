@@ -3,6 +3,7 @@ import { fakePaginated, fakeStaffCaseloadEntry } from '../../src/server/communit
 import { SeedFn } from './wiremock'
 import { CRN } from './offender'
 import { USERNAME } from './hmpps-auth'
+import { DeepPartial } from '../../src/server/app.types'
 
 const CASES: DeepPartial<StaffCaseloadEntry>[] = [
   {

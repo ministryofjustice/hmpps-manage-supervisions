@@ -2,6 +2,7 @@ import { AppointmentDetail } from '../../src/server/community-api/client'
 import { SeedFn } from './wiremock'
 import { fakeAppointmentDetail } from '../../src/server/community-api/community-api.fake'
 import { DateTime } from 'luxon'
+import { DeepPartial } from '../../src/server/app.types'
 
 export const APPOINTMENTS: DeepPartial<AppointmentDetail>[] = [
   {

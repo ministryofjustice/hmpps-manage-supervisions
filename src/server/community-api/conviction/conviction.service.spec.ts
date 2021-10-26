@@ -7,6 +7,7 @@ import { fakeOkResponse } from '../../common/rest/rest.fake'
 import { fakeConviction } from '../community-api.fake'
 import { Conviction } from '../client'
 import { DateTime } from 'luxon'
+import { DeepPartial } from '../../app.types'
 
 describe('ConvictionService', () => {
   let subject: ConvictionService

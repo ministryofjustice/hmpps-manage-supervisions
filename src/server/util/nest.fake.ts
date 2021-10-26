@@ -4,6 +4,7 @@ import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-hos
 import { Request, Response } from 'express'
 import { createStubInstance } from 'sinon'
 import { of } from 'rxjs'
+import { DeepPartial } from '../app.types'
 
 export const FAKE_HANDLER = 'handler'
 export const FAKE_CLASS = 'cls'

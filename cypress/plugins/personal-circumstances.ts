@@ -1,6 +1,7 @@
 import { PersonalCircumstance, PersonalCircumstances } from '../../src/server/community-api/client'
 import { SeedFn } from './wiremock'
 import { fakePersonalCircumstance } from '../../src/server/community-api/community-api.fake'
+import { DeepPartial } from '../../src/server/app.types'
 
 export const PERSONAL_CIRCUMSTANCES: DeepPartial<PersonalCircumstance>[] = [
   {

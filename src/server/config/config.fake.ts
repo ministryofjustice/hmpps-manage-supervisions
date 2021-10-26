@@ -6,6 +6,7 @@ import { CONTACT_DEFAULTS } from './factory'
 import { requirements } from './requirements'
 import { fake } from '../util/util.fake'
 import { URL } from 'url'
+import { DeepPartial } from '../app.types'
 
 export const fakeApiConfig = fake<ApiConfig>(() => ({
   enabled: true,
