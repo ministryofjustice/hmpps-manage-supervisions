@@ -28,6 +28,7 @@ import { isActiveDateRange } from '../util'
 import { Breadcrumb, BreadcrumbType, LinksService } from '../common/links'
 import { Role, Roles, CurrentSecurityContext, SecurityContext } from '../security'
 import { EligibleCaseloadOnly } from '../security/eligibility'
+import { DeepPartial } from '../app.types'
 
 type RenderOrRedirect = AppointmentWizardViewModel | RedirectResponse
 

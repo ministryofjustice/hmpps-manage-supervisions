@@ -1,6 +1,7 @@
 import { Requirement } from '../../src/server/community-api/client'
 import { SeedFn } from './wiremock'
 import { fakeRequirement } from '../../src/server/community-api/community-api.fake'
+import { DeepPartial } from '../../src/server/app.types'
 
 export const REQUIREMENTS: DeepPartial<Requirement>[] = [
   {

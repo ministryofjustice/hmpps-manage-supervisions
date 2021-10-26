@@ -13,6 +13,7 @@ import { GetBreachesResult } from './breach.types'
 import { ContactTypeCategory } from '../../config'
 import { MockLinksModule } from '../../common/links/links.mock'
 import { BreadcrumbType, UtmMedium } from '../../common/links'
+import { DeepPartial } from '../../app.types'
 
 describe('BreachService', () => {
   let subject: BreachService

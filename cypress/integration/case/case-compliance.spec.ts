@@ -1,6 +1,7 @@
 import { ViewCaseFixture } from '../../fixtures/view-case.fixture'
 import { DateTime } from 'luxon'
 import { ActivityLogEntry, ActivityLogGroup, AppointmentOutcome } from '../../../src/server/community-api/client'
+import { DeepPartial } from '../../../src/server/app.types'
 
 class Fixture extends ViewCaseFixture {
   shouldRenderSentence({ breaches, breachesLabel = 'Breaches' }: { breaches: string; breachesLabel?: string }) {

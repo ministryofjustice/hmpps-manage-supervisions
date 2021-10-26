@@ -1,6 +1,7 @@
 import { Conviction } from '../../src/server/community-api/client'
 import { fakeConviction } from '../../src/server/community-api/community-api.fake'
 import { SeedFn } from './wiremock'
+import { DeepPartial } from '../../src/server/app.types'
 
 export const ACTIVE_CONVICTION_ID = 100
 export const PREVIOUS_CONVICTION_IDS = [101]

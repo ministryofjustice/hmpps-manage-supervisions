@@ -4,6 +4,16 @@ import * as fs from 'fs'
 import { promisify } from 'util'
 import * as rimraf from 'rimraf'
 import { trim } from 'lodash'
+import {
+  CreateStubMappingRequest,
+  GetAllRequestsResponse,
+  GetAllStubMappingsResponse,
+  JournaledRequest,
+  MatchRules,
+  StubMapping,
+  StubMappingRequest,
+  StubMappingResponse,
+} from './wiremock.types'
 
 const rm = promisify(rimraf)
 const wiremockPath = path.resolve(__dirname, '..', '..', '..', 'wiremock')
@@ -22,14 +32,14 @@ function urlJoin(...tokens: string[]) {
   return !result.startsWith('http') ? `/${result}` : result
 }
 
-function getUrl({ url, urlPath, urlPattern, urlPathPattern, queryParameters }: WireMock.StubMappingRequest): string {
+function getUrl({ url, urlPath, urlPattern, urlPathPattern, queryParameters }: StubMappingRequest): string {
   const queryTokens = Object.entries(queryParameters || {}).map(([k, v]) => `${k}=${Object.values(v).join()}`)
   return [url || urlPath || urlPattern || urlPathPattern, queryTokens.length === 0 ? '' : '?' + queryTokens.join('&')]
     .filter(x => x)
     .join('')
 }
 
-function getMappingName(mapping: Pick<WireMock.StubMapping, 'name' | 'request' | 'response'>): string {
+function getMappingName(mapping: Pick<StubMapping, 'name' | 'request' | 'response'>): string {
   return (
     mapping.name || [mapping.request.method, getUrl(mapping.request), '=>', (mapping.response as any).status].join(' ')
   )
@@ -99,13 +109,13 @@ export class WiremockClient {
 }
 
 class WiremockApiHelper {
-  private readonly mappings: WireMock.CreateStubMappingRequest[] = []
+  private readonly mappings: CreateStubMappingRequest[] = []
   private readonly mutations: Record<string, Mutation[]> = {}
   private reset = true
 
   constructor(public readonly wiremockUrl: string, private readonly writeMappings: boolean) {}
 
-  stub(mapping: WireMock.CreateStubMappingRequest) {
+  stub(mapping: CreateStubMappingRequest) {
     this.mappings.push(mapping)
   }
 
@@ -113,22 +123,22 @@ class WiremockApiHelper {
     this.reset = value
   }
 
-  async getStubs(): Promise<WireMock.StubMapping[]> {
+  async getStubs(): Promise<StubMapping[]> {
     if (this.writeMappings) {
       return []
     }
-    const { data } = await axios.get<WireMock.GetAllStubMappingsResponse>(this.admin('mappings'))
+    const { data } = await axios.get<GetAllStubMappingsResponse>(this.admin('mappings'))
     return data.mappings
   }
 
-  async getRequests(basePath: string): Promise<WireMock.JournaledRequest[]> {
+  async getRequests(basePath: string): Promise<JournaledRequest[]> {
     if (this.writeMappings) {
       return []
     }
     const url = this.admin('requests')
     const {
       data: { requests },
-    } = await axios.get<WireMock.GetAllRequestsResponse>(url)
+    } = await axios.get<GetAllRequestsResponse>(url)
     return requests.filter(x => x.request.url.startsWith(basePath))
   }
 
@@ -187,7 +197,7 @@ class FluentWiremockContext {
   constructor(
     private readonly helper: WiremockApiHelper,
     readonly basePath: string,
-    private readonly mapping: WireMock.CreateStubMappingRequest = {
+    private readonly mapping: CreateStubMappingRequest = {
       request: { method: 'GET', headers: {} },
       response: { status: 200 },
     },
@@ -228,7 +238,7 @@ class FluentWiremockContext {
     return this.header('Authorization', `Bearer ${token}`)
   }
 
-  header(key: string, value: string, rule: keyof WireMock.MatchRules = 'equalTo'): this {
+  header(key: string, value: string, rule: keyof MatchRules = 'equalTo'): this {
     this.mapping.request.headers[key] = { [rule]: value }
     return this
   }
@@ -247,7 +257,7 @@ class FluentWiremockContext {
     return this
   }
 
-  query(query: Record<string, any>, rule: keyof WireMock.MatchRules = 'equalTo'): this {
+  query(query: Record<string, any>, rule: keyof MatchRules = 'equalTo'): this {
     this.mapping.request.queryParameters = {
       ...this.mapping.request.queryParameters,
       ...Object.entries(query)
@@ -261,7 +271,7 @@ class FluentWiremockContext {
     return this.query(query, 'matches')
   }
 
-  private response(response: WireMock.StubMappingResponse) {
+  private response(response: StubMappingResponse) {
     if (this.regex) {
       this.mapping.request.urlPathPattern = this.mapping.request.urlPath
       delete this.mapping.request.urlPath

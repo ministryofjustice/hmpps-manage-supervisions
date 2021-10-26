@@ -1,6 +1,7 @@
 import { Nsi, NsiWrapper } from '../../src/server/community-api/client'
 import { SeedFn } from './wiremock'
 import { fakeNsi } from '../../src/server/community-api/community-api.fake'
+import { DeepPartial } from '../../src/server/app.types'
 
 const NSIS: Nsi[] = [
   {

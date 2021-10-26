@@ -2,6 +2,7 @@ import { cloneDeep, merge, mergeWith } from 'lodash'
 import { ClassConstructor, ClassTransformOptions, plainToClass } from 'class-transformer'
 import { Settings } from 'luxon'
 import * as faker from 'faker'
+import { DeepNonFunctionPartial, DeepPartial } from '../app.types'
 
 // Put this here as most tests consume a faker factory.
 // Any tests that do not consume this file & are interested in times should also set this.

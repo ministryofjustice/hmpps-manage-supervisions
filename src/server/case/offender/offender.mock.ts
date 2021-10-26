@@ -6,6 +6,7 @@ import { OffenderDetail } from '../../community-api/client'
 import { MockLinksModule } from '../../common/links/links.mock'
 import { fakeOffenderDetailSummary } from '../../community-api/community-api.fake'
 import { CaseViewModel } from '../case.types'
+import { DeepPartial } from '../../app.types'
 
 @Injectable()
 export class OffenderServiceFixture {

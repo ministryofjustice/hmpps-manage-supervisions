@@ -2,6 +2,7 @@ import { OffenderDetail, OffenderDetailSummary, PhoneNumberType } from '../../sr
 import { fakeOffenderDetail } from '../../src/server/community-api/community-api.fake'
 import { omit } from 'lodash'
 import { SeedFn } from './wiremock'
+import { DeepPartial } from '../../src/server/app.types'
 
 export const CRN = 'X009923'
 export const OFFENDER_ID = 2500011641

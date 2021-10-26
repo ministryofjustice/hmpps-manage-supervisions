@@ -20,8 +20,8 @@ import { DateTime } from 'luxon'
 import { ContactTypeCategory, WellKnownContactTypeConfig } from '../../config'
 import { ConfigService } from '@nestjs/config'
 import { BreachService } from '../../community-api/breach'
-import { Mutable } from '../../@types/mutable'
 import { ActivityLogEntryService, DatedActivityLogEntry } from './activity-log-entry.service'
+import { Mutable } from '../../app.types'
 
 export const PAGE_SIZE = 1000
 

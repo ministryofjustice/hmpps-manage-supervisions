@@ -30,6 +30,7 @@ import { nsis } from './nsis'
 import * as faker from 'faker'
 import { needs } from './needs'
 import { cases } from './cases'
+import { DeepPartial } from '../../src/server/app.types'
 
 /**
  * Resets the wiremock server, this should always be the first seed module loaded.

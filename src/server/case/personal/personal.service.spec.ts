@@ -18,6 +18,7 @@ import { MockLinksModule } from '../../common/links/links.mock'
 import { BreadcrumbType, UtmMedium } from '../../common/links'
 import { CommunityApiService, WellKnownAddressTypes } from '../../community-api'
 import { fakeCriminogenicNeed } from '../risk/risk.fake'
+import { DeepPartial } from '../../app.types'
 
 describe('PersonalService', () => {
   let subject: PersonalService

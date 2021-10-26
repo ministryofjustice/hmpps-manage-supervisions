@@ -3,6 +3,7 @@ import { TEAM_CODE } from './teams'
 import { SeedFn } from './wiremock'
 import { fakeStaffDetails } from '../../src/server/community-api/community-api.fake'
 import { USERNAME } from './hmpps-auth'
+import { DeepPartial } from '../../src/server/app.types'
 
 export const STAFF_CODE = 'CRSSTAFF1'
 

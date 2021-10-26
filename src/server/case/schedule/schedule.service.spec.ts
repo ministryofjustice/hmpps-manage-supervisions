@@ -12,6 +12,7 @@ import { DateTime } from 'luxon'
 import { ContactTypeCategory } from '../../config'
 import { MockLinksModule } from '../../common/links/links.mock'
 import { BreadcrumbType } from '../../common/links'
+import { DeepPartial } from '../../app.types'
 
 describe('ScheduleService', () => {
   let subject: ScheduleService

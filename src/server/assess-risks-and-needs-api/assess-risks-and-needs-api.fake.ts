@@ -18,6 +18,7 @@ import { startCase } from 'lodash'
 import { toList } from '../util'
 
 import { NeedsAssessmentSection } from './well-known'
+import { DeepPartial } from '../app.types'
 
 const fakeRiskDto = fake<RiskDtoAllRisksView>((options, partial = {}) => {
   const current = partial.current || fakeEnum(RiskDtoAllRisksViewCurrent)

@@ -5,6 +5,7 @@ import {
 } from '../../src/server/assess-risks-and-needs-api/client'
 import { SeedFn } from './wiremock'
 import { fakeAllRoshRiskDto } from '../../src/server/assess-risks-and-needs-api/assess-risks-and-needs-api.fake'
+import { DeepPartial } from '../../src/server/app.types'
 
 export const RISKS: DeepPartial<AllRoshRiskDtoAllRisksView> = {
   riskToSelf: {

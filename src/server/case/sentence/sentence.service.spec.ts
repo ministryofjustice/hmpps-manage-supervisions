@@ -25,6 +25,7 @@ import { fakeBreachSummary } from '../../community-api/breach/breach.fake'
 import { MockLinksModule } from '../../common/links/links.mock'
 import { BreadcrumbType, UtmMedium } from '../../common/links'
 import { fakeComplianceConvictionSummary } from '../compliance/compliance.fake'
+import { DeepPartial } from '../../app.types'
 
 describe('SentenceService', () => {
   let subject: SentenceService

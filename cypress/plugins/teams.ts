@@ -1,6 +1,7 @@
 import { OfficeLocation } from '../../src/server/community-api/client'
 import { SeedFn } from './wiremock'
 import { fakeOfficeLocation } from '../../src/server/community-api/community-api.fake'
+import { DeepPartial } from '../../src/server/app.types'
 
 export const TEAM_CODE = 'N07UAT'
 export const OFFICE_LOCATIONS: OfficeLocation[] = [
