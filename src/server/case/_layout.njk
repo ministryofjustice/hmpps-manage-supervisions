@@ -26,6 +26,18 @@
             }) }}
         {% endif %}
 
+        {% if assessRisksAndNeedsApiStatus === 'unavailable' %}
+            {{ govukErrorSummary({
+                titleText: "OASys data is currently unavailable",
+                attributes: { 'data-qa': 'offender/oasys-data-unavailable-warning' },
+                errorList: [
+                    {
+                        text: "Some of the data on this page is incomplete as we cannot currently retrieve risk assessments from OASys."
+                    }
+                ]
+            }) }}
+        {% endif %}
+
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
             <span class="govuk-caption-l"><abbr title="Case reference number">CRN</abbr>: {{ ids.crn }}</span>
             {{ displayName }}

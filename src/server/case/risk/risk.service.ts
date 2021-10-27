@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { HttpStatus, Injectable, Logger } from '@nestjs/common'
 import { groupBy, orderBy } from 'lodash'
 import { CommunityApiService } from '../../community-api'
 import {
@@ -9,7 +9,8 @@ import {
   RoshRiskToSelfDtoAllRisksView,
 } from '../../assess-risks-and-needs-api/client'
 import {
-  CriminogenicNeed,
+  AssessRisksAndNeedsApiStatus,
+  CriminogenicNeeds,
   FlatRiskToSelf,
   RiskLevel,
   RiskLevelMeta,
@@ -17,6 +18,7 @@ import {
   RiskRegistrationDetails,
   RiskRegistrations,
   Risks,
+  RisksAndNeedsDegraded,
   RoshRisk,
 } from './risk.types'
 import { ConfigService } from '@nestjs/config'
@@ -29,6 +31,7 @@ import { riskReferenceData } from './registration-reference-data'
 import { AssessRisksAndNeedsApiService } from '../../assess-risks-and-needs-api'
 import { Registration } from '../../community-api/client'
 import { BreadcrumbType, LinksHelper, LinksService, ResolveBreadcrumbOptions, UtmMedium } from '../../common/links'
+import { AxiosPromise } from 'axios'
 
 @Injectable()
 export class RiskService {
@@ -41,45 +44,43 @@ export class RiskService {
     private readonly links: LinksService,
   ) {}
 
-  async getRisks(crn: string): Promise<Risks | null> {
-    const risks = await SanitisedAxiosError.catchNotFound(() =>
-      this.assessRisksAndNeeds.risk.getRoshRisksByCrn({ crn }),
-    )
+  async getRisks(crn: string): Promise<Risks | RisksAndNeedsDegraded> {
+    return await this.catchDegradedState(
+      crn,
+      api => api.risk.getRoshRisksByCrn({ crn }),
+      risks => {
+        const { riskToSelf, summary, assessedOn } = risks
 
-    if (!risks) {
-      this.logger.log(`offender with crn '${crn}' has no risk assessment available`)
-      return null
-    }
-
-    const { riskToSelf, summary, assessedOn } = risks
-
-    const communityRisks: RoshRisk[] = orderBy(
-      Object.entries(summary?.riskInCommunity || {})
-        .map(([key, values]) =>
-          values.map(riskTo => ({ meta: KNOWN_RISK_LEVELS[key as RiskLevel], level: key as RiskLevel, riskTo })),
+        const communityRisks: RoshRisk[] = orderBy(
+          Object.entries(summary?.riskInCommunity || {})
+            .map(([key, values]) =>
+              values.map(riskTo => ({ meta: KNOWN_RISK_LEVELS[key as RiskLevel], level: key as RiskLevel, riskTo })),
+            )
+            .reduce((agg, x) => [...agg, ...x], []),
+          [x => x.meta.index, x => x.riskTo],
+          ['desc', 'asc'],
         )
-        .reduce((agg, x) => [...agg, ...x], []),
-      [x => x.meta.index, x => x.riskTo],
-      ['desc', 'asc'],
-    )
 
-    return {
-      community: {
-        level: communityRisks.length > 0 ? communityRisks[0].meta : null, // the highest risk is first
-        risks: communityRisks,
-        riskLevels: summary?.riskInCommunity || {},
-        riskImminence: summary?.riskImminence,
-        whoIsAtRisk: summary?.whoIsAtRisk,
-        natureOfRisk: summary?.natureOfRisk,
+        return {
+          status: AssessRisksAndNeedsApiStatus.Available,
+          community: {
+            level: communityRisks.length > 0 ? communityRisks[0].meta : null, // the highest risk is first
+            risks: communityRisks,
+            riskLevels: summary?.riskInCommunity || {},
+            riskImminence: summary?.riskImminence,
+            whoIsAtRisk: summary?.whoIsAtRisk,
+            natureOfRisk: summary?.natureOfRisk,
+          },
+          self: {
+            ...getSummaryRisks(riskToSelf),
+            harm: flattenRisks({ selfHarm: 'self-harm', suicide: 'suicide' }, riskToSelf),
+            custody: flattenRisks({ hostelSetting: 'in a hostel', custody: 'in custody' }, riskToSelf, 'about coping'),
+            vulnerability: flattenRisks({ vulnerability: 'a vulnerability' }, riskToSelf),
+          },
+          assessedOn: assessedOn ? DateTime.fromISO(assessedOn) : null,
+        }
       },
-      self: {
-        ...getSummaryRisks(riskToSelf),
-        harm: flattenRisks({ selfHarm: 'self-harm', suicide: 'suicide' }, riskToSelf),
-        custody: flattenRisks({ hostelSetting: 'in a hostel', custody: 'in custody' }, riskToSelf, 'about coping'),
-        vulnerability: flattenRisks({ vulnerability: 'a vulnerability' }, riskToSelf),
-      },
-      assessedOn: assessedOn ? DateTime.fromISO(assessedOn) : null,
-    }
+    )
   }
 
   async getRiskRegistrations(crn: string): Promise<RiskRegistrations> {
@@ -161,24 +162,25 @@ export class RiskService {
     }
   }
 
-  async getNeeds(crn: string): Promise<CriminogenicNeed[]> {
-    const needs = await SanitisedAxiosError.catchNotFound(() =>
-      this.assessRisksAndNeeds.needs.getCriminogenicNeedsByCrn({ crn }),
-    )
-
-    if (!needs) {
-      return []
-    }
-
-    const date = DateTime.fromISO(needs.assessedOn)
-    return orderBy(
-      needs.identifiedNeeds
-        .filter(x => x.severity !== AssessmentNeedDtoSeverity.NoNeed)
-        .map(x => ({
-          name: x.name,
-          date,
-        })),
-      x => x.name,
+  async getNeeds(crn: string): Promise<CriminogenicNeeds | RisksAndNeedsDegraded> {
+    return this.catchDegradedState(
+      crn,
+      api => api.needs.getCriminogenicNeedsByCrn({ crn }),
+      needs => {
+        const date = DateTime.fromISO(needs.assessedOn)
+        return {
+          status: AssessRisksAndNeedsApiStatus.Available,
+          needs: orderBy(
+            needs.identifiedNeeds
+              .filter(x => x.severity !== AssessmentNeedDtoSeverity.NoNeed)
+              .map(x => ({
+                name: x.name,
+                date,
+              })),
+            x => x.name,
+          ),
+        }
+      },
     )
   }
 
@@ -187,6 +189,29 @@ export class RiskService {
     return registration.active
       ? links.url(BreadcrumbType.RiskDetails, options)
       : links.url(BreadcrumbType.RemovedRiskDetails, options)
+  }
+
+  private async catchDegradedState<T, R>(
+    crn: string,
+    action: (api: AssessRisksAndNeedsApiService) => AxiosPromise<T>,
+    mapResult: (data: T) => R,
+  ): Promise<R | RisksAndNeedsDegraded> {
+    const { data, success, status } = await SanitisedAxiosError.catchStatus(
+      () => action(this.assessRisksAndNeeds),
+      HttpStatus.NOT_FOUND,
+      ...SanitisedAxiosError.SERVICE_UNAVAILABLE_STATUSES,
+    )
+
+    if (!success) {
+      if (status === HttpStatus.NOT_FOUND) {
+        this.logger.log(`offender with crn '${crn}' has no risk assessment available`)
+        return { status: AssessRisksAndNeedsApiStatus.NoRiskAssessment }
+      }
+      this.logger.error(`risks and needs service is unavailable`, { status })
+      return { status: AssessRisksAndNeedsApiStatus.Unavailable }
+    }
+
+    return mapResult(data)
   }
 }
 

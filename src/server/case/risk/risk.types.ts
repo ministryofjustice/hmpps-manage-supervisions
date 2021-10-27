@@ -2,7 +2,23 @@ import { DateTime } from 'luxon'
 import { ViewModel } from '../../common'
 import { GovUkUiTagColour } from '../../util/govuk-ui'
 
-export interface Risks {
+export enum AssessRisksAndNeedsApiStatus {
+  Available = 'available',
+  Unavailable = 'unavailable',
+  NoRiskAssessment = 'missing',
+}
+
+export interface RisksAndNeedsResult<ServiceStatus extends AssessRisksAndNeedsApiStatus> {
+  status: ServiceStatus
+}
+
+export type RisksAndNeedsServiceUnavailable = RisksAndNeedsResult<AssessRisksAndNeedsApiStatus.Unavailable>
+
+export type RisksAndNeedsAssessmentNotFound = RisksAndNeedsResult<AssessRisksAndNeedsApiStatus.NoRiskAssessment>
+
+export type RisksAndNeedsDegraded = RisksAndNeedsServiceUnavailable | RisksAndNeedsAssessmentNotFound
+
+export interface Risks extends RisksAndNeedsResult<AssessRisksAndNeedsApiStatus.Available> {
   community: {
     level?: RiskLevelMeta
     risks: RoshRisk[]
@@ -104,4 +120,8 @@ export interface RiskReferenceData {
 export interface CriminogenicNeed {
   date: DateTime
   name: string
+}
+
+export interface CriminogenicNeeds extends RisksAndNeedsResult<AssessRisksAndNeedsApiStatus.Available> {
+  needs: CriminogenicNeed[]
 }

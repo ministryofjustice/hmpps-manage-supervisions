@@ -295,6 +295,14 @@ class FluentWiremockContext {
     })
   }
 
+  serverError() {
+    this.response({
+      status: 500,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: { message: 'Sorry :-(' },
+    })
+  }
+
   html(htmlBody: string) {
     this.response({
       status: 200,

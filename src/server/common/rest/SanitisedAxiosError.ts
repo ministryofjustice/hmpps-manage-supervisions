@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from 'axios'
+import { AxiosError, AxiosPromise } from 'axios'
 import { HttpStatus } from '@nestjs/common'
 import { DependentApisConfig } from '../../config'
 
@@ -44,19 +44,35 @@ export class SanitisedAxiosError extends Error {
     data?: any
   }
 
-  static async catchStatus<T>(action: () => Promise<AxiosResponse<T>>, ...statuses: HttpStatus[]): Promise<T | null> {
+  static async catchStatus<T>(
+    action: () => AxiosPromise<T>,
+    ...statuses: (HttpStatus | [HttpStatus, HttpStatus])[]
+  ): Promise<{ data: T; status?: HttpStatus; success: boolean }> {
     try {
-      const { data } = await action()
-      return data
+      const response = await action()
+      return { data: response.data, status: response.status, success: true }
     } catch (err) {
-      if (err instanceof SanitisedAxiosError && err.response && statuses.includes(err.response.status)) {
-        return null
+      if (
+        err instanceof SanitisedAxiosError &&
+        err.response?.status &&
+        statuses.some(statusOrRange =>
+          Array.isArray(statusOrRange)
+            ? err.response.status >= statusOrRange[0] && err.response.status <= statusOrRange[1]
+            : err.response.status === statusOrRange,
+        )
+      ) {
+        return { data: null, status: err.response?.status, success: false }
       }
       throw err
     }
   }
 
-  static async catchNotFound<T>(action: () => Promise<AxiosResponse<T>>) {
+  static async catchNotFound<T>(action: () => AxiosPromise<T>) {
     return this.catchStatus(action, HttpStatus.NOT_FOUND)
   }
+
+  static SERVICE_UNAVAILABLE_STATUSES: (HttpStatus | [HttpStatus, HttpStatus])[] = [
+    HttpStatus.TOO_MANY_REQUESTS,
+    [500, 599],
+  ]
 }

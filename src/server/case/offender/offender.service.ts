@@ -9,7 +9,7 @@ export type CasePageLinksOnly<Model extends CaseViewModel> = Omit<Model['links']
 
 export type CasePageOfOptions<Model extends CaseViewModel> = Omit<
   Model,
-  Exclude<keyof CaseViewModelBase<Model['page'], {}>, 'page'>
+  Exclude<keyof CaseViewModelBase<Model['page'], {}>, 'page' | 'assessRisksAndNeedsApiStatus'>
 > & {
   breadcrumb?: { type?: BreadcrumbType; options?: ResolveBreadcrumbOptions }
   links?: (links: LinksHelper) => CasePageLinksOnly<Model>

@@ -47,6 +47,10 @@ export class CasePage extends PageBase {
     return cy.get('[data-qa="offender/ineligible-case-warning"]')
   }
 
+  get oasysDataUnavailableWarning() {
+    return cy.get('[data-qa="offender/oasys-data-unavailable-warning"]')
+  }
+
   get overview() {
     return {
       schedule(callback: SummaryListCallback) {

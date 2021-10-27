@@ -13,9 +13,9 @@ import {
 } from './personal.fake'
 import { PersonalAddressesViewModel, PersonalContactViewModel, PersonalDisabilitiesViewModel } from './personal.types'
 import { BreadcrumbType, UtmMedium } from '../../common/links'
-import { RiskService } from '../risk'
+import { AssessRisksAndNeedsApiStatus, RiskService } from '../risk'
 import { CasePage, CasePersonalViewModel } from '../case.types'
-import { fakeCriminogenicNeed } from '../risk/risk.fake'
+import { fakeCriminogenicNeeds } from '../risk/risk.fake'
 import { EligibilityService } from '../../community-api/eligibility'
 import { MockOffenderModule, OffenderServiceFixture } from '../offender/offender.mock'
 
@@ -124,7 +124,7 @@ describe('PersonalController', () => {
     const circumstances = [fakePersonalCircumstanceDetail()]
     personalService.getPersonalCircumstances.withArgs('some-crn').resolves(circumstances)
 
-    const needs = [fakeCriminogenicNeed()]
+    const needs = fakeCriminogenicNeeds()
     riskService.getNeeds.withArgs('some-crn').resolves(needs)
 
     const contactDetails = fakeContactDetailsViewModel()
@@ -138,6 +138,7 @@ describe('PersonalController', () => {
     expect(observed).toBe(offenderFixture.caseViewModel)
     offenderFixture.shouldHaveCalledCasePageOf<CasePersonalViewModel>({
       page: CasePage.Personal,
+      assessRisksAndNeedsApiStatus: AssessRisksAndNeedsApiStatus.Available,
       contactDetails,
       personalDetails,
       links: {

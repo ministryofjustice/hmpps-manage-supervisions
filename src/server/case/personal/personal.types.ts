@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
 import { ViewModel } from '../../common'
+import { CriminogenicNeeds, RisksAndNeedsDegraded } from '../risk'
 
 export interface PersonalViewModel extends ViewModel {
   displayName: string
@@ -63,7 +64,7 @@ export interface PersonalDetailsViewModel {
   currentCircumstancesLastUpdated: DateTime
   disabilities: string[]
   disabilitiesLastUpdated: DateTime
-  criminogenicNeeds: string[]
+  criminogenicNeeds: CriminogenicNeeds | RisksAndNeedsDegraded
   religion?: string
   sex?: string
   genderIdentity?: string

@@ -13,7 +13,7 @@ import {
 } from './personal.types'
 import { BreadcrumbType, LinksService, UtmMedium } from '../../common/links'
 import { CommunityApiService, WellKnownAddressTypes } from '../../community-api'
-import { CriminogenicNeed } from '../risk'
+import { CriminogenicNeeds, RisksAndNeedsDegraded } from '../risk'
 
 function getLanguageSummary(languages: OffenderLanguages) {
   if (!languages.primaryLanguage) {
@@ -197,7 +197,7 @@ export class PersonalService {
     offender: OffenderDetail,
     personalContacts: PersonalContactDetail[],
     personalCircumstances: PersonalCircumstanceDetail[],
-    criminogenicNeeds: CriminogenicNeed[],
+    criminogenicNeeds: CriminogenicNeeds | RisksAndNeedsDegraded,
   ): GetPersonalDetailsResult {
     const addresses = this.getAddressDetail(offender)
 
@@ -252,7 +252,7 @@ export class PersonalService {
           : undefined,
         disabilities: formattedDisabilities,
         disabilitiesLastUpdated,
-        criminogenicNeeds: criminogenicNeeds.map(x => x.name),
+        criminogenicNeeds,
         religion,
         sex: offender.gender,
         genderIdentity,

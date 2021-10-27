@@ -94,6 +94,20 @@
     {%- endcall %}
 
     {% call appSummaryCard({ titleText: 'Personal details', classes: 'app-summary-card--large-title govuk-!-margin-bottom-6' }) -%}
+        {% set needsHtml %}
+            {% switch personalDetails.criminogenicNeeds.status %}
+            {% case 'available' %}
+                {{ join(personalDetails.criminogenicNeeds.needs | map('name'), {
+                        linkText: 'View sentence plan in OASys',
+                        link: links.criminogenicNeeds
+                    }) if personalDetails.criminogenicNeeds.needs.length > 0 else 'None' }}
+            {% case 'unavailable' %}
+                OASys data is currently unavailable
+            {% case 'missing' %}
+                There is no OASys risk assessment
+            {% endswitch %}
+        {% endset %}
+
         {{ govukSummaryList({
             rows: [
                 {
@@ -149,12 +163,7 @@
                 },
                 {
                     key: { text: 'Criminogenic needs' },
-                    value: {
-                        html: join(personalDetails.criminogenicNeeds, {
-                                linkText: 'View sentence plan in OASys',
-                                link: links.criminogenicNeeds
-                            }) if personalDetails.criminogenicNeeds.length > 0 else 'None'
-                    }
+                    value: { html: needsHtml }
                 },
                 {
                     key: { html: 'PNC' | abbr },

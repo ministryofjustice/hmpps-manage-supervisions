@@ -19,9 +19,18 @@ export const NEEDS: DeepPartial<AssessmentNeedsDto> = {
   ],
 }
 
-export function needs(crn: string, partial: DeepPartial<AssessmentNeedsDto> = NEEDS): SeedFn {
+export function needs(crn: string, partial?: DeepPartial<AssessmentNeedsDto> | 'unavailable'): SeedFn {
   return context => {
-    const needs = fakeAssessmentNeedsDto(partial)
-    context.client.assessRisksAndNeeds.get(`/needs/crn/${crn}`).returns(needs)
+    const request = context.client.assessRisksAndNeeds.get(`/needs/crn/${crn}`)
+    if (partial === 'unavailable') {
+      // special case, api down, return a 500
+      request.serverError()
+    } else if (partial === null) {
+      // special case, no risk data return a 404
+      request.notFound()
+    } else {
+      const needs = fakeAssessmentNeedsDto(partial || NEEDS)
+      request.returns(needs)
+    }
   }
 }

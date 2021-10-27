@@ -76,8 +76,8 @@ export interface OffenderSeedOptions {
   personalContacts?: DeepPartial<PersonalContact>[]
   personalCircumstances?: DeepPartial<PersonalCircumstance>[]
   registrations?: DeepPartial<Registration>[]
-  risks?: DeepPartial<AllRoshRiskDtoAllRisksView>
-  needs?: DeepPartial<AssessmentNeedsDto>
+  risks?: DeepPartial<AllRoshRiskDtoAllRisksView> | 'unavailable'
+  needs?: DeepPartial<AssessmentNeedsDto> | 'unavailable'
   convictions?: { active: ConvictionSeedOptions | null; previous?: ConvictionSeedOptions[] }
 }
 

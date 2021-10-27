@@ -54,14 +54,18 @@ export const RISKS: DeepPartial<AllRoshRiskDtoAllRisksView> = {
   assessedOn: '2000-01-02T13:30:00',
 }
 
-export function risks(crn: string, partial?: DeepPartial<AllRoshRiskDtoAllRisksView>): SeedFn {
+export function risks(crn: string, partial?: DeepPartial<AllRoshRiskDtoAllRisksView> | 'unavailable'): SeedFn {
   return context => {
-    if (partial === null) {
+    const request = context.client.assessRisksAndNeeds.get(`/risks/crn/${crn}`)
+    if (partial === 'unavailable') {
+      // special case, api down, return a 500
+      request.serverError()
+    } else if (partial === null) {
       // special case, no risk data return a 404
-      context.client.assessRisksAndNeeds.get(`/risks/crn/${crn}`).notFound()
+      request.notFound()
     } else {
       const risks = fakeAllRoshRiskDto([RISKS, partial])
-      context.client.assessRisksAndNeeds.get(`/risks/crn/${crn}`).returns(risks)
+      request.returns(risks)
     }
   }
 }

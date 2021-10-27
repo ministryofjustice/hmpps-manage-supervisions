@@ -10,6 +10,8 @@ import {
   PersonalContactDetail,
   PersonalDetailsViewModel,
 } from './personal.types'
+import { AssessRisksAndNeedsApiStatus } from '../risk'
+import { fakeCriminogenicNeed } from '../risk/risk.fake'
 
 function fakeFullName() {
   return `${faker.name.firstName()} ${faker.name.lastName()}`
@@ -84,7 +86,10 @@ export const fakePersonalDetailsViewModel = fake<PersonalDetailsViewModel>(() =>
   currentCircumstancesLastUpdated: DateTime.fromJSDate(faker.date.past()),
   disabilities: ['Mental Illness: Flex refreshment breaks', 'Visual Impairment: Colour/visibility marking'],
   disabilitiesLastUpdated: DateTime.fromJSDate(faker.date.past()),
-  criminogenicNeeds: ['Thinking and behaviour', 'Attitudes'],
+  criminogenicNeeds: {
+    status: AssessRisksAndNeedsApiStatus.Available,
+    needs: ['Thinking and behaviour', 'Attitudes'].map(name => fakeCriminogenicNeed({ name })),
+  },
   religion: 'Christian',
   sex: 'Male',
   genderIdentity: 'Prefer to self-describe',

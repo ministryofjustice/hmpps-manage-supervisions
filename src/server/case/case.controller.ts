@@ -41,8 +41,9 @@ export class CaseController {
 
     return this.offenderService.casePageOf<CaseOverviewViewModel>(offender, {
       page: CasePage.Overview,
-      // We are not rendering personal contacts or needs on the overview page so provide an empty array instead
-      ...this.personalService.getPersonalDetails(offender, [], personalCircumstances, []),
+      assessRisksAndNeedsApiStatus: risks.status,
+      // HACK: We are not rendering personal contacts or needs on the overview page so provide an empty array instead
+      ...this.personalService.getPersonalDetails(offender, null, personalCircumstances, null),
       compliance,
       nextAppointment,
       risks,

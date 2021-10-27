@@ -68,22 +68,42 @@
         classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
         actions: { items: [{ href: links.risk, text: "View all risk details" }] }
     }) -%}
+        {% switch risks.status %}
+        {% case 'available' %}
+            {% set roshInCommunity %}
+                {{ govukTag({
+                    text: risks.community.level.text + ' risk of serious harm',
+                    classes: risks.community.level.colour | tagClassName
+                }) if risks.community.level else 'No concerns' }}
+            {% endset %}
+            {% set roshToThemselves %}
+                {% if risks.self.current %}
+                    Current concerns
+                {% elseif risks.self.previous %}
+                    Previous concerns
+                {% else %}
+                    No concerns
+                {% endif %}
+            {% endset %}
+        {% case 'unavailable' %}
+            {% set roshInCommunity, roshToThemselves %}
+                OASys data is currently unavailable
+            {% endset %}
+        {% case 'missing' %}
+            {% set roshInCommunity, roshToThemselves %}
+                There is no OASys risk assessment
+            {% endset %}
+        {% endswitch %}
+
         {{ govukSummaryList({
             rows: [
                 {
                     key: { text: 'Risk of serious harm (ROSH) in the community' },
-                    value: { html: govukTag({
-                    text: risks.community.level.text + ' risk of serious harm',
-                    classes: risks.community.level.colour | tagClassName
-                }) if risks.community.level else 'No concerns' } if risks
-                    else { text: 'There is no OASys risk assessment' }
+                    value: { html: roshInCommunity }
                 },
                 {
                     key: { text: 'Risk of serious harm to themselves' },
-                    value: { text: 'Current concerns' if risks.self.current
-                        else ('Previous concerns' if risks.self.previous
-                        else ('No concerns' if risks else 'There is no OASys risk assessment'))
-                    }
+                    value: { text: roshToThemselves }
                 },
                 {
                     key: { text: 'Risk flags' },

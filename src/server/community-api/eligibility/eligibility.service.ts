@@ -36,10 +36,10 @@ export class EligibilityService {
       return session.eligibility[crn] ? OffenderEligibilityResult.Eligible : OffenderEligibilityResult.Ineligible
     }
 
-    const result = await SanitisedAxiosError.catchNotFound(() =>
+    const { success } = await SanitisedAxiosError.catchNotFound(() =>
       this.community.offender.getManageSupervisionsEligibilityUsingGET({ crn }),
     )
-    return (session.eligibility[crn] = !!result)
+    return (session.eligibility[crn] = success)
       ? OffenderEligibilityResult.Eligible
       : OffenderEligibilityResult.IneligibleDisplayWarning
   }

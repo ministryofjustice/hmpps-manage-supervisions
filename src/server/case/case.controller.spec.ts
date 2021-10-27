@@ -12,7 +12,7 @@ import {
 } from './personal/personal.fake'
 import { SentenceService } from './sentence'
 import { ScheduleService } from './schedule'
-import { RiskService } from './risk'
+import { AssessRisksAndNeedsApiStatus, RiskService } from './risk'
 import { fakeComplianceDetails, fakeConvictionDetails, fakeConvictionRequirement } from './sentence/sentence.fake'
 import { fakeNextAppointmentSummary } from './schedule/schedule.fake'
 import { MockLinksModule } from '../common/links/links.mock'
@@ -69,7 +69,7 @@ describe('CaseController', () => {
     const contactDetails = fakeContactDetailsViewModel()
     const personalDetails = fakePersonalDetailsViewModel()
     personalService.getPersonalDetails
-      .withArgs(offender, [], circumstances, [])
+      .withArgs(offender, null, circumstances, null)
       .returns({ contactDetails, personalDetails })
 
     const conviction = fakeConvictionDetails({
@@ -94,6 +94,7 @@ describe('CaseController', () => {
     expect(observed).toBe(viewModel)
     expect(stub.getCall(0).args[1]).toEqual({
       page: CasePage.Overview,
+      assessRisksAndNeedsApiStatus: AssessRisksAndNeedsApiStatus.Available,
       contactDetails,
       personalDetails,
       nextAppointment,

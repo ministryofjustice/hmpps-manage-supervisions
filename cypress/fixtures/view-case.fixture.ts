@@ -80,6 +80,13 @@ export class ViewCaseFixture {
     return this
   }
 
+  shouldDisplayOASysDataUnavailableWarning() {
+    this.page.oasysDataUnavailableWarning.contains(
+      'Some of the data on this page is incomplete as we cannot currently retrieve risk assessments from OASys',
+    )
+    return this
+  }
+
   thenWhenGoingBack() {
     cy.go('back')
     return this
