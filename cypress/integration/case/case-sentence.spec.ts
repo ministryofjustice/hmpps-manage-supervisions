@@ -114,7 +114,7 @@ context('Case sentence tab', () => {
           })
 
           page.probationHistory(card => {
-            card.value('Previous orders').contains('1 previous order Last ended on 1 November 2018')
+            card.value('Previous orders').contains('1 previous order Last ended on 1 December 2020')
             card.value('Previous breaches').contains('1 previous breach')
           })
         })
