@@ -57,6 +57,7 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "luxon": "^2.0.2",
+    "node-cache": "^5.1.2",
     "nunjucks": "^3.2.3",
     "openid-client": "^4.9.1",
     "passport": "^0.4.1",
