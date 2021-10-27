@@ -8,7 +8,7 @@ orbs:
 executors:
   integration-test:
     docker:
-      - image: cypress/base:14.17.3
+      - image: cypress/base:16.5.0
         environment:
           TZ: "Europe/London"
       - image: circleci/redis:buster
@@ -17,7 +17,7 @@ executors:
 
   smoke-test:
     docker:
-      - image: cypress/base:14.17.3
+      - image: cypress/base:16.5.0
 
 
 commands:
@@ -34,15 +34,12 @@ commands:
             <<# parameters.sudo >>sudo <</ parameters.sudo >>mkdir -p /usr/share/man/man1 /usr/share/man/man2
             <<# parameters.sudo >>sudo <</ parameters.sudo >>apt-get update
             <<# parameters.sudo >>sudo <</ parameters.sudo >>apt-get install --no-install-recommends -y openjdk-11-jre-headless
-      - run:
-          name: Update npm
-          command: <<# parameters.sudo >>sudo <</ parameters.sudo >>npm install -g npm
 
 jobs:
   build-test:
     executor:
       name: hmpps/node
-      tag: 14.17-browsers
+      tag: '16.12'
     environment:
       TZ: "Europe/London"
     steps:
@@ -81,7 +78,7 @@ jobs:
   check_outdated:
     executor:
       name: hmpps/node
-      tag: 14.17-browsers
+      tag: '16.12'
     environment:
       TZ: "Europe/London"
     steps:

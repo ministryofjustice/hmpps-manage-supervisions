@@ -1,5 +1,5 @@
 # Stage: base image
-FROM node:14-buster-slim as base
+FROM node:16-bullseye-slim as base
 ARG BUILD_NUMBER
 ARG GIT_REF
 
@@ -17,8 +17,6 @@ RUN apt-get update && apt-get upgrade -y
 RUN mkdir -p /usr/share/man/man1 /usr/share/man/man2
 RUN apt-get install --no-install-recommends -y openjdk-11-jre-headless
 RUN apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
-
-RUN npm install -g npm@7 && npm --version
 
 # Stage: build app
 FROM base as build

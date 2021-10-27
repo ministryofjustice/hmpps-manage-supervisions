@@ -87,7 +87,7 @@
     "@types/jsonwebtoken": "^8.5.5",
     "@types/lodash": "^4.14.176",
     "@types/luxon": "^2.0.5",
-    "@types/node": "^14.17.32",
+    "@types/node": "^16.11.6",
     "@types/nunjucks": "^3.2.0",
     "@types/passport-oauth2": "^1.4.11",
     "@types/redis": "^2.8.32",
@@ -137,7 +137,7 @@
     "yargs": "^16.2.0"
   },
   "engines": {
-    "node": "^14",
+    "node": "^16",
     "npm": "^7"
   },
   "jest": {
