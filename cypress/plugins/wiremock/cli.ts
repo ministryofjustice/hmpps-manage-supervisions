@@ -62,6 +62,12 @@ const { argv } = yargs
     default: true,
     group: 'convictions',
   })
+  .option('arn-api-availability', {
+    type: 'boolean',
+    description: 'is the assess risks & needs api available',
+    default: true,
+    group: 'risk',
+  })
   .option('rosh', {
     type: 'boolean',
     description: 'stub the ROSH assessment from OASys',
@@ -118,8 +124,13 @@ async function seed(args: CamelCased<typeof argv>) {
     set(options, 'convictions.previous', [])
   }
 
-  if (args.rosh === false) {
-    options.risks = null
+  if (args.arnApiAvailability === false) {
+    options.risks = 'unavailable'
+    options.needs = 'unavailable'
+  } else {
+    if (args.rosh === false) {
+      options.risks = null
+    }
   }
 
   if (args.registrations === false) {

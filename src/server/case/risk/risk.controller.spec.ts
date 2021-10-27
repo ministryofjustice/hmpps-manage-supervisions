@@ -4,7 +4,7 @@ import { MockLinksModule } from '../../common/links/links.mock'
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { RiskService } from './risk.service'
 import { fakeRegistrationDetails, fakeRiskRegistrations, fakeRisks } from './risk.fake'
-import { RemovedRisksListViewModel, RiskDetailsViewModel } from './risk.types'
+import { AssessRisksAndNeedsApiStatus, RemovedRisksListViewModel, RiskDetailsViewModel } from './risk.types'
 import { BreadcrumbType, UtmMedium } from '../../common/links'
 import { DateTime } from 'luxon'
 import { RedirectResponse } from '../../common'
@@ -123,6 +123,7 @@ describe('RiskController', () => {
     expect(observed).toBe(offenderFixture.caseViewModel)
     offenderFixture.shouldHaveCalledCasePageOf<CaseRiskViewModel>({
       page: CasePage.Risk,
+      assessRisksAndNeedsApiStatus: AssessRisksAndNeedsApiStatus.Available,
       risks,
       registrations,
       links: {

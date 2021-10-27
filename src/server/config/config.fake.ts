@@ -10,6 +10,7 @@ import { DeepPartial } from '../app.types'
 
 export const fakeApiConfig = fake<ApiConfig>(() => ({
   enabled: true,
+  criticalAvailability: true,
   url: new URL(faker.internet.url()),
   timeout: faker.datatype.number({ min: 5000, max: 30000 }),
   agent: {

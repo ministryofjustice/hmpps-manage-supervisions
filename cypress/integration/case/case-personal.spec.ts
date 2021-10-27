@@ -182,169 +182,182 @@ interface ExpectedCircumstance {
 context('Case personal details tab', () => {
   const fixture = new Fixture()
 
-  before(() => cy.seed())
+  describe('populated personal details page', () => {
+    before(() => cy.seed())
 
-  it('displays personal details', () => {
-    fixture
-      .whenViewingOffender()
-      .whenClickingSubNavTab('personal')
-      .shouldBeAccessible()
-      .shouldDisplayCommonHeader()
-      .shouldRenderOffenderTab('personal', page => {
-        page.contactDetails(card => {
-          card.value('Mobile number').contains('07734 111992')
-          card.value('Telephone number').contains('01234 111222')
-          card.value('Email address').contains('example2@example2.com example@example.com')
+    it('displays personal details', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('personal')
+        .shouldBeAccessible()
+        .shouldDisplayCommonHeader()
+        .shouldRenderOffenderTab('personal', page => {
+          page.contactDetails(card => {
+            card.value('Mobile number').contains('07734 111992')
+            card.value('Telephone number').contains('01234 111222')
+            card.value('Email address').contains('example2@example2.com example@example.com')
 
-          card.value('Main address').contains('1 High Street Sheffield South Yorkshire S10 1AG')
-          card.detailsList('Main address', 'View address details', list => {
-            list.value('Address telephone').contains('0123456789')
-            list.value('Type of address').contains('Approved Premises (verified)')
-            list.value('Start date').contains('16 July 2015')
-            list.value('Notes').contains('Sleeping on sofa')
+            card.value('Main address').contains('1 High Street Sheffield South Yorkshire S10 1AG')
+            card.detailsList('Main address', 'View address details', list => {
+              list.value('Address telephone').contains('0123456789')
+              list.value('Type of address').contains('Approved Premises (verified)')
+              list.value('Start date').contains('16 July 2015')
+              list.value('Notes').contains('Sleeping on sofa')
+            })
+
+            card.value('Other addresses').contains('1 other current address 1 previous address')
+            card.value('Personal contacts').contains('Next of Kin: Pippa Wade – Wife')
+            card.value('Personal contacts').contains('Family member: Jonathon Bacon – Father')
           })
 
-          card.value('Other addresses').contains('1 other current address 1 previous address')
-          card.value('Personal contacts').contains('Next of Kin: Pippa Wade – Wife')
-          card.value('Personal contacts').contains('Family member: Jonathon Bacon – Father')
+          page.personalDetails(card => {
+            card.value('Name').contains('Liz Danger Haggis')
+            card.value('Date of birth').contains('10 June 1980')
+            card.value('Preferred name/Known as').contains('Bob')
+            card.value('Aliases').contains('Dylan Meyer Romario Montgomery')
+            card.value('Previous name').contains('Scotland')
+            card.value('Preferred language').contains('Bengali (interpreter required)')
+            card
+              .value('Current circumstances')
+              .contains('Employment: Temporary/casual work (30 or more hours per week)')
+            card.title('Current circumstances').contains('Last updated')
+            card
+              .value('Disabilities and adjustments')
+              .contains('Learning Difficulties: Other Speech Impairment: No adjustments')
+            card.title('Disabilities and adjustments').contains('Last updated')
+            card.value('Criminogenic needs').contains('Accommodation Alcohol Misuse Drug Misuse')
+            card.valueAbbr('CRN').contains(fixture.data.crn)
+            card.valueAbbr('PNC').contains('2012/123400000F')
+          })
+
+          page.equalityMonitoring(card => {
+            card.value('Religion or belief').contains('Christian')
+            card.value('Sex').contains('Female')
+            card.value('Gender identity').contains('Prefer to self-describe')
+            card.value('Self-described gender').contains('Jedi')
+            card.value('Sexual orientation').contains('Bisexual')
+          })
         })
+    })
 
-        page.personalDetails(card => {
-          card.value('Name').contains('Liz Danger Haggis')
-          card.value('Date of birth').contains('10 June 1980')
-          card.value('Preferred name/Known as').contains('Bob')
-          card.value('Aliases').contains('Dylan Meyer Romario Montgomery')
-          card.value('Previous name').contains('Scotland')
-          card.value('Preferred language').contains('Bengali (interpreter required)')
-          card.value('Current circumstances').contains('Employment: Temporary/casual work (30 or more hours per week)')
-          card.title('Current circumstances').contains('Last updated')
-          card
-            .value('Disabilities and adjustments')
-            .contains('Learning Difficulties: Other Speech Impairment: No adjustments')
-          card.title('Disabilities and adjustments').contains('Last updated')
-          card.value('Criminogenic needs').contains('Accommodation Alcohol Misuse Drug Misuse')
-          card.valueAbbr('CRN').contains(fixture.data.crn)
-          card.valueAbbr('PNC').contains('2012/123400000F')
+    it('links to oasys interstitial from criminogenic needs', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('personal')
+        .shouldRenderOffenderTab('personal', page => {
+          page.personalDetails(card =>
+            card.value('Criminogenic needs').find('a').contains('View sentence plan in OASys').click(),
+          )
         })
+        .shouldDisplayExitPage('oasys')
+    })
 
-        page.equalityMonitoring(card => {
-          card.value('Religion or belief').contains('Christian')
-          card.value('Sex').contains('Female')
-          card.value('Gender identity').contains('Prefer to self-describe')
-          card.value('Self-described gender').contains('Jedi')
-          card.value('Sexual orientation').contains('Bisexual')
+    it('displays all address details', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('personal')
+        .whenClickingViewAllAddresses()
+        .shouldBeAccessible()
+        .shouldRenderAddress('main', {
+          name: 'Main address – Since 16 July 2015',
+          status: 'Main address',
+          address: '1 High Street Sheffield South Yorkshire S10 1AG',
+          phone: '0123456789',
+          type: 'Approved Premises (verified)',
+          startDate: '16 July 2015',
+          notes: 'Sleeping on sofa',
         })
-      })
+        .shouldRenderAddress('other', {
+          name: 'Secondary address – Since 8 January 2016',
+          status: 'Secondary address',
+          address: '24 The Mill Sherbourne Street Birmingham West Midlands B16 8TP',
+          startDate: '8 January 2016',
+        })
+        .shouldRenderAddress('previous', {
+          name: 'Main address – 16 July 2001 to 16 July 2015',
+          status: 'Main address',
+          address: 'No fixed abode Tent',
+          type: 'Tent (not verified)',
+          startDate: '16 July 2001',
+          endDate: '16 July 2015',
+        })
+    })
+
+    it('displays all disability details', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('personal')
+        .whenClickingViewAllDisabilities()
+        .shouldBeAccessible()
+        .shouldRenderDisability({
+          name: 'Learning Difficulties',
+          startDate: '1 February 2021',
+          adjustments: [{ name: 'Other', startDate: '10 May 2021', notes: 'Extra tuition' }],
+        })
+        .shouldRenderDisability({
+          name: 'Speech Impairment',
+          startDate: '1 March 2021',
+          notes: 'Talks like a pirate',
+          adjustments: [],
+        })
+        .shouldRenderDisability({
+          name: 'Dyslexia',
+          startDate: '1 April 2020',
+          endDate: '1 May 2020',
+          adjustments: [],
+        })
+    })
+
+    it('displays all personal circumstances', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('personal')
+        .whenClickingViewAllPersonalCircumstances()
+        .shouldBeAccessible()
+        .shouldRenderPersonalCircumstance({
+          type: 'Employment',
+          subType: 'Temporary/casual work (30 or more hours per week)',
+          startDate: '3 March 2021',
+          verified: false,
+          lastUpdated: '4 March 2021',
+        })
+        .shouldRenderPersonalCircumstance({
+          type: 'Relationship',
+          subType: 'Married / Civil partnership',
+          startDate: '1 April 2005',
+          endDate: '2 July 2021',
+          verified: true,
+          previous: true,
+          notes: 'Divorced',
+          lastUpdated: '2 July 2021',
+        })
+    })
+
+    it('displays personal contact', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('personal')
+        .whenClickingViewPersonalContact('Pippa Wade – Wife')
+        .shouldBeAccessible()
+        .shouldDisplayPersonalContact('Next of Kin Pippa Wade – Wife', page => {
+          page.value('Name').contains('Pippa Wade')
+          page.value('Relationship type').contains('Next of Kin')
+          page.value(/^\s*Relationship\s*$/).contains('Wife')
+          page.value('Address').contains('64 Ermin Street Wrenthorpe West Yorkshire WF2 8WT')
+          page.value('Phone number').contains('07700 900 141')
+          page.value('Notes').contains('Divorced')
+        })
+        .whenClickingChangeContactDetails('Pippa Wade – Wife')
+        .shouldDisplayExitPage('delius')
+    })
   })
 
-  it('links to oasys interstitial from criminogenic needs', () => {
+  it('renders oasys needs unavailable warning', () => {
+    cy.seed({ needs: 'unavailable' })
     fixture
       .whenViewingOffender()
       .whenClickingSubNavTab('personal')
-      .shouldRenderOffenderTab('personal', page => {
-        page.personalDetails(card =>
-          card.value('Criminogenic needs').find('a').contains('View sentence plan in OASys').click(),
-        )
-      })
-      .shouldDisplayExitPage('oasys')
-  })
-
-  it('displays all address details', () => {
-    fixture
-      .whenViewingOffender()
-      .whenClickingSubNavTab('personal')
-      .whenClickingViewAllAddresses()
-      .shouldBeAccessible()
-      .shouldRenderAddress('main', {
-        name: 'Main address – Since 16 July 2015',
-        status: 'Main address',
-        address: '1 High Street Sheffield South Yorkshire S10 1AG',
-        phone: '0123456789',
-        type: 'Approved Premises (verified)',
-        startDate: '16 July 2015',
-        notes: 'Sleeping on sofa',
-      })
-      .shouldRenderAddress('other', {
-        name: 'Secondary address – Since 8 January 2016',
-        status: 'Secondary address',
-        address: '24 The Mill Sherbourne Street Birmingham West Midlands B16 8TP',
-        startDate: '8 January 2016',
-      })
-      .shouldRenderAddress('previous', {
-        name: 'Main address – 16 July 2001 to 16 July 2015',
-        status: 'Main address',
-        address: 'No fixed abode Tent',
-        type: 'Tent (not verified)',
-        startDate: '16 July 2001',
-        endDate: '16 July 2015',
-      })
-  })
-
-  it('displays all disability details', () => {
-    fixture
-      .whenViewingOffender()
-      .whenClickingSubNavTab('personal')
-      .whenClickingViewAllDisabilities()
-      .shouldBeAccessible()
-      .shouldRenderDisability({
-        name: 'Learning Difficulties',
-        startDate: '1 February 2021',
-        adjustments: [{ name: 'Other', startDate: '10 May 2021', notes: 'Extra tuition' }],
-      })
-      .shouldRenderDisability({
-        name: 'Speech Impairment',
-        startDate: '1 March 2021',
-        notes: 'Talks like a pirate',
-        adjustments: [],
-      })
-      .shouldRenderDisability({
-        name: 'Dyslexia',
-        startDate: '1 April 2020',
-        endDate: '1 May 2020',
-        adjustments: [],
-      })
-  })
-
-  it('displays all personal circumstances', () => {
-    fixture
-      .whenViewingOffender()
-      .whenClickingSubNavTab('personal')
-      .whenClickingViewAllPersonalCircumstances()
-      .shouldBeAccessible()
-      .shouldRenderPersonalCircumstance({
-        type: 'Employment',
-        subType: 'Temporary/casual work (30 or more hours per week)',
-        startDate: '3 March 2021',
-        verified: false,
-        lastUpdated: '4 March 2021',
-      })
-      .shouldRenderPersonalCircumstance({
-        type: 'Relationship',
-        subType: 'Married / Civil partnership',
-        startDate: '1 April 2005',
-        endDate: '2 July 2021',
-        verified: true,
-        previous: true,
-        notes: 'Divorced',
-        lastUpdated: '2 July 2021',
-      })
-  })
-
-  it('displays personal contact', () => {
-    fixture
-      .whenViewingOffender()
-      .whenClickingSubNavTab('personal')
-      .whenClickingViewPersonalContact('Pippa Wade – Wife')
-      .shouldBeAccessible()
-      .shouldDisplayPersonalContact('Next of Kin Pippa Wade – Wife', page => {
-        page.value('Name').contains('Pippa Wade')
-        page.value('Relationship type').contains('Next of Kin')
-        page.value(/^\s*Relationship\s*$/).contains('Wife')
-        page.value('Address').contains('64 Ermin Street Wrenthorpe West Yorkshire WF2 8WT')
-        page.value('Phone number').contains('07700 900 141')
-        page.value('Notes').contains('Divorced')
-      })
-      .whenClickingChangeContactDetails('Pippa Wade – Wife')
-      .shouldDisplayExitPage('delius')
+      .shouldRenderOffenderTab('personal')
+      .shouldDisplayOASysDataUnavailableWarning()
   })
 })

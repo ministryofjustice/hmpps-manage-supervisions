@@ -217,4 +217,13 @@ context('Case risk tab', () => {
         .shouldDisplayExitPage('delius')
     })
   })
+
+  it('renders oasys risk data unavailable warning', () => {
+    cy.seed({ risks: 'unavailable' })
+    fixture
+      .whenViewingOffender()
+      .whenClickingSubNavTab('risk')
+      .shouldRenderOffenderTab('risk')
+      .shouldDisplayOASysDataUnavailableWarning()
+  })
 })

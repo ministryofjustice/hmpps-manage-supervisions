@@ -17,7 +17,7 @@ import { fakePersonalCircumstanceDetail, fakePersonalContactDetail } from './per
 import { MockLinksModule } from '../../common/links/links.mock'
 import { BreadcrumbType, UtmMedium } from '../../common/links'
 import { CommunityApiService, WellKnownAddressTypes } from '../../community-api'
-import { fakeCriminogenicNeed } from '../risk/risk.fake'
+import { fakeCriminogenicNeeds } from '../risk/risk.fake'
 import { DeepPartial } from '../../app.types'
 
 describe('PersonalService', () => {
@@ -180,7 +180,7 @@ describe('PersonalService', () => {
 
   it('gets offender personal details without disabilities', async () => {
     offender.offenderProfile.disabilities = null
-    const observed = subject.getPersonalDetails(offender, [], [], [])
+    const observed = subject.getPersonalDetails(offender, [], [], null)
     expect(observed.personalDetails.disabilities).toEqual([])
   })
 
@@ -194,7 +194,7 @@ describe('PersonalService', () => {
         { name: 'Some expired circumstance', endDate: DateTime.fromJSDate(faker.date.past()) },
       ),
     ]
-    const needs = [fakeCriminogenicNeed({ name: 'Some criminogenic need' })]
+    const needs = fakeCriminogenicNeeds()
 
     const observed = subject.getPersonalDetails(offender, personalContacts, personalCircumstances, needs)
     expect(observed).toEqual({
@@ -222,7 +222,7 @@ describe('PersonalService', () => {
         currentCircumstancesLastUpdated,
         disabilities: ['Some disability: No adjustments', 'Some other disability: Some provision'],
         disabilitiesLastUpdated,
-        criminogenicNeeds: ['Some criminogenic need'],
+        criminogenicNeeds: needs,
         religion: 'Christian',
         sex: 'Male',
         genderIdentity: 'Prefer to self-describe',
@@ -243,7 +243,7 @@ describe('PersonalService', () => {
         personalCircumstances: [],
       }),
     )
-    const observed = subject.getPersonalDetails(offender, [], [], [])
+    const observed = subject.getPersonalDetails(offender, [], [], null)
     expect(observed.contactDetails.address).toBeFalsy()
   })
 

@@ -37,6 +37,7 @@ export class PersonalController {
 
     return this.offender.casePageOf<CasePersonalViewModel>(offender, {
       page: CasePage.Personal,
+      assessRisksAndNeedsApiStatus: criminogenicNeeds.status,
       ...this.personal.getPersonalDetails(offender, personalContacts, personalCircumstances, criminogenicNeeds),
       links: links => ({
         addressBook: links.url(BreadcrumbType.PersonalAddresses),

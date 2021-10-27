@@ -80,6 +80,11 @@ export class ViewCaseFixture {
     return this
   }
 
+  shouldDisplayOASysDataUnavailableWarning() {
+    this.page.oasysDataUnavailableWarning.contains('Risk information from OASys is temporarily unavailable')
+    return this
+  }
+
   thenWhenGoingBack() {
     cy.go('back')
     return this
@@ -89,6 +94,7 @@ export class ViewCaseFixture {
     cy.testA11y()
     return this
   }
+
   shouldRenderPreviousOrdersPage(callback: (page: CasePreviousOrdersPage) => void) {
     const page = new CasePreviousOrdersPage()
     page.pageTitle.contains('Previous orders')

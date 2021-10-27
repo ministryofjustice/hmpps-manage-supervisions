@@ -1,7 +1,7 @@
 import { ActivityComplianceFilter, CaseActivityLogGroup } from './activity'
 import { ComplianceDetails, ConvictionDetails } from './sentence'
 import { AppointmentListViewModel, NextAppointmentSummary } from './schedule'
-import { RiskRegistrations, Risks } from './risk'
+import { AssessRisksAndNeedsApiStatus, RiskRegistrations, Risks, RisksAndNeedsDegraded } from './risk'
 import { GetPersonalDetailsResult } from './personal'
 import { ViewModel } from '../common'
 import { BreadcrumbType } from '../common/links'
@@ -43,6 +43,7 @@ export interface CaseLinks extends CasePageLinks {
 
 export interface CaseViewModelBase<Page extends CasePage, Links> extends ViewModel {
   page: Page
+  assessRisksAndNeedsApiStatus?: AssessRisksAndNeedsApiStatus
   ids: {
     crn: string
     pnc?: string
@@ -55,7 +56,7 @@ export interface CaseViewModelBase<Page extends CasePage, Links> extends ViewMod
 export interface CaseOverviewViewModel extends CaseViewModelBase<CasePage.Overview, {}>, GetPersonalDetailsResult {
   compliance: ComplianceDetails
   nextAppointment?: NextAppointmentSummary
-  risks: Risks
+  risks: Risks | RisksAndNeedsDegraded
   registrations: RiskRegistrations
 }
 
@@ -123,7 +124,7 @@ export interface CaseRiskLinks {
 }
 
 export interface CaseRiskViewModel extends CaseViewModelBase<CasePage.Risk, CaseRiskLinks> {
-  risks: Risks
+  risks: Risks | RisksAndNeedsDegraded
   registrations: RiskRegistrations
 }
 

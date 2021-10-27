@@ -1,13 +1,15 @@
 import {
+  AssessRisksAndNeedsApiStatus,
+  CriminogenicNeed,
+  CriminogenicNeeds,
   FlatRiskToSelf,
+  RiskLevel,
   RiskLevelMeta,
   RiskRegistration,
+  RiskRegistrationDetails,
+  RiskRegistrations,
   Risks,
   RoshRisk,
-  RiskLevel,
-  RiskRegistrations,
-  RiskRegistrationDetails,
-  CriminogenicNeed,
 } from './risk.types'
 import { fake, fakeEnum, fakeRandomArray } from '../../util/util.fake'
 import * as faker from 'faker'
@@ -70,6 +72,7 @@ const fakeFlatRiskToSelf = fake<FlatRiskToSelf>(() => ({
 }))
 
 export const fakeRisks = fake<Risks>((options, partial = {}) => ({
+  status: AssessRisksAndNeedsApiStatus.Available,
   community: {
     level: fakeRiskLevelMeta(),
     risks: partial.community?.risks?.map(fakeRoshRisk) || [fakeRoshRisk(), fakeRoshRisk()],
@@ -96,4 +99,9 @@ export const fakeRisks = fake<Risks>((options, partial = {}) => ({
 export const fakeCriminogenicNeed = fake<CriminogenicNeed>(() => ({
   name: faker.company.bs(),
   date: DateTime.fromJSDate(faker.date.past()),
+}))
+
+export const fakeCriminogenicNeeds = fake<CriminogenicNeeds>((options, partial = {}) => ({
+  status: AssessRisksAndNeedsApiStatus.Available,
+  needs: partial.needs?.map(x => fakeCriminogenicNeed(x)) || [fakeCriminogenicNeed()],
 }))

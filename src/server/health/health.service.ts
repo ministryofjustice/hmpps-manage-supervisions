@@ -9,6 +9,7 @@ import { OpenApiVersionService } from './open-api-version'
 interface ServiceHealthResult {
   name: keyof DependentApisConfig
   healthy: boolean
+  criticalAvailability: boolean
   result: string
 }
 
@@ -34,7 +35,7 @@ export class HealthService {
 
     const [[community, assessRisksAndNeeds], results] = await Promise.all([openApiPromise, servicesPromise])
     return {
-      healthy: results.length === 0 || results.every(x => x.healthy),
+      healthy: results.length === 0 || results.every(x => x.healthy || !x.criticalAvailability),
       checks: results.reduce((agg, x) => ({ ...agg, [x.name]: x.result }), {}),
       uptime: process.uptime(),
       version,
@@ -42,14 +43,17 @@ export class HealthService {
     }
   }
 
-  private async service(name: keyof DependentApisConfig, { url }: ApiConfig): Promise<ServiceHealthResult> {
+  private async service(
+    name: keyof DependentApisConfig,
+    { url, criticalAvailability }: ApiConfig,
+  ): Promise<ServiceHealthResult> {
     try {
       const result = await Axios.get(urlJoin(url, 'health', 'ping'), { timeout: 5000 })
-      return { name, healthy: true, result: result.data }
+      return { name, healthy: true, result: result.data, criticalAvailability }
     } catch (err) {
       const reason = (Axios.isAxiosError(err) && err.response?.data) || err.message || null
       this.logger.warn(`${name} is unhealthy`, { reason, service: name })
-      return { name, healthy: false, result: reason }
+      return { name, healthy: false, result: reason, criticalAvailability }
     }
   }
 }

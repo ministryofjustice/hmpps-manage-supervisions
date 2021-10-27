@@ -1,0 +1,11 @@
+{%- macro twoThirds(content) %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            {% if caller %}
+                {{ caller() }}
+            {% else %}
+                {{ content | safe }}
+            {% endif %}
+        </div>
+    </div>
+{% endmacro -%}

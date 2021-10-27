@@ -25,7 +25,7 @@
 {% endmacro %}
 
 {% block page %}
-    {% if risks %}
+    {% if risks.status === 'available' %}
         {% call appSummaryCard({
             titleText: 'Risk of serious harm (ROSH) in the community',
             classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
@@ -98,7 +98,7 @@
                 ]
             }) }}
         {%- endcall %}
-    {% else %}
+    {% elseif risks.status === 'missing' %}
         {% set noRisksWarning %}
             <h2 class="govuk-heading-m">There is no OASys risk assessment for {{ shortName }}</h2>
             <p>We do not know:</p>

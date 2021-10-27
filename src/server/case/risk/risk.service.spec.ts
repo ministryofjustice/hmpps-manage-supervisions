@@ -5,7 +5,13 @@ import {
   RiskDtoAllRisksViewPrevious,
 } from '../../assess-risks-and-needs-api/client'
 import { fakeOkResponse, fakeRestError } from '../../common/rest/rest.fake'
-import { CriminogenicNeed, RiskRegistrationDetails, RiskRegistrations, Risks } from './risk.types'
+import {
+  AssessRisksAndNeedsApiStatus,
+  CriminogenicNeeds,
+  RiskRegistrationDetails,
+  RiskRegistrations,
+  Risks,
+} from './risk.types'
 import { MockCommunityApiModule, MockCommunityApiService } from '../../community-api/community-api.mock'
 import { RiskService } from './risk.service'
 import {
@@ -101,6 +107,7 @@ describe('RiskService', () => {
       const observed = await subject.getRisks('some-crn')
 
       expect(observed).toEqual({
+        status: AssessRisksAndNeedsApiStatus.Available,
         community: {
           level: { colour: GovUkUiTagColour.DarkRed, index: 3, text: 'Very high' },
           riskLevels: { HIGH: ['Public'], LOW: ['Known Adult'], VERY_HIGH: ['Children', 'Staff'] },
@@ -154,7 +161,17 @@ describe('RiskService', () => {
     it('handles missing offender', async () => {
       arn.risk.getRoshRisksByCrn.throws(fakeRestError(HttpStatus.NOT_FOUND))
       const observed = await subject.getRisks('some-crn')
-      expect(observed).toBeNull()
+      expect(observed).toEqual({
+        status: AssessRisksAndNeedsApiStatus.NoRiskAssessment,
+      })
+    })
+
+    it('handles service unavailable', async () => {
+      arn.risk.getRoshRisksByCrn.throws(fakeRestError(HttpStatus.SERVICE_UNAVAILABLE))
+      const observed = await subject.getRisks('some-crn')
+      expect(observed).toEqual({
+        status: AssessRisksAndNeedsApiStatus.Unavailable,
+      })
     })
 
     it('handles missing risk data', async () => {
@@ -165,6 +182,7 @@ describe('RiskService', () => {
       arn.risk.getRoshRisksByCrn.resolves(fakeOkResponse(risks))
       const observed = await subject.getRisks('some-crn')
       expect(observed).toEqual({
+        status: AssessRisksAndNeedsApiStatus.Available,
         community: {
           level: null,
           natureOfRisk: null,
@@ -349,7 +367,19 @@ describe('RiskService', () => {
     it('handles missing offender', async () => {
       arn.needs.getCriminogenicNeedsByCrn.withArgs({ crn: 'some-crn' }).throws(fakeRestError(HttpStatus.NOT_FOUND))
       const observed = await subject.getNeeds('some-crn')
-      expect(observed).toEqual([])
+      expect(observed).toEqual({
+        status: AssessRisksAndNeedsApiStatus.NoRiskAssessment,
+      })
+    })
+
+    it('handles service unavailable', async () => {
+      arn.needs.getCriminogenicNeedsByCrn
+        .withArgs({ crn: 'some-crn' })
+        .throws(fakeRestError(HttpStatus.SERVICE_UNAVAILABLE))
+      const observed = await subject.getNeeds('some-crn')
+      expect(observed).toEqual({
+        status: AssessRisksAndNeedsApiStatus.Unavailable,
+      })
     })
 
     it('handles empty data', async () => {
@@ -362,7 +392,10 @@ describe('RiskService', () => {
         }),
       )
       const observed = await subject.getNeeds('some-crn')
-      expect(observed).toEqual([])
+      expect(observed).toEqual({
+        status: AssessRisksAndNeedsApiStatus.Available,
+        needs: [],
+      } as CriminogenicNeeds)
     })
 
     it('gets identified needs', async () => {
@@ -387,12 +420,13 @@ describe('RiskService', () => {
       })
       arn.needs.getCriminogenicNeedsByCrn.withArgs({ crn: 'some-crn' }).resolves(fakeOkResponse(needs))
       const observed = await subject.getNeeds('some-crn')
-      expect(observed).toEqual(
-        ['Education', 'Financial'].map<CriminogenicNeed>(name => ({
+      expect(observed).toEqual({
+        status: AssessRisksAndNeedsApiStatus.Available,
+        needs: ['Education', 'Financial'].map(name => ({
           name,
           date: DateTime.fromObject({ year: 2021, month: 2, day: 3 }),
         })),
-      )
+      } as CriminogenicNeeds)
     })
   })
 })

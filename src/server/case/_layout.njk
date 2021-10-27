@@ -1,5 +1,5 @@
 {%- from "moj/components/sub-navigation/macro.njk" import mojSubNavigation -%}
-
+{%- from 'components/two-thirds.njk' import twoThirds -%}
 {% extends "partials/layout.njk" %}
 {% set pageTitle = pageTitle | default(pageName + ' - ' + displayName) %}
 
@@ -23,6 +23,25 @@
             {{ govukNotificationBanner({
                 attributes: { 'data-qa': 'offender/ineligible-case-warning' },
                 html: caseEligibilityWarning
+            }) }}
+        {% endif %}
+
+        {% if assessRisksAndNeedsApiStatus === 'unavailable' %}
+            {% set assessRisksAndNeedsApiUnavailableWarning %}
+                {% call twoThirds() -%}
+                    <p>We cannot show the following:</p>
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>Risk of serious harm (ROSH) in the community</li>
+                        <li>Risk to themselves</li>
+                        <li>Criminogenic needs</li>
+                    </ul>
+                    <p class='govuk-!-margin-bottom-0'>If you need this information please try again later.</p>
+                {%- endcall %}
+            {% endset %}
+            {{ govukErrorSummary({
+                titleText: "Risk information from OASys is temporarily unavailable",
+                attributes: { 'data-qa': 'offender/oasys-data-unavailable-warning' },
+                errorList: [{ html: assessRisksAndNeedsApiUnavailableWarning }]
             }) }}
         {% endif %}
 

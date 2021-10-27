@@ -23,8 +23,9 @@ describe('HealthService', () => {
       imports: [
         FakeConfigModule.register({
           apis: {
-            hmppsAuth: { enabled: true },
-            community: { enabled: true },
+            hmppsAuth: { enabled: true, criticalAvailability: true },
+            community: { enabled: true, criticalAvailability: true },
+            assessRisksAndNeeds: { enabled: true, criticalAvailability: false },
             tokenVerification: { enabled: false },
           },
         }),
@@ -69,6 +70,22 @@ describe('HealthService', () => {
     expect(observed).toEqual({
       healthy: false,
       checks: { hmppsAuth: { status: 'DOWN' }, community: { status: 'UP' }, assessRisksAndNeeds: { status: 'UP' } },
+      version: server.version,
+      services: {
+        community: communityApiVersion,
+        assessRisksAndNeeds: assessRisksAndNeedsApiVersion,
+      },
+    } as HealthResult)
+  })
+
+  it('should be healthy even when a non critical service is unhealthy', async () => {
+    havingHealthyApi('hmppsAuth')
+    havingHealthyApi('community')
+    havingHealthyApi('assessRisksAndNeeds', false)
+    const { uptime, ...observed } = await subject.getHealth()
+    expect(observed).toEqual({
+      healthy: true,
+      checks: { hmppsAuth: { status: 'UP' }, community: { status: 'UP' }, assessRisksAndNeeds: { status: 'DOWN' } },
       version: server.version,
       services: {
         community: communityApiVersion,

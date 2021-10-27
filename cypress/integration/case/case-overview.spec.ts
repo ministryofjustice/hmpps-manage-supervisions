@@ -169,4 +169,9 @@ context('Case overview tab', () => {
         })
       })
   })
+
+  it('renders oasys risk data unavailable warning', () => {
+    cy.seed({ risks: 'unavailable' })
+    fixture.whenViewingOffender().shouldRenderOffenderTab('overview').shouldDisplayOASysDataUnavailableWarning()
+  })
 })

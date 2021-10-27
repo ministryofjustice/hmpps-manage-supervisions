@@ -29,6 +29,7 @@ export class RiskController {
 
     return this.offender.casePageOf<CaseRiskViewModel>(offender, {
       page: CasePage.Risk,
+      assessRisksAndNeedsApiStatus: risks.status,
       risks,
       registrations,
       links: links => ({
