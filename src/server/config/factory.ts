@@ -15,24 +15,55 @@ import { getApplicationInfo } from '../util'
 import { requirements } from './requirements'
 import { URL } from 'url'
 
-interface EnvironmentFallback<T> {
+enum DefaultFallbackType {
+  Always,
+  NonProductionNodeEnvironment,
+  DeploymentEnvironment,
+}
+
+interface FallbackBase<Default extends DefaultFallbackType, T> {
+  type: Default
   value: T
-  developmentOnly: boolean
 }
 
-function fallback<T>(value: T): EnvironmentFallback<T> {
-  return { value, developmentOnly: false }
+type AlwaysFallback<T> = FallbackBase<DefaultFallbackType.Always, T>
+
+type NonProductionNodeEnvironment<T> = FallbackBase<DefaultFallbackType.NonProductionNodeEnvironment, T>
+
+interface DeploymentEnvironmentFallback<T> extends FallbackBase<DefaultFallbackType.DeploymentEnvironment, T> {
+  environment: string
 }
 
-function developmentOnly<T>(value: T): EnvironmentFallback<T> {
-  return { value, developmentOnly: true }
+type Fallback<T> = AlwaysFallback<T> | NonProductionNodeEnvironment<T> | DeploymentEnvironmentFallback<T>
+
+function fallback<T>(value: T): Fallback<T> {
+  return { type: DefaultFallbackType.Always, value }
+}
+
+function developmentOnly<T>(value: T): Fallback<T> {
+  return { type: DefaultFallbackType.NonProductionNodeEnvironment, value }
+}
+
+function localOnly<T>(value: T): Fallback<T> {
+  return { type: DefaultFallbackType.DeploymentEnvironment, environment: 'local', value }
 }
 
 export function isProduction(): boolean {
   return process.env.NODE_ENV === 'production'
 }
 
-function env<T>(name: string, parse: (value: string) => T, fallbackFn?: EnvironmentFallback<T>): T {
+function deploymentEnvironment() {
+  const value = process.env.DEPLOYMENT_ENV
+  if (!value) {
+    if (isProduction()) {
+      throw new Error('DEPLOYMENT_ENV is required')
+    }
+    return 'local'
+  }
+  return value
+}
+
+function env<T>(name: string, parse: (value: string) => T, ...fallbacks: Fallback<T>[]): T {
   if (process.env[name] !== undefined) {
     const value = parse(process.env[name])
     if (value !== undefined) {
@@ -40,36 +71,51 @@ function env<T>(name: string, parse: (value: string) => T, fallbackFn?: Environm
     }
   }
 
-  if (fallbackFn !== undefined && (!isProduction() || !fallbackFn.developmentOnly)) {
-    return fallbackFn.value
+  const environment = deploymentEnvironment()
+  const production = isProduction()
+  for (const fallback of fallbacks) {
+    switch (fallback.type) {
+      case DefaultFallbackType.Always:
+        return fallback.value
+      case DefaultFallbackType.DeploymentEnvironment:
+        if (environment === fallback.environment) {
+          return fallback.value
+        }
+        break
+      case DefaultFallbackType.NonProductionNodeEnvironment:
+        if (!production) {
+          return fallback.value
+        }
+        break
+    }
   }
 
   throw new Error(`Missing env var ${name}`)
 }
 
-function string(name: string, fallbackFn?: EnvironmentFallback<string>): string {
-  return env(name, x => x, fallbackFn)
+function string(name: string, ...fallbacks: Fallback<string>[]): string {
+  return env(name, x => x, ...fallbacks)
 }
 
-function url(name: string, fallbackFn?: EnvironmentFallback<string>): URL {
-  const value = string(name, fallbackFn)
+function url(name: string, ...fallbacks: Fallback<string>[]): URL {
+  const value = string(name, ...fallbacks)
   return value ? Object.freeze(new URL(value)) : null
 }
 
-function int(name: string, fallbackFn?: EnvironmentFallback<number>): number {
-  return env(name, x => parseInt(x, 10), fallbackFn)
+function int(name: string, ...fallbacks: Fallback<number>[]): number {
+  return env(name, x => parseInt(x, 10), ...fallbacks)
 }
 
-function bool(name: string, fallbackFn?: EnvironmentFallback<boolean>): boolean {
-  return env(name, x => x === 'true', fallbackFn)
+function bool(name: string, ...fallbacks: Fallback<boolean>[]): boolean {
+  return env(name, x => x === 'true', ...fallbacks)
 }
 
-function stringEnum<T>(cls: T, name: string, fallbackFn?: EnvironmentFallback<T[keyof T]>): T[keyof T] {
+function stringEnum<T>(cls: T, name: string, ...fallbacks: Fallback<T[keyof T]>[]): T[keyof T] {
   const values = Object.values(cls)
   return env(
     name,
     x => values.find(v => v.localeCompare(x.trim(), undefined, { sensitivity: 'base' }) === 0),
-    fallbackFn,
+    ...fallbacks,
   )
 }
 
@@ -292,13 +338,13 @@ export function configFactory(): Config {
       description: appInfo.description,
       version: appInfo.version || 'unknown',
       port: int('PORT', fallback(3000)),
-      deploymentEnvironment: string('DEPLOYMENT_ENV', developmentOnly('local')),
+      deploymentEnvironment: deploymentEnvironment(),
       isProduction: isProduction(),
       domain: url('INGRESS_URL', developmentOnly('http://localhost:3000')),
       staticResourceCacheDuration: int('STATIC_RESOURCE_CACHE_DURATION', fallback(20)),
       features,
       logLevel: stringEnum(LogLevel, 'LOG_LEVEL', fallback(LogLevel.Info)),
-      sentryDsn: string('SENTRY_DSN', developmentOnly(null)),
+      sentryDsn: string('SENTRY_DSN', developmentOnly(null), localOnly(null)),
       supportEmail: string('SUPPORT_EMAIL', fallback('manage-supervisions-support@digital.justice.gov.uk')),
     },
     redis: {
