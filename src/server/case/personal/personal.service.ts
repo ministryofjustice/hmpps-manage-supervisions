@@ -1,6 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { groupBy, maxBy, orderBy } from 'lodash'
-import { Address, AddressSummary, OffenderDetail, OffenderLanguages, PhoneNumberType } from '../../community-api/client'
+import {
+  Address,
+  AddressSummary,
+  Disability,
+  OffenderDetail,
+  OffenderLanguages,
+  PhoneNumberType,
+} from '../../community-api/client'
 import { getDisplayName, isActiveDateRange, sentenceCase, titleCase } from '../../util'
 import { DateTime } from 'luxon'
 import {
@@ -65,6 +72,21 @@ function getAddressViewModel(address: Address): AddressDetail {
     status,
     lastUpdated: DateTime.fromISO(address.lastUpdatedDatetime),
   }
+}
+
+function formatDisabilities(disabilities: Array<Disability>): string[] {
+  const formatType = type => (type.description === 'Other' ? 'Other disability' : type.description)
+  const formatProvision = provision =>
+    provision.provisionType.description === 'Other' ? 'With adjustment' : provision.provisionType.description
+
+  return disabilities
+    .map(x =>
+      [
+        formatType(x.disabilityType),
+        x.provisions?.length ? x.provisions.map(formatProvision).join(', ') : 'No adjustments',
+      ].join(': '),
+    )
+    .sort()
 }
 
 @Injectable()
@@ -205,14 +227,7 @@ export class PersonalService {
       offender.offenderProfile
 
     const disabilities = offender.offenderProfile.disabilities?.filter(isActiveDateRange) || []
-    const formattedDisabilities = disabilities
-      .map(x =>
-        [
-          x.disabilityType.description,
-          x.provisions?.length ? x.provisions.map(p => p.provisionType.description).join(', ') : 'No adjustments',
-        ].join(': '),
-      )
-      .sort()
+    const formattedDisabilities = formatDisabilities(disabilities)
 
     const disabilitiesLastUpdated = DateTime.fromISO(
       disabilities

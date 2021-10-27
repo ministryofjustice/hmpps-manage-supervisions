@@ -223,7 +223,9 @@ context('Case personal details tab', () => {
             card.title('Current circumstances').contains('Last updated')
             card
               .value('Disabilities and adjustments')
-              .contains('Learning Difficulties: Other Speech Impairment: No adjustments')
+              .contains(
+                'Learning Difficulties: With adjustment Other disability: With adjustment Speech Impairment: No adjustments',
+              )
             card.title('Disabilities and adjustments').contains('Last updated')
             card.value('Criminogenic needs').contains('Accommodation Alcohol Misuse Drug Misuse')
             card.valueAbbr('CRN').contains(fixture.data.crn)
