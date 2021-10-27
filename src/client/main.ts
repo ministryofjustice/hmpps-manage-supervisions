@@ -21,7 +21,7 @@ const enhanceInputElement = configurationOptions => {
   configurationOptions.name = configurationOptions.element.name
 
   const element = document.createElement('div')
-  element.style.maxWidth = '110px'
+  element.style.maxWidth = '120px'
 
   configurationOptions.element.parentNode.insertBefore(element, configurationOptions.element)
 
