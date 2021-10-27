@@ -50,6 +50,10 @@ export interface SessionConfig {
 
 export interface ApiConfig {
   enabled: boolean
+  /**
+   * This API must be up for the readiness probe to succeed
+   */
+  criticalAvailability: boolean
   url: URL
   timeout: number
   specVersion?: string
