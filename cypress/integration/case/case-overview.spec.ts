@@ -86,7 +86,7 @@ context('Case overview tab', () => {
           card.value('Mobile number').contains('07734 111992')
           card.value('Telephone number').contains('01234 111222')
           card
-            .value('Current circumstances and disabilities')
+            .value('Current circumstances')
             .contains(
               [
                 'Employment: Temporary/casual work (30 or more hours per week)',
@@ -106,6 +106,7 @@ context('Case overview tab', () => {
           card
             .value('Main offence')
             .contains('Cheats at gambling or enables or assists person to cheat (Gambling Act 2005) (1 count)')
+          card.value('Main offence').contains('1 additional offence')
           card.value('Order').contains('12 month Community Order (12 months elapsed)')
           card.value('Requirements').contains('44 days RAR, 1 completed')
           card.value('Previous orders').contains('1 previous order (1 breach on a previous order)')
@@ -148,7 +149,7 @@ context('Case overview tab', () => {
           card.value('Gender').contains('Female')
           card.title('Mobile number').should('not.exist')
           card.title('Telephone number').should('not.exist')
-          card.value('Current circumstances and disabilities').contains('None')
+          card.value('Current circumstances').contains('None')
         })
 
         page.risk(card => {

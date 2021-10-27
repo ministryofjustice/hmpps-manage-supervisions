@@ -64,7 +64,7 @@ class Fixture extends ViewCaseFixture {
     if (expected.notes) {
       page.address(type, 'Notes').contains(expected.notes)
     } else {
-      page.addressCell(type, 'Notes').should('not.exist')
+      page.address(type, 'Notes').contains('No notes')
     }
 
     return this
@@ -85,7 +85,7 @@ class Fixture extends ViewCaseFixture {
       if (expected.notes) {
         card.value('Notes').contains(expected.notes)
       } else {
-        card.cell('Notes').should('not.exist')
+        card.value('Notes').contains('No notes')
       }
 
       for (const adjustment of expected.adjustments) {
@@ -102,7 +102,7 @@ class Fixture extends ViewCaseFixture {
           if (adjustment.notes) {
             subject.value('Notes').contains(adjustment.notes)
           } else {
-            subject.cell('Notes').should('not.exist')
+            subject.value('Notes').contains('No notes')
           }
         })
       }

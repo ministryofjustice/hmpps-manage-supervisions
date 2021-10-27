@@ -36,8 +36,8 @@
                                 } if adjustment.endDate,
                                 {
                                     key: { text: "Notes" },
-                                    value: { html: adjustment.notes | nl2br }
-                                } if adjustment.notes
+                                    value: { html: (adjustment.notes | nl2br) if adjustment.notes else 'No notes' }
+                                }
                             ]
                         })
                     }) }}
@@ -69,8 +69,8 @@
                         } if disability.endDate,
                         {
                             key: { text: "Notes" },
-                            value: { html: disability.notes | nl2br }
-                        } if disability.notes,
+                            value: { html: (disability.notes | nl2br) if disability.notes else 'No notes' }
+                        },
                         {
                             key: { text: "Adjustments" },
                             value: { html: adjustmentDetails }
