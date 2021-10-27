@@ -1,5 +1,5 @@
 {%- from "moj/components/sub-navigation/macro.njk" import mojSubNavigation -%}
-
+{%- from 'components/two-thirds.njk' import twoThirds -%}
 {% extends "partials/layout.njk" %}
 {% set pageTitle = pageTitle | default(pageName + ' - ' + displayName) %}
 
@@ -27,14 +27,21 @@
         {% endif %}
 
         {% if assessRisksAndNeedsApiStatus === 'unavailable' %}
+            {% set assessRisksAndNeedsApiUnavailableWarning %}
+                {% call twoThirds() -%}
+                    <p>We cannot show the following:</p>
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>Risk of serious harm (ROSH) in the community</li>
+                        <li>Risk to themselves</li>
+                        <li>Criminogenic needs</li>
+                    </ul>
+                    <p class='govuk-!-margin-bottom-0'>If you need this information please try again later.</p>
+                {%- endcall %}
+            {% endset %}
             {{ govukErrorSummary({
-                titleText: "OASys data is currently unavailable",
+                titleText: "Risk information from OASys is temporarily unavailable",
                 attributes: { 'data-qa': 'offender/oasys-data-unavailable-warning' },
-                errorList: [
-                    {
-                        text: "Some of the data on this page is incomplete as we cannot currently retrieve risk assessments from OASys."
-                    }
-                ]
+                errorList: [{ html: assessRisksAndNeedsApiUnavailableWarning }]
             }) }}
         {% endif %}
 

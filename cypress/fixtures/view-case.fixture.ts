@@ -81,9 +81,7 @@ export class ViewCaseFixture {
   }
 
   shouldDisplayOASysDataUnavailableWarning() {
-    this.page.oasysDataUnavailableWarning.contains(
-      'Some of the data on this page is incomplete as we cannot currently retrieve risk assessments from OASys',
-    )
+    this.page.oasysDataUnavailableWarning.contains('Risk information from OASys is temporarily unavailable')
     return this
   }
 
@@ -96,6 +94,7 @@ export class ViewCaseFixture {
     cy.testA11y()
     return this
   }
+
   shouldRenderPreviousOrdersPage(callback: (page: CasePreviousOrdersPage) => void) {
     const page = new CasePreviousOrdersPage()
     page.pageTitle.contains('Previous orders')
