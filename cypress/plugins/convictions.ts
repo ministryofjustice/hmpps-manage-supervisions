@@ -4,7 +4,7 @@ import { SeedFn } from './wiremock'
 import { DeepPartial } from '../../src/server/app.types'
 
 export const ACTIVE_CONVICTION_ID = 100
-export const PREVIOUS_CONVICTION_IDS = [101]
+export const PREVIOUS_CONVICTION_IDS = [101, 102]
 
 export const ACTIVE_CONVICTION: DeepPartial<Conviction> = {
   convictionId: ACTIVE_CONVICTION_ID,
@@ -82,6 +82,23 @@ export const PREVIOUS_CONVICTIONS: DeepPartial<Conviction>[] = [
       legacyOrder: false,
     },
     offences: [{ mainOffence: true, offenceCount: 2, detail: { subCategoryDescription: 'Assault on Police Officer' } }],
+  },
+  {
+    convictionId: PREVIOUS_CONVICTION_IDS[1],
+    active: false,
+    convictionDate: '2016-11-01',
+    sentence: {
+      sentenceType: {
+        description: 'ORA Community Order',
+      },
+      startDate: '2016-12-01',
+      terminationDate: '2018-12-01',
+      originalLength: 24,
+      originalLengthUnits: 'Months',
+      cja2003Order: true,
+      legacyOrder: false,
+    },
+    offences: [{ mainOffence: true, offenceCount: 1, detail: { subCategoryDescription: 'Drinking and Driving' } }],
   },
 ]
 
