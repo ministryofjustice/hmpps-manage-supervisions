@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { createNodeRedisClient, WrappedNodeRedisClient } from 'handy-redis'
 import { ConfigService } from '@nestjs/config'
 import { Config, RedisConfig } from '../../config'
+import { SimpleCache } from '../../util/simple-cache'
 
 export interface CacheSetOptions {
   durationSeconds?: number
@@ -19,6 +20,11 @@ export interface ICacheService {
 export class CacheService implements ICacheService {
   private readonly client: WrappedNodeRedisClient
   private readonly logger = new Logger(CacheService.name)
+
+  /**
+   * a short lived local cache of promises that is used to prevent races for uncached data.
+   */
+  private readonly local = new SimpleCache<Promise<any>>({ useClones: false, stdTTL: 60, checkperiod: 60 })
 
   constructor(config: ConfigService<Config>) {
     this.client = createNodeRedisClient({ ...config.get<RedisConfig>('redis') })
@@ -50,13 +56,26 @@ export class CacheService implements ICacheService {
   }
 
   async getOrSet<T>(key: string, factory: ValueFactory<T>): Promise<T> {
+    // check for locally cached promise first
+    const cachedPromise = this.local.get(key)
+    if (cachedPromise) {
+      return cachedPromise
+    }
+
+    // otherwise check the remote cache.
     const cached = await this.get<T>(key)
     if (cached) {
       return cached
     }
 
-    const { value, options } = await factory()
-    await this.set(key, value, options)
-    return value
+    // create a new promise to fetch the uncached data & cache it then add this to the local promise cache
+    // this means that multiple async callbacks asking for the same data will resolve the same promise from the cache
+    // this prevents us from retrieving uncached data multiple times.
+    const promise = factory().then(async ({ value, options }) => {
+      await this.set(key, value, options)
+      return value
+    })
+    this.local.set(key, promise)
+    return promise
   }
 }

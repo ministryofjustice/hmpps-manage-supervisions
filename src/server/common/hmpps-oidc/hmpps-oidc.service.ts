@@ -1,19 +1,26 @@
-import { Injectable, Scope } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Client, custom, Issuer } from 'openid-client'
 import { AuthApiConfig, ClientCredentials } from '../../config'
 import { CacheService } from '../cache/cache.service'
 import { urlJoin } from '../../util'
+import { SimpleCache } from '../../util/simple-cache'
 
 export function generateOauthClientToken(credentials: ClientCredentials): string {
   const token = Buffer.from(`${credentials.id}:${credentials.secret}`).toString('base64')
   return `Basic ${token}`
 }
 
-@Injectable({ scope: Scope.DEFAULT })
+@Injectable()
 export class HmppsOidcService {
-  private issuer: Issuer<Client>
+  private readonly logger = new Logger(HmppsOidcService.name)
   private readonly config: AuthApiConfig
+
+  /**
+   * Local 30 minute cache of a promise to get the issuer.
+   * This is here to prevent a race to get the issuer & no point this going out to remote cache.
+   */
+  private readonly issuerCache = new SimpleCache<Promise<Issuer<Client>>>({ stdTTL: 60 * 30, useClones: false })
 
   constructor(private readonly cache: CacheService, config: ConfigService) {
     this.config = config.get('apis.hmppsAuth')
@@ -43,17 +50,22 @@ export class HmppsOidcService {
       }
 
       const tokenSet = await client.grant({ grant_type: 'client_credentials', username })
+      this.logger.log('new hmpps-auth client credentials token', {
+        id: credentials.id,
+        username,
+        expiresIn: tokenSet.expires_in,
+        tokenType: tokenSet.token_type,
+        scope: tokenSet.scope,
+      })
       return { value: tokenSet.access_token, options: { durationSeconds: tokenSet.expires_in - 60 } }
     })
   }
 
-  private async getIssuer(): Promise<Issuer<Client>> {
-    // TODO this issuer cache should be cleared out periodically
-    if (this.issuer) {
-      return this.issuer
-    }
-
-    const url = urlJoin(this.config.url, this.config.issuerPath)
-    return (this.issuer = await Issuer.discover(url))
+  private async getIssuer() {
+    return this.issuerCache.getOrSet('issuer', () => {
+      const url = urlJoin(this.config.url, this.config.issuerPath)
+      this.logger.log('getting hmpps-auth issuer', { url })
+      return Issuer.discover(url)
+    })
   }
 }
