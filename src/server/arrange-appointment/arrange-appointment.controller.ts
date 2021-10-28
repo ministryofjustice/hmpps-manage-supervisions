@@ -221,7 +221,10 @@ export class ArrangeAppointmentController {
     @Session() session: AppointmentWizardSession,
     @BodyClass(AppointmentWizardStep.When) body: AppointmentBuilderDto,
   ): Promise<RenderOrRedirect> {
-    this.wizard.assertStep(session, AppointmentWizardStep.When, crn)
+    const redirect = this.wizard.assertStep(session, AppointmentWizardStep.When, crn)
+    if (redirect) {
+      return redirect
+    }
 
     const errors = await ArrangeAppointmentController.validateWithSession(body, session, AppointmentWizardStep.When)
     if (errors.length > 0) {
@@ -235,6 +238,7 @@ export class ArrangeAppointmentController {
 
   @Get('add-notes')
   @Render('arrange-appointment/views/add-notes')
+  @DynamicRedirect()
   async getAddNotes(
     @Param('crn') crn: string,
     @Session() session: AppointmentWizardSession,
@@ -255,7 +259,10 @@ export class ArrangeAppointmentController {
     @Session() session: AppointmentWizardSession,
     @BodyClass(AppointmentWizardStep.AddNotes) body: AppointmentBuilderDto,
   ): Promise<RenderOrRedirect> {
-    this.wizard.assertStep(session, AppointmentWizardStep.AddNotes, crn)
+    const redirect = this.wizard.assertStep(session, AppointmentWizardStep.AddNotes, crn)
+    if (redirect) {
+      return redirect
+    }
 
     const errors = await ArrangeAppointmentController.validateWithSession(body, session, AppointmentWizardStep.AddNotes)
     if (errors.length > 0) {
