@@ -4,7 +4,13 @@ module.exports = {
     node: true,
     jest: true,
   },
-  ignorePatterns: ['*.js', 'scripts/**/*.ts', 'src/server/community-api/client/**/*', 'src/server/assess-risks-and-needs-api/client/**/*'],
+  ignorePatterns: [
+    '*.js',
+    'scripts/**/*.ts',
+    'src/server/community-api/client/**/*',
+    'src/server/assess-risks-and-needs-api/client/**/*',
+    'src/server/delius-api/client/**/*'
+  ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     sourceType: 'module',

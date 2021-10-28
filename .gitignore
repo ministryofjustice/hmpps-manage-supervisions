@@ -140,4 +140,8 @@ src/server/assess-risks-and-needs-api/client/**/*
 !src/server/assess-risks-and-needs-api/client/.openapi-generator-ignore
 !src/server/assess-risks-and-needs-api/client/assess-risks-and-needs-api.json
 
+src/server/delius-api/client/**/*
+!src/server/delius-api/client/.openapi-generator-ignore
+!src/server/delius-api/client/delius-api.json
+
 dev.env

@@ -29,6 +29,19 @@
           "withSeparateModelsAndApi": true,
           "enumNameSuffix": null
         }
+      },
+      "delius-api": {
+        "generatorName": "typescript-axios",
+        "output": "src/server/delius-api/client",
+        "glob": "src/server/delius-api/client/delius-api.json",
+        "modelPackage": "model",
+        "apiPackage": "api",
+        "additionalProperties": {
+          "useSingleRequestParameter": true,
+          "supportsES6": true,
+          "withSeparateModelsAndApi": true,
+          "enumNameSuffix": null
+        }
       }
     }
   }

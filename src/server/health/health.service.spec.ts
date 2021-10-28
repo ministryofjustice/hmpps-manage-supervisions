@@ -27,6 +27,7 @@ describe('HealthService', () => {
             community: { enabled: true, criticalAvailability: true },
             assessRisksAndNeeds: { enabled: true, criticalAvailability: false },
             tokenVerification: { enabled: false },
+            delius: { enabled: false },
           },
         }),
       ],

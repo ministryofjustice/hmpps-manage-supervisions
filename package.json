@@ -170,6 +170,6 @@
   "lint-staged": {
     "*.ts": "eslint --fix",
     "./*.json": "prettier --write",
-    "!(wiremock)/**/!(*community-api|assess-risks-and-needs-api).json": "prettier --write"
+    "!(wiremock)/**/!(*community-api|assess-risks-and-needs-api|delius-api).json": "prettier --write"
   }
 }
