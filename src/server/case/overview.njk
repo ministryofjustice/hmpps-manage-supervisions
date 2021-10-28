@@ -111,14 +111,20 @@
             {% endset %}
         {% endswitch %}
 
+        {% set lastUpdatedAt %}
+            {% if risks.assessedOn %}
+                <br><span class="govuk-!-font-size-16 govuk-!-font-weight-regular">Last updated {{ risks.assessedOn | shortDate }}</span>
+            {% endif %}
+        {% endset %}
+
         {{ govukSummaryList({
             rows: [
                 {
-                    key: { text: 'Risk of serious harm (ROSH) in the community' },
+                    key: { html: 'Risk of serious harm (ROSH) in the community' + lastUpdatedAt },
                     value: { html: roshInCommunity }
                 },
                 {
-                    key: { text: 'Risk of serious harm to themselves' },
+                    key: { html: 'Risk of serious harm to themselves' + lastUpdatedAt },
                     value: { html: roshToThemselves }
                 },
                 {
