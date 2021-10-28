@@ -15,8 +15,8 @@ export enum AppointmentWizardStep {
   Confirm = 'confirm',
 }
 
-interface AppointmentWizardViewModelBase extends ViewModel {
-  step: AppointmentWizardStep
+interface AppointmentWizardViewModelBase<Step extends AppointmentWizardStep> extends ViewModel {
+  step: Step
   errors?: ValidationError[] | null
   paths?: {
     back?: string
@@ -44,21 +44,18 @@ export interface AvailableAppointmentTypes {
   other: OtherAppointmentType[]
 }
 
-export interface AppointmentTypeViewModel extends AppointmentWizardViewModelBase {
-  step: AppointmentWizardStep.Type
+export interface AppointmentTypeViewModel extends AppointmentWizardViewModelBase<AppointmentWizardStep.Type> {
   types: AvailableAppointmentTypes
   type: string | null
   otherType: string | null
 }
 
-export interface AppointmentLocationViewModel extends AppointmentWizardViewModelBase {
-  step: AppointmentWizardStep.Where
+export interface AppointmentLocationViewModel extends AppointmentWizardViewModelBase<AppointmentWizardStep.Where> {
   location: string
   locations: OfficeLocation[]
 }
 
-export interface AppointmentSchedulingViewModel extends AppointmentWizardViewModelBase {
-  step: AppointmentWizardStep.When
+export interface AppointmentSchedulingViewModel extends AppointmentWizardViewModelBase<AppointmentWizardStep.When> {
   date: { day: number; month: number; year: number }
   startTime: string
   endTime: string
@@ -73,29 +70,24 @@ export interface AppointmentSchedulingViewModel extends AppointmentWizardViewMod
   }
 }
 
-export interface AppointmentAddNotesViewModel extends AppointmentWizardViewModelBase {
-  step: AppointmentWizardStep.AddNotes
+export interface AppointmentAddNotesViewModel extends AppointmentWizardViewModelBase<AppointmentWizardStep.AddNotes> {
   addNotes?: boolean
 }
-export interface AppointmentNotesViewModel extends AppointmentWizardViewModelBase {
-  step: AppointmentWizardStep.Notes
+export interface AppointmentNotesViewModel extends AppointmentWizardViewModelBase<AppointmentWizardStep.Notes> {
   notes: string
 }
-export interface AppointmentSensitiveViewModel extends AppointmentWizardViewModelBase {
-  step: AppointmentWizardStep.Sensitive
+export interface AppointmentSensitiveViewModel extends AppointmentWizardViewModelBase<AppointmentWizardStep.Sensitive> {
   sensitive?: boolean
 }
 
-export interface CheckAppointmentViewModel extends AppointmentWizardViewModelBase {
-  step: AppointmentWizardStep.Check
+export interface CheckAppointmentViewModel extends AppointmentWizardViewModelBase<AppointmentWizardStep.Check> {
   rarDetails: {
     category: string
     subCategory: string
   }
 }
 
-export interface ConfirmAppointmentViewModel extends AppointmentWizardViewModelBase {
-  step: AppointmentWizardStep.Confirm
+export interface ConfirmAppointmentViewModel extends AppointmentWizardViewModelBase<AppointmentWizardStep.Confirm> {
   offender: {
     firstName: string
     phoneNumber: string

@@ -1,39 +1,39 @@
-import { RedirectResponse } from '../common'
+import { NotFoundException } from '@nestjs/common'
+import { ClassConstructor, plainToClass } from 'class-transformer'
+import { RedirectResponse } from '../../common'
+import { BreadcrumbType, LinksService } from '../../common/links'
 import { difference } from 'lodash'
-import { plainToClass, ClassConstructor } from 'class-transformer'
-import { DEFAULT_GROUP } from '../util/mapping'
-import { FlatDeepPartial } from '../app.types'
+import { DEFAULT_GROUP } from '../mapping'
+import { StepMeta, StepType, WizardSession } from './form-builder.types'
 
-type StepTransitionFunction<Dto, Step extends string> = (model?: Dto) => Step
-
-export type StepMeta<Dto, Step extends string> = {
-  [S in Step]: {
-    next: Step | StepTransitionFunction<Dto, Step> | null
-  }
-}
-
-export interface WizardSession<Dto, Step extends string> {
-  crn: string
-  dto?: FlatDeepPartial<Dto>
-  completedSteps?: Step[]
-}
-
-export class FormBuilder<Dto, Step extends string> {
-  constructor(
+export abstract class FormBuilderService<Dto, Step extends string> {
+  protected constructor(
     private readonly DtoClass: ClassConstructor<Dto>,
     private readonly StepEnum: any, // TODO
     private readonly meta: StepMeta<Dto, Step>,
+    private readonly links: LinksService,
+    private readonly stepBreadcrumb: BreadcrumbType,
   ) {}
 
   reset(session: WizardSession<Dto, Step>, crn: string): RedirectResponse {
-    const [firstStep] = this.getSteps(session)
-    session.crn = crn
-    session.dto = {}
-    session.completedSteps = []
-    return this.toStep(session, firstStep)
+    return this.resetToStep(session, crn)
   }
 
-  assertStep(session: WizardSession<Dto, Step>, step: Step, crn: string): RedirectResponse | null {
+  assertStep(
+    session: WizardSession<Dto, Step>,
+    step: Step,
+    crn: string,
+    method: 'get' | 'post',
+  ): RedirectResponse | null {
+    if (!session) {
+      return this.resetToStep(session, crn, { currentStep: step })
+    }
+
+    const stepMeta = this.meta[step]
+    if (method === 'post' && stepMeta.type === StepType.Confirmation) {
+      throw new NotFoundException(`the ${step} is confirmation only & cannot be submitted`)
+    }
+
     const steps = this.getSteps(session)
     const [firstStep, lastStep] = [steps[0], ...steps.slice(-1)]
     const completedSteps = session?.completedSteps || []
@@ -42,8 +42,7 @@ export class FormBuilder<Dto, Step extends string> {
     // OR
     // the last step was completed & we're not also asserting the last step then assume a fresh wizard is required
     if (!session.dto || crn !== session.crn || (completedSteps.includes(lastStep) && step !== lastStep)) {
-      const toFirstStep = this.reset(session, crn)
-      return step !== firstStep ? toFirstStep : null
+      return this.resetToStep(session, crn, { currentStep: step, toStep: firstStep })
     }
 
     // assert all previous steps completed
@@ -53,17 +52,12 @@ export class FormBuilder<Dto, Step extends string> {
       return this.toStep(session, missingSteps[0])
     }
 
-    return null
-  }
-
-  recordStep(session: WizardSession<Dto, Step>, step: Step) {
-    if (session.completedSteps) {
-      if (!session.completedSteps.includes(step)) {
-        session.completedSteps.push(step)
-      }
-    } else {
-      session.completedSteps = [step]
+    // if we are asserting a confirmation step then we should mark it as complete
+    if (stepMeta.type === StepType.Confirmation) {
+      this.recordStep(session, step)
     }
+
+    return null
   }
 
   nextStep(session: WizardSession<Dto, Step>, step: Step): RedirectResponse {
@@ -84,14 +78,39 @@ export class FormBuilder<Dto, Step extends string> {
     return this.getStepUrl(session, steps[previousIndex])
   }
 
+  getStepUrl({ crn }: WizardSession<Dto, Step>, step: Step) {
+    return this.links.getUrl(this.stepBreadcrumb, { crn, step })
+  }
+
+  private resetToStep(
+    session: WizardSession<Dto, Step>,
+    crn: string,
+    { currentStep, toStep }: { currentStep?: Step; toStep?: Step } = {},
+  ) {
+    session.crn = crn
+    session.dto = {}
+    session.completedSteps = []
+    if (!toStep) {
+      // if toStep not provided then reset to first step
+      const [firstStep] = this.getSteps(session)
+      toStep = firstStep
+    }
+    return !currentStep || currentStep !== toStep ? this.toStep(session, toStep) : null
+  }
+
+  private recordStep(session: WizardSession<Dto, Step>, step: Step) {
+    if (session.completedSteps) {
+      if (!session.completedSteps.includes(step)) {
+        session.completedSteps.push(step)
+      }
+    } else {
+      session.completedSteps = [step]
+    }
+  }
+
   private toStep(session: WizardSession<Dto, Step>, step: Step): RedirectResponse {
     const url = this.getStepUrl(session, step)
     return RedirectResponse.found(url)
-  }
-
-  getStepUrl({ crn }: WizardSession<Dto, Step>, step: Step) {
-    // TODO use the links service
-    return `/arrange-appointment/${crn}/${step}`
   }
 
   private getSteps(session: WizardSession<Dto, Step>): Step[] {

@@ -3,6 +3,7 @@ import { ClassConstructor, ClassTransformOptions, plainToClass } from 'class-tra
 import { Settings } from 'luxon'
 import * as faker from 'faker'
 import { DeepNonFunctionPartial, DeepPartial } from '../app.types'
+import { ValidationError } from 'class-validator'
 
 // Put this here as most tests consume a faker factory.
 // Any tests that do not consume this file & are interested in times should also set this.
@@ -59,7 +60,7 @@ export function fakeClass<Faked, Options = ClassTransformOptions>(
   cls: ClassConstructor<Faked>,
   factory: (options?: Options, partial?: DeepPartial<Faked>) => DeepNonFunctionPartial<Faked>,
   defaultOptions?: ClassTransformOptions,
-): FakeFn<Faked> {
+): FakeFn<Faked, Options> {
   return (partialOrPartials, options) => {
     // passing the fake function by function reference in an array map will assign the array index to options
     if (typeof options !== 'object') {
@@ -67,7 +68,7 @@ export function fakeClass<Faked, Options = ClassTransformOptions>(
     }
     const partial = unwrapPartial(partialOrPartials)
     const fake = factory(options, partial)
-    return plainToClass(cls, merge(fake, partial), { ...options, ...defaultOptions })
+    return plainToClass(cls, merge(fake, partial), { ...defaultOptions, ...options })
   }
 }
 
@@ -79,3 +80,12 @@ export function fakeRandomArray<T>(factory: () => T, options: { min: number; max
   const length = faker.datatype.number(options)
   return [...Array(length)].map(() => factory())
 }
+
+export const fakeValidationError = fake<ValidationError>(() => ({
+  property: 'some-property',
+  constraints: {
+    'some-constraint': 'Some error',
+  },
+  contexts: {},
+  value: faker.company.bs(),
+}))

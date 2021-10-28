@@ -14,6 +14,7 @@ import {
 } from '../seeds'
 import { WiremockClient } from './wiremock-client'
 import { deliusLdap, hmppsAuthStub, Role } from '../hmpps-auth'
+import { KebabToCamelCase } from '../../../src/server/app.types'
 
 const { argv } = yargs
   .option('write-mappings', {
@@ -83,16 +84,7 @@ const { argv } = yargs
 
 type SeedOptions = ReferenceDataSeedOptions & OffenderSeedOptions & ContactSeedOptions & CasesSeedOptions
 
-type KebabToCamelCase<T extends string> = T extends `${infer L}-${infer R}`
-  ? `${Lowercase<L>}${Capitalize<KebabToCamelCase<R>>}`
-  : Lowercase<T>
-
-/**
- * yargs camelCases all kebab case properties but fails to type them.
- */
-type CamelCased<T> = { [K in keyof T as K extends string ? KebabToCamelCase<K> : K]: T[K] }
-
-async function seed(args: CamelCased<typeof argv>) {
+async function seed(args: KebabToCamelCase<typeof argv>) {
   if (args.getRequests) {
     const client = new WiremockClient()
     const requests = await client.getRequests(args.getRequests)

@@ -54,7 +54,7 @@ function home() {
 Cypress.Commands.add('home', home)
 
 function arrangeAppointment(crn: string = CRN) {
-  cy.visit(`/arrange-appointment/${crn}`)
+  cy.visit(`/case/${crn}/arrange-appointment`)
   hmppsAuth.login()
 }
 Cypress.Commands.add('arrangeAppointment', arrangeAppointment)
