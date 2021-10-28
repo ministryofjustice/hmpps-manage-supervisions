@@ -74,6 +74,12 @@
                     }
                 ]
             }) }}
+
+            {% if risks.assessedOn %}
+                <p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s app-hint-s">
+                    OASys assessment completed on {{ risks.assessedOn | shortDate }}
+                </p>
+            {% endif %}
         {%- endcall %}
 
         {% call appSummaryCard({
@@ -97,6 +103,12 @@
                     }
                 ]
             }) }}
+
+            {% if risks.assessedOn %}
+                <p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s app-hint-s">
+                    OASys assessment completed on {{ risks.assessedOn | shortDate }}
+                </p>
+            {% endif %}
         {%- endcall %}
     {% elseif risks.status === 'missing' %}
         {% set noRisksWarning %}
