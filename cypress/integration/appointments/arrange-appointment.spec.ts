@@ -37,7 +37,7 @@ context('Arrange appointment happy path & validation', () => {
 
   it('can book an office visit appointment', () => {
     const test = testCase({
-      type: { code: 'APAT', name: 'Office visit' },
+      type: { code: 'COAP', name: 'Office visit' },
       location: { code: 'LDN_BCR', name: '29/33 VICTORIA ROAD' },
       addNotes: true,
       notes: 'These are some notes',
