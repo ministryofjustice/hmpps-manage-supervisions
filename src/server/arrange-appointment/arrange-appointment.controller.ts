@@ -18,7 +18,7 @@ import {
   AppointmentWizardViewModel,
 } from './dto/AppointmentWizardViewModel'
 import { AppointmentWizardSession } from './dto/AppointmentWizardSession'
-import { AppointmentWizardService, getStepUrl } from './appointment-wizard.service'
+import { AppointmentWizardService } from './appointment-wizard.service'
 import { Controller, Get, Param, Post, Redirect, Render, Session } from '@nestjs/common'
 import { DynamicRedirect, RedirectResponse, BodyClass } from '../common'
 import { DEFAULT_GROUP } from '../util/mapping'
@@ -74,16 +74,16 @@ export class ArrangeAppointmentController {
       )
     }
 
-    session.appointment.staffCode = offenderManager.staff.code
-    session.appointment.teamCode = offenderManager.team.code
-    session.appointment.providerCode = offenderManager.probationArea.code
-    session.appointment.convictionId = conviction.convictionId
+    session.dto.staffCode = offenderManager.staff.code
+    session.dto.teamCode = offenderManager.team.code
+    session.dto.providerCode = offenderManager.probationArea.code
+    session.dto.convictionId = conviction.convictionId
     // Book everything against the event, even if we have a RAR requirement, as we're not asking about RAR requirements yet.
     // When RAR appointment functionality is added, the list of available appointment types will need to be filtered to those that
     // can be used against the RAR requirement main category
-    // session.appointment.requirementId = requirement.id
-    session.appointment.cja2003Order = conviction.sentence.cja2003Order
-    session.appointment.legacyOrder = conviction.sentence.legacyOrder
+    // session.dto.requirementId = requirement.id
+    session.dto.cja2003Order = conviction.sentence.cja2003Order
+    session.dto.legacyOrder = conviction.sentence.legacyOrder
     return response
   }
 
@@ -98,7 +98,6 @@ export class ArrangeAppointmentController {
 
     return await this.getAppointmentTypeViewModel(session)
   }
-
   @Post('type')
   @Render('arrange-appointment/views/type')
   @DynamicRedirect()
@@ -117,8 +116,8 @@ export class ArrangeAppointmentController {
       return await this.getAppointmentTypeViewModel(session, body, errors)
     }
 
-    body.cja2003Order = session.appointment.cja2003Order
-    body.legacyOrder = session.appointment.legacyOrder
+    body.cja2003Order = session.dto.cja2003Order
+    body.legacyOrder = session.dto.legacyOrder
 
     const type = await this.service.getAppointmentType(body)
     if (!type) {
@@ -132,23 +131,23 @@ export class ArrangeAppointmentController {
       ])
     }
 
-    Object.assign(session.appointment, body)
-    session.appointment.typeDescription = type.description
-    session.appointment.requiresLocation = type.requiresLocation
+    Object.assign(session.dto, body)
+    session.dto.typeDescription = type.description
+    session.dto.requiresLocation = type.requiresLocation
 
     if (type.requiresLocation === AppointmentTypeRequiresLocation.Optional) {
-      const locations = await this.service.getTeamOfficeLocations(session.appointment.teamCode)
-      session.appointment.locationsAvailableForTeam = locations.length > 0
+      const locations = await this.service.getTeamOfficeLocations(session.dto.teamCode)
+      session.dto.locationsAvailableForTeam = locations.length > 0
 
-      if (!session.appointment.locationsAvailableForTeam) {
-        session.appointment.location = UNSPECIFIED_LOCATION_CODE
-        session.appointment.locationDescription = UNSPECIFIED_LOCATION_DESCRIPTION
+      if (!session.dto.locationsAvailableForTeam) {
+        session.dto.location = UNSPECIFIED_LOCATION_CODE
+        session.dto.locationDescription = UNSPECIFIED_LOCATION_DESCRIPTION
       }
     }
 
-    if (type.requiresLocation === AppointmentTypeRequiresLocation.NotRequired && session.appointment.location) {
-      session.appointment.location = null
-      session.appointment.locationDescription = null
+    if (type.requiresLocation === AppointmentTypeRequiresLocation.NotRequired && session.dto.location) {
+      session.dto.location = null
+      session.dto.locationDescription = null
     }
 
     return this.wizard.nextStep(session, AppointmentWizardStep.Type)
@@ -195,8 +194,8 @@ export class ArrangeAppointmentController {
       return viewModel
     }
 
-    Object.assign(session.appointment, body)
-    session.appointment.locationDescription = location.description
+    Object.assign(session.dto, body)
+    session.dto.locationDescription = location.description
 
     return this.wizard.nextStep(session, AppointmentWizardStep.Where)
   }
@@ -231,7 +230,7 @@ export class ArrangeAppointmentController {
       return await this.getAppointmentSchedulingViewModel(session, crn, body, errors)
     }
 
-    Object.assign(session.appointment, body)
+    Object.assign(session.dto, body)
 
     return this.wizard.nextStep(session, AppointmentWizardStep.When)
   }
@@ -269,10 +268,10 @@ export class ArrangeAppointmentController {
       return this.getAddNotesViewModel(session, body, errors)
     }
 
-    session.appointment.addNotes = body.addNotes
+    session.dto.addNotes = body.addNotes
 
     if (!body.addNotes) {
-      session.appointment.notes = null
+      session.dto.notes = null
     }
 
     return this.wizard.nextStep(session, AppointmentWizardStep.AddNotes)
@@ -307,7 +306,7 @@ export class ArrangeAppointmentController {
       return this.getNotesViewModel(session, body, errors)
     }
 
-    session.appointment.notes = body.notes
+    session.dto.notes = body.notes
 
     return this.wizard.nextStep(session, AppointmentWizardStep.Notes)
   }
@@ -349,7 +348,7 @@ export class ArrangeAppointmentController {
       return this.getSensitiveViewModel(session, body, errors)
     }
 
-    Object.assign(session.appointment, body)
+    Object.assign(session.dto, body)
 
     return this.wizard.nextStep(session, AppointmentWizardStep.Sensitive)
   }
@@ -362,7 +361,7 @@ export class ArrangeAppointmentController {
     if (redirect) {
       return redirect
     }
-    const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
+    const appointment = plainToClass(AppointmentBuilderDto, session.dto, {
       groups: [DEFAULT_GROUP],
       excludeExtraneousValues: true,
     })
@@ -371,11 +370,11 @@ export class ArrangeAppointmentController {
       appointment,
       paths: {
         back: this.wizard.getBackUrl(session, AppointmentWizardStep.Check),
-        type: getStepUrl(session, AppointmentWizardStep.Type),
-        where: getStepUrl(session, AppointmentWizardStep.Where),
-        when: getStepUrl(session, AppointmentWizardStep.When),
-        notes: getStepUrl(session, AppointmentWizardStep.Notes),
-        sensitive: getStepUrl(session, AppointmentWizardStep.Sensitive),
+        type: this.wizard.getStepUrl(session, AppointmentWizardStep.Type),
+        where: this.wizard.getStepUrl(session, AppointmentWizardStep.Where),
+        when: this.wizard.getStepUrl(session, AppointmentWizardStep.When),
+        notes: this.wizard.getStepUrl(session, AppointmentWizardStep.Notes),
+        sensitive: this.wizard.getStepUrl(session, AppointmentWizardStep.Sensitive),
       },
       rarDetails: {
         category: '', // TODO from nsiType.description
@@ -391,7 +390,7 @@ export class ArrangeAppointmentController {
     if (redirect) {
       return redirect
     }
-    const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
+    const appointment = plainToClass(AppointmentBuilderDto, session.dto, {
       groups: [DEFAULT_GROUP],
       excludeExtraneousValues: true,
     })
@@ -408,7 +407,7 @@ export class ArrangeAppointmentController {
     if (redirect) {
       return redirect
     }
-    const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
+    const appointment = plainToClass(AppointmentBuilderDto, session.dto, {
       groups: [DEFAULT_GROUP],
       excludeExtraneousValues: true,
     })
@@ -441,7 +440,7 @@ export class ArrangeAppointmentController {
   ) {
     const merged = plainToClass(
       AppointmentBuilderDto,
-      { ...session.appointment, ...body },
+      { ...session.dto, ...body },
       { groups: [DEFAULT_GROUP], excludeExtraneousValues: true },
     )
     return await validate(merged, { groups: [step] })
@@ -452,15 +451,12 @@ export class ArrangeAppointmentController {
     body?: DeepPartial<AppointmentBuilderDto>,
     errors: ValidationError[] = [],
   ): Promise<AppointmentTypeViewModel> {
-    const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
+    const appointment = plainToClass(AppointmentBuilderDto, session.dto, {
       groups: [DEFAULT_GROUP],
       excludeExtraneousValues: true,
     })
 
-    const types = await this.service.getAppointmentTypes(
-      session.appointment.cja2003Order,
-      session.appointment.legacyOrder,
-    )
+    const types = await this.service.getAppointmentTypes(session.dto.cja2003Order, session.dto.legacyOrder)
     const currentType = await this.service.getAppointmentType(appointment)
 
     const [type, other] = currentType
@@ -513,7 +509,7 @@ export class ArrangeAppointmentController {
 
     const language = offender.offenderProfile.offenderLanguages?.primaryLanguage
 
-    const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
+    const appointment = plainToClass(AppointmentBuilderDto, session.dto, {
       groups: [DEFAULT_GROUP],
       excludeExtraneousValues: true,
     })
@@ -544,13 +540,13 @@ export class ArrangeAppointmentController {
     body?: DeepPartial<AppointmentBuilderDto>,
     errors: ValidationError[] = [],
   ): Promise<AppointmentLocationViewModel> {
-    const locations = await this.service.getTeamOfficeLocations(session.appointment.teamCode)
-    const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
+    const locations = await this.service.getTeamOfficeLocations(session.dto.teamCode)
+    const appointment = plainToClass(AppointmentBuilderDto, session.dto, {
       groups: [DEFAULT_GROUP],
       excludeExtraneousValues: true,
     })
 
-    if (session.appointment.requiresLocation == AppointmentTypeRequiresLocation.Optional) {
+    if (session.dto.requiresLocation == AppointmentTypeRequiresLocation.Optional) {
       locations.push({ code: UNSPECIFIED_LOCATION_CODE, description: UNSPECIFIED_LOCATION_DESCRIPTION })
     }
 
@@ -571,7 +567,7 @@ export class ArrangeAppointmentController {
     body?: DeepPartial<AppointmentBuilderDto>,
     errors: ValidationError[] = [],
   ): AppointmentAddNotesViewModel {
-    const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
+    const appointment = plainToClass(AppointmentBuilderDto, session.dto, {
       groups: [DEFAULT_GROUP],
       excludeExtraneousValues: true,
     })
@@ -591,7 +587,7 @@ export class ArrangeAppointmentController {
     body?: DeepPartial<AppointmentBuilderDto>,
     errors: ValidationError[] = [],
   ): AppointmentNotesViewModel {
-    const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
+    const appointment = plainToClass(AppointmentBuilderDto, session.dto, {
       groups: [DEFAULT_GROUP],
       excludeExtraneousValues: true,
     })
@@ -611,7 +607,7 @@ export class ArrangeAppointmentController {
     body?: DeepPartial<AppointmentBuilderDto>,
     errors: ValidationError[] = [],
   ): AppointmentSensitiveViewModel {
-    const appointment = plainToClass(AppointmentBuilderDto, session.appointment, {
+    const appointment = plainToClass(AppointmentBuilderDto, session.dto, {
       groups: [DEFAULT_GROUP],
       excludeExtraneousValues: true,
     })
