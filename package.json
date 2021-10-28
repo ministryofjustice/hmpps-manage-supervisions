@@ -16,7 +16,7 @@
     "start:local": "DOTENV_CONFIG_PATH=local.env npm start",
     "start:e2e": "DOTENV_CONFIG_PATH=e2e.env npm start",
     "start:e2e:dev": "NODE_ENV=development DOTENV_CONFIG_PATH=e2e.env npm run start:dev",
-    "dev:server": "nest start --watch -e \"node -r dotenv/config\"",
+    "dev:server": "nest start --watch --debug -e \"node -r dotenv/config\"",
     "dev:client": "webpack -c ./webpack.config.client.js --watch --mode development",
     "start:dev": "concurrently \"npm:dev:*\"",
     "format": "prettier --write \"src/**/*.ts\"",
