@@ -121,7 +121,7 @@ function stringEnum<T>(cls: T, name: string, ...fallbacks: Fallback<T[keyof T]>[
 
 export const CONTACT_DEFAULTS: WellKnownContactTypeConfig = {
   appointment: {
-    [WellKnownAppointmentType.OfficeVisit]: { name: 'Office visit', codes: { nonRar: 'APAT' } },
+    [WellKnownAppointmentType.OfficeVisit]: { name: 'Office visit', codes: { nonRar: 'COAP' } },
     [WellKnownAppointmentType.HomeVisit]: { name: 'Home visit', codes: { nonRar: 'CHVS' } },
     [WellKnownAppointmentType.VideoCall]: { name: 'Video call', codes: { nonRar: 'COVC' } },
     [WellKnownAppointmentType.PhoneCall]: { name: 'Phone call', codes: { nonRar: 'COPT' } },

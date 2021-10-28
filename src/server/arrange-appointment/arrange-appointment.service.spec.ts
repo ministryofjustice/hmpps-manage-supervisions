@@ -92,7 +92,7 @@ describe('ArrangeAppointmentService', () => {
   })
 
   it('getting fresh appointment types', async () => {
-    const featured = fakeAppointmentType({ contactType: 'APAT' })
+    const featured = fakeAppointmentType({ contactType: 'COAP' })
     const other = fakeAppointmentType()
     community.appointment.getAllAppointmentTypesUsingGET.resolves(fakeOkResponse([featured, other]))
     const observed = await subject.getAppointmentTypes(true, false)
