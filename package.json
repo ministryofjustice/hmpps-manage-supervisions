@@ -59,7 +59,7 @@
     "luxon": "^2.0.2",
     "node-cache": "^5.1.2",
     "nunjucks": "^3.2.3",
-    "openid-client": "^4.9.1",
+    "openid-client": "^5.0.2",
     "passport": "^0.4.1",
     "passport-oauth2": "^1.6.1",
     "qs": "^6.10.1",
