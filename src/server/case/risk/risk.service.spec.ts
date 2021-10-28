@@ -139,19 +139,19 @@ describe('RiskService', () => {
         },
         self: {
           harm: {
-            notes: { current: 'Some current concerns', previous: null },
-            value: 'There are concerns about self-harm and suicide',
+            notes: { current: 'Some ignored current concerns', previous: null },
+            value: 'Immediate concerns about suicide and self-harm',
           },
           custody: {
             notes: { current: null, previous: 'Some previous concerns' },
-            value: 'There were concerns about coping in custody',
+            value: 'Previous concerns about coping in custody',
           },
           vulnerability: {
             notes: { current: null, previous: null },
             value: null,
           },
-          current: true,
-          previous: true,
+          current: ['suicide', 'self-harm'],
+          previous: ['coping in custody'],
         },
         assessedOn: DateTime.fromISO('2000-01-02T13:30:00'),
       } as Risks)
@@ -195,8 +195,8 @@ describe('RiskService', () => {
           custody: { notes: { current: null, previous: null }, value: null },
           harm: { notes: { current: null, previous: null }, value: null },
           vulnerability: { notes: { current: null, previous: null }, value: null },
-          current: false,
-          previous: false,
+          current: [],
+          previous: [],
         },
         assessedOn: null,
       } as Risks)

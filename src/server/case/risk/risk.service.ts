@@ -215,20 +215,27 @@ export class RiskService {
   }
 }
 
-function getSummaryRisks(riskToSelf: RoshRiskToSelfDtoAllRisksView): { current: boolean; previous: boolean } {
-  return Object.values(riskToSelf || {})
-    .filter(x => x)
-    .map(({ current, previous }) => ({
-      current: current === RiskDtoCurrent.Yes,
-      previous: previous === RiskDtoPrevious.Yes,
-    }))
-    .reduce(
-      (x, y) => ({
-        current: x.current || y.current,
-        previous: x.previous || y.previous,
-      }),
-      { current: false, previous: false },
-    )
+function getSummaryRisks(riskToSelf: RoshRiskToSelfDtoAllRisksView): { current: string[]; previous: string[] } {
+  if (!riskToSelf) {
+    return { current: [], previous: [] }
+  }
+  const formatConcern = concern =>
+    ({
+      suicide: 'suicide',
+      selfHarm: 'self harm',
+      custody: 'coping in custody',
+      hostelSetting: 'coping in a hostel setting',
+      vulnerability: 'a vulnerability',
+    }[concern])
+  const concerns = Object.keys(riskToSelf)
+  const current = concerns.filter(key => riskToSelf[key].current === RiskDtoCurrent.Yes)
+  const previous = concerns
+    .filter(key => riskToSelf[key].previous === RiskDtoPrevious.Yes)
+    .filter(concern => current.indexOf(concern) === -1)
+  return {
+    current: current.map(formatConcern),
+    previous: previous.map(formatConcern),
+  }
 }
 
 function flattenRisks(
