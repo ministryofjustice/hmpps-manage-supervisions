@@ -222,7 +222,7 @@ function getSummaryRisks(riskToSelf: RoshRiskToSelfDtoAllRisksView): { current: 
   const formatConcern = concern =>
     ({
       suicide: 'suicide',
-      selfHarm: 'self harm',
+      selfHarm: 'self-harm',
       custody: 'coping in custody',
       hostelSetting: 'coping in a hostel setting',
       vulnerability: 'a vulnerability',

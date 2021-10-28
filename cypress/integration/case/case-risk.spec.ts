@@ -66,10 +66,10 @@ context('Case risk tab', () => {
 
           page.roshThemselves(card =>
             card.summaryList(list => {
-              list.value('Risk of suicide or self harm').contains('There are concerns about self-harm and suicide')
+              list.value('Risk of suicide or self-harm').contains('Immediate concerns about suicide and self-harm')
               list.details(
                 'Coping in custody or a hostel',
-                'There were concerns about coping in a hostel and in custody',
+                'Previous concerns about coping in custody and in a hostel',
                 () => {
                   page.currentNotes.contains('No detail given')
                   page.previousNotes.contains(
