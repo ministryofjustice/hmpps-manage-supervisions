@@ -6,7 +6,7 @@
 {% macro roshDetail(risk) %}
     {% if not risk.value %}
         No concerns
-    {% elseif risk.notes.current or risk.notes.previous %}
+    {% else %}
         {% set detailsHtml %}
             <h3 class="govuk-heading-s">Current circumstances, issues and needs</h3>
             <p class='govuk-body' data-qa='offender/risk/current-notes'>
@@ -19,8 +19,6 @@
             </p>
         {% endset %}
         {{ govukDetails({ summaryText: risk.value, html: detailsHtml }) }}
-    {% else %}
-        {{ risk.value }}
     {% endif %}
 {% endmacro %}
 

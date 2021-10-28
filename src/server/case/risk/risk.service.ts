@@ -73,8 +73,8 @@ export class RiskService {
           },
           self: {
             ...getSummaryRisks(riskToSelf),
-            harm: flattenRisks({ selfHarm: 'self-harm', suicide: 'suicide' }, riskToSelf),
-            custody: flattenRisks({ hostelSetting: 'in a hostel', custody: 'in custody' }, riskToSelf, 'about coping'),
+            harm: flattenRisks({ suicide: 'suicide', selfHarm: 'self-harm' }, riskToSelf),
+            custody: flattenRisks({ custody: 'in custody', hostelSetting: 'in a hostel' }, riskToSelf, 'about coping'),
             vulnerability: flattenRisks({ vulnerability: 'a vulnerability' }, riskToSelf),
           },
           assessedOn: assessedOn ? DateTime.fromISO(assessedOn) : null,
@@ -274,13 +274,13 @@ function flattenRisks(
     result.value = null
   } else if (previousConcerns.length === 0 || currentConcerns.length === Object.keys(meta).length) {
     // no previous or all current then ignore previous
-    result.value = `There are concerns ${about} ${toList(currentConcerns)}`
+    result.value = `Immediate concerns ${about} ${toList(currentConcerns)}`
   } else if (currentConcerns.length === 0) {
     // no current, just previous
-    result.value = `There were concerns ${about} ${toList(previousConcerns)}`
+    result.value = `Previous concerns ${about} ${toList(previousConcerns)}`
   } else {
     // current & previous
-    result.value = `There are concerns ${about} ${toList(currentConcerns)} and previous concerns ${about} ${toList(
+    result.value = `Immediate concerns ${about} ${toList(currentConcerns)} and previous concerns ${about} ${toList(
       previousConcerns,
     )}`
   }
