@@ -73,7 +73,7 @@ context('Case risk tab', () => {
                 () => {
                   page.currentNotes.contains('No detail given')
                   page.previousNotes.contains(
-                    'Soluta tempore nemo et velit est perspiciatis. Neque error aut est nemo quasi. Et labore impedit omnis numquam id et eaque facere itaque. Ipsam et atque eos tempora possimus.',
+                    'Soluta tempore nemo et velit est perspiciatis. Neque error aut est nemo quasi. Et labore impedit omnis numquam id et eaque facere itaque. Ipsam et atque eos tempora possimus. A hostel setting would pose significant risk for this case.',
                   )
                 },
               )

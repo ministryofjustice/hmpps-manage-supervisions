@@ -139,7 +139,7 @@ describe('RiskService', () => {
         },
         self: {
           harm: {
-            notes: { current: 'Some ignored current concerns', previous: null },
+            notes: { current: 'Some current concerns\n\nSome ignored current concerns', previous: null },
             value: 'Immediate concerns about suicide and self-harm',
           },
           custody: {
