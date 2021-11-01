@@ -2,14 +2,16 @@ import { AppointmentBuilderDto } from './dto/AppointmentBuilderDto'
 import { AppointmentWizardStep, AppointmentWizardViewModel } from './dto/AppointmentWizardViewModel'
 import { AppointmentWizardSession } from './dto/AppointmentWizardSession'
 import { AppointmentFormBuilderService } from './appointment-form-builder.service'
-import { Controller, Get, Param, ParseEnumPipe, Post, Redirect, Render, Session } from '@nestjs/common'
-import { DynamicRedirect, RedirectResponse, BodyClassFromParam } from '../common'
+import { Controller, Get, Param, ParseEnumPipe, Post, Redirect, Session } from '@nestjs/common'
+import { BodyClassFromParam } from '../common'
 import { Breadcrumb, BreadcrumbType } from '../common/links'
 import { Role, Roles, CurrentSecurityContext, SecurityContext } from '../security'
 import { EligibleCaseloadOnly } from '../security/eligibility'
 import { ViewModelFactoryService } from './view-model-factory/view-model-factory.service'
 import { SessionBuilderService } from './session-builder/session-builder.service'
 import { FormBuilderController } from '../util/form-builder'
+import { DynamicRedirect, DynamicRender, RedirectResponse } from '../common/dynamic-routing'
+import { DynamicRouting } from '../common/dynamic-routing/dynamic-routing.decorator'
 
 interface AppointmentSessionPartial {
   arrangeAppointment?: AppointmentWizardSession
@@ -48,8 +50,7 @@ export class ArrangeAppointmentController extends FormBuilderController<
   }
 
   @Get(':step([-\\w]+)')
-  @Render('arrange-appointment/views/wizard')
-  @DynamicRedirect()
+  @DynamicRouting(DynamicRedirect, DynamicRender('arrange-appointment/views/param:step'))
   @Breadcrumb({
     type: BreadcrumbType.NewAppointmentStep,
     parent: BreadcrumbType.Case,
@@ -67,7 +68,7 @@ export class ArrangeAppointmentController extends FormBuilderController<
   }
 
   @Post(':step([-\\w]+)')
-  @Render('arrange-appointment/views/wizard')
+  @DynamicRouting(DynamicRedirect, DynamicRender('arrange-appointment/views/param:step'))
   @DynamicRedirect()
   async postStep(
     @Param('crn') crn: string,

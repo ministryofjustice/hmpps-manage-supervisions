@@ -2,7 +2,7 @@ import { ClassConstructor, plainToClass } from 'class-transformer'
 import { validate } from 'class-validator'
 import { SessionBuilder, ViewModelFactory, WizardSession } from './form-builder.types'
 import { SecurityContext } from '../../security'
-import { RedirectResponse } from '../../common'
+import { RedirectResponse } from '../../common/dynamic-routing'
 import { DEFAULT_GROUP } from '../mapping'
 import { FormBuilderService } from './form-builder.service'
 

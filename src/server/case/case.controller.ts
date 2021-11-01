@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Redirect, Render } from '@nestjs/common'
 import { CaseOverviewViewModel, CasePage } from './case.types'
-import { RedirectResponse } from '../common'
+import { RedirectResponse } from '../common/dynamic-routing'
 import { OffenderService } from './offender'
 import { SentenceService } from './sentence'
 import { ScheduleService } from './schedule'

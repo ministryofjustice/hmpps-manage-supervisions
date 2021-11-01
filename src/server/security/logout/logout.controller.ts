@@ -2,7 +2,7 @@ import { Controller, Get, Redirect, Req } from '@nestjs/common'
 import { Request } from 'express'
 import { LogoutService } from './logout.service'
 import { Public } from '../authentication'
-import { RedirectResponse } from '../../common'
+import { RedirectResponse } from '../../common/dynamic-routing'
 
 @Controller('logout')
 @Public() // allow unauthenticated users to logout, this helps complete the flow when oauth fails during callback

@@ -1,6 +1,6 @@
 import { NotFoundException } from '@nestjs/common'
 import { ClassConstructor, plainToClass } from 'class-transformer'
-import { RedirectResponse } from '../../common'
+import { RedirectResponse } from '../../common/dynamic-routing'
 import { BreadcrumbType, LinksService } from '../../common/links'
 import { difference } from 'lodash'
 import { DEFAULT_GROUP } from '../mapping'

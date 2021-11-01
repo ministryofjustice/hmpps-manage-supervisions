@@ -1,7 +1,7 @@
 import { AppointmentFormBuilderService } from './appointment-form-builder.service'
 import { AppointmentWizardStep } from './dto/AppointmentWizardViewModel'
 import { AppointmentWizardSession } from './dto/AppointmentWizardSession'
-import { RedirectResponse } from '../common'
+import { RedirectResponse } from '../common/dynamic-routing'
 import { HttpStatus } from '@nestjs/common'
 import { AppointmentTypeRequiresLocation } from '../community-api/client'
 import { fakeOfficeLocation } from '../community-api/community-api.fake'
