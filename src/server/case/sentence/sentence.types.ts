@@ -124,7 +124,7 @@ export interface ComplianceDetails {
   current?: CurrentComplianceConvictionSummary
   previous: {
     convictions: ComplianceConvictionSummary[]
-    dateFrom: DateTime
+    dateFrom?: DateTime
     totalBreaches: number
   }
 }

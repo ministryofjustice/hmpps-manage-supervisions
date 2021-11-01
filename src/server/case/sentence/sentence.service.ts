@@ -116,8 +116,7 @@ export class SentenceService {
     }
   }
 
-  async getSentenceComplianceDetails(crn: string): Promise<ComplianceDetails> {
-    const from = DateTime.now().minus({ years: 2 }).set({ day: 1, hour: 0, minute: 0, second: 0, millisecond: 0 })
+  async getSentenceComplianceDetails(crn: string, from?: DateTime): Promise<ComplianceDetails> {
     const { requirements, current, previous } = await this.getConvictionsAndRequirements(crn, from)
 
     const [currentSummary, ...previousSummaries] = await Promise.all([

@@ -310,7 +310,8 @@ describe('SentenceService', () => {
         currentSummary.lastRecentBreachEnd,
       )
 
-      const observed = await subject.getSentenceComplianceDetails('some-crn')
+      const from = DateTime.now().minus({ years: 2 }).set({ day: 1, hour: 0, minute: 0, second: 0, millisecond: 0 })
+      const observed = await subject.getSentenceComplianceDetails('some-crn', from)
 
       expect(observed).toEqual({
         current: {

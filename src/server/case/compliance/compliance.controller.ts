@@ -4,6 +4,7 @@ import { CaseTabbedPage } from '../case-tabbed-page.decorators'
 import { OffenderService } from '../offender'
 import { SentenceService } from '../sentence'
 import { BreadcrumbType, UtmMedium } from '../../common/links'
+import { DateTime } from 'luxon'
 
 @Controller('case/:crn(\\w+)/compliance')
 export class ComplianceController {
@@ -13,9 +14,12 @@ export class ComplianceController {
   @Render('case/compliance/compliance')
   @CaseTabbedPage({ page: CasePage.Compliance, title: 'Compliance' })
   async getCompliance(@Param('crn') crn: string): Promise<CaseComplianceViewModel> {
+    const complianceFrom = DateTime.now()
+      .minus({ years: 2 })
+      .set({ day: 1, hour: 0, minute: 0, second: 0, millisecond: 0 })
     const [offender, compliance] = await Promise.all([
       this.offender.getOffenderSummary(crn),
-      this.sentence.getSentenceComplianceDetails(crn),
+      this.sentence.getSentenceComplianceDetails(crn, complianceFrom),
     ])
 
     return this.offender.casePageOf<CaseComplianceViewModel>(offender, {
