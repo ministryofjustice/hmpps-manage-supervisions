@@ -6,7 +6,7 @@
 {% macro roshDetail(risk) %}
     {% if not risk.value %}
         No concerns
-    {% elseif risk.notes.current or risk.notes.previous %}
+    {% else %}
         {% set detailsHtml %}
             <h3 class="govuk-heading-s">Current circumstances, issues and needs</h3>
             <p class='govuk-body' data-qa='offender/risk/current-notes'>
@@ -19,8 +19,6 @@
             </p>
         {% endset %}
         {{ govukDetails({ summaryText: risk.value, html: detailsHtml }) }}
-    {% else %}
-        {{ risk.value }}
     {% endif %}
 {% endmacro %}
 
@@ -74,6 +72,12 @@
                     }
                 ]
             }) }}
+
+            {% if risks.assessedOn %}
+                <p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s app-hint-s">
+                    OASys assessment completed on {{ risks.assessedOn | shortDate }}
+                </p>
+            {% endif %}
         {%- endcall %}
 
         {% call appSummaryCard({
@@ -84,7 +88,7 @@
             {{ govukSummaryList({
                 rows: [
                     {
-                        key: { text: "Risk of suicide or self harm" },
+                        key: { text: "Risk of suicide or self-harm" },
                         value: { html: roshDetail(risks.self.harm) }
                     },
                     {
@@ -97,6 +101,12 @@
                     }
                 ]
             }) }}
+
+            {% if risks.assessedOn %}
+                <p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s app-hint-s">
+                    OASys assessment completed on {{ risks.assessedOn | shortDate }}
+                </p>
+            {% endif %}
         {%- endcall %}
     {% elseif risks.status === 'missing' %}
         {% set noRisksWarning %}

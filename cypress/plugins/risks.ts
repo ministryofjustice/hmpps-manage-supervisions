@@ -30,7 +30,7 @@ export const RISKS: DeepPartial<AllRoshRiskDtoAllRisksView> = {
     },
     hostelSetting: {
       previous: RiskDtoAllRisksViewPrevious.Yes,
-      previousConcernsText: null,
+      previousConcernsText: 'A hostel setting would pose significant risk for this case.',
       current: RiskDtoAllRisksViewCurrent.No,
       currentConcernsText: null,
     },

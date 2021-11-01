@@ -28,8 +28,8 @@ export interface Risks extends RisksAndNeedsResult<AssessRisksAndNeedsApiStatus.
     riskImminence?: string
   }
   self: {
-    current: boolean
-    previous: boolean
+    current: string[]
+    previous: string[]
     harm: FlatRiskToSelf
     custody: FlatRiskToSelf
     vulnerability: FlatRiskToSelf

@@ -87,8 +87,8 @@ export const fakeRisks = fake<Risks>((options, partial = {}) => ({
     whoIsAtRisk: faker.lorem.sentence(),
   },
   self: {
-    current: faker.datatype.boolean(),
-    previous: faker.datatype.boolean(),
+    current: ['suicide'],
+    previous: [],
     harm: fakeFlatRiskToSelf(),
     custody: fakeFlatRiskToSelf(),
     vulnerability: fakeFlatRiskToSelf(),

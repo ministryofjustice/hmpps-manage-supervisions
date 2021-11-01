@@ -98,7 +98,7 @@ context('Case overview tab', () => {
 
         page.risk(card => {
           card.value('Risk of serious harm (ROSH) in the community').contains('Very high risk of serious harm')
-          card.value('Risk of serious harm to themselves').contains('Current concerns')
+          card.value('Risk of serious harm to themselves').contains('Immediate concerns')
           card.value('Risk flags').contains('Restraining Order')
         })
 

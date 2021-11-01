@@ -77,12 +77,28 @@
                 }) if risks.community.level else 'No concerns' }}
             {% endset %}
             {% set roshToThemselves %}
-                {% if risks.self.current %}
-                    Current concerns
-                {% elseif risks.self.previous %}
-                    Previous concerns
-                {% else %}
-                    No concerns
+                {% if risks.self.current.length === 1 %}
+                    <p>Immediate concerns about {{ risks.self.current[0] }}</p>
+                {% elif risks.self.current.length > 1 %}
+                    <p>Immediate concerns about:</p>
+                    <ul class="govuk-list govuk-list--bullet">
+                        {% for concern in risks.self.current %}
+                          <li>{{ concern }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if risks.self.previous.length === 1 %}
+                    <p>Previous concerns about {{ risks.self.previous[0] }}</p>
+                {% elif risks.self.current.length > 1 %}
+                    <p>Previous concerns about:</p>
+                    <ul class="govuk-list govuk-list--bullet">
+                        {% for concern in risks.self.previous %}
+                          <li>{{ concern }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if risks.self.current.length === 0 and risks.self.previous.length === 0 %}
+                    <p>No concerns</p>
                 {% endif %}
             {% endset %}
         {% case 'unavailable' %}
@@ -95,15 +111,21 @@
             {% endset %}
         {% endswitch %}
 
+        {% set lastUpdatedAt %}
+            {% if risks.assessedOn %}
+                <br><span class="govuk-!-font-size-16 govuk-!-font-weight-regular">Last updated {{ risks.assessedOn | shortDate }}</span>
+            {% endif %}
+        {% endset %}
+
         {{ govukSummaryList({
             rows: [
                 {
-                    key: { text: 'Risk of serious harm (ROSH) in the community' },
+                    key: { html: 'Risk of serious harm (ROSH) in the community' + lastUpdatedAt },
                     value: { html: roshInCommunity }
                 },
                 {
-                    key: { text: 'Risk of serious harm to themselves' },
-                    value: { text: roshToThemselves }
+                    key: { html: 'Risk of serious harm to themselves' + lastUpdatedAt },
+                    value: { html: roshToThemselves }
                 },
                 {
                     key: { text: 'Risk flags' },

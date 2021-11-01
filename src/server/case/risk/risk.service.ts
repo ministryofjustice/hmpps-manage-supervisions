@@ -73,8 +73,8 @@ export class RiskService {
           },
           self: {
             ...getSummaryRisks(riskToSelf),
-            harm: flattenRisks({ selfHarm: 'self-harm', suicide: 'suicide' }, riskToSelf),
-            custody: flattenRisks({ hostelSetting: 'in a hostel', custody: 'in custody' }, riskToSelf, 'about coping'),
+            harm: flattenRisks({ suicide: 'suicide', selfHarm: 'self-harm' }, riskToSelf),
+            custody: flattenRisks({ custody: 'in custody', hostelSetting: 'in a hostel' }, riskToSelf, 'about coping'),
             vulnerability: flattenRisks({ vulnerability: 'a vulnerability' }, riskToSelf),
           },
           assessedOn: assessedOn ? DateTime.fromISO(assessedOn) : null,
@@ -215,20 +215,27 @@ export class RiskService {
   }
 }
 
-function getSummaryRisks(riskToSelf: RoshRiskToSelfDtoAllRisksView): { current: boolean; previous: boolean } {
-  return Object.values(riskToSelf || {})
-    .filter(x => x)
-    .map(({ current, previous }) => ({
-      current: current === RiskDtoCurrent.Yes,
-      previous: previous === RiskDtoPrevious.Yes,
-    }))
-    .reduce(
-      (x, y) => ({
-        current: x.current || y.current,
-        previous: x.previous || y.previous,
-      }),
-      { current: false, previous: false },
-    )
+function getSummaryRisks(riskToSelf: RoshRiskToSelfDtoAllRisksView): { current: string[]; previous: string[] } {
+  if (!riskToSelf) {
+    return { current: [], previous: [] }
+  }
+  const formatConcern = concern =>
+    ({
+      suicide: 'suicide',
+      selfHarm: 'self-harm',
+      custody: 'coping in custody',
+      hostelSetting: 'coping in a hostel setting',
+      vulnerability: 'a vulnerability',
+    }[concern])
+  const concerns = Object.keys(riskToSelf)
+  const current = concerns.filter(key => riskToSelf[key].current === RiskDtoCurrent.Yes)
+  const previous = concerns
+    .filter(key => riskToSelf[key].previous === RiskDtoPrevious.Yes)
+    .filter(concern => current.indexOf(concern) === -1)
+  return {
+    current: current.map(formatConcern),
+    previous: previous.map(formatConcern),
+  }
 }
 
 function flattenRisks(
@@ -254,12 +261,15 @@ function flattenRisks(
 
     if (risk.current === RiskDtoCurrent.Yes) {
       currentConcerns.push(name)
-      result.notes.current = risk.currentConcernsText
+      if (result.notes.current && risk.currentConcernsText) result.notes.current += '\n\n' + risk.currentConcernsText
+      else result.notes.current = risk.currentConcernsText
     }
 
     if (risk.previous === RiskDtoPrevious.Yes) {
       previousConcerns.push(name)
-      result.notes.previous = risk.previousConcernsText
+      if (result.notes.previous && risk.previousConcernsText)
+        result.notes.previous += '\n\n' + risk.previousConcernsText
+      else result.notes.previous = risk.previousConcernsText
     }
   }
 
@@ -267,13 +277,13 @@ function flattenRisks(
     result.value = null
   } else if (previousConcerns.length === 0 || currentConcerns.length === Object.keys(meta).length) {
     // no previous or all current then ignore previous
-    result.value = `There are concerns ${about} ${toList(currentConcerns)}`
+    result.value = `Immediate concerns ${about} ${toList(currentConcerns)}`
   } else if (currentConcerns.length === 0) {
     // no current, just previous
-    result.value = `There were concerns ${about} ${toList(previousConcerns)}`
+    result.value = `Previous concerns ${about} ${toList(previousConcerns)}`
   } else {
     // current & previous
-    result.value = `There are concerns ${about} ${toList(currentConcerns)} and previous concerns ${about} ${toList(
+    result.value = `Immediate concerns ${about} ${toList(currentConcerns)} and previous concerns ${about} ${toList(
       previousConcerns,
     )}`
   }
