@@ -25,7 +25,7 @@ export abstract class FormBuilderService<Dto, Step extends string> {
     crn: string,
     method: 'get' | 'post',
   ): RedirectResponse | null {
-    if (!session) {
+    if (!session.dto || !session.completedSteps || !session.crn) {
       return this.resetToStep(session, crn, { currentStep: step })
     }
 

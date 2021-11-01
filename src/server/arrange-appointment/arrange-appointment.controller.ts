@@ -60,6 +60,9 @@ export class ArrangeAppointmentController extends FormBuilderController<
     @Param('step', new ParseEnumPipe(AppointmentWizardStep)) step: AppointmentWizardStep,
     @Session() session: AppointmentSessionPartial,
   ): Promise<AppointmentWizardViewModel | RedirectResponse> {
+    if (!session.arrangeAppointment) {
+      session.arrangeAppointment = {}
+    }
     return this.viewStep(crn, step, session.arrangeAppointment)
   }
 
@@ -72,6 +75,9 @@ export class ArrangeAppointmentController extends FormBuilderController<
     @Session() session: AppointmentSessionPartial,
     @BodyClassFromParam('step') body: AppointmentBuilderDto,
   ): Promise<AppointmentWizardViewModel | RedirectResponse> {
+    if (!session.arrangeAppointment) {
+      session.arrangeAppointment = {}
+    }
     return this.updateStep(crn, step, session.arrangeAppointment, body)
   }
 }

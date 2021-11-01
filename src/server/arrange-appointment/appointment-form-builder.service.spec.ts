@@ -40,6 +40,28 @@ describe('AppointmentFormBuilderService', () => {
     expect(observed.statusCode).toBe(HttpStatus.FOUND)
   }
 
+  function shouldResetSession(session: AppointmentWizardSession) {
+    expect(session).toEqual({
+      crn: 'some-crn',
+      dto: {},
+      completedSteps: [],
+    } as AppointmentWizardSession)
+  }
+
+  it('resets on first step when session is bad', () => {
+    const session = {}
+    const observed = subject.assertStep(session, FIRST_STEP, 'some-crn', 'get')
+    expect(observed).toBeNull()
+    shouldResetSession(session)
+  })
+
+  it('resets back to first step when session is bad', () => {
+    const session = {}
+    const observed = subject.assertStep(session, SECOND_STEP, 'some-crn', 'get')
+    shouldRedirectToStep(observed, FIRST_STEP)
+    shouldResetSession(session)
+  })
+
   it('asserting first step', () => {
     const session = fakeSession()
     const observed = subject.assertStep(session, FIRST_STEP, 'some-crn', 'get')
