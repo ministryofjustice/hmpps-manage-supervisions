@@ -1,5 +1,4 @@
 import { AppointmentFormBuilderService } from './appointment-form-builder.service'
-import { AppointmentWizardStep } from './dto/AppointmentWizardViewModel'
 import { AppointmentWizardSession } from './dto/AppointmentWizardSession'
 import { RedirectResponse } from '../common/dynamic-routing'
 import { HttpStatus } from '@nestjs/common'
@@ -7,6 +6,7 @@ import { AppointmentTypeRequiresLocation } from '../community-api/client'
 import { fakeOfficeLocation } from '../community-api/community-api.fake'
 import { Test } from '@nestjs/testing'
 import { MockLinksModule } from '../common/links/links.mock'
+import { AppointmentBookingUnavailableReason, AppointmentWizardStep } from './dto/arrange-appointment.types'
 
 describe('AppointmentFormBuilderService', () => {
   let subject: AppointmentFormBuilderService
@@ -119,6 +119,13 @@ describe('AppointmentFormBuilderService', () => {
     session.dto.requiresLocation = AppointmentTypeRequiresLocation.NotRequired
     const observed = subject.nextStep(session, AppointmentWizardStep.Type)
     shouldRedirectToStep(observed, AppointmentWizardStep.When)
+  })
+
+  it('redirects to unavailable when reason given', () => {
+    const session = fakeSession()
+    session.dto.unavailableReason = AppointmentBookingUnavailableReason.NewLocationRequired
+    const observed = subject.nextStep(session, AppointmentWizardStep.Where)
+    shouldRedirectToStep(observed, AppointmentWizardStep.Unavailable)
   })
 
   it('getting back url on first step', () => {

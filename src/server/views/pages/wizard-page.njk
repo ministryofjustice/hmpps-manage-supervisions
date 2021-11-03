@@ -14,14 +14,16 @@
     <div class="govuk-grid-column-two-thirds">
       {% block page %}{% endblock %}
 
-      {{ govukButton({
-        text: buttonText if buttonText else 'Continue',
-        href: paths.next,
-        classes: 'govuk-!-margin-top-6',
-        attributes: {
-          'data-qa': buttonQa if buttonQa else 'wizard-page/continue'
-        }
-      }) }}
+      {% if paths.next %}
+        {{ govukButton({
+          text: buttonText if buttonText else 'Continue',
+          href: paths.next,
+          classes: 'govuk-!-margin-top-6',
+          attributes: {
+            'data-qa': buttonQa if buttonQa else 'wizard-page/continue'
+          }
+        }) }}
+      {% endif %}
     </div>
   </div>
 {% endblock %}

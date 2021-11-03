@@ -96,6 +96,20 @@ export class WiremockClient {
   }
 
   /**
+   * Stubs for the fake delius exit on /delius
+   */
+  get delius(): FluentWiremockContext {
+    return new FluentWiremockContext(this.helper, 'delius')
+  }
+
+  /**
+   * Stubs for the fake oasys exit on /oasys
+   */
+  get oasys(): FluentWiremockContext {
+    return new FluentWiremockContext(this.helper, 'oasys')
+  }
+
+  /**
    * Registers a mutation for all requests to the specified api that will be run during commit.
    */
   mutate(api: ApiName, mutation: Mutation) {
@@ -307,7 +321,7 @@ class FluentWiremockContext {
     this.response({
       status: 200,
       headers: { 'Content-Type': 'text/html' },
-      body: htmlBody,
+      body: `<html lang='en'><body>${htmlBody}</body></html>`,
     })
   }
 

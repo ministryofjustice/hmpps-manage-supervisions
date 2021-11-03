@@ -7,10 +7,12 @@ export enum StepType {
   Confirmation,
 }
 
+export type StepFn<Dto, Step extends string> = (model: Dto) => Step
+
 export type StepMeta<Dto, Step extends string> = {
   [S in Step]: {
     type: StepType
-    next: Step | ((model: Dto) => Step) | null
+    next: Step | StepFn<Dto, Step> | null
   }
 }
 

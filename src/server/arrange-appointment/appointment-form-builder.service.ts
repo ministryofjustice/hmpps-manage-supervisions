@@ -1,9 +1,9 @@
-import { AppointmentWizardStep } from './dto/AppointmentWizardViewModel'
 import { Injectable } from '@nestjs/common'
 import { AppointmentBuilderDto } from './dto/AppointmentBuilderDto'
 import { AppointmentTypeRequiresLocation } from '../community-api/client'
 import { FormBuilderService, StepMeta, StepType } from '../util/form-builder'
 import { BreadcrumbType, LinksService } from '../common/links'
+import { AppointmentWizardStep } from './dto/arrange-appointment.types'
 
 const meta: StepMeta<AppointmentBuilderDto, AppointmentWizardStep> = {
   [AppointmentWizardStep.Type]: {
@@ -36,7 +36,12 @@ const meta: StepMeta<AppointmentBuilderDto, AppointmentWizardStep> = {
   },
   [AppointmentWizardStep.Where]: {
     type: StepType.Update,
-    next: AppointmentWizardStep.When,
+    next: model => {
+      if (model.unavailableReason) {
+        return AppointmentWizardStep.Unavailable
+      }
+      return AppointmentWizardStep.When
+    },
   },
   [AppointmentWizardStep.When]: {
     type: StepType.Update,
@@ -61,6 +66,10 @@ const meta: StepMeta<AppointmentBuilderDto, AppointmentWizardStep> = {
     next: AppointmentWizardStep.Confirm,
   },
   [AppointmentWizardStep.Confirm]: {
+    type: StepType.Confirmation,
+    next: null,
+  },
+  [AppointmentWizardStep.Unavailable]: {
     type: StepType.Confirmation,
     next: null,
   },

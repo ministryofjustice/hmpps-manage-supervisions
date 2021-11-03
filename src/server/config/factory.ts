@@ -358,10 +358,10 @@ export function configFactory(): Config {
       expiryMinutes: int('WEB_SESSION_TIMEOUT_IN_MINUTES', fallback(60 * 12 - 5)),
     },
     delius: {
-      baseUrl: url('DELIUS_BASE_URL', developmentOnly('http://localhost:8082/delius')),
+      baseUrl: url('DELIUS_BASE_URL', developmentOnly('http://localhost:9091/delius')),
     },
     oasys: {
-      baseUrl: url('OASYS_BASE_URL', developmentOnly('http://localhost:8082/oasys')),
+      baseUrl: url('OASYS_BASE_URL', developmentOnly('http://localhost:9091/oasys')),
     },
     apis: {
       hmppsAuth: {

@@ -1,5 +1,4 @@
 import 'reflect-metadata'
-import { AppointmentWizardStep } from './AppointmentWizardViewModel'
 import { fakeAppointmentBuilderDto } from './arrange-appointment.fake'
 import { IS_BOOLEAN, IS_IN, IS_INT, IS_NOT_EMPTY, IS_POSITIVE, IS_STRING, validate } from 'class-validator'
 import { AppointmentBuilderDto } from './AppointmentBuilderDto'
@@ -13,6 +12,7 @@ import { IS_AFTER, IS_DATE_INPUT, IS_FUTURE_DATE, IS_FUTURE_TIME, IS_TIME } from
 import { AppointmentTypeRequiresLocation } from '../../community-api/client'
 import { WellKnownAppointmentType } from '../../config'
 import { DeepPartial } from '../../app.types'
+import { AppointmentWizardStep } from './arrange-appointment.types'
 
 type Assertion = (subject: AppointmentBuilderDto) => void
 
@@ -191,16 +191,19 @@ describe('AppointmentBuilderDto validation & mapping', () => {
         .shouldBeValid()
         .run())
 
+    /**
+     * Even when optional, an alternative location is required
+     */
     it('is optional & not provided', async () =>
       Given.dto({ requiresLocation: AppointmentTypeRequiresLocation.Optional, location: '' })
         .whenValidating(AppointmentWizardStep.Where)
-        .shouldBeValid()
+        .shouldTriggerConstraints('location', IS_NOT_EMPTY)
         .run())
 
     it('is not required & not provided', async () =>
       Given.dto({ requiresLocation: AppointmentTypeRequiresLocation.NotRequired, location: '' })
         .whenValidating(AppointmentWizardStep.Where)
-        .whenValidating()
+        .shouldBeValid()
         .run())
 
     it('is required but not provided', async () =>

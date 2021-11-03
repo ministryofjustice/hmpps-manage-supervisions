@@ -16,6 +16,12 @@ import { fakeAppointmentBuilderDto } from '../dto/arrange-appointment.fake'
 import { WellKnownAppointmentType } from '../../config'
 import { AppointmentTypeRequiresLocation } from '../../community-api/client'
 import { FlatDeepPartial } from '../../app.types'
+import {
+  AppointmentBookingUnavailableReason,
+  AppointmentWizardStep,
+  NO_LOCATION,
+  UNAVAILABLE_LOCATION,
+} from '../dto/arrange-appointment.types'
 
 describe('SessionBuilderService', () => {
   let subject: SessionBuilderService
@@ -53,6 +59,7 @@ describe('SessionBuilderService', () => {
       await subject.init(session, fakeSecurityContext({ staffCode: 'some-staff' }))
 
       expect(session.dto).toEqual({
+        offender,
         staffCode: 'some-staff',
         teamCode: 'some-team',
         providerCode: 'some-provider',
@@ -96,65 +103,107 @@ describe('SessionBuilderService', () => {
       expect(session.dto).toEqual({
         typeDescription: 'some type',
         requiresLocation: AppointmentTypeRequiresLocation.NotRequired,
+        alternateLocations: null,
+        availableLocations: null,
         location: null,
         locationDescription: null,
       } as AppointmentBuilderDto)
     })
 
-    for (const requiresLocation of [
-      AppointmentTypeRequiresLocation.Optional,
-      AppointmentTypeRequiresLocation.Required,
-    ]) {
-      it(`sets available locations when location ${requiresLocation}`, async () => {
-        havingType({ description: 'some type', requiresLocation: requiresLocation })
-        const session = havingSession({ teamCode: 'some-team' })
+    it('sets available locations when location required', async () => {
+      havingType({ description: 'some type', requiresLocation: AppointmentTypeRequiresLocation.Required })
+      const session = havingSession({ teamCode: 'some-team' })
 
-        const availableLocations = [fakeOfficeLocation()]
-        service.getTeamOfficeLocations
-          .withArgs('some-team', requiresLocation === AppointmentTypeRequiresLocation.Optional)
-          .resolves(availableLocations)
+      const availableLocations = [fakeOfficeLocation()]
+      service.getTeamOfficeLocations.withArgs('some-team').resolves(availableLocations)
 
-        const observed = await subject.type(session, model)
+      const observed = await subject.type(session, model)
 
-        expect(observed).toEqual([])
-        expect(session.dto).toEqual({
-          teamCode: 'some-team',
-          typeDescription: 'some type',
-          requiresLocation,
-          availableLocations,
-          location: null,
-          locationDescription: null,
-        } as AppointmentBuilderDto)
-      })
-    }
+      expect(observed).toEqual([])
+      expect(session.dto).toEqual({
+        teamCode: 'some-team',
+        typeDescription: 'some type',
+        requiresLocation: AppointmentTypeRequiresLocation.Required,
+        alternateLocations: [UNAVAILABLE_LOCATION],
+        availableLocations,
+        location: null,
+        locationDescription: null,
+      } as AppointmentBuilderDto)
+    })
+
+    it('sets available locations when location optional', async () => {
+      havingType({ description: 'some type', requiresLocation: AppointmentTypeRequiresLocation.Optional })
+      const session = havingSession({ teamCode: 'some-team' })
+
+      const availableLocations = [fakeOfficeLocation()]
+      service.getTeamOfficeLocations.withArgs('some-team').resolves(availableLocations)
+
+      const observed = await subject.type(session, model)
+
+      expect(observed).toEqual([])
+      expect(session.dto).toEqual({
+        teamCode: 'some-team',
+        typeDescription: 'some type',
+        requiresLocation: AppointmentTypeRequiresLocation.Optional,
+        alternateLocations: [UNAVAILABLE_LOCATION, NO_LOCATION],
+        availableLocations,
+        location: null,
+        locationDescription: null,
+      } as AppointmentBuilderDto)
+    })
   })
 
   describe('where', () => {
     const availableLocations = [fakeOfficeLocation({ code: 'some-location', description: 'some-location-description' })]
+    const alternateLocations = [UNAVAILABLE_LOCATION, NO_LOCATION]
 
     it('fails when location is not available', () => {
-      const session = havingSession({ location: 'some-other-location', availableLocations })
+      const session = havingSession({ location: 'some-other-location', availableLocations, alternateLocations })
       const observed = subject.where(session)
 
       expect(observed).toEqual([{ property: 'location', constraints: { isLocation: MESSAGES.location.required } }])
     })
 
     it('succeeds when location is available', () => {
-      const session = havingSession({ location: 'some-location', availableLocations })
+      const session = havingSession({ location: 'some-location', availableLocations, alternateLocations })
       const observed = subject.where(session)
 
       expect(observed).toEqual([])
       expect(session.dto).toEqual({
         location: 'some-location',
         availableLocations,
+        alternateLocations,
         locationDescription: 'some-location-description',
+        unavailableReason: null,
       } as AppointmentBuilderDto)
     })
-  })
 
-  it('does nothing for when', () => {
-    const observed = subject.when()
-    expect(observed).toEqual([])
+    it('succeeds when location is alternate', () => {
+      const session = havingSession({ location: NO_LOCATION.code, availableLocations, alternateLocations })
+      const observed = subject.where(session)
+
+      expect(observed).toEqual([])
+      expect(session.dto).toEqual({
+        location: NO_LOCATION.code,
+        availableLocations,
+        alternateLocations,
+        locationDescription: NO_LOCATION.description,
+        unavailableReason: null,
+      } as AppointmentBuilderDto)
+    })
+
+    it('unavailable when location is unavailable', () => {
+      const session = havingSession({ location: UNAVAILABLE_LOCATION.code, availableLocations, alternateLocations })
+      const observed = subject.where(session)
+
+      expect(observed).toEqual([])
+      expect(session.dto).toEqual({
+        location: UNAVAILABLE_LOCATION.code,
+        availableLocations,
+        alternateLocations,
+        unavailableReason: AppointmentBookingUnavailableReason.NewLocationRequired,
+      } as AppointmentBuilderDto)
+    })
   })
 
   describe('add-notes', () => {
@@ -173,16 +222,6 @@ describe('SessionBuilderService', () => {
     })
   })
 
-  it('does nothing for notes', () => {
-    const observed = subject.notes()
-    expect(observed).toEqual([])
-  })
-
-  it('does nothing for sensitive', () => {
-    const observed = subject.sensitive()
-    expect(observed).toEqual([])
-  })
-
   it('books the appointment on check', async () => {
     const session = havingSession()
     const model = fakeAppointmentBuilderDto()
@@ -192,8 +231,16 @@ describe('SessionBuilderService', () => {
     expect(stub.called).toBe(true)
   })
 
-  it('does nothing for confirm', () => {
-    const observed = subject.confirm()
-    expect(observed).toEqual([])
-  })
+  for (const step of [
+    AppointmentWizardStep.When,
+    AppointmentWizardStep.Notes,
+    AppointmentWizardStep.Sensitive,
+    AppointmentWizardStep.Confirm,
+    AppointmentWizardStep.Unavailable,
+  ]) {
+    it(`does nothing for ${step}`, () => {
+      const observed = subject[step](null, null)
+      expect(observed).toEqual([])
+    })
+  }
 })

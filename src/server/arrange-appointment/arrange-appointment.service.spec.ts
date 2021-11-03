@@ -19,7 +19,6 @@ import { WellKnownAppointmentType, ContactTypeCategory, WellKnownContactTypeConf
 import { AvailableAppointmentTypes } from './dto/AppointmentWizardViewModel'
 import { FakeConfigModule } from '../config/config.fake'
 import { ConfigService } from '@nestjs/config'
-import { UNSPECIFIED_LOCATION_CODE, UNSPECIFIED_LOCATION_DESCRIPTION } from './dto/AppointmentBuilderDto'
 
 describe('ArrangeAppointmentService', () => {
   let community: MockCommunityApiService
@@ -121,20 +120,17 @@ describe('ArrangeAppointmentService', () => {
   it('getting team office locations', async () => {
     const locations = [fakeOfficeLocation(), fakeOfficeLocation()]
     community.team.getAllOfficeLocationsUsingGET.resolves(fakeOkResponse(locations))
-    const observed = await subject.getTeamOfficeLocations('some-team-code', false)
+    const observed = await subject.getTeamOfficeLocations('some-team-code')
     expect(observed).toBe(locations)
   })
 
-  it('getting cached team office locations including unclassified location', async () => {
+  it('getting cached team office locations', async () => {
     const locations = (cache.cache['community:team-office-locations:some-team-code'] = [
       fakeOfficeLocation(),
       fakeOfficeLocation(),
     ])
-    const observed = await subject.getTeamOfficeLocations('some-team-code', true)
-    expect(observed).toEqual([
-      ...locations,
-      { code: UNSPECIFIED_LOCATION_CODE, description: UNSPECIFIED_LOCATION_DESCRIPTION },
-    ])
+    const observed = await subject.getTeamOfficeLocations('some-team-code')
+    expect(observed).toEqual(locations)
   })
 
   it('gets offender employment', async () => {
