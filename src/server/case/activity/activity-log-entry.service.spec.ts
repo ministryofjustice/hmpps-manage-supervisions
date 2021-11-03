@@ -30,6 +30,7 @@ describe('ActivityLogEntryService', () => {
       contactId: 1,
       notes: 'some appointment notes',
       outcome: { complied: true, attended: true, description: 'some outcome' },
+      officeLocation: { code: 'OFF1', description: 'Main Office' },
       contactStart: '2200-01-01T12:00:00',
       contactEnd: '2200-01-02T14:00:00',
       type: { nationalStandard: true },
@@ -50,6 +51,7 @@ describe('ActivityLogEntryService', () => {
       name: 'some appointment',
       type: ContactTypeCategory.Appointment,
       typeName: 'some appointment category',
+      location: 'Main Office',
       notes: 'some appointment notes',
       links: {
         view: links.url(BreadcrumbType.Appointment),
@@ -107,6 +109,7 @@ describe('ActivityLogEntryService', () => {
       name: 'some appointment',
       type: ContactTypeCategory.Appointment,
       typeName: 'some non well known appointment',
+      location: null,
       notes: 'some appointment notes',
       links: {
         view: links.url(BreadcrumbType.Appointment),

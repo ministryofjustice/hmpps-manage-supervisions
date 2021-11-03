@@ -316,11 +316,23 @@ context('Arrange appointment happy path & validation', () => {
     page.continueButton.click()
   }
 
-  function shouldDisplayCorrectAppointmentSummary({ start, end, type, notes, sensitive }: AppointmentBookingTestCase) {
+  function shouldDisplayCorrectAppointmentSummary({
+    start,
+    end,
+    type,
+    notes,
+    sensitive,
+    location: { name: locationDescription },
+  }: AppointmentBookingTestCase) {
     const crn = CRN
     page.pageTitle.contains('Check your answers')
     page.check.appointmentType.contains(type.name)
     page.check.appointmentTypeChangeLink.should('have.attr', 'href').and('include', `${crn}/arrange-appointment/type`)
+
+    page.check.appointmentLocation.contains(locationDescription)
+    page.check.appointmentLocationChangeLink
+      .should('have.attr', 'href')
+      .and('include', `${crn}/arrange-appointment/where`)
 
     page.check.appointmentDate.contains(longDate(start))
     page.check.appointmentDateChangeLink.should('have.attr', 'href').and('include', `${crn}/arrange-appointment/when`)

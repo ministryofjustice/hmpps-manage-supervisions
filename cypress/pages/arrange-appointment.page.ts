@@ -165,6 +165,14 @@ export class ArrangeAppointmentPage extends PageBase {
         return cy.get('.qa-type .qa-change')
       },
 
+      get appointmentLocation() {
+        return cy.get('.qa-location .govuk-summary-list__value')
+      },
+
+      get appointmentLocationChangeLink() {
+        return cy.get('.qa-location .qa-change')
+      },
+
       get appointmentDate() {
         return cy.get('.qa-date .govuk-summary-list__value')
       },

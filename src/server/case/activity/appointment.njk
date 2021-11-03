@@ -30,6 +30,10 @@
                 value: { text: appointment.typeName }
             },
             {
+                key: { text: "Location" },
+                value: { text: appointment.location }
+            } if appointment.location,
+            {
                 key: { text: "Date" },
                 value: { text: appointment.start | shortDate }
             },
