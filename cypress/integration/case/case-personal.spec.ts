@@ -29,7 +29,7 @@ class Fixture extends ViewCaseFixture {
 
   whenClickingViewPersonalContact(name: string) {
     return this.shouldRenderOffenderTab('personal', page => {
-      page.contactDetails(card => card.value('Personal contacts').contains(name).click())
+      page.contactDetails(card => card.value('Contacts').contains(name).click())
     })
   }
 
@@ -206,8 +206,8 @@ context('Case personal details tab', () => {
             })
 
             card.value('Other addresses').contains('1 other current address 1 previous address')
-            card.value('Personal contacts').contains('Next of Kin: Pippa Wade – Wife')
-            card.value('Personal contacts').contains('Family member: Jonathon Bacon – Father')
+            card.value('Contacts').contains('Next of Kin: Pippa Wade – Wife')
+            card.value('Contacts').contains('Family member: Jonathon Bacon – Father')
           })
 
           page.personalDetails(card => {

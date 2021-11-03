@@ -106,7 +106,7 @@ export class PersonalController {
   @Breadcrumb({
     type: BreadcrumbType.PersonalContact,
     parent: BreadcrumbType.PersonalDetails,
-    title: x => `Personal contact: ${x.entityName}`,
+    title: x => `Contact: ${x.entityName}`,
   })
   async getPersonalContact(
     @Param('crn') crn: string,
@@ -119,7 +119,7 @@ export class PersonalController {
 
     const personalContact = personalContacts.find(x => x.id === id)
     if (!personalContact) {
-      throw new NotFoundException(`Personal contact with id ${id} does not exist`)
+      throw new NotFoundException(`Contact with id ${id} does not exist`)
     }
 
     return {
