@@ -31,19 +31,24 @@ import * as faker from 'faker'
 import { needs } from './needs'
 import { cases } from './cases'
 import { DeepPartial } from '../../src/server/app.types'
+import { exit } from './exit'
 
 /**
  * Resets the wiremock server, this should always be the first seed module loaded.
  */
-export const reset = seedModule({ title: 'Reset' }, context => {
-  context.client.setReset()
-  context.client.community.stubPing()
-  context.client.community.stubPing(true)
-  context.client.community.stubApiInfo('2100-01-01.999999.1680c86')
-  context.client.assessRisksAndNeeds.stubPing()
-  context.client.assessRisksAndNeeds.stubApiInfo('2100-01-01.999999.c482abe')
-  context.client.hmppsAuth.stubPing()
-})
+export const reset = seedModule(
+  { title: 'Reset' },
+  context => {
+    context.client.setReset()
+    context.client.community.stubPing()
+    context.client.community.stubPing(true)
+    context.client.community.stubApiInfo('2100-01-01.999999.1680c86')
+    context.client.assessRisksAndNeeds.stubPing()
+    context.client.assessRisksAndNeeds.stubApiInfo('2100-01-01.999999.c482abe')
+    context.client.hmppsAuth.stubPing()
+  },
+  exit,
+)
 
 export interface ReferenceDataSeedOptions extends SeedTeamOfficeLocationsOptions {
   staff?: DeepPartial<StaffDetails>

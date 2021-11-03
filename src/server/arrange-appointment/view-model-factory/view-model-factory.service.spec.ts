@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing'
 import { ViewModelFactoryService } from './view-model-factory.service'
 import { ArrangeAppointmentService } from '../arrange-appointment.service'
 import { AppointmentFormBuilderService } from '../appointment-form-builder.service'
-import { createStubInstance, SinonStubbedInstance, match } from 'sinon'
+import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
 import { MockLinksModule } from '../../common/links/links.mock'
 import { AppointmentWizardSession } from '../dto/AppointmentWizardSession'
 import {
@@ -19,13 +19,13 @@ import {
   AppointmentSchedulingViewModel,
   AppointmentSensitiveViewModel,
   AppointmentTypeViewModel,
-  AppointmentWizardStep,
   CheckAppointmentViewModel,
   ConfirmAppointmentViewModel,
+  UnavailableAppointmentViewModel,
 } from '../dto/AppointmentWizardViewModel'
 import { fakeValidationError } from '../../util/util.fake'
-import { fakeOffenderDetail } from '../../community-api/community-api.fake'
-import { BreadcrumbType } from '../../common/links'
+import { BreadcrumbType, UtmMedium } from '../../common/links'
+import { AppointmentBookingUnavailableReason, AppointmentWizardStep } from '../dto/arrange-appointment.types'
 
 describe('ViewModelFactoryService', () => {
   let subject: ViewModelFactoryService
@@ -34,6 +34,24 @@ describe('ViewModelFactoryService', () => {
   const dto = fakeAppointmentBuilderDto({
     cja2003Order: true,
     legacyOrder: true,
+    unavailableReason: AppointmentBookingUnavailableReason.NewLocationRequired,
+    offender: {
+      firstName: 'Liz',
+      surname: 'Haggis',
+      otherIds: { crn: 'some-crn' },
+      contactDetails: {
+        phoneNumbers: [{ number: '1-530-861-4048' }],
+      },
+      offenderProfile: {
+        offenderLanguages: { primaryLanguage: 'some-primary-language' },
+        disabilities: [
+          {
+            disabilityType: { description: 'some-disability' },
+            provisions: [{ provisionType: { description: 'some-provision' } }],
+          },
+        ],
+      },
+    },
   })
   const session: AppointmentWizardSession = {
     crn: 'some-crn',
@@ -89,18 +107,6 @@ describe('ViewModelFactoryService', () => {
   })
 
   it('when', async () => {
-    const offender = fakeOffenderDetail({
-      offenderProfile: {
-        offenderLanguages: { primaryLanguage: 'some-primary-language' },
-        disabilities: [
-          {
-            disabilityType: { description: 'some-disability' },
-            provisions: [{ provisionType: { description: 'some-provision' } }],
-          },
-        ],
-      },
-    })
-    service.getOffenderDetails.withArgs(session.crn).resolves(offender)
     service.getCurrentEmploymentCircumstances.withArgs(session.crn).resolves('some-employment-circumstances')
 
     const body = fakeAppointmentBuilderDto(
@@ -122,7 +128,7 @@ describe('ViewModelFactoryService', () => {
       startTime: '10am',
       endTime: '12pm',
       offender: {
-        firstName: offender.firstName,
+        firstName: 'Liz',
         personalCircumstances: {
           language: 'some-primary-language',
           employment: 'some-employment-circumstances',
@@ -140,6 +146,7 @@ describe('ViewModelFactoryService', () => {
       step: AppointmentWizardStep.Where,
       appointment: dto,
       locations: session.dto.availableLocations,
+      alternateLocations: session.dto.alternateLocations,
       location: 'some-location',
       paths: { back: '/where/back' },
       errors,
@@ -202,24 +209,36 @@ describe('ViewModelFactoryService', () => {
     } as CheckAppointmentViewModel)
   })
 
-  it('confirm', async () => {
-    const offender = fakeOffenderDetail({
-      otherIds: { crn: 'some-crn' },
-      firstName: 'some-first-name',
-      contactDetails: {
-        phoneNumbers: [{ number: 'some-phone-number' }],
-      },
-    })
-    service.getOffenderDetails.withArgs(session.crn).resolves(offender)
-
-    const observed = await subject.confirm(session)
+  it('confirm', () => {
+    const observed = subject.confirm(session)
 
     const links = MockLinksModule.of({ crn: 'some-crn' })
     expect(observed).toEqual({
       step: AppointmentWizardStep.Confirm,
       appointment: dto,
       paths: { next: links.url(BreadcrumbType.Case) },
-      offender: { firstName: 'some-first-name', phoneNumber: 'some-phone-number' },
+      offender: { firstName: 'Liz', phoneNumber: '1-530-861-4048' },
     } as ConfirmAppointmentViewModel)
+  })
+
+  it('unavailable', () => {
+    const observed = subject.unavailable(session)
+
+    const links = MockLinksModule.of({ crn: 'some-crn' })
+    expect(observed).toEqual({
+      step: AppointmentWizardStep.Unavailable,
+      appointment: dto,
+      paths: { back: '/unavailable/back' },
+      reason: AppointmentBookingUnavailableReason.NewLocationRequired,
+      offender: { displayName: 'Liz Haggis' },
+      links: {
+        exit: links.url(BreadcrumbType.ExitToDeliusNow, {
+          utm: {
+            medium: UtmMedium.ArrangeAppointment,
+            campaign: 'unavailable-new-location-required',
+          },
+        }),
+      },
+    } as UnavailableAppointmentViewModel)
   })
 })

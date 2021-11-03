@@ -14,7 +14,12 @@
                 classes: "govuk-label--xl govuk-!-margin-bottom-6"
             }
         },
-        items: locations | toRadioList(location, "code", "description"),
+        items: locations | toRadioList(location, "code", "description", { alternate: {
+            divider: 'or',
+            items: alternateLocations,
+            valuePath: 'code',
+            textPath: 'description'
+        } }),
         errorMessage: errors | findErrorMessages("location")
     }) }}
 {% endblock %}

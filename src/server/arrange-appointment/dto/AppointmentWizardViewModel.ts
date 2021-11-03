@@ -3,17 +3,11 @@ import { AppointmentBuilderDto } from './AppointmentBuilderDto'
 import { AppointmentType, OfficeLocation } from '../../community-api/client'
 import { WellKnownAppointmentType, WellKnownAppointmentTypeMeta } from '../../config'
 import { ValidationError } from 'class-validator'
-
-export enum AppointmentWizardStep {
-  Type = 'type',
-  Where = 'where',
-  When = 'when',
-  Sensitive = 'sensitive',
-  AddNotes = 'add-notes',
-  Notes = 'notes',
-  Check = 'check',
-  Confirm = 'confirm',
-}
+import {
+  AlternateLocation,
+  AppointmentBookingUnavailableReason,
+  AppointmentWizardStep,
+} from './arrange-appointment.types'
 
 interface AppointmentWizardViewModelBase<Step extends AppointmentWizardStep> extends ViewModel {
   step: Step
@@ -53,6 +47,7 @@ export interface AppointmentTypeViewModel extends AppointmentWizardViewModelBase
 export interface AppointmentLocationViewModel extends AppointmentWizardViewModelBase<AppointmentWizardStep.Where> {
   location: string
   locations: OfficeLocation[]
+  alternateLocations: AlternateLocation[]
 }
 
 export interface AppointmentSchedulingViewModel extends AppointmentWizardViewModelBase<AppointmentWizardStep.When> {
@@ -94,6 +89,17 @@ export interface ConfirmAppointmentViewModel extends AppointmentWizardViewModelB
   }
 }
 
+export interface UnavailableAppointmentViewModel
+  extends AppointmentWizardViewModelBase<AppointmentWizardStep.Unavailable> {
+  reason: AppointmentBookingUnavailableReason
+  offender: {
+    displayName: string
+  }
+  links: {
+    exit: string
+  }
+}
+
 export type AppointmentWizardViewModel =
   | AppointmentTypeViewModel
   | AppointmentLocationViewModel
@@ -103,3 +109,4 @@ export type AppointmentWizardViewModel =
   | AppointmentSensitiveViewModel
   | CheckAppointmentViewModel
   | ConfirmAppointmentViewModel
+  | UnavailableAppointmentViewModel

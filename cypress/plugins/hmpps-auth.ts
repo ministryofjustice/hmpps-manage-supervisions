@@ -37,12 +37,8 @@ const login: SeedFn = context =>
   context.client.hmppsAuth
     .get(AUTHORIZE_PATH)
     .query({ response_type: 'code', client_id: 'api-client-id' })
-    .queryMatches({ redirect_uri: '.+', state: '.+' }).html(`<html>
-  <body>
-    <h1>Sign in</h1>
-    <a href="{{ request.query.redirect_uri }}&code=${AUTHORIZATION_CODE}&state={{ request.query.state }}">Sign in</a>
-  </body>
-</html>`)
+    .queryMatches({ redirect_uri: '.+', state: '.+' }).html(`<h1>Sign in</h1>
+    <a href="{{ request.query.redirect_uri }}&code=${AUTHORIZATION_CODE}&state={{ request.query.state }}">Sign in</a>`)
 
 /**
  * Stub the token granted for subject authorization code flow.

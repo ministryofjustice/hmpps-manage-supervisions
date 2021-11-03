@@ -126,6 +126,7 @@ export abstract class FormBuilderService<Dto, Step extends string> {
       const current = result[result.length - 1]
       const stepMeta = this.meta[current]
       next = typeof stepMeta.next === 'function' ? stepMeta.next(dto) : stepMeta.next
+
       result.push(next)
     } while (next)
 

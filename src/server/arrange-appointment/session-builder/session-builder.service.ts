@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import { AppointmentWizardStep } from '../dto/AppointmentWizardViewModel'
 import { AppointmentWizardSession } from '../dto/AppointmentWizardSession'
 import { ValidationError } from 'class-validator'
 import { AppointmentBuilderDto, MESSAGES } from '../dto/AppointmentBuilderDto'
@@ -7,6 +6,12 @@ import { ArrangeAppointmentService } from '../arrange-appointment.service'
 import { SecurityContext } from '../../security'
 import { AppointmentTypeRequiresLocation } from '../../community-api/client'
 import { SessionBuilder } from '../../util/form-builder'
+import {
+  AppointmentBookingUnavailableReason,
+  AppointmentWizardStep,
+  NO_LOCATION,
+  UNAVAILABLE_LOCATION,
+} from '../dto/arrange-appointment.types'
 
 @Injectable()
 export class SessionBuilderService implements SessionBuilder<AppointmentBuilderDto, AppointmentWizardStep> {
@@ -25,6 +30,7 @@ export class SessionBuilderService implements SessionBuilder<AppointmentBuilderD
       )
     }
 
+    session.dto.offender = offender
     session.dto.staffCode = offenderManager.staff.code
     session.dto.teamCode = offenderManager.team.code
     session.dto.providerCode = offenderManager.probationArea.code
@@ -50,26 +56,39 @@ export class SessionBuilderService implements SessionBuilder<AppointmentBuilderD
       ]
     }
 
+    const locationTypeChanged = !session.dto.requiresLocation || session.dto.requiresLocation !== type.requiresLocation
+
     session.dto.typeDescription = type.description
     session.dto.requiresLocation = type.requiresLocation
+
+    if (!locationTypeChanged) {
+      return []
+    }
 
     // type affects location availability so safest option is to clear out any existing locations
     session.dto.location = null
     session.dto.locationDescription = null
+    session.dto.availableLocations = null
+    session.dto.alternateLocations = null
 
     if (type.requiresLocation !== AppointmentTypeRequiresLocation.NotRequired) {
       // location is now required or optional, so get list of locations
-      session.dto.availableLocations = await this.service.getTeamOfficeLocations(
-        session.dto.teamCode,
-        session.dto.requiresLocation === AppointmentTypeRequiresLocation.Optional,
-      )
+      session.dto.availableLocations = await this.service.getTeamOfficeLocations(session.dto.teamCode)
+      session.dto.alternateLocations = [UNAVAILABLE_LOCATION]
+      if (type.requiresLocation === AppointmentTypeRequiresLocation.Optional) {
+        session.dto.alternateLocations.push(NO_LOCATION)
+      }
     }
 
     return []
   }
 
   where(session: AppointmentWizardSession): ValidationError[] {
-    const location = session.dto.availableLocations.find(x => x.code === session.dto.location)
+    session.dto.unavailableReason = null
+    const location =
+      session.dto.availableLocations.find(x => x.code === session.dto.location) ||
+      session.dto.alternateLocations.find(x => x.code === session.dto.location)
+
     if (!location) {
       return [
         {
@@ -77,6 +96,11 @@ export class SessionBuilderService implements SessionBuilder<AppointmentBuilderD
           constraints: { isLocation: MESSAGES.location.required },
         },
       ]
+    }
+
+    if (location.code === UNAVAILABLE_LOCATION.code) {
+      session.dto.unavailableReason = AppointmentBookingUnavailableReason.NewLocationRequired
+      return []
     }
 
     session.dto.locationDescription = location.description
@@ -114,6 +138,11 @@ export class SessionBuilderService implements SessionBuilder<AppointmentBuilderD
   }
 
   confirm(): ValidationError[] {
+    // no extra data or validation
+    return []
+  }
+
+  unavailable(): ValidationError[] {
     // no extra data or validation
     return []
   }

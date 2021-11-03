@@ -23,6 +23,7 @@ export enum BreadcrumbType {
   RiskDetails,
   RemovedRiskDetails,
   ExitToDelius,
+  ExitToDeliusNow,
   ExitToOASys,
 }
 
@@ -37,6 +38,7 @@ export enum UtmMedium {
   Risk = 'risk',
   Compliance = 'compliance',
   Sentence = 'sentence',
+  ArrangeAppointment = 'arrange-appointment',
 }
 
 export interface Utm {
@@ -73,7 +75,7 @@ export interface ResolveBreadcrumbOptions {
 
 export interface BreadcrumbMeta {
   type: BreadcrumbType
-  title: string | ((options: ResolveBreadcrumbOptions) => string)
+  title?: string | ((options: ResolveBreadcrumbOptions) => string)
   parent?: BreadcrumbType
   requiresUtm?: boolean
 }

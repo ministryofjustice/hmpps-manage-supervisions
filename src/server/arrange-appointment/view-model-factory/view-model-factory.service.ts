@@ -10,19 +10,20 @@ import {
   AppointmentSchedulingViewModel,
   AppointmentSensitiveViewModel,
   AppointmentTypeViewModel,
-  AppointmentWizardStep,
   AppointmentWizardViewModel,
   CheckAppointmentViewModel,
   ConfirmAppointmentViewModel,
+  UnavailableAppointmentViewModel,
 } from '../dto/AppointmentWizardViewModel'
 import { plainToClass } from 'class-transformer'
 import { DEFAULT_GROUP } from '../../util/mapping'
-import { isActiveDateRange } from '../../util'
+import { getDisplayName, isActiveDateRange } from '../../util'
 import { DateTime } from 'luxon'
-import { BreadcrumbType, LinksService } from '../../common/links'
+import { BreadcrumbType, LinksService, UtmMedium } from '../../common/links'
 import { ArrangeAppointmentService } from '../arrange-appointment.service'
 import { AppointmentFormBuilderService } from '../appointment-form-builder.service'
 import { ViewModelFactory } from '../../util/form-builder'
+import { AlternateLocation, AppointmentWizardStep } from '../dto/arrange-appointment.types'
 
 @Injectable()
 export class ViewModelFactoryService
@@ -69,12 +70,9 @@ export class ViewModelFactoryService
     body?: DeepPartial<AppointmentBuilderDto>,
     errors: ValidationError[] = [],
   ): Promise<AppointmentSchedulingViewModel> {
-    const [offender, employment] = await Promise.all([
-      this.service.getOffenderDetails(session.crn),
-      this.service.getCurrentEmploymentCircumstances(session.crn),
-    ])
+    const employment = await this.service.getCurrentEmploymentCircumstances(session.crn)
 
-    const disabilities = (offender.offenderProfile.disabilities || [])
+    const disabilities = (session.dto.offender.offenderProfile.disabilities || [])
       .filter(isActiveDateRange)
       .map(d => {
         const provisions = (d.provisions || [])
@@ -92,7 +90,7 @@ export class ViewModelFactoryService
       })
       .join(', ')
 
-    const language = offender.offenderProfile.offenderLanguages?.primaryLanguage
+    const language = session.dto.offender.offenderProfile.offenderLanguages?.primaryLanguage
 
     const appointment = plainToClass(AppointmentBuilderDto, session.dto, {
       groups: [DEFAULT_GROUP],
@@ -109,7 +107,7 @@ export class ViewModelFactoryService
       startTime: body?.startTime || appointment.startTime,
       endTime: body?.endTime || appointment.endTime,
       offender: {
-        firstName: offender.firstName,
+        firstName: session.dto.offender.firstName,
         personalCircumstances: {
           language,
           employment,
@@ -133,6 +131,7 @@ export class ViewModelFactoryService
       step: AppointmentWizardStep.Where,
       appointment,
       locations: session.dto.availableLocations,
+      alternateLocations: session.dto.alternateLocations as AlternateLocation[],
       location: body?.location || appointment.location,
       paths: {
         back: this.formBuilder.getBackUrl(session, AppointmentWizardStep.Where),
@@ -224,23 +223,50 @@ export class ViewModelFactoryService
     }
   }
 
-  async confirm(session: AppointmentWizardSession): Promise<ConfirmAppointmentViewModel> {
+  confirm(session: AppointmentWizardSession): ConfirmAppointmentViewModel {
     const appointment = plainToClass(AppointmentBuilderDto, session.dto, {
       groups: [DEFAULT_GROUP],
       excludeExtraneousValues: true,
     })
-    const offenderDetails = await this.service.getOffenderDetails(session.crn)
-    const phoneNumber = offenderDetails.contactDetails?.phoneNumbers.find(x => x.number)
+    const phoneNumber = session.dto.offender.contactDetails?.phoneNumbers.find(x => x.number)
 
     return {
       step: AppointmentWizardStep.Confirm,
       appointment,
       paths: {
-        next: this.links.getUrl(BreadcrumbType.Case, { crn: offenderDetails.otherIds.crn }),
+        next: this.links.getUrl(BreadcrumbType.Case, { crn: session.dto.offender.otherIds.crn }),
       },
       offender: {
-        firstName: offenderDetails.firstName,
+        firstName: session.dto.offender.firstName,
         phoneNumber: phoneNumber?.number,
+      },
+    }
+  }
+
+  unavailable(session: AppointmentWizardSession): UnavailableAppointmentViewModel {
+    const appointment = plainToClass(AppointmentBuilderDto, session.dto, {
+      groups: [DEFAULT_GROUP],
+      excludeExtraneousValues: true,
+    })
+
+    return {
+      step: AppointmentWizardStep.Unavailable,
+      appointment,
+      paths: {
+        back: this.formBuilder.getBackUrl(session, AppointmentWizardStep.Unavailable),
+      },
+      reason: session.dto.unavailableReason,
+      offender: {
+        displayName: getDisplayName(session.dto.offender, { middleNames: false }),
+      },
+      links: {
+        exit: this.links.getUrl(BreadcrumbType.ExitToDeliusNow, {
+          crn: session.crn,
+          utm: {
+            medium: UtmMedium.ArrangeAppointment,
+            campaign: 'unavailable-' + session.dto.unavailableReason,
+          },
+        }),
       },
     }
   }

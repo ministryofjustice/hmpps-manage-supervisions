@@ -7,9 +7,14 @@ import { AppointmentTypeRequiresLocation } from '../../community-api/client'
 import { WellKnownAppointmentType } from '../../config'
 import { fake, fakeClass, fakeEnum } from '../../util/util.fake'
 import { AvailableAppointmentTypes, FeaturedAppointmentType } from './AppointmentWizardViewModel'
-import { fakeAppointmentType, fakeOfficeLocation } from '../../community-api/community-api.fake'
+import { fakeAppointmentType, fakeOffenderDetail, fakeOfficeLocation } from '../../community-api/community-api.fake'
 import { fakeConfig } from '../../config/config.fake'
-import { MaybeWellKnownAppointmentType } from './arrange-appointment.types'
+import {
+  AppointmentBookingUnavailableReason,
+  MaybeWellKnownAppointmentType,
+  NO_LOCATION,
+  UNAVAILABLE_LOCATION,
+} from './arrange-appointment.types'
 
 export const fakeAppointmentBuilderDto = fakeClass(
   AppointmentBuilderDto,
@@ -20,6 +25,8 @@ export const fakeAppointmentBuilderDto = fakeClass(
       requiresLocation: AppointmentTypeRequiresLocation.Required,
       typeDescription: faker.company.bs(),
       availableLocations: partial.availableLocations?.map(fakeOfficeLocation) || [fakeOfficeLocation()],
+      alternateLocations: [UNAVAILABLE_LOCATION, NO_LOCATION],
+      unavailableReason: fakeEnum(AppointmentBookingUnavailableReason),
       location: faker.datatype.uuid(),
       locationDescription: faker.address.streetAddress(),
       date: { day: date.day, month: date.month, year: date.year } as any,
@@ -35,6 +42,7 @@ export const fakeAppointmentBuilderDto = fakeClass(
       convictionId: faker.datatype.number(),
       cja2003Order: true,
       legacyOrder: false,
+      offender: fakeOffenderDetail(),
     }
   },
   { groups: [DEFAULT_GROUP] },

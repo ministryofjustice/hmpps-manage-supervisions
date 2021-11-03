@@ -2,12 +2,16 @@ import { Transform, Type } from 'class-transformer'
 import { DateTime } from 'luxon'
 import { IsBoolean, IsIn, IsInt, IsNotEmpty, IsPositive, IsString, ValidateIf, ValidateNested } from 'class-validator'
 import striptags = require('striptags')
-import { AppointmentWizardStep } from './AppointmentWizardViewModel'
 import { DateInput, IsAfter, IsDateInput, IsFutureTime, ValidationGroup, IsFutureDate, IsTime } from '../../validators'
 import { getDateTime } from '../../util'
 import { ExposeDefault, ToBoolean } from '../../util/mapping'
-import { AppointmentTypeRequiresLocation, OfficeLocation } from '../../community-api/client'
+import { AppointmentTypeRequiresLocation, OffenderDetail, OfficeLocation } from '../../community-api/client'
 import { WellKnownAppointmentType } from '../../config'
+import {
+  AlternateLocation,
+  AppointmentBookingUnavailableReason,
+  AppointmentWizardStep,
+} from './arrange-appointment.types'
 
 export const MESSAGES = {
   type: {
@@ -26,9 +30,6 @@ export const MESSAGES = {
     required: 'Select yes if the appointment contains sensitive information',
   },
 }
-
-export const UNSPECIFIED_LOCATION_CODE = 'UNSPECIFIED_LOCATION'
-export const UNSPECIFIED_LOCATION_DESCRIPTION = 'No location'
 
 function IsAppointmentType(featured: boolean) {
   const decorators = [IsString, IsNotEmpty]
@@ -93,6 +94,9 @@ export class AppointmentDateDto implements DateInput {
 
 export class AppointmentBuilderDto {
   @ExposeDefault()
+  offender?: OffenderDetail
+
+  @ExposeDefault()
   providerCode?: string
 
   @ExposeDefault()
@@ -125,8 +129,11 @@ export class AppointmentBuilderDto {
   @ExposeDefault()
   availableLocations?: OfficeLocation[]
 
+  @ExposeDefault()
+  alternateLocations?: AlternateLocation[]
+
   @ExposeDefault({ groups: [AppointmentWizardStep.Where] })
-  @ValidateIf(object => object?.requiresLocation === AppointmentTypeRequiresLocation.Required, {
+  @ValidateIf(object => object?.requiresLocation !== AppointmentTypeRequiresLocation.NotRequired, {
     groups: [AppointmentWizardStep.Where],
   })
   @IsLocationCode()
@@ -171,6 +178,9 @@ export class AppointmentBuilderDto {
   @ExposeDefault({ groups: [AppointmentWizardStep.Notes] })
   @Transform(({ value }) => striptags(value))
   notes?: string
+
+  @ExposeDefault()
+  unavailableReason?: AppointmentBookingUnavailableReason
 
   get appointmentType(): null | { value: WellKnownAppointmentType | string; featured: boolean } {
     if (!this.type) {

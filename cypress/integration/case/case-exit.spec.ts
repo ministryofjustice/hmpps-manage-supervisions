@@ -37,7 +37,7 @@ describe('Case exit pages', () => {
           .should('have.attr', 'href')
           .and(
             'include',
-            `http://localhost:8082/NDelius-war/delius/JSP/deeplink.jsp?component=ContactList&offenderId=${OFFENDER_ID}&eventId=${ACTIVE_CONVICTION_ID}`,
+            `http://localhost:9091/delius/NDelius-war/delius/JSP/deeplink.jsp?component=ContactList&offenderId=${OFFENDER_ID}&eventId=${ACTIVE_CONVICTION_ID}`,
           )
 
         page.delius.homepageExplanation.contains(
@@ -46,7 +46,7 @@ describe('Case exit pages', () => {
         page.delius.homepage
           .contains('Open the Delius homepage')
           .should('have.attr', 'href')
-          .and('include', 'http://localhost:8082/NDelius-war/delius/JSP/homepage.jsp')
+          .and('include', 'http://localhost:9091/delius/NDelius-war/delius/JSP/homepage.jsp')
       })
       .shouldRenderOffenderDetails('delius')
   })
@@ -60,7 +60,7 @@ describe('Case exit pages', () => {
         page.oasys.homepage
           .contains('Open the OASys homepage')
           .should('have.attr', 'href')
-          .and('include', 'http://localhost:8082/oasys')
+          .and('include', 'http://localhost:9091/oasys')
       })
       .shouldRenderOffenderDetails('oasys')
   })

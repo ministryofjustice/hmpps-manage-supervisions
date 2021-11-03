@@ -1,8 +1,4 @@
-import {
-  AppointmentBuilderDto,
-  UNSPECIFIED_LOCATION_CODE,
-  UNSPECIFIED_LOCATION_DESCRIPTION,
-} from './dto/AppointmentBuilderDto'
+import { AppointmentBuilderDto } from './dto/AppointmentBuilderDto'
 import { Injectable } from '@nestjs/common'
 import { CacheService } from '../common'
 import {
@@ -60,6 +56,9 @@ export class ArrangeAppointmentService {
     if (!appointmentType) {
       throw new Error('appointment type is not set')
     }
+
+    const isAlternateLocation = builder.alternateLocations.some(x => x.code === builder.location)
+
     const appointmentCreateRequest: AppointmentCreateRequest = {
       providerCode: builder.providerCode,
       requirementId: builder.requirementId,
@@ -68,7 +67,7 @@ export class ArrangeAppointmentService {
       appointmentStart: builder.appointmentStart.toISO(),
       appointmentEnd: builder.appointmentEnd.toISO(),
       contactType: appointmentType.contactType,
-      officeLocationCode: builder.location == UNSPECIFIED_LOCATION_CODE ? null : builder.location,
+      officeLocationCode: isAlternateLocation ? null : builder.location,
       notes: builder.notes,
       sensitive: builder.sensitive,
     }
@@ -130,15 +129,11 @@ export class ArrangeAppointmentService {
     )
   }
 
-  async getTeamOfficeLocations(teamCode: string, includeUnclassified: boolean): Promise<OfficeLocation[]> {
-    const locations = await this.cache.getOrSet(`community:team-office-locations:${teamCode}`, async () => {
+  async getTeamOfficeLocations(teamCode: string): Promise<OfficeLocation[]> {
+    return this.cache.getOrSet(`community:team-office-locations:${teamCode}`, async () => {
       const { data } = await this.community.team.getAllOfficeLocationsUsingGET({ teamCode })
       return { value: data, options: { durationSeconds: 600 } }
     })
-
-    return includeUnclassified
-      ? [...locations, { code: UNSPECIFIED_LOCATION_CODE, description: UNSPECIFIED_LOCATION_DESCRIPTION }]
-      : locations
   }
 
   async getConvictionAndRarRequirement(crn: string) {

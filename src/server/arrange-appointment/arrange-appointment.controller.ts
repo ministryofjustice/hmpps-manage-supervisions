@@ -1,5 +1,5 @@
 import { AppointmentBuilderDto } from './dto/AppointmentBuilderDto'
-import { AppointmentWizardStep, AppointmentWizardViewModel } from './dto/AppointmentWizardViewModel'
+import { AppointmentWizardViewModel } from './dto/AppointmentWizardViewModel'
 import { AppointmentWizardSession } from './dto/AppointmentWizardSession'
 import { AppointmentFormBuilderService } from './appointment-form-builder.service'
 import { Controller, Get, Param, ParseEnumPipe, Post, Redirect, Session } from '@nestjs/common'
@@ -12,6 +12,7 @@ import { SessionBuilderService } from './session-builder/session-builder.service
 import { FormBuilderController } from '../util/form-builder'
 import { DynamicRedirect, DynamicRender, RedirectResponse } from '../common/dynamic-routing'
 import { DynamicRouting } from '../common/dynamic-routing/dynamic-routing.decorator'
+import { AppointmentWizardStep } from './dto/arrange-appointment.types'
 
 interface AppointmentSessionPartial {
   arrangeAppointment?: AppointmentWizardSession

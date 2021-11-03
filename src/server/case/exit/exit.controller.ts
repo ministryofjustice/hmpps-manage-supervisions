@@ -1,14 +1,16 @@
-import { Controller, Get, Logger, Param, Render } from '@nestjs/common'
+import { Controller, Get, Logger, Param, Redirect, Render } from '@nestjs/common'
 import { OffenderService } from '../offender'
 import { SentenceService } from '../sentence'
 import { ConfigService } from '@nestjs/config'
 import { Config, DeliusConfig, OASysConfig } from '../../config'
 import { Breadcrumb, BreadcrumbType, LinksService, Utm } from '../../common/links'
 import { DeliusExitViewModel, ExitViewModel, OASysExitViewModel } from './exit.types'
-import { getDisplayName } from '../../util'
+import { getDisplayName, urlJoin } from '../../util'
 import { DateTime } from 'luxon'
 import { OffenderDetail } from '../../community-api/client'
 import { UtmTags } from '../../common'
+import { URL } from 'url'
+import { RedirectResponse } from '../../common/dynamic-routing'
 
 @Controller('case/:crn(\\w+)')
 export class ExitController {
@@ -20,6 +22,17 @@ export class ExitController {
     private readonly config: ConfigService<Config>,
     private readonly links: LinksService,
   ) {}
+
+  @Get('to-delius-now')
+  @Redirect()
+  @Breadcrumb({
+    type: BreadcrumbType.ExitToDeliusNow,
+    requiresUtm: true,
+  })
+  async getDeliusExitNow(@Param('crn') crn: string, @UtmTags() utm: Utm): Promise<RedirectResponse> {
+    const result = await this.getDeliusExit(crn, utm)
+    return RedirectResponse.found(result.links.deliusContactLog)
+  }
 
   @Get('to-delius')
   @Render('case/exit/to-delius')
@@ -37,14 +50,15 @@ export class ExitController {
       this.sentence.getCurrentConvictionSummary(crn),
     ])
 
-    const contactLog = new URL('/NDelius-war/delius/JSP/deeplink.jsp', this.config.get<DeliusConfig>('delius').baseUrl)
+    const { baseUrl } = this.config.get<DeliusConfig>('delius')
+    const contactLog = new URL(urlJoin(baseUrl, '/NDelius-war/delius/JSP/deeplink.jsp'))
     contactLog.searchParams.set('component', 'ContactList')
     contactLog.searchParams.set('offenderId', offender.offenderId.toString())
     if (conviction) {
       contactLog.searchParams.set('eventId', conviction.id.toString())
     }
 
-    const homePage = new URL('/NDelius-war/delius/JSP/homepage.jsp', this.config.get<DeliusConfig>('delius').baseUrl)
+    const homePage = new URL(urlJoin(baseUrl, '/NDelius-war/delius/JSP/homepage.jsp'))
 
     return {
       ...this.getBase(offender, BreadcrumbType.ExitToDelius),

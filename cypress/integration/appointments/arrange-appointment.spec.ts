@@ -149,6 +149,19 @@ context('Arrange appointment happy path & validation', () => {
     shouldBeAccessible()
   })
 
+  it('redirects to unavailable when unavailable location selected', () => {
+    cy.arrangeAppointment()
+
+    whenSelectingTypeRadio('Office visit')
+    whenSubmittingCurrentStep()
+
+    whenSelectingLocationRadio('The location I’m looking for is not in this list')
+    whenSubmittingCurrentStep()
+    shouldRedirectToLocationUnavailablePage()
+
+    shouldBeAccessible()
+  })
+
   it('validates time and dates', () => {
     const test = testCase({
       type: { code: 'CHVS', name: 'Home visit' },
@@ -373,6 +386,11 @@ context('Arrange appointment happy path & validation', () => {
     page.documentTitle.contains('Error')
     page.errorSummary.contains('There is a problem')
     page.where.errorMessages.location.contains(expected)
+  }
+
+  function shouldRedirectToLocationUnavailablePage() {
+    page.pageTitle.contains('Arrange an appointment in another location')
+    page.documentTitle.contains('Arrange an appointment in another location')
   }
 
   function whenEnteringDate(date: DateTime) {
