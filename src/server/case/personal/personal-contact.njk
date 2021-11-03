@@ -15,7 +15,7 @@
                 rows: [
                     {
                         key: { text: "Name" },
-                        value: { text: personalContact.displayName }
+                        value: { text: personalContact.displayName if personalContact.displayName else 'No name' }
                     },
                     {
                         key: { text: "Relationship type" },
