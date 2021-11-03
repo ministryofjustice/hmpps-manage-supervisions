@@ -299,6 +299,7 @@ context('Case activity tab', () => {
         .shouldRenderAppointmentPage('Appointment Not a well known appointment with Robert Ohagan', page => {
           page.detail(list => {
             list.value('Type of appointment').contains('Not a well known appointment')
+            list.value('Location').contains('Main Office')
             list.value('Date').contains('2 September 2020')
             list.value('Time').contains('11am to 1pm')
             list.value('Appointment notes').contains('Some unknown appointment')

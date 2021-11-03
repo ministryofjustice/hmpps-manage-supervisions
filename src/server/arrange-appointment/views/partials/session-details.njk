@@ -23,6 +23,21 @@
         }
       },
       {
+        key: { text: "Location" },
+        value: { text: appointment.locationDescription },
+        classes: ["qa-location"],
+        actions: {
+          items: [
+            {
+              href: paths.where,
+              text: "Change",
+              visuallyHiddenText: "location",
+              classes: ["qa-change"]
+            }
+          ]
+        }
+      } if appointment.locationDescription and appointment.availableLocations,
+      {
         key: { text: "Date" },
         value: { text: appointment.appointmentStart | longDate },
         classes: ["qa-date"],

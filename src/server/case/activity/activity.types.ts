@@ -43,6 +43,7 @@ export interface AppointmentActivityLogEntry
   nationalStandard: boolean
   enforcementAction?: string
   end?: DateTime
+  location?: string
   rarActivity: { name?: string }
   outcome?: {
     complied: boolean

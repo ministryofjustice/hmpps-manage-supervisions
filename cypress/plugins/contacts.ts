@@ -5,6 +5,7 @@ import {
   ActivityLogGroup,
   ActivityLogEntry,
   KeyValue,
+  OfficeLocation,
 } from '../../src/server/community-api/client'
 import { SeedFn } from './wiremock'
 import {
@@ -271,11 +272,16 @@ type CommonContactApiQuery = Omit<
   'crn'
 >
 
+const STATIC_LOCATION: OfficeLocation = {
+  code: 'OFF1',
+  description: 'Main Office',
+}
+
 /**
  * Seeds contact summary & activity log APIs with a common set of contacts.
  * TODO this is not conviction ID aware so for previous convictions we get the same results...
  */
-export function contacts(crn: string, partials = ACTIVITY_LOG_GROUPS): SeedFn {
+export function contacts(crn: string, partials = ACTIVITY_LOG_GROUPS, officeLocation = STATIC_LOCATION): SeedFn {
   return context => {
     const activityLogGroups = partials.map(p => fakeActivityLogGroup(p))
     const contacts = activityLogGroups.flatMap(grp =>
@@ -284,6 +290,7 @@ export function contacts(crn: string, partials = ACTIVITY_LOG_GROUPS): SeedFn {
           contactId: e.contactId,
           contactStart: `${grp.date}T${e.startTime || '00:00:00'}`,
           contactEnd: `${grp.date}T${e.endTime || '00:00:00'}`,
+          officeLocation: e.type.appointment ? officeLocation : null,
           notes: e.notes,
           outcome: e.outcome,
           sensitive: e.sensitive,
