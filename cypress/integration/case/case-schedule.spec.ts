@@ -129,7 +129,7 @@ context('Case schedule tab', () => {
         .whenClickingSubNavTab('schedule')
         .shouldRenderOffenderTab('schedule', page => {
           page.arrangeAppointmentButton.contains('Arrange an appointment').click()
-          cy.url().should('include', `/arrange-appointment/${fixture.data.crn}`)
+          cy.url().should('include', `/case/${fixture.data.crn}/arrange-appointment`)
         })
         .shouldBeAccessible()
     })

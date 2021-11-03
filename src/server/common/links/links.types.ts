@@ -15,6 +15,7 @@ export enum BreadcrumbType {
   CaseSchedule,
   CaseRisk,
   NewAppointment,
+  NewAppointmentStep,
   Appointment,
   Communication,
   OtherActivityLogEntry,
@@ -57,6 +58,7 @@ export interface RawUtm {
 
 export interface ResolveBreadcrumbOptions {
   id?: string | number
+  step?: string | number
   entityName?: string
   crn?: string
   offenderName?: string

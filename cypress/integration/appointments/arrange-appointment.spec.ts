@@ -307,19 +307,19 @@ context('Arrange appointment happy path & validation', () => {
     const crn = CRN
     page.pageTitle.contains('Check your answers')
     page.check.appointmentType.contains(type.name)
-    page.check.appointmentTypeChangeLink.should('have.attr', 'href').and('include', `${crn}/type`)
+    page.check.appointmentTypeChangeLink.should('have.attr', 'href').and('include', `${crn}/arrange-appointment/type`)
 
     page.check.appointmentDate.contains(longDate(start))
-    page.check.appointmentDateChangeLink.should('have.attr', 'href').and('include', `${crn}/when`)
+    page.check.appointmentDateChangeLink.should('have.attr', 'href').and('include', `${crn}/arrange-appointment/when`)
 
     page.check.appointmentTime.contains(`${time(start)} to ${time(end)}`)
-    page.check.appointmentTimeChangeLink.should('have.attr', 'href').and('include', `${crn}/when`)
+    page.check.appointmentTimeChangeLink.should('have.attr', 'href').and('include', `${crn}/arrange-appointment/when`)
 
     page.check.notes.contains(notes)
-    page.check.notesChangeLink.should('have.attr', 'href').and('include', `${crn}/notes`)
+    page.check.notesChangeLink.should('have.attr', 'href').and('include', `${crn}/arrange-appointment/notes`)
 
     page.check.sensitive.contains(sensitive ? 'Yes' : 'No')
-    page.check.sensitiveChangeLink.should('have.attr', 'href').and('include', `${crn}/sensitive`)
+    page.check.sensitiveChangeLink.should('have.attr', 'href').and('include', `${crn}/arrange-appointment/sensitive`)
   }
 
   function longDate(date: DateTime) {

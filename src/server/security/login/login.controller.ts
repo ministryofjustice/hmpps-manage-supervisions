@@ -3,7 +3,7 @@ import { Request } from 'express'
 import { LoginGuard } from './login.guard'
 import { Public } from '../authentication'
 import { LoginService } from './login.service'
-import { RedirectResponse } from '../../common'
+import { RedirectResponse } from '../../common/dynamic-routing'
 
 @Public()
 @Controller('login')

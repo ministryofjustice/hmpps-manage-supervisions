@@ -1,16 +1,19 @@
-import { AppointmentBuilderDto, UNSPECIFIED_LOCATION_CODE } from './dto/AppointmentBuilderDto'
+import {
+  AppointmentBuilderDto,
+  UNSPECIFIED_LOCATION_CODE,
+  UNSPECIFIED_LOCATION_DESCRIPTION,
+} from './dto/AppointmentBuilderDto'
 import { Injectable } from '@nestjs/common'
 import { CacheService } from '../common'
 import {
   AppointmentCreateRequest,
   AppointmentCreateResponse,
-  AppointmentType,
   AppointmentTypeOrderTypes,
   OffenderDetail,
   OfficeLocation,
   PersonalCircumstance,
 } from '../community-api/client'
-import { Config, WellKnownAppointmentType, ContactTypeCategory, WellKnownContactTypeConfig } from '../config'
+import { Config, ContactTypeCategory, WellKnownContactTypeConfig } from '../config'
 import { AvailableAppointmentTypes, FeaturedAppointmentType } from './dto/AppointmentWizardViewModel'
 import { ConfigService } from '@nestjs/config'
 import { isActiveDateRange } from '../util'
@@ -22,6 +25,7 @@ import {
   EMPLOYMENT_TYPE_CODE,
   RequirementService,
 } from '../community-api'
+import { MaybeWellKnownAppointmentType } from './dto/arrange-appointment.types'
 
 @Injectable()
 export class ArrangeAppointmentService {
@@ -33,9 +37,7 @@ export class ArrangeAppointmentService {
     private readonly requirement: RequirementService,
   ) {}
 
-  async getAppointmentType(
-    builder: AppointmentBuilderDto,
-  ): Promise<(AppointmentType & { wellKnownType?: WellKnownAppointmentType }) | null> {
+  async getAppointmentType(builder: AppointmentBuilderDto): Promise<MaybeWellKnownAppointmentType | null> {
     const selected = builder.appointmentType
     if (!selected) {
       return null
@@ -128,11 +130,15 @@ export class ArrangeAppointmentService {
     )
   }
 
-  async getTeamOfficeLocations(teamCode: string): Promise<OfficeLocation[]> {
-    return this.cache.getOrSet(`community:team-office-locations:${teamCode}`, async () => {
+  async getTeamOfficeLocations(teamCode: string, includeUnclassified: boolean): Promise<OfficeLocation[]> {
+    const locations = await this.cache.getOrSet(`community:team-office-locations:${teamCode}`, async () => {
       const { data } = await this.community.team.getAllOfficeLocationsUsingGET({ teamCode })
       return { value: data, options: { durationSeconds: 600 } }
     })
+
+    return includeUnclassified
+      ? [...locations, { code: UNSPECIFIED_LOCATION_CODE, description: UNSPECIFIED_LOCATION_DESCRIPTION }]
+      : locations
   }
 
   async getConvictionAndRarRequirement(crn: string) {

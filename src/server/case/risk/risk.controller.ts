@@ -5,7 +5,7 @@ import { RemovedRisksListViewModel, RiskDetailsViewModel, RiskViewModel } from '
 import { getDisplayName } from '../../util'
 import { OffenderDetailSummary } from '../../community-api/client'
 import { OffenderService } from '../offender'
-import { RedirectResponse } from '../../common'
+import { RedirectResponse } from '../../common/dynamic-routing'
 import { CasePage, CaseRiskViewModel } from '../case.types'
 import { CaseTabbedPage } from '../case-tabbed-page.decorators'
 

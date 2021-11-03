@@ -31,6 +31,7 @@ import {
   StaffCaseloadEntry,
   ActivityLogGroup,
   ActivityLogEntry,
+  OffenderManager,
 } from './client'
 import * as faker from 'faker'
 import { DateTime } from 'luxon'
@@ -138,6 +139,13 @@ export const fakeOffenderAlias = fake<OffenderAlias>(() => ({
   surname: faker.name.lastName(),
 }))
 
+export const fakeOffenderManager = fake<OffenderManager>(() => ({
+  active: true,
+  staff: fakeStaffHuman(),
+  team: fakeTeam(),
+  probationArea: fakeProbationArea(),
+}))
+
 export const fakeOffenderDetail = fake<OffenderDetail>((options, partial = {}) => ({
   offenderId: faker.datatype.number(),
   otherIds: { crn: fakeCrn(), pncNumber: fakePnc() },
@@ -168,7 +176,7 @@ export const fakeOffenderDetail = fake<OffenderDetail>((options, partial = {}) =
     religion: 'Christian',
   },
   offenderAliases: partial.offenderAliases?.map(fakeOffenderAlias) || [fakeOffenderAlias()],
-  offenderManagers: [{ team: { code: faker.datatype.uuid() } }],
+  offenderManagers: partial.offenderManagers?.map(fakeOffenderManager) || [fakeOffenderManager()],
 }))
 
 export const fakeOffenderDetailSummary = fake<OffenderDetailSummary>((options, partial) => ({

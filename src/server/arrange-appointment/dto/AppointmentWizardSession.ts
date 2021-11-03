@@ -1,9 +1,5 @@
 import { AppointmentBuilderDto } from './AppointmentBuilderDto'
 import { AppointmentWizardStep } from './AppointmentWizardViewModel'
-import { FlatDeepPartial } from '../../app.types'
+import { WizardSession } from '../../util/form-builder'
 
-export interface AppointmentWizardSession {
-  crn: string
-  appointment?: FlatDeepPartial<AppointmentBuilderDto>
-  completedSteps?: AppointmentWizardStep[]
-}
+export type AppointmentWizardSession = WizardSession<AppointmentBuilderDto, AppointmentWizardStep>

@@ -16,7 +16,8 @@ import { fake } from '../../util/util.fake'
 import * as faker from 'faker'
 import { DateTime } from 'luxon'
 import { fakeComplianceConvictionSummary } from '../compliance/compliance.fake'
-import { ConvictionRequirement, ConvictionRequirementDetail, ConvictionRequirementType } from '../../community-api'
+import { ConvictionRequirement, ConvictionRequirementType } from '../../community-api'
+import { fakeConvictionRequirementDetail } from '../../community-api/conviction/conviction.fake'
 
 export const fakeConvictionAdditionalOffence = fake<ConvictionAdditionalOffence>(() => ({
   name: faker.company.bs(),
@@ -42,25 +43,6 @@ export const fakeAdditionalSentence = fake<AdditionalSentence>(() => ({
   length: faker.datatype.number(),
   value: faker.datatype.number(),
 }))
-
-const fakeConvictionRequirementDetail = fake<ConvictionRequirementDetail, { isActive?: boolean }>(
-  ({ isActive = true } = {}) => ({
-    id: faker.datatype.number(),
-    length: `${faker.datatype.number()} days`,
-    startDate: {
-      value: DateTime.fromJSDate(faker.date.past()),
-      expected: faker.datatype.boolean(),
-    },
-    endDate: isActive
-      ? null
-      : {
-          value: DateTime.fromJSDate(faker.date.past()),
-          expected: faker.datatype.boolean(),
-        },
-    notes: faker.lorem.sentence(),
-    terminationReason: isActive ? faker.company.bs() : null,
-  }),
-)
 
 export const fakeConvictionRequirement = fake<ConvictionRequirement, { isActive?: boolean }>((options, partial) => {
   const type = partial?.type || faker.random.arrayElement(Object.values(ConvictionRequirementType))

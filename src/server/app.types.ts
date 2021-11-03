@@ -69,3 +69,9 @@ export type DeepNonFunctionPartial<T> = T extends object
 export type Mutable<T> = {
   -readonly [K in keyof T]: T[K]
 }
+
+type TransformKebabToCamelCase<T extends string> = T extends `${infer L}-${infer R}`
+  ? `${Lowercase<L>}${Capitalize<TransformKebabToCamelCase<R>>}`
+  : Lowercase<T>
+
+export type KebabToCamelCase<T> = { [K in keyof T as K extends string ? TransformKebabToCamelCase<K> : K]: T[K] }

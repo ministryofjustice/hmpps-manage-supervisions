@@ -5,19 +5,21 @@ import { TIME_FORMAT } from '../../validators'
 import { DEFAULT_GROUP } from '../../util/mapping'
 import { AppointmentTypeRequiresLocation } from '../../community-api/client'
 import { WellKnownAppointmentType } from '../../config'
-import { fake, fakeClass } from '../../util/util.fake'
-import { FeaturedAppointmentType } from './AppointmentWizardViewModel'
-import { fakeAppointmentType } from '../../community-api/community-api.fake'
+import { fake, fakeClass, fakeEnum } from '../../util/util.fake'
+import { AvailableAppointmentTypes, FeaturedAppointmentType } from './AppointmentWizardViewModel'
+import { fakeAppointmentType, fakeOfficeLocation } from '../../community-api/community-api.fake'
 import { fakeConfig } from '../../config/config.fake'
+import { MaybeWellKnownAppointmentType } from './arrange-appointment.types'
 
 export const fakeAppointmentBuilderDto = fakeClass(
   AppointmentBuilderDto,
-  () => {
+  (options, partial) => {
     const date = DateTime.fromJSDate(faker.date.future()).set({ hour: 12 })
     return {
       type: faker.random.arrayElement(Object.values(WellKnownAppointmentType)),
       requiresLocation: AppointmentTypeRequiresLocation.Required,
       typeDescription: faker.company.bs(),
+      availableLocations: partial.availableLocations?.map(fakeOfficeLocation) || [fakeOfficeLocation()],
       location: faker.datatype.uuid(),
       locationDescription: faker.address.streetAddress(),
       date: { day: date.day, month: date.month, year: date.year } as any,
@@ -47,3 +49,13 @@ export const fakeFeaturedAppointmentType = fake<FeaturedAppointmentType>(() => {
     appointmentTypes: [fakeAppointmentType(), fakeAppointmentType()],
   }
 })
+
+export const fakeAvailableAppointmentTypes = fake<AvailableAppointmentTypes>((options, partial = {}) => ({
+  featured: partial.featured?.map(fakeFeaturedAppointmentType) || [fakeFeaturedAppointmentType()],
+  other: partial.other?.map(fakeAppointmentType) || [fakeAppointmentType()],
+}))
+
+export const fakeMaybeWellKnownAppointmentType = fake<MaybeWellKnownAppointmentType>(() => ({
+  ...fakeAppointmentType(),
+  wellKnownType: fakeEnum(WellKnownAppointmentType),
+}))

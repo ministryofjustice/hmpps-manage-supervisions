@@ -3,7 +3,7 @@ import { createStubInstance, match, SinonStubbedInstance } from 'sinon'
 import { CaseController } from './case.controller'
 import { OffenderService } from './offender'
 import { CasePage } from './case.types'
-import { RedirectResponse } from '../common'
+import { RedirectResponse } from '../common/dynamic-routing'
 import { fakeOffenderDetail } from '../community-api/community-api.fake'
 import {
   fakeContactDetailsViewModel,

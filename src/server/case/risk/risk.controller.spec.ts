@@ -7,7 +7,7 @@ import { fakeRegistrationDetails, fakeRiskRegistrations, fakeRisks } from './ris
 import { AssessRisksAndNeedsApiStatus, RemovedRisksListViewModel, RiskDetailsViewModel } from './risk.types'
 import { BreadcrumbType, UtmMedium } from '../../common/links'
 import { DateTime } from 'luxon'
-import { RedirectResponse } from '../../common'
+import { RedirectResponse } from '../../common/dynamic-routing'
 import { CasePage, CaseRiskViewModel } from '../case.types'
 import { EligibilityService } from '../../community-api/eligibility'
 import { MockOffenderModule, OffenderServiceFixture } from '../offender/offender.mock'
