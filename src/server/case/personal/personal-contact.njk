@@ -27,8 +27,8 @@
                     } if personalContact.relationship,
                     {
                         key: { text: "Address" },
-                        value: { html: join(personalContact.address) }
-                    } if personalContact.address,
+                        value: { html: join(personalContact.address).trim() }
+                    } if join(personalContact.address).trim().length,
                     {
                         key: { text: "Phone number" },
                         value: { text: personalContact.phone }
