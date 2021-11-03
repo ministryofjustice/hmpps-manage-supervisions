@@ -7,6 +7,7 @@ export const PERSONAL_CONTACTS: DeepPartial<PersonalContact>[] = [
   {
     relationship: 'Wife',
     startDate: '2019-09-13T00:00:00',
+    endDate: '2200-10-10T00:00:00',
     title: 'Dr',
     firstName: 'Pippa',
     surname: 'Wade',
