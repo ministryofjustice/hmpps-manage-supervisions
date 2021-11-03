@@ -261,15 +261,12 @@ function flattenRisks(
 
     if (risk.current === RiskDtoCurrent.Yes) {
       currentConcerns.push(name)
-      if (result.notes.current && risk.currentConcernsText) result.notes.current += '\n\n' + risk.currentConcernsText
-      else result.notes.current = risk.currentConcernsText
+      result.notes.current = risk.currentConcernsText
     }
 
     if (risk.previous === RiskDtoPrevious.Yes) {
       previousConcerns.push(name)
-      if (result.notes.previous && risk.previousConcernsText)
-        result.notes.previous += '\n\n' + risk.previousConcernsText
-      else result.notes.previous = risk.previousConcernsText
+      result.notes.previous = risk.previousConcernsText
     }
   }
 

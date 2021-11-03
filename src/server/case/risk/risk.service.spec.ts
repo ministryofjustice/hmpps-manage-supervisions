@@ -63,13 +63,13 @@ describe('RiskService', () => {
             previous: RiskDtoAllRisksViewPrevious.No,
             previousConcernsText: null,
             current: RiskDtoAllRisksViewCurrent.Yes,
-            currentConcernsText: 'Some current concerns',
+            currentConcernsText: 'Some ignored current concerns',
           },
           selfHarm: {
             previous: RiskDtoAllRisksViewPrevious.Yes,
             previousConcernsText: null,
             current: RiskDtoAllRisksViewCurrent.Yes,
-            currentConcernsText: 'Some ignored current concerns',
+            currentConcernsText: 'Some current concerns',
           },
           custody: {
             previous: RiskDtoAllRisksViewPrevious.Yes,
@@ -139,7 +139,7 @@ describe('RiskService', () => {
         },
         self: {
           harm: {
-            notes: { current: 'Some current concerns\n\nSome ignored current concerns', previous: null },
+            notes: { current: 'Some current concerns', previous: null },
             value: 'Immediate concerns about suicide and self-harm',
           },
           custody: {
