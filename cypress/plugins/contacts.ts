@@ -196,7 +196,7 @@ export const ACTIVITY_LOG_GROUPS: DeepPartial<ActivityLogGroup>[] = [
         endTime: '11:30:00',
         notes: LONG_CONTACT_NOTES,
         staff: { forenames: 'Unallocated', surname: 'Staff', unallocated: true },
-        outcome: { complied: true, attended: false },
+        outcome: { complied: true, attended: false, description: 'Holiday' },
         sensitive: true,
         rarActivity: null,
       },

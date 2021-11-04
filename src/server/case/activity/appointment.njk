@@ -67,9 +67,14 @@
             rows: [
                 {
                     key: { text: "Complied" },
-                    value: { text: appointment.outcome.complied | yesNo },
+                    value: { text: appointment.outcome.compliedAndAttendedText },
                     actions: { items: [{ href: appointment.links.updateOutcome, text: "Change" }] }
                 },
+                {
+                    key: { text: "Reason for absence" },
+                    value: { text: appointment.outcome.description },
+                    actions: { items: [{ href: appointment.links.updateOutcome, text: "Change" }] }
+                } if appointment.outcome.complied and not appointment.outcome.attended,
                 {
                     key: { text: "Enforcement action" },
                     value: { text: appointment.enforcementAction }

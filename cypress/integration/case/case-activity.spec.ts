@@ -230,6 +230,9 @@ context('Case activity tab', () => {
           notes: EXPECTED_LONG_CONTACT_NOTES,
           notesType: 'closed-detail',
           action: { colour: 'green', name: 'acceptable absence' },
+          summary: {
+            'Reason for absence': 'Holiday',
+          },
         })
 
         .shouldRenderActivity({
@@ -333,6 +336,28 @@ context('Case activity tab', () => {
         })
     })
 
+    it('displays appointment detail with acceptable absence outcome', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('activity')
+        .whenClickingActivityEntry(3)
+
+        .shouldRenderAppointmentPage('Office visit', page => {
+          page.detail(list => {
+            list.value('Type of appointment').contains('Office visit')
+            list.value('Date').contains('3 September 2020')
+            list.value('Time').contains('11am to 11:30am')
+            list.title('RAR activity').should('not.exist')
+          })
+
+          page.outcome(list => {
+            list.value('Complied').contains('Acceptable absence')
+            list.value('Reason for absence').contains('Holiday')
+            list.value('Sensitive').contains('Yes')
+          })
+        })
+    })
+
     it('displays appointment detail with enforcement action', () => {
       fixture
         .whenViewingOffender()
@@ -347,7 +372,7 @@ context('Case activity tab', () => {
           })
 
           page.outcome(list => {
-            list.value('Complied').contains('No')
+            list.value('Complied').contains('Uncceptable absence')
             list.value('Enforcement action').contains('Warning letter requested')
             list.value('Appointment notes').contains(EXPECTED_LONG_CONTACT_NOTES)
             list.value('Sensitive').contains('No')

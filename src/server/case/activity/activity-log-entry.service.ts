@@ -112,6 +112,13 @@ export class ActivityLogEntryService {
                   name: contact.outcome.attended ? 'failed to comply' : 'unacceptable absence',
                   colour: GovUkUiTagColour.Red,
                 },
+            compliedAndAttendedText: contact.outcome.complied
+              ? contact.outcome.attended
+                ? 'Yes'
+                : 'Acceptable absence'
+              : contact.outcome.attended
+              ? 'No'
+              : 'Uncceptable absence',
           }
         : null,
     }

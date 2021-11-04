@@ -42,6 +42,7 @@ export const fakeCaseActivityLogEntry = fake<CaseActivityLogEntry, FakeCaseActiv
             attended: true,
             description: faker.company.bs(),
             tag: { name: faker.company.bs(), colour: GovUkUiTagColour.Red },
+            compliedAndAttendedText: faker.company.bs(),
           },
         }
 
