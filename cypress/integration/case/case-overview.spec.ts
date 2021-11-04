@@ -90,7 +90,8 @@ context('Case overview tab', () => {
             .contains(
               [
                 'Employment: Temporary/casual work (30 or more hours per week)',
-                'Learning Difficulties: Other',
+                'Learning Difficulties: With adjustment',
+                'Other disability: With adjustment',
                 'Speech Impairment: No adjustments',
               ].join(' '),
             )

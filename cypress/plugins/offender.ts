@@ -102,6 +102,19 @@ export const OFFENDER: DeepPartial<OffenderDetail> = {
     sexualOrientation: 'Bisexual',
     disabilities: [
       {
+        disabilityType: { description: 'Other' },
+        startDate: '2021-02-01',
+        notes: null,
+        provisions: [
+          {
+            startDate: '2021-05-10',
+            provisionType: { description: 'Other' },
+            notes: 'Other',
+          },
+        ],
+        lastUpdatedDateTime: '2021-09-01',
+      },
+      {
         disabilityType: { description: 'Learning Difficulties' },
         startDate: '2021-02-01',
         notes: null,
