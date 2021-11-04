@@ -29,7 +29,7 @@ class Fixture extends ViewCaseFixture {
 
   whenClickingViewPersonalContact(name: string) {
     return this.shouldRenderOffenderTab('personal', page => {
-      page.contactDetails(card => card.value('Personal contacts').contains(name).click())
+      page.contactDetails(card => card.value('Contacts').contains(name).click())
     })
   }
 
@@ -206,8 +206,8 @@ context('Case personal details tab', () => {
             })
 
             card.value('Other addresses').contains('1 other current address 1 previous address')
-            card.value('Personal contacts').contains('Next of Kin: Pippa Wade – Wife')
-            card.value('Personal contacts').contains('Family member: Jonathon Bacon – Father')
+            card.value('Contacts').contains('Next of Kin: Pippa Wade – Wife')
+            card.value('Contacts').contains('Family member: Jonathon Bacon – Father')
           })
 
           page.personalDetails(card => {
@@ -347,6 +347,8 @@ context('Case personal details tab', () => {
           page.value(/^\s*Relationship\s*$/).contains('Wife')
           page.value('Address').contains('64 Ermin Street Wrenthorpe West Yorkshire WF2 8WT')
           page.value('Phone number').contains('07700 900 141')
+          page.value('Start date').contains('13 September 2019')
+          page.value('End date').contains('10 October 2200')
           page.value('Notes').contains('Divorced')
         })
         .whenClickingChangeContactDetails('Pippa Wade – Wife')

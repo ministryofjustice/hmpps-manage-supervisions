@@ -1,5 +1,5 @@
 {% extends "partials/layout.njk" %}
-{% set pageTitle = 'Personal contact - ' + personalContact.description %}
+{% set pageTitle = 'Contact - ' + personalContact.description %}
 {% from '_join.njk' import join %}
 
 {% block content %}
@@ -15,7 +15,7 @@
                 rows: [
                     {
                         key: { text: "Name" },
-                        value: { text: personalContact.displayName }
+                        value: { text: personalContact.displayName if personalContact.displayName else 'No name' }
                     },
                     {
                         key: { text: "Relationship type" },
@@ -33,6 +33,14 @@
                         key: { text: "Phone number" },
                         value: { text: personalContact.phone }
                     } if personalContact.phone,
+                    {
+                        key: { text: "Start date" },
+                        value: { text: personalContact.startDate | shortDate }
+                    } if personalContact.startDate,
+                    {
+                        key: { text: "End date" },
+                        value: { text: personalContact.endDate | shortDate }
+                    } if personalContact.endDate,
                     {
                         key: { text: "Notes" },
                         value: { text: personalContact.notes if personalContact.notes else "No notes" }
