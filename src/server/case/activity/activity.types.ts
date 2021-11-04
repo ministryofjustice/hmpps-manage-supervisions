@@ -50,6 +50,7 @@ export interface AppointmentActivityLogEntry
     attended: boolean
     description: string
     tag: ActivityLogEntryTag
+    compliedAndAttendedText: string
   }
 }
 

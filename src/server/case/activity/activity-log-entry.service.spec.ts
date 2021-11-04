@@ -74,6 +74,7 @@ describe('ActivityLogEntryService', () => {
         complied: true,
         description: 'some outcome',
         tag: { colour: 'green', name: 'complied' },
+        compliedAndAttendedText: 'Yes',
       },
       rarActivity: { name: 'Some RAR type: Some RAR subtype' },
       sensitive: true,

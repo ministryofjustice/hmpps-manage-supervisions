@@ -53,12 +53,13 @@
         actionsHtml: govukTag({ text: entry.outcome.tag.name, classes: entry.outcome.tag.colour | tagClassName + ' govuk-!-margin-left-2' }) if entry.outcome,
         headingLevel: 4
     }) -%}
-        {% if entry.rarActivity or entry.enforcementAction %}
+        {% if entry.rarActivity or entry.enforcementAction or (entry.outcome.complied and not entry.outcome.attended)%}
             {{ govukSummaryList({
                 classes: 'govuk-!-margin-bottom-0',
                 rows: [
                     { key: { html: 'RAR' | abbr + ' activity' }, value: { text: entry.rarActivity.name or 'Yes' } } if entry.rarActivity,
-                    { key: { text: 'Enforcement action' }, value: { text: entry.enforcementAction } } if entry.enforcementAction
+                    { key: { text: 'Enforcement action' }, value: { text: entry.enforcementAction } } if entry.enforcementAction,
+                    { key: { text: 'Reason for absence' }, value: { text: entry.outcome.description } } if entry.outcome.complied and not entry.outcome.attended
                 ]
             }) }}
             <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-1">
