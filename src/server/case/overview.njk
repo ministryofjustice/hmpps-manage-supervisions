@@ -202,7 +202,7 @@
                                 compliance.current.appointments.complied,
                                 compliance.current.appointments.failureToComply,
                                 compliance.current.appointments.acceptableAbsences
-                            ] | filter('value') | map('name') | arrayCoalesce(['No appointments']),
+                            ] | filter('quantity') | map('content') | arrayCoalesce(['No appointments']),
                             { link: links.activity, linkText: 'View all activity' }
                         ) if compliance.current else 'Current compliance details are unavailable.'
                     }

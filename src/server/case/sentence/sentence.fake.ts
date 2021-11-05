@@ -94,11 +94,12 @@ export const fakeConvictionDetails = fake<ConvictionDetails>((options, partial =
 })
 
 function fakeComplianceQuantity(): ComplianceQuantity {
-  const value = faker.datatype.number({ min: 2, max: 10 })
+  const quantity = faker.datatype.number({ min: 2, max: 10 })
   return {
-    name: `${value} ${faker.commerce.product()}s`,
-    value,
+    content: `${quantity} ${faker.commerce.product()}s`,
+    quantity,
     link: faker.internet.url(),
+    linkContent: `${quantity} ${faker.commerce.product()}s`,
   }
 }
 

@@ -4,9 +4,9 @@
 
 {% macro maybeLink(value) %}
     {% if value.link %}
-        <a href='{{ value.link }}'>{{ value.name }}</a>
+        <a href='{{ value.link }}'>{{ value.linkContent | safe }}</a>
     {% else %}
-        {{ value.name }}
+        {{ value.content | safe }}
     {% endif %}
 {% endmacro %}
 
