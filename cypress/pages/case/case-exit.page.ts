@@ -12,19 +12,19 @@ export class CaseExitPage extends PageBase {
   get delius() {
     return {
       get contactLog() {
-        return cy.get('a[data-qa="offender/to-delius/contact-log"]')
+        return cy.get('a[data-qa="to-delius/contact-log"]')
       },
 
       get contactLogTitle() {
-        return cy.get('[data-qa="offender/to-delius/contact-log-title"]')
+        return cy.get('[data-qa="to-delius/contact-log-title"]')
       },
 
       get homepage() {
-        return cy.get('a[data-qa="offender/to-delius/homepage"]')
+        return cy.get('a[data-qa="to-delius/homepage"]')
       },
 
       get homepageExplanation() {
-        return cy.get('[data-qa="offender/to-delius/homepage-explanation"]')
+        return cy.get('[data-qa="to-delius/homepage-explanation"]')
       },
     }
   }

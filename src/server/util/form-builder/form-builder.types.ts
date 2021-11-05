@@ -5,6 +5,7 @@ import { SecurityContext } from '../../security'
 export enum StepType {
   Update,
   Confirmation,
+  Complete,
 }
 
 export type StepFn<Dto, Step extends string> = (model: Dto) => Step
@@ -20,6 +21,7 @@ export interface WizardSession<Dto, Step extends string> {
   crn?: string
   dto?: FlatDeepPartial<Dto>
   completedSteps?: Step[]
+  isComplete?: boolean
 }
 
 export type ViewModelFactory<Dto, Step extends string, ViewModel> = {

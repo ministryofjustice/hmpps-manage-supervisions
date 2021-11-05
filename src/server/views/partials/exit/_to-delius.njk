@@ -1,0 +1,35 @@
+{% from './_exit.njk' import offenderExitSummary %}
+
+{# model: ToDeliusViewModel #}
+{% macro toDeliusContactLog(model) %}
+    <h2 class="govuk-heading-m" data-qa='to-delius/contact-log-title'>
+        Go directly to {{ model.offender.shortName }} on Delius
+    </h2>
+
+    <p>
+        <a href="{{ model.links.deliusContactLog }}" target='_blank' data-qa='to-delius/contact-log'>
+            Open {{ model.offender.shortName }}’s contact log on Delius
+        </a>
+        <br>
+        <span class="govuk-!-font-size-16">Link opens in a new window</span>
+    </p>
+{% endmacro %}
+
+{# model: ToDeliusViewModel #}
+{% macro toDeliusHomepage(model) %}
+    <h2 class="govuk-heading-m">Go to the Delius homepage</h2>
+
+    <p data-qa='to-delius/homepage-explanation'>
+        Or you can use the following information to find {{ model.offender.shortName }} on Delius:
+    </p>
+
+    {{ offenderExitSummary(model.offender) }}
+
+    <p>
+        <a href="{{ model.links.deliusHomePage }}" target='_blank' data-qa='to-delius/homepage'>
+            Open the Delius homepage
+        </a>
+        <br>
+        <span class="govuk-!-font-size-16">Link opens in a new window</span>
+    </p>
+{% endmacro %}

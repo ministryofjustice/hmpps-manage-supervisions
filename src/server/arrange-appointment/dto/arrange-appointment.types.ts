@@ -5,6 +5,7 @@ export type MaybeWellKnownAppointmentType = AppointmentType & { wellKnownType?: 
 
 export enum AppointmentBookingUnavailableReason {
   NewLocationRequired = 'new-location-required',
+  CountsTowardsRar = 'counts-towards-rar',
 }
 
 export interface AlternateLocation {
@@ -24,6 +25,7 @@ export const NO_LOCATION: AlternateLocation = Object.freeze({
 
 export enum AppointmentWizardStep {
   Type = 'type',
+  Rar = 'rar',
   Where = 'where',
   When = 'when',
   Sensitive = 'sensitive',

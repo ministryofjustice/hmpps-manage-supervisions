@@ -1,7 +1,7 @@
 import { AppointmentFormBuilderService } from './appointment-form-builder.service'
 import { AppointmentWizardSession } from './dto/AppointmentWizardSession'
 import { RedirectResponse } from '../common/dynamic-routing'
-import { HttpStatus } from '@nestjs/common'
+import { HttpStatus, NotFoundException } from '@nestjs/common'
 import { AppointmentTypeRequiresLocation } from '../community-api/client'
 import { fakeOfficeLocation } from '../community-api/community-api.fake'
 import { Test } from '@nestjs/testing'
@@ -11,7 +11,7 @@ import { AppointmentBookingUnavailableReason, AppointmentWizardStep } from './dt
 describe('AppointmentFormBuilderService', () => {
   let subject: AppointmentFormBuilderService
   const FIRST_STEP = AppointmentWizardStep.Type
-  const SECOND_STEP = AppointmentWizardStep.Where
+  const SECOND_STEP = AppointmentWizardStep.Rar
   const LAST_STEP = AppointmentWizardStep.Confirm
 
   beforeAll(async () => {
@@ -28,6 +28,7 @@ describe('AppointmentFormBuilderService', () => {
       crn: 'some-crn',
       completedSteps,
       dto: {
+        isRar: false,
         requiresLocation: AppointmentTypeRequiresLocation.Required,
         availableLocations: [fakeOfficeLocation(), fakeOfficeLocation()],
       },
@@ -40,26 +41,34 @@ describe('AppointmentFormBuilderService', () => {
     expect(observed.statusCode).toBe(HttpStatus.FOUND)
   }
 
-  function shouldResetSession(session: AppointmentWizardSession) {
+  function shouldRedirectToReset(observed: RedirectResponse) {
+    expect(observed).toBeInstanceOf(RedirectResponse)
+    expect(observed.url).toBe(`/NewAppointment?crn=some-crn`)
+    expect(observed.statusCode).toBe(HttpStatus.FOUND)
+  }
+
+  it('resets to first step', () => {
+    const session = {}
+    const observed = subject.resetToFirstStep(session, 'some-crn')
     expect(session).toEqual({
       crn: 'some-crn',
       dto: {},
       completedSteps: [],
+      isComplete: false,
     } as AppointmentWizardSession)
-  }
+    shouldRedirectToStep(observed, FIRST_STEP)
+  })
 
   it('resets on first step when session is bad', () => {
     const session = {}
     const observed = subject.assertStep(session, FIRST_STEP, 'some-crn', 'get')
-    expect(observed).toBeNull()
-    shouldResetSession(session)
+    shouldRedirectToReset(observed)
   })
 
-  it('resets back to first step when session is bad', () => {
+  it('resets on any other step when session is bad', () => {
     const session = {}
     const observed = subject.assertStep(session, SECOND_STEP, 'some-crn', 'get')
-    shouldRedirectToStep(observed, FIRST_STEP)
-    shouldResetSession(session)
+    shouldRedirectToReset(observed)
   })
 
   it('asserting first step', () => {
@@ -73,6 +82,17 @@ describe('AppointmentFormBuilderService', () => {
     const session = fakeSession(...completedSteps)
     const observed = subject.assertStep(session, LAST_STEP, 'some-crn', 'get')
     expect(observed).toBeNull()
+  })
+
+  it('asserting step when update not supported', () => {
+    const session = fakeSession()
+    expect(() => subject.assertStep(session, LAST_STEP, 'some-crn', 'post')).toThrow(NotFoundException)
+  })
+
+  it('asserting second step when first step not completed', () => {
+    const session = fakeSession()
+    const observed = subject.assertStep(session, SECOND_STEP, 'some-crn', 'get')
+    shouldRedirectToStep(observed, FIRST_STEP)
   })
 
   it('asserting last step when first step not completed', () => {
@@ -95,14 +115,14 @@ describe('AppointmentFormBuilderService', () => {
 
   it('next step when location required', () => {
     const session = fakeSession()
-    const observed = subject.nextStep(session, AppointmentWizardStep.Type)
+    const observed = subject.nextStep(session, AppointmentWizardStep.Rar)
     shouldRedirectToStep(observed, AppointmentWizardStep.Where)
   })
 
   it('next step when location optional and locations available', () => {
     const session = fakeSession()
     session.dto.requiresLocation = AppointmentTypeRequiresLocation.Optional
-    const observed = subject.nextStep(session, AppointmentWizardStep.Type)
+    const observed = subject.nextStep(session, AppointmentWizardStep.Rar)
     shouldRedirectToStep(observed, AppointmentWizardStep.Where)
   })
 
@@ -110,21 +130,28 @@ describe('AppointmentFormBuilderService', () => {
     const session = fakeSession()
     session.dto.requiresLocation = AppointmentTypeRequiresLocation.Optional
     session.dto.availableLocations = []
-    const observed = subject.nextStep(session, AppointmentWizardStep.Type)
+    const observed = subject.nextStep(session, AppointmentWizardStep.Rar)
     shouldRedirectToStep(observed, AppointmentWizardStep.When)
   })
 
   it('next step when location not required', () => {
     const session = fakeSession()
     session.dto.requiresLocation = AppointmentTypeRequiresLocation.NotRequired
-    const observed = subject.nextStep(session, AppointmentWizardStep.Type)
+    const observed = subject.nextStep(session, AppointmentWizardStep.Rar)
     shouldRedirectToStep(observed, AppointmentWizardStep.When)
   })
 
-  it('redirects to unavailable when reason given', () => {
+  it('redirects to location unavailable when reason given', () => {
     const session = fakeSession()
     session.dto.unavailableReason = AppointmentBookingUnavailableReason.NewLocationRequired
     const observed = subject.nextStep(session, AppointmentWizardStep.Where)
+    shouldRedirectToStep(observed, AppointmentWizardStep.Unavailable)
+  })
+
+  it('redirects to rar unavailable when reason given', () => {
+    const session = fakeSession()
+    session.dto.unavailableReason = AppointmentBookingUnavailableReason.CountsTowardsRar
+    const observed = subject.nextStep(session, AppointmentWizardStep.Rar)
     shouldRedirectToStep(observed, AppointmentWizardStep.Unavailable)
   })
 

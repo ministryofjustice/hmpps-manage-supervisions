@@ -4,13 +4,14 @@ import { SentenceService } from '../sentence'
 import { ConfigService } from '@nestjs/config'
 import { Config, DeliusConfig, OASysConfig } from '../../config'
 import { Breadcrumb, BreadcrumbType, LinksService, Utm } from '../../common/links'
-import { DeliusExitViewModel, ExitViewModel, OASysExitViewModel } from './exit.types'
+import { DeliusExitViewModel, OASysExitViewModel } from './exit.types'
 import { getDisplayName, urlJoin } from '../../util'
 import { DateTime } from 'luxon'
 import { OffenderDetail } from '../../community-api/client'
-import { UtmTags } from '../../common'
+import { UtmTags, ViewModel } from '../../common'
 import { URL } from 'url'
 import { RedirectResponse } from '../../common/dynamic-routing'
+import { OffenderExitViewModel } from '../../views/partials/exit/exit.types'
 
 @Controller('case/:crn(\\w+)')
 export class ExitController {
@@ -23,15 +24,20 @@ export class ExitController {
     private readonly links: LinksService,
   ) {}
 
-  @Get('to-delius-now')
+  @Get('to-delius-contact-log-now')
   @Redirect()
-  @Breadcrumb({
-    type: BreadcrumbType.ExitToDeliusNow,
-    requiresUtm: true,
-  })
-  async getDeliusExitNow(@Param('crn') crn: string, @UtmTags() utm: Utm): Promise<RedirectResponse> {
+  @Breadcrumb({ type: BreadcrumbType.ExitToDeliusContactLogNow, requiresUtm: true })
+  async toDeliusContactLogNow(@Param('crn') crn: string, @UtmTags() utm: Utm): Promise<RedirectResponse> {
     const result = await this.getDeliusExit(crn, utm)
     return RedirectResponse.found(result.links.deliusContactLog)
+  }
+
+  @Get('to-delius-homepage-now')
+  @Redirect()
+  @Breadcrumb({ type: BreadcrumbType.ExitToDeliusHomepageNow, requiresUtm: true })
+  async toDeliusHomepageNow(@Param('crn') crn: string, @UtmTags() utm: Utm): Promise<RedirectResponse> {
+    const result = await this.getDeliusExit(crn, utm)
+    return RedirectResponse.found(result.links.deliusHomePage)
   }
 
   @Get('to-delius')
@@ -89,7 +95,10 @@ export class ExitController {
     }
   }
 
-  private getBase(offender: OffenderDetail, breadcrumb: BreadcrumbType): ExitViewModel {
+  private getBase(
+    offender: OffenderDetail,
+    breadcrumb: BreadcrumbType,
+  ): { offender: OffenderExitViewModel } & ViewModel {
     const displayName = getDisplayName(offender)
     return {
       breadcrumbs: this.links.resolveAll(breadcrumb, { crn: offender.otherIds.crn, offenderName: displayName }),

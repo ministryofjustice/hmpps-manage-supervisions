@@ -178,6 +178,17 @@ describe('AppointmentBuilderDto validation & mapping', () => {
         .run())
   })
 
+  describe('rar group', () => {
+    it('is valid', async () =>
+      Given.dto({ isRar: false }).whenValidating(AppointmentWizardStep.Rar).shouldBeValid().run())
+
+    it('is invalid when not provided', async () =>
+      Given.dto({ isRar: null })
+        .whenValidating(AppointmentWizardStep.Rar)
+        .shouldTriggerConstraints('isRar', IS_BOOLEAN)
+        .run())
+  })
+
   describe('where group', () => {
     it('is required & provided', async () =>
       Given.dto({ requiresLocation: AppointmentTypeRequiresLocation.Required, location: 'code' })

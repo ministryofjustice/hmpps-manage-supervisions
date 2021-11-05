@@ -83,6 +83,14 @@ export class SessionBuilderService implements SessionBuilder<AppointmentBuilderD
     return []
   }
 
+  rar(session: AppointmentWizardSession): ValidationError[] {
+    session.dto.unavailableReason = null
+    if (session.dto.isRar === true) {
+      session.dto.unavailableReason = AppointmentBookingUnavailableReason.CountsTowardsRar
+    }
+    return []
+  }
+
   where(session: AppointmentWizardSession): ValidationError[] {
     session.dto.unavailableReason = null
     const location =

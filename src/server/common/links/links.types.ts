@@ -23,7 +23,8 @@ export enum BreadcrumbType {
   RiskDetails,
   RemovedRiskDetails,
   ExitToDelius,
-  ExitToDeliusNow,
+  ExitToDeliusContactLogNow,
+  ExitToDeliusHomepageNow,
   ExitToOASys,
 }
 

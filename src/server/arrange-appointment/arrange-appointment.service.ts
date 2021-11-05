@@ -57,8 +57,7 @@ export class ArrangeAppointmentService {
       throw new Error('appointment type is not set')
     }
 
-    const isAlternateLocation = builder.alternateLocations.some(x => x.code === builder.location)
-
+    const isAlternateLocation = builder.alternateLocations?.some(x => x.code === builder.location) || false
     const appointmentCreateRequest: AppointmentCreateRequest = {
       providerCode: builder.providerCode,
       requirementId: builder.requirementId,

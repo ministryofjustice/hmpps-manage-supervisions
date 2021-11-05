@@ -40,6 +40,26 @@ export class ArrangeAppointmentPage extends PageBase {
     }
   }
 
+  get rar() {
+    return {
+      get yes() {
+        return cy.get('#isRar-yes')
+      },
+
+      get no() {
+        return cy.get('#isRar-no')
+      },
+
+      get errorMessages() {
+        return {
+          get isRar() {
+            return cy.get('#isRar-error')
+          },
+        }
+      },
+    }
+  }
+
   get where() {
     return {
       radio(name: string) {

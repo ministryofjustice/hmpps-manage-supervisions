@@ -8,6 +8,7 @@ import {
   AppointmentBookingUnavailableReason,
   AppointmentWizardStep,
 } from './arrange-appointment.types'
+import { ToDeliusViewModel } from '../../views/partials/exit/exit.types'
 
 interface AppointmentWizardViewModelBase<Step extends AppointmentWizardStep> extends ViewModel {
   step: Step
@@ -42,6 +43,10 @@ export interface AppointmentTypeViewModel extends AppointmentWizardViewModelBase
   types: AvailableAppointmentTypes
   type: string | null
   otherType: string | null
+}
+
+export interface AppointmentRarViewModel extends AppointmentWizardViewModelBase<AppointmentWizardStep.Rar> {
+  isRar?: boolean
 }
 
 export interface AppointmentLocationViewModel extends AppointmentWizardViewModelBase<AppointmentWizardStep.Where> {
@@ -90,18 +95,14 @@ export interface ConfirmAppointmentViewModel extends AppointmentWizardViewModelB
 }
 
 export interface UnavailableAppointmentViewModel
-  extends AppointmentWizardViewModelBase<AppointmentWizardStep.Unavailable> {
+  extends AppointmentWizardViewModelBase<AppointmentWizardStep.Unavailable>,
+    ToDeliusViewModel {
   reason: AppointmentBookingUnavailableReason
-  offender: {
-    displayName: string
-  }
-  links: {
-    exit: string
-  }
 }
 
 export type AppointmentWizardViewModel =
   | AppointmentTypeViewModel
+  | AppointmentRarViewModel
   | AppointmentLocationViewModel
   | AppointmentSchedulingViewModel
   | AppointmentAddNotesViewModel

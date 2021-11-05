@@ -26,6 +26,7 @@ export const fakeAppointmentBuilderDto = fakeClass(
       typeDescription: faker.company.bs(),
       availableLocations: partial.availableLocations?.map(fakeOfficeLocation) || [fakeOfficeLocation()],
       alternateLocations: [UNAVAILABLE_LOCATION, NO_LOCATION],
+      isRar: faker.datatype.boolean(),
       unavailableReason: fakeEnum(AppointmentBookingUnavailableReason),
       location: faker.datatype.uuid(),
       locationDescription: faker.address.streetAddress(),

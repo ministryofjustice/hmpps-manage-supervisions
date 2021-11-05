@@ -1,31 +1,47 @@
 {% extends "pages/wizard-page.njk" %}
-{% set title = 'Arrange an appointment in another location' %}
+
+{% from 'partials/exit/_to-delius.njk' import toDeliusContactLog, toDeliusHomepage %}
+
+{% switch(reason) %}
+{% case 'new-location-required' %}
+    {% set title = 'Arrange an appointment in another location' %}
+    {% set page %}
+        <h1 class="govuk-heading-xl">{{ title }}</h1>
+
+        <p>At the moment you can only arrange appointments from a list of locations associated with the offender manager’s team.</p>
+        <p>You need to use National Delius to arrange an appointment in another location.</p>
+
+        {{ toDeliusContactLog({ offender: offender, links: links }) }}
+
+        <h2 class="govuk-heading-l">Tell us about the location you’re looking for</h2>
+
+        <p>Help us improve the service by telling us:</p>
+
+        <ul class="govuk-list govuk-list--bullet">
+            <li>which location you are looking for</li>
+            <li>why you cannot find that location</li>
+        </ul>
+    {% endset %}
+    {% set displaySupportEmail = true %}
+
+{% case 'counts-towards-rar' %}
+    {% set title = 'You need to arrange this appointment on National Delius' %}
+    {% set page %}
+        <h1 class="govuk-heading-xl">{{ title }}</h1>
+
+        <p>Arranging an appointment with a RAR activity is not yet available in the Manage supervisions pilot.</p>
+
+        {{ toDeliusContactLog({ offender: offender, links: links }) }}
+        {{ toDeliusHomepage({ offender: offender, links: links }) }}
+    {% endset %}
+{% endswitch %}
 
 {% block page %}
-    <h1 class="govuk-heading-xl">{{ title }}</h1>
-
-    <p>At the moment you can only arrange appointments from a list of locations associated with the offender manager’s team.</p>
-
-    <p>You need to use National Delius to arrange an appointment in another location.</p>
-
-    <h2 class="govuk-heading-m">Go directly to {{ offender.displayName }} on Delius</h2>
-
-    <p>
-        <a href="{{ links.exit }}" target='_blank'>Open {{ offender.displayName }}’s contact log on Delius</a><br>
-        <span class="govuk-!-font-size-16">Link opens in a new window</span>
-    </p>
-
-    <h2 class="govuk-heading-l">Tell us about the location you’re looking for</h2>
-
-    <p>Help us improve the service by telling us:</p>
-
-    <ul class="govuk-list govuk-list--bullet">
-        <li>which location you are looking for</li>
-        <li>why you cannot find that location</li>
-    </ul>
-
-    <p>
-        Contact us by email:<br>
-        {{ appEmail(supportEmail) }}
-    </p>
+    {{ page | safe }}
+    {% if displaySupportEmail %}
+        <p>
+            Contact us by email:<br>
+            {{ appEmail(supportEmail) }}
+        </p>
+    {% endif %}
 {% endblock %}
