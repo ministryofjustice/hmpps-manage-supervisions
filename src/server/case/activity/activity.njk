@@ -59,7 +59,7 @@
                 rows: [
                     { key: { html: 'RAR' | abbr + ' activity' }, value: { text: entry.rarActivity.name or 'Yes' } } if entry.rarActivity,
                     { key: { text: 'Enforcement action' }, value: { text: entry.enforcementAction } } if entry.enforcementAction,
-                    { key: { text: 'Reason for absence' }, value: { text: entry.outcome.description } } if entry.outcome.complied and not entry.outcome.attended
+                    { key: { text: 'Reason for absence' }, value: { text: entry.outcome.description | replace("Acceptable Absence - ", "") } } if entry.outcome.complied and not entry.outcome.attended
                 ]
             }) }}
             <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-1">
