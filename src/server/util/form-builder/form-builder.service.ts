@@ -12,11 +12,17 @@ export abstract class FormBuilderService<Dto, Step extends string> {
     private readonly StepEnum: any, // TODO
     private readonly meta: StepMeta<Dto, Step>,
     private readonly links: LinksService,
+    private readonly resetBreadcrumb: BreadcrumbType,
     private readonly stepBreadcrumb: BreadcrumbType,
   ) {}
 
-  reset(session: WizardSession<Dto, Step>, crn: string): RedirectResponse {
-    return this.resetToStep(session, crn)
+  resetToFirstStep(session: WizardSession<Dto, Step>, crn: string): RedirectResponse {
+    session.crn = crn
+    session.dto = {}
+    session.completedSteps = []
+    session.isComplete = false
+    const steps = this.getSteps(session)
+    return this.toStep(session, steps[0])
   }
 
   assertStep(
@@ -26,23 +32,39 @@ export abstract class FormBuilderService<Dto, Step extends string> {
     method: 'get' | 'post',
   ): RedirectResponse | null {
     if (!session.dto || !session.completedSteps || !session.crn) {
-      return this.resetToStep(session, crn, { currentStep: step })
+      return this.toReset(crn)
     }
 
     const stepMeta = this.meta[step]
-    if (method === 'post' && stepMeta.type === StepType.Confirmation) {
+    if (method === 'post' && stepMeta.type !== StepType.Update) {
       throw new NotFoundException(`the ${step} is confirmation only & cannot be submitted`)
     }
 
     const steps = this.getSteps(session)
-    const [firstStep, lastStep] = [steps[0], ...steps.slice(-1)]
+    const firstStep = steps[0]
     const completedSteps = session?.completedSteps || []
+    const lastCompletedStep = completedSteps.length > 0 ? completedSteps[completedSteps.length - 1] : null
 
     // if the session is for a different offender
     // OR
     // the last step was completed & we're not also asserting the last step then assume a fresh wizard is required
-    if (!session.dto || crn !== session.crn || (completedSteps.includes(lastStep) && step !== lastStep)) {
-      return this.resetToStep(session, crn, { currentStep: step, toStep: firstStep })
+    if (!session.dto || crn !== session.crn || (session.isComplete && stepMeta.type !== StepType.Complete)) {
+      return this.toReset(crn)
+    }
+
+    // if the current step isn't in the current run of steps then redirect back to the current step
+    if (!steps.includes(step)) {
+      if (!lastCompletedStep) {
+        return this.toStep(session, firstStep)
+      }
+      const lastCompletedStepIndex = steps.indexOf(lastCompletedStep)
+      if (lastCompletedStepIndex === steps.length - 1) {
+        return this.toStep(session, steps[steps.length - 1])
+      }
+      if (lastCompletedStepIndex < 0) {
+        return this.toReset(crn)
+      }
+      return this.toStep(session, steps[lastCompletedStepIndex + 1])
     }
 
     // assert all previous steps completed
@@ -52,8 +74,8 @@ export abstract class FormBuilderService<Dto, Step extends string> {
       return this.toStep(session, missingSteps[0])
     }
 
-    // if we are asserting a confirmation step then we should mark it as complete
-    if (stepMeta.type === StepType.Confirmation) {
+    // if we are asserting a non update step then we should mark it as complete
+    if (stepMeta.type !== StepType.Update) {
       this.recordStep(session, step)
     }
 
@@ -82,20 +104,8 @@ export abstract class FormBuilderService<Dto, Step extends string> {
     return this.links.getUrl(this.stepBreadcrumb, { crn, step })
   }
 
-  private resetToStep(
-    session: WizardSession<Dto, Step>,
-    crn: string,
-    { currentStep, toStep }: { currentStep?: Step; toStep?: Step } = {},
-  ) {
-    session.crn = crn
-    session.dto = {}
-    session.completedSteps = []
-    if (!toStep) {
-      // if toStep not provided then reset to first step
-      const [firstStep] = this.getSteps(session)
-      toStep = firstStep
-    }
-    return !currentStep || currentStep !== toStep ? this.toStep(session, toStep) : null
+  private toReset(crn: string): RedirectResponse {
+    return RedirectResponse.found(this.links.getUrl(this.resetBreadcrumb, { crn }))
   }
 
   private recordStep(session: WizardSession<Dto, Step>, step: Step) {
@@ -105,6 +115,11 @@ export abstract class FormBuilderService<Dto, Step extends string> {
       }
     } else {
       session.completedSteps = [step]
+    }
+
+    const meta = this.meta[step]
+    if (meta.type === StepType.Complete) {
+      session.isComplete = true
     }
   }
 
@@ -127,7 +142,9 @@ export abstract class FormBuilderService<Dto, Step extends string> {
       const stepMeta = this.meta[current]
       next = typeof stepMeta.next === 'function' ? stepMeta.next(dto) : stepMeta.next
 
-      result.push(next)
+      if (next) {
+        result.push(next)
+      }
     } while (next)
 
     return result

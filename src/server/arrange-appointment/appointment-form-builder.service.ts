@@ -3,12 +3,20 @@ import { AppointmentBuilderDto } from './dto/AppointmentBuilderDto'
 import { AppointmentTypeRequiresLocation } from '../community-api/client'
 import { FormBuilderService, StepMeta, StepType } from '../util/form-builder'
 import { BreadcrumbType, LinksService } from '../common/links'
-import { AppointmentWizardStep } from './dto/arrange-appointment.types'
+import { AppointmentBookingUnavailableReason, AppointmentWizardStep } from './dto/arrange-appointment.types'
 
 const meta: StepMeta<AppointmentBuilderDto, AppointmentWizardStep> = {
   [AppointmentWizardStep.Type]: {
     type: StepType.Update,
+    next: AppointmentWizardStep.Rar,
+  },
+  [AppointmentWizardStep.Rar]: {
+    type: StepType.Update,
     next(model) {
+      if (model.unavailableReason === AppointmentBookingUnavailableReason.CountsTowardsRar) {
+        return AppointmentWizardStep.Unavailable
+      }
+
       switch (model.requiresLocation) {
         case AppointmentTypeRequiresLocation.Optional:
         case AppointmentTypeRequiresLocation.Required:
@@ -37,7 +45,7 @@ const meta: StepMeta<AppointmentBuilderDto, AppointmentWizardStep> = {
   [AppointmentWizardStep.Where]: {
     type: StepType.Update,
     next: model => {
-      if (model.unavailableReason) {
+      if (model.unavailableReason === AppointmentBookingUnavailableReason.NewLocationRequired) {
         return AppointmentWizardStep.Unavailable
       }
       return AppointmentWizardStep.When
@@ -66,7 +74,7 @@ const meta: StepMeta<AppointmentBuilderDto, AppointmentWizardStep> = {
     next: AppointmentWizardStep.Confirm,
   },
   [AppointmentWizardStep.Confirm]: {
-    type: StepType.Confirmation,
+    type: StepType.Complete,
     next: null,
   },
   [AppointmentWizardStep.Unavailable]: {
@@ -78,6 +86,13 @@ const meta: StepMeta<AppointmentBuilderDto, AppointmentWizardStep> = {
 @Injectable()
 export class AppointmentFormBuilderService extends FormBuilderService<AppointmentBuilderDto, AppointmentWizardStep> {
   constructor(links: LinksService) {
-    super(AppointmentBuilderDto, AppointmentWizardStep, meta, links, BreadcrumbType.NewAppointmentStep)
+    super(
+      AppointmentBuilderDto,
+      AppointmentWizardStep,
+      meta,
+      links,
+      BreadcrumbType.NewAppointment,
+      BreadcrumbType.NewAppointmentStep,
+    )
   }
 }

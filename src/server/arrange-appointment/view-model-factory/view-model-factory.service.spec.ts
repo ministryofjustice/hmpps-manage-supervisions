@@ -16,6 +16,7 @@ import {
   AppointmentAddNotesViewModel,
   AppointmentLocationViewModel,
   AppointmentNotesViewModel,
+  AppointmentRarViewModel,
   AppointmentSchedulingViewModel,
   AppointmentSensitiveViewModel,
   AppointmentTypeViewModel,
@@ -26,6 +27,7 @@ import {
 import { fakeValidationError } from '../../util/util.fake'
 import { BreadcrumbType, UtmMedium } from '../../common/links'
 import { AppointmentBookingUnavailableReason, AppointmentWizardStep } from '../dto/arrange-appointment.types'
+import { DateTime } from 'luxon'
 
 describe('ViewModelFactoryService', () => {
   let subject: ViewModelFactoryService
@@ -37,8 +39,10 @@ describe('ViewModelFactoryService', () => {
     unavailableReason: AppointmentBookingUnavailableReason.NewLocationRequired,
     offender: {
       firstName: 'Liz',
+      middleNames: ['Danger'],
       surname: 'Haggis',
-      otherIds: { crn: 'some-crn' },
+      dateOfBirth: '1999-10-10',
+      otherIds: { crn: 'some-crn', pncNumber: 'some-pnc' },
       contactDetails: {
         phoneNumbers: [{ number: '1-530-861-4048' }],
       },
@@ -104,6 +108,18 @@ describe('ViewModelFactoryService', () => {
       type: 'other',
       otherType: 'some-type',
     } as AppointmentTypeViewModel)
+  })
+
+  it('rar', () => {
+    const body = fakeAppointmentBuilderDto({ isRar: true }, { groups: [AppointmentWizardStep.Rar] })
+    const observed = subject.rar(session, body, errors)
+    expect(observed).toEqual({
+      step: AppointmentWizardStep.Rar,
+      errors,
+      appointment: dto,
+      paths: { back: '/rar/back' },
+      isRar: true,
+    } as AppointmentRarViewModel)
   })
 
   it('when', async () => {
@@ -230,9 +246,25 @@ describe('ViewModelFactoryService', () => {
       appointment: dto,
       paths: { back: '/unavailable/back' },
       reason: AppointmentBookingUnavailableReason.NewLocationRequired,
-      offender: { displayName: 'Liz Haggis' },
+      offender: {
+        ids: {
+          crn: 'SOME-CRN',
+          pnc: 'some-pnc',
+        },
+        displayName: 'Liz Danger Haggis',
+        shortName: 'Liz Haggis',
+        dateOfBirth: DateTime.fromISO('1999-10-10'),
+      },
       links: {
-        exit: links.url(BreadcrumbType.ExitToDeliusNow, {
+        deliusContactLog: links.url(BreadcrumbType.ExitToDeliusContactLogNow, {
+          crn: session.crn,
+          utm: {
+            medium: UtmMedium.ArrangeAppointment,
+            campaign: 'unavailable-new-location-required',
+          },
+        }),
+        deliusHomePage: links.url(BreadcrumbType.ExitToDeliusHomepageNow, {
+          crn: session.crn,
           utm: {
             medium: UtmMedium.ArrangeAppointment,
             campaign: 'unavailable-new-location-required',

@@ -1,6 +1,6 @@
 {% extends "partials/layout.njk" %}
 {% set pageTitle = 'Continue on National Delius' %}
-{% from './_exit.njk' import offenderExitSummary %}
+{% from 'partials/exit/_to-delius.njk' import toDeliusContactLog, toDeliusHomepage %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -13,33 +13,8 @@
         <li>view certain information, such as previous orders or NSIs</li>
       </ul>
 
-      <h2 class="govuk-heading-m" data-qa='offender/to-delius/contact-log-title'>
-        Go directly to {{ offender.shortName }} on Delius
-      </h2>
-
-      <p>
-        <a href="{{ links.deliusContactLog }}" target='_blank' data-qa='offender/to-delius/contact-log'>
-          Open {{ offender.shortName }}’s contact log on Delius
-        </a>
-        <br>
-        <span class="govuk-!-font-size-16">Link opens in a new window</span>
-      </p>
-
-      <h2 class="govuk-heading-m">Go to the Delius homepage</h2>
-
-      <p data-qa='offender/to-delius/homepage-explanation'>
-        Or you can use the following information to find {{ offender.shortName }} on Delius:
-      </p>
-
-      {{ offenderExitSummary(offender) }}
-
-      <p>
-        <a href="{{ links.deliusHomePage }}" target='_blank' data-qa='offender/to-delius/homepage'>
-          Open the Delius homepage
-        </a>
-        <br>
-        <span class="govuk-!-font-size-16">Link opens in a new window</span>
-      </p>
+      {{ toDeliusContactLog({ offender: offender, links: links }) }}
+      {{ toDeliusHomepage({ offender: offender, links: links }) }}
     </div>
   </div>
 {% endblock %}

@@ -41,7 +41,11 @@ function serverOptions(options) {
       ...options.plugins,
       new CopyPlugin({
         patterns: [
-          { from: 'src/server/views', to: 'views' },
+          {
+            from: '**/*.(njk|html)',
+            to: 'views',
+            context: path.resolve(__dirname, 'src', 'server', 'views'),
+          },
           {
             from: '**/*.(njk|html)',
             to: 'views',

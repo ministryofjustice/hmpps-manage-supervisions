@@ -1,0 +1,31 @@
+{% extends "pages/wizard-form.njk" %}
+{% set title = "Will this be a RAR toolkit session?" %}
+
+{% block form %}
+    {{ govukRadios({
+        id: "arrange-appointment-rar-radios",
+        name: "isRar",
+        fieldset: {
+            legend: {
+                text: title,
+                classes: "govuk-label--xl",
+                isPageHeading: true
+            }
+        },
+        items: [
+            {
+                id: 'isRar-yes',
+                text: 'Yes, it will count towards RAR',
+                value: 'true',
+                checked: isRar === true
+            },
+            {
+                id: 'isRar-no',
+                text: 'No',
+                value: 'false',
+                checked: isRar === false
+            }
+        ],
+        errorMessage: errors | findErrorMessages("isRar")
+    }) }}
+{% endblock %}

@@ -153,6 +153,24 @@ describe('SessionBuilderService', () => {
     })
   })
 
+  describe('rar', () => {
+    it('does nothing when isRar is false', () => {
+      const session = havingSession({ isRar: false })
+      const observed = subject.rar(session)
+
+      expect(observed).toEqual([])
+      expect(session.dto.unavailableReason).toBeNull()
+    })
+
+    it('sets unavailable when isRar is true', () => {
+      const session = havingSession({ isRar: true })
+      const observed = subject.rar(session)
+
+      expect(observed).toEqual([])
+      expect(session.dto.unavailableReason).toEqual(AppointmentBookingUnavailableReason.CountsTowardsRar)
+    })
+  })
+
   describe('where', () => {
     const availableLocations = [fakeOfficeLocation({ code: 'some-location', description: 'some-location-description' })]
     const alternateLocations = [UNAVAILABLE_LOCATION, NO_LOCATION]

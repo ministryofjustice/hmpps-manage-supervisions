@@ -7,6 +7,7 @@ import {
   AppointmentAddNotesViewModel,
   AppointmentLocationViewModel,
   AppointmentNotesViewModel,
+  AppointmentRarViewModel,
   AppointmentSchedulingViewModel,
   AppointmentSensitiveViewModel,
   AppointmentTypeViewModel,
@@ -19,7 +20,7 @@ import { plainToClass } from 'class-transformer'
 import { DEFAULT_GROUP } from '../../util/mapping'
 import { getDisplayName, isActiveDateRange } from '../../util'
 import { DateTime } from 'luxon'
-import { BreadcrumbType, LinksService, UtmMedium } from '../../common/links'
+import { BreadcrumbType, LinksService, Utm, UtmMedium } from '../../common/links'
 import { ArrangeAppointmentService } from '../arrange-appointment.service'
 import { AppointmentFormBuilderService } from '../appointment-form-builder.service'
 import { ViewModelFactory } from '../../util/form-builder'
@@ -62,6 +63,27 @@ export class ViewModelFactoryService
       types,
       type: body?.type || type,
       otherType: body?.otherType || other,
+    }
+  }
+
+  rar(
+    session: AppointmentWizardSession,
+    body?: DeepPartial<AppointmentBuilderDto>,
+    errors: ValidationError[] = [],
+  ): AppointmentRarViewModel {
+    const appointment = plainToClass(AppointmentBuilderDto, session.dto, {
+      groups: [DEFAULT_GROUP],
+      excludeExtraneousValues: true,
+    })
+
+    return {
+      step: AppointmentWizardStep.Rar,
+      errors,
+      appointment,
+      paths: {
+        back: this.formBuilder.getBackUrl(session, AppointmentWizardStep.Rar),
+      },
+      isRar: body?.isRar ?? session.dto.isRar,
     }
   }
 
@@ -249,6 +271,9 @@ export class ViewModelFactoryService
       excludeExtraneousValues: true,
     })
 
+    const offender = session.dto.offender
+    const displayName = getDisplayName(offender)
+    const utm: Utm = { medium: UtmMedium.ArrangeAppointment, campaign: 'unavailable-' + session.dto.unavailableReason }
     return {
       step: AppointmentWizardStep.Unavailable,
       appointment,
@@ -257,16 +282,17 @@ export class ViewModelFactoryService
       },
       reason: session.dto.unavailableReason,
       offender: {
-        displayName: getDisplayName(session.dto.offender, { middleNames: false }),
+        ids: {
+          crn: offender.otherIds.crn.toUpperCase(),
+          pnc: offender.otherIds.pncNumber,
+        },
+        displayName,
+        shortName: getDisplayName(offender, { middleNames: false }),
+        dateOfBirth: offender.dateOfBirth && DateTime.fromISO(offender.dateOfBirth),
       },
       links: {
-        exit: this.links.getUrl(BreadcrumbType.ExitToDeliusNow, {
-          crn: session.crn,
-          utm: {
-            medium: UtmMedium.ArrangeAppointment,
-            campaign: 'unavailable-' + session.dto.unavailableReason,
-          },
-        }),
+        deliusContactLog: this.links.getUrl(BreadcrumbType.ExitToDeliusContactLogNow, { crn: session.crn, utm }),
+        deliusHomePage: this.links.getUrl(BreadcrumbType.ExitToDeliusHomepageNow, { crn: session.crn, utm }),
       },
     }
   }

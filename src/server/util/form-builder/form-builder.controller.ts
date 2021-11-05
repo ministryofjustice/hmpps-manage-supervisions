@@ -15,7 +15,7 @@ export abstract class FormBuilderController<Dto extends object, Step extends str
   ) {}
 
   protected async init(crn: string, session: WizardSession<Dto, Step>, security: SecurityContext) {
-    const response = this.formBuilder.reset(session, crn)
+    const response = this.formBuilder.resetToFirstStep(session, crn)
     await this.sessionBuilder.init(session, security)
     return response
   }

@@ -1,5 +1,6 @@
 {% from "govuk/components/summary-list/macro.njk"     import govukSummaryList %}
 
+{# offender: OffenderExitViewModel #}
 {% macro offenderExitSummary(offender) %}
     {{ govukSummaryList({
         attributes: { 'data-qa': 'offender/exit/offender-details' },

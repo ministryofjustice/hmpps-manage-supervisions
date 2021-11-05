@@ -51,7 +51,7 @@ export class ArrangeAppointmentController extends FormBuilderController<
   }
 
   @Get(':step([-\\w]+)')
-  @DynamicRouting(DynamicRedirect, DynamicRender('arrange-appointment/views/param:step'))
+  @DynamicRouting(DynamicRedirect(), DynamicRender('arrange-appointment/views/param:step'))
   @Breadcrumb({
     type: BreadcrumbType.NewAppointmentStep,
     parent: BreadcrumbType.Case,
@@ -69,7 +69,7 @@ export class ArrangeAppointmentController extends FormBuilderController<
   }
 
   @Post(':step([-\\w]+)')
-  @DynamicRouting(DynamicRedirect, DynamicRender('arrange-appointment/views/param:step'))
+  @DynamicRouting(DynamicRedirect(), DynamicRender('arrange-appointment/views/param:step'))
   @DynamicRedirect()
   async postStep(
     @Param('crn') crn: string,

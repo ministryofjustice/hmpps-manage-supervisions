@@ -17,6 +17,9 @@ export const MESSAGES = {
   type: {
     required: 'Select an appointment type',
   },
+  isRar: {
+    required: 'Select yes if this appointment will count towards RAR',
+  },
   location: {
     required: 'Select a location',
   },
@@ -131,6 +134,11 @@ export class AppointmentBuilderDto {
 
   @ExposeDefault()
   alternateLocations?: AlternateLocation[]
+
+  @ExposeDefault({ groups: [AppointmentWizardStep.Rar] })
+  @ToBoolean()
+  @ValidationGroup({ message: MESSAGES.isRar.required, groups: [AppointmentWizardStep.Rar] }, IsBoolean)
+  isRar?: boolean
 
   @ExposeDefault({ groups: [AppointmentWizardStep.Where] })
   @ValidateIf(object => object?.requiresLocation !== AppointmentTypeRequiresLocation.NotRequired, {

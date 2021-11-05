@@ -1,26 +1,10 @@
 import { ViewModel } from '../../common'
-import { DateTime } from 'luxon'
+import { OffenderExitViewModel, ToDeliusViewModel } from '../../views/partials/exit/exit.types'
 
-export interface ExitViewModel extends ViewModel {
-  offender: {
-    ids: {
-      crn: string
-      pnc?: string
-    }
-    displayName: string
-    shortName: string
-    dateOfBirth?: DateTime
-  }
-}
+export type DeliusExitViewModel = ToDeliusViewModel & ViewModel
 
-export interface DeliusExitViewModel extends ExitViewModel {
-  links: {
-    deliusContactLog: string
-    deliusHomePage: string
-  }
-}
-
-export interface OASysExitViewModel extends ExitViewModel {
+export interface OASysExitViewModel extends ViewModel {
+  offender: OffenderExitViewModel
   links: {
     oasysHomePage: string
   }

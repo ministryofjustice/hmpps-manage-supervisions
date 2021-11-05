@@ -53,6 +53,11 @@ context('Arrange appointment happy path & validation', () => {
 
     shouldBeAccessible()
 
+    whenSelectingIsRar(false)
+    whenSubmittingCurrentStep()
+
+    shouldBeAccessible()
+
     whenSelectingLocationRadio(test.location.name)
     whenSubmittingCurrentStep()
 
@@ -92,6 +97,9 @@ context('Arrange appointment happy path & validation', () => {
 
     whenSelectingTypeRadio('Other')
     whenSelectingOtherAppointmentType('Alcohol', test)
+    whenSubmittingCurrentStep()
+
+    whenSelectingIsRar(false)
     whenSubmittingCurrentStep()
 
     whenSelectingLocationRadio(test.location.name)
@@ -142,6 +150,9 @@ context('Arrange appointment happy path & validation', () => {
     whenSelectingTypeRadio(test.type.name)
     whenSubmittingCurrentStep()
 
+    whenSelectingIsRar(false)
+    whenSubmittingCurrentStep()
+
     // nothing selected
     whenSubmittingCurrentStep()
     shouldRenderLocationValidationMessages('Select a location')
@@ -155,9 +166,29 @@ context('Arrange appointment happy path & validation', () => {
     whenSelectingTypeRadio('Office visit')
     whenSubmittingCurrentStep()
 
+    whenSelectingIsRar(false)
+    whenSubmittingCurrentStep()
+
     whenSelectingLocationRadio('The location I’m looking for is not in this list')
     whenSubmittingCurrentStep()
     shouldRedirectToLocationUnavailablePage()
+
+    shouldBeAccessible()
+  })
+
+  it('validates rar options and redirects to unavailable when rar selected', () => {
+    cy.arrangeAppointment()
+
+    whenSelectingTypeRadio('Office visit')
+    whenSubmittingCurrentStep()
+
+    whenSubmittingCurrentStep()
+    page.rar.errorMessages.isRar.contains('Select yes if this appointment will count towards RAR')
+
+    whenSelectingIsRar(true)
+    whenSubmittingCurrentStep()
+
+    shouldRedirectToRarUnavailablePage()
 
     shouldBeAccessible()
   })
@@ -171,6 +202,9 @@ context('Arrange appointment happy path & validation', () => {
     cy.arrangeAppointment()
 
     whenSelectingTypeRadio(test.type.name)
+    whenSubmittingCurrentStep()
+
+    whenSelectingIsRar(false)
     whenSubmittingCurrentStep()
 
     offendersCircumstancesAreShown()
@@ -215,6 +249,9 @@ context('Arrange appointment happy path & validation', () => {
     whenSelectingTypeRadio(test.type.name)
     whenSubmittingCurrentStep()
 
+    whenSelectingIsRar(false)
+    whenSubmittingCurrentStep()
+
     whenSelectingLocationRadio(test.location.name)
     whenSubmittingCurrentStep()
 
@@ -252,6 +289,9 @@ context('Arrange appointment happy path & validation', () => {
     whenSelectingTypeRadio(test.type.name)
     whenSubmittingCurrentStep()
 
+    whenSelectingIsRar(false)
+    whenSubmittingCurrentStep()
+
     whenSelectingLocationRadio(test.location.name)
     whenSubmittingCurrentStep()
 
@@ -279,6 +319,15 @@ context('Arrange appointment happy path & validation', () => {
   function whenSelectingTypeRadio(name: string) {
     page.pageTitle.contains('What type of appointment are you arranging?')
     page.type.radio(name).click()
+  }
+
+  function whenSelectingIsRar(value: boolean) {
+    page.pageTitle.contains('Will this be a RAR toolkit session?')
+    if (value) {
+      page.rar.yes.click()
+    } else {
+      page.rar.no.click()
+    }
   }
 
   function whenSelectingOtherAppointmentType(search: string, { type }: AppointmentBookingTestCase) {
@@ -403,6 +452,11 @@ context('Arrange appointment happy path & validation', () => {
   function shouldRedirectToLocationUnavailablePage() {
     page.pageTitle.contains('Arrange an appointment in another location')
     page.documentTitle.contains('Arrange an appointment in another location')
+  }
+
+  function shouldRedirectToRarUnavailablePage() {
+    page.pageTitle.contains('You need to arrange this appointment on National Delius')
+    page.documentTitle.contains('You need to arrange this appointment on National Delius')
   }
 
   function whenEnteringDate(date: DateTime) {
