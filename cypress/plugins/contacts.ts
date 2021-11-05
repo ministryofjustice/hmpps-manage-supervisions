@@ -264,6 +264,24 @@ export const ACTIVITY_LOG_GROUPS: DeepPartial<ActivityLogGroup>[] = [
       },
     ],
   },
+  {
+    date: '2035-10-10',
+    rarDay: false,
+    entries: [
+      {
+        contactId: 13,
+        convictionId: ACTIVE_CONVICTION_ID,
+        type: { code: 'NOT_WELL_KNOWN', description: 'Not a well known appointment', appointment: true },
+        startTime: '11:00:00',
+        endTime: '13:00:00',
+        notes: 'Future appointment with no outcome',
+        staff: { forenames: 'Brian', surname: 'Northgate', unallocated: false },
+        outcome: null,
+        sensitive: false,
+        rarActivity: null,
+      },
+    ],
+  },
 ]
 
 type CommonContactApiQuery = Omit<

@@ -49,7 +49,7 @@
         titleHtml: title,
         classes: 'govuk-!-margin-bottom-2',
         attributes: { 'data-qa': 'offender/activity/' + entry.id },
-        actions: { items: [{ href: entry.links.recordMissingAttendance, text: "Record an outcome" }] } if not entry.outcome,
+        actions: { items: [{ href: entry.links.recordMissingAttendance, text: "Record an outcome" }] } if entry.links.recordMissingAttendance,
         actionsHtml: govukTag({ text: entry.outcome.tag.name, classes: entry.outcome.tag.colour | tagClassName + ' govuk-!-margin-left-2' }) if entry.outcome,
         headingLevel: 4
     }) -%}
