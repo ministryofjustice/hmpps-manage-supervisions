@@ -285,6 +285,17 @@ context('Case activity tab', () => {
         .shouldDisplayExitPage('delius')
     })
 
+    it('does not display record outcome on future appointments', () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('activity')
+        .shouldRenderOffenderTab('activity', page => {
+          page.group('Wednesday 10 October 2035', group => {
+            group.entry(13, card => card.actions.should('not.exist'))
+          })
+        })
+    })
+
     it('displays system contact on activity log with link to delius', () => {
       fixture
         .whenViewingOffender()
