@@ -26,6 +26,8 @@ export enum BreadcrumbType {
   ExitToDeliusContactLogNow,
   ExitToDeliusHomepageNow,
   ExitToOASys,
+  RecordOutcome,
+  RecordOutcomeStep,
 }
 
 export enum UtmSource {

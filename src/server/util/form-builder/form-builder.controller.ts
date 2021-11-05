@@ -1,6 +1,6 @@
 import { ClassConstructor, plainToClass } from 'class-transformer'
 import { validate } from 'class-validator'
-import { SessionBuilder, ViewModelFactory, WizardSession } from './form-builder.types'
+import { ExtraBreadcrumbOptions, SessionBuilder, ViewModelFactory, WizardSession } from './form-builder.types'
 import { SecurityContext } from '../../security'
 import { RedirectResponse } from '../../common/dynamic-routing'
 import { DEFAULT_GROUP } from '../mapping'
@@ -14,8 +14,13 @@ export abstract class FormBuilderController<Dto extends object, Step extends str
     protected readonly sessionBuilder: SessionBuilder<Dto, Step>,
   ) {}
 
-  protected async init(crn: string, session: WizardSession<Dto, Step>, security: SecurityContext) {
-    const response = this.formBuilder.resetToFirstStep(session, crn)
+  protected async init(
+    crn: string,
+    session: WizardSession<Dto, Step>,
+    security: SecurityContext,
+    options: ExtraBreadcrumbOptions = {},
+  ) {
+    const response = this.formBuilder.resetToFirstStep(session, crn, options)
     await this.sessionBuilder.init(session, security)
     return response
   }
@@ -24,8 +29,9 @@ export abstract class FormBuilderController<Dto extends object, Step extends str
     crn: string,
     step: Step,
     session: WizardSession<Dto, Step>,
+    options: ExtraBreadcrumbOptions = {},
   ): Promise<ViewModel | RedirectResponse> {
-    const redirect = this.formBuilder.assertStep(session, step, crn, 'get')
+    const redirect = this.formBuilder.assertStep(session, step, crn, 'get', options)
     if (redirect) {
       return redirect
     }
@@ -38,8 +44,9 @@ export abstract class FormBuilderController<Dto extends object, Step extends str
     step: Step,
     session: WizardSession<Dto, Step>,
     body: Dto,
+    options: ExtraBreadcrumbOptions = {},
   ): Promise<ViewModel | RedirectResponse> {
-    const redirect = this.formBuilder.assertStep(session, step, crn, 'post')
+    const redirect = this.formBuilder.assertStep(session, step, crn, 'post', options)
     if (redirect) {
       return redirect
     }

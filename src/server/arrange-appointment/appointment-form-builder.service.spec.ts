@@ -32,6 +32,8 @@ describe('AppointmentFormBuilderService', () => {
         requiresLocation: AppointmentTypeRequiresLocation.Required,
         availableLocations: [fakeOfficeLocation(), fakeOfficeLocation()],
       },
+      breadcrumbOptions: {},
+      isComplete: false,
     }
   }
 
@@ -55,6 +57,7 @@ describe('AppointmentFormBuilderService', () => {
       dto: {},
       completedSteps: [],
       isComplete: false,
+      breadcrumbOptions: {},
     } as AppointmentWizardSession)
     shouldRedirectToStep(observed, FIRST_STEP)
   })

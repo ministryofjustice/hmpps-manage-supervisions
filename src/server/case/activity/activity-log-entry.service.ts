@@ -9,10 +9,11 @@ import {
   UnknownActivityLogEntry,
 } from './activity.types'
 import { DateTime } from 'luxon'
-import { ContactTypeCategory } from '../../config'
+import { Config, ContactTypeCategory, FeatureFlags, ServerConfig } from '../../config'
 import { BreadcrumbType, LinksService, UtmMedium } from '../../common/links'
 import { GovUkUiTagColour } from '../../util/govuk-ui'
 import { getDisplayName } from '../../util'
+import { ConfigService } from '@nestjs/config'
 
 type CommonActivityLogEntry = Pick<CaseActivityLogEntry, 'id' | 'start' | 'notes' | 'sensitive' | 'isFuture'>
 
@@ -36,7 +37,7 @@ function getDates(value: Contact): { start: DateTime; end: DateTime } {
 
 @Injectable()
 export class ActivityLogEntryService {
-  constructor(private readonly links: LinksService) {}
+  constructor(private readonly links: LinksService, private readonly config: ConfigService<Config>) {}
 
   getAppointmentActivityLogEntry(
     crn: string,
@@ -62,6 +63,7 @@ export class ActivityLogEntryService {
 
     const isFuture = start > DateTime.now()
     const links = this.links.of({ id, crn })
+    const { features } = this.config.get<ServerConfig>('server')
     return {
       id,
       start,
@@ -84,13 +86,15 @@ export class ActivityLogEntryService {
         // user is prompted to record outcome for appointments in the past without an existing outcome
         recordMissingAttendance:
           !contact.outcome && start <= DateTime.now()
-            ? links.url(BreadcrumbType.ExitToDelius, {
-                utm: {
-                  medium: UtmMedium.ActivityLog,
-                  campaign: 'create-appointment-outcome',
-                  content: { contactId: id },
-                },
-              })
+            ? features[FeatureFlags.RecordOutcome]
+              ? links.url(BreadcrumbType.RecordOutcome)
+              : links.url(BreadcrumbType.ExitToDelius, {
+                  utm: {
+                    medium: UtmMedium.ActivityLog,
+                    campaign: 'create-appointment-outcome',
+                    content: { contactId: id },
+                  },
+                })
             : null,
         updateOutcome: links.url(BreadcrumbType.ExitToDelius, {
           utm: { medium: UtmMedium.ActivityLog, campaign: 'update-appointment-outcome', content: { contactId: id } },

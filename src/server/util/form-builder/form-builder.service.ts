@@ -2,9 +2,9 @@ import { NotFoundException } from '@nestjs/common'
 import { ClassConstructor, plainToClass } from 'class-transformer'
 import { RedirectResponse } from '../../common/dynamic-routing'
 import { BreadcrumbType, LinksService } from '../../common/links'
-import { difference } from 'lodash'
+import { difference, isEqual, pick } from 'lodash'
 import { DEFAULT_GROUP } from '../mapping'
-import { StepMeta, StepType, WizardSession } from './form-builder.types'
+import { ExtraBreadcrumbOptions, StepMeta, StepType, WizardSession } from './form-builder.types'
 
 export abstract class FormBuilderService<Dto, Step extends string> {
   protected constructor(
@@ -16,11 +16,16 @@ export abstract class FormBuilderService<Dto, Step extends string> {
     private readonly stepBreadcrumb: BreadcrumbType,
   ) {}
 
-  resetToFirstStep(session: WizardSession<Dto, Step>, crn: string): RedirectResponse {
+  resetToFirstStep(
+    session: WizardSession<Dto, Step>,
+    crn: string,
+    options: ExtraBreadcrumbOptions = {},
+  ): RedirectResponse {
     session.crn = crn
     session.dto = {}
     session.completedSteps = []
     session.isComplete = false
+    session.breadcrumbOptions = options
     const steps = this.getSteps(session)
     return this.toStep(session, steps[0])
   }
@@ -30,9 +35,17 @@ export abstract class FormBuilderService<Dto, Step extends string> {
     step: Step,
     crn: string,
     method: 'get' | 'post',
+    options: ExtraBreadcrumbOptions = {},
   ): RedirectResponse | null {
-    if (!session.dto || !session.completedSteps || !session.crn) {
-      return this.toReset(crn)
+    if (
+      !session.dto ||
+      !session.completedSteps ||
+      !session.crn ||
+      !session.breadcrumbOptions ||
+      !isEqual(options, pick(session.breadcrumbOptions, Object.keys(options))) // only compare provided keys as some may be set elsewhere
+    ) {
+      // either the session has expired, is for a different offender or entity
+      return this.toReset(crn, options)
     }
 
     const stepMeta = this.meta[step]
@@ -49,7 +62,7 @@ export abstract class FormBuilderService<Dto, Step extends string> {
     // OR
     // the last step was completed & we're not also asserting the last step then assume a fresh wizard is required
     if (!session.dto || crn !== session.crn || (session.isComplete && stepMeta.type !== StepType.Complete)) {
-      return this.toReset(crn)
+      return this.toReset(crn, options)
     }
 
     // if the current step isn't in the current run of steps then redirect back to the current step
@@ -62,7 +75,7 @@ export abstract class FormBuilderService<Dto, Step extends string> {
         return this.toStep(session, steps[steps.length - 1])
       }
       if (lastCompletedStepIndex < 0) {
-        return this.toReset(crn)
+        return this.toReset(crn, options)
       }
       return this.toStep(session, steps[lastCompletedStepIndex + 1])
     }
@@ -86,7 +99,7 @@ export abstract class FormBuilderService<Dto, Step extends string> {
     this.recordStep(session, step)
     const steps = this.getSteps(session)
     const nextIndex = (steps.indexOf(step) + 1) % steps.length
-    return this.toStep(session, steps[nextIndex])
+    return this.toStep(session, steps[nextIndex]) // TODO use options nfrom session
   }
 
   getBackUrl(session: WizardSession<Dto, Step>, step: Step): string {
@@ -100,12 +113,12 @@ export abstract class FormBuilderService<Dto, Step extends string> {
     return this.getStepUrl(session, steps[previousIndex])
   }
 
-  getStepUrl({ crn }: WizardSession<Dto, Step>, step: Step) {
-    return this.links.getUrl(this.stepBreadcrumb, { crn, step })
+  getStepUrl(session: WizardSession<Dto, Step>, step: Step) {
+    return this.links.getUrl(this.stepBreadcrumb, { crn: session.crn, step, ...session.breadcrumbOptions })
   }
 
-  private toReset(crn: string): RedirectResponse {
-    return RedirectResponse.found(this.links.getUrl(this.resetBreadcrumb, { crn }))
+  private toReset(crn: string, options: ExtraBreadcrumbOptions): RedirectResponse {
+    return RedirectResponse.found(this.links.getUrl(this.resetBreadcrumb, { crn, ...options }))
   }
 
   private recordStep(session: WizardSession<Dto, Step>, step: Step) {

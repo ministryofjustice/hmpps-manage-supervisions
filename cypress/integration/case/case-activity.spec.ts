@@ -273,7 +273,7 @@ context('Case activity tab', () => {
         .shouldRenderSystemContactWithId(9, 'System generated unknown contact')
     })
 
-    it('displays attendance missing', () => {
+    it('displays record an outcome', () => {
       fixture
         .whenViewingOffender()
         .whenClickingSubNavTab('activity')
@@ -282,7 +282,7 @@ context('Case activity tab', () => {
             group.entry(5, card => card.actionLinks.contains('Record an outcome').click())
           })
         })
-        .shouldDisplayExitPage('delius')
+        .shouldDisplayPageWithTitle('Record an outcome')
     })
 
     it('displays system contact on activity log with link to delius', () => {

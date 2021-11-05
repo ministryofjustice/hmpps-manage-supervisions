@@ -12,6 +12,7 @@ import { LoggerModule } from './logger/logger.module'
 import { CasesModule } from './cases/cases.module'
 import { StaticModule } from './static/static.module'
 import { SentryModule } from '@ntegral/nestjs-sentry'
+import { RecordOutcomeModule } from './record-outcome/record-outcome.module'
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { SentryModule } from '@ntegral/nestjs-sentry'
     ArrangeAppointmentModule,
     CommunityApiModule,
     CaseModule,
+    RecordOutcomeModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: HttpExceptionFilter }],
 })

@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing'
 import { ActivityLogEntryService } from './activity-log-entry.service'
 import { MockLinksModule } from '../../common/links/links.mock'
 import { fakeActivityLogEntry, fakeContactSummary, fakeOffenderDetail } from '../../community-api/community-api.fake'
-import { ContactTypeCategory } from '../../config'
+import { ContactTypeCategory, FeatureFlags } from '../../config'
 import { DateTime } from 'luxon'
 import { BreadcrumbType, UtmMedium } from '../../common/links'
 import {
@@ -12,6 +12,7 @@ import {
   UnknownActivityLogEntry,
 } from './activity.types'
 import { fakeContactMeta } from '../../community-api/contact-mapping/contact-mapping.fake'
+import { FakeConfigModule } from '../../config/config.fake'
 
 describe('ActivityLogEntryService', () => {
   let subject: ActivityLogEntryService
@@ -19,7 +20,10 @@ describe('ActivityLogEntryService', () => {
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [ActivityLogEntryService],
-      imports: [MockLinksModule],
+      imports: [
+        MockLinksModule,
+        FakeConfigModule.register({ server: { features: { [FeatureFlags.RecordOutcome]: false } } }),
+      ],
     }).compile()
 
     subject = module.get(ActivityLogEntryService)

@@ -271,7 +271,9 @@ export const CONTACT_DEFAULTS: WellKnownContactTypeConfig = {
   ],
 }
 
-const FEATURE_DEFAULTS: Record<FeatureFlags, boolean> = {}
+const FEATURE_DEFAULTS: Record<FeatureFlags, boolean> = {
+  [FeatureFlags.RecordOutcome]: true,
+}
 
 export function configFactory(): Config {
   const authUrl = url('HMPPS_AUTH_URL', developmentOnly('http://localhost:9090/auth'))

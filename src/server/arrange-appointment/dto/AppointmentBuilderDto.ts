@@ -184,7 +184,7 @@ export class AppointmentBuilderDto {
   addNotes?: boolean
 
   @ExposeDefault({ groups: [AppointmentWizardStep.Notes] })
-  @Transform(({ value }) => striptags(value))
+  @Transform(({ value }) => (value ? striptags(value) : value))
   notes?: string
 
   @ExposeDefault()

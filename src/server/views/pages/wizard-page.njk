@@ -18,9 +18,8 @@
         {{ govukButton({
           text: buttonText if buttonText else 'Continue',
           href: paths.next,
-          classes: 'govuk-!-margin-top-6',
           attributes: {
-            'data-qa': buttonQa if buttonQa else 'wizard-page/continue'
+            'data-qa': buttonQa if buttonQa else 'wizard/continue'
           }
         }) }}
       {% endif %}
