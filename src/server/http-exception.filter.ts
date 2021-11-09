@@ -34,6 +34,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     this.logger.error('unhandled exception', exception)
     return host.switchToHttp().getResponse<Response>().status(status).render('pages/error', viewModel)
   }
+
   private renderNotFoundPage(exception: Error, host: ArgumentsHost) {
     this.logger.error('unhandled exception', exception)
     return host.switchToHttp().getResponse<Response>().status(HttpStatus.NOT_FOUND).render('pages/not-found')
@@ -67,7 +68,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
         // or result of oauth failure eg invalid callback, user profile does not exist => display unauthorized page
         // => display unauthorized page
         return response.status(status).render('pages/unauthorized')
-
+      case HttpStatus.NOT_FOUND:
+        return this.renderNotFoundPage(exception, host)
       case HttpStatus.MOVED_PERMANENTLY:
       case HttpStatus.FOUND:
       case HttpStatus.SEE_OTHER:
@@ -78,7 +80,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
           return response.redirect(meta.url, status)
         }
         return this.renderErrorPage(new Error('Invalid redirect'), host)
-
       default:
         return this.renderErrorPage(exception, host, status)
     }
