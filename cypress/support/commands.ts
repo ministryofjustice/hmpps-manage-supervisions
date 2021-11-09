@@ -30,6 +30,11 @@ declare global {
       viewCase: typeof viewCase
 
       /**
+       * Navigate to record outcome page & logs in.
+       */
+      recordOutcome: typeof recordOutcome
+
+      /**
        * Checks accessibility of the currently open page using Axe.
        */
       testA11y: typeof testA11y
@@ -64,6 +69,12 @@ function viewCase({ crn = CRN, path = '' }: { crn?: string; path?: string } = {}
   hmppsAuth.login()
 }
 Cypress.Commands.add('viewCase', viewCase)
+
+function recordOutcome({ crn, id }: { crn: string; id: number }) {
+  cy.visit(`/case/${crn}/appointment/${id}/record-outcome`)
+  hmppsAuth.login()
+}
+Cypress.Commands.add('recordOutcome', recordOutcome)
 
 function testA11y() {
   cy.injectAxe()

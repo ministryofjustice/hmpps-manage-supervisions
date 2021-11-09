@@ -2,7 +2,7 @@ import { PageBase } from './page'
 
 export class ArrangeAppointmentPage extends PageBase {
   get continueButton() {
-    return cy.get('button[data-qa="arrange-appointment/continue-button"]')
+    return cy.get('button[data-qa="wizard/continue-button"]')
   }
 
   get backLink() {

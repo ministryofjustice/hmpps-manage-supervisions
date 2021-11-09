@@ -1,0 +1,17 @@
+{% extends "pages/wizard-page.njk" %}
+
+{% set title = 'Record an outcome' %}
+
+{% block page %}
+    <h1 class="govuk-heading-xl">{{ title }}</h1>
+
+    <p class="govuk-body">You’re recording an outcome for:</p>
+
+    {% set appointmentHtml %}
+        <strong>{{ appointment.name }}</strong><br>
+        {{ appointment.start | longDate }} from {{ appointment.start | timeRange(appointment.end) }}<br>
+        <a href="{{ paths.viewAppointment }}">View appointment</a>
+    {% endset %}
+
+    {{ govukInsetText({ html: appointmentHtml, attributes: { 'data-qa': 'record-outcome/appointment-details' } }) }}
+{% endblock %}

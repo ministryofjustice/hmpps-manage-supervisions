@@ -32,10 +32,14 @@ import {
   ActivityLogGroup,
   ActivityLogEntry,
   OffenderManager,
+  AvailableContactOutcomeTypes,
+  AvailableContactOutcomeTypesOutcomeRequired,
+  ContactOutcomeTypeDetail,
+  EnforcementAction,
 } from './client'
 import * as faker from 'faker'
 import { DateTime } from 'luxon'
-import { fake } from '../util/util.fake'
+import { fake, fakeEnum } from '../util/util.fake'
 import { Paginated } from './types'
 import { WellKnownAddressTypes } from './well-known'
 
@@ -55,6 +59,10 @@ export function fakePnc() {
 
 export function fakeIsoDate(type: 'past' | 'recent' | 'soon' | 'future' = 'past'): string {
   return faker.date[type]().toISOString().substr(0, 10)
+}
+
+export function fakeCode() {
+  return (faker.random.alpha() + faker.random.alphaNumeric(3)).toUpperCase()
 }
 
 export const fakeAppointmentType = fake<AppointmentType>(() => ({
@@ -651,3 +659,25 @@ export const fakeStaffCaseloadEntry = fake<StaffCaseloadEntry>(() => {
     preferredName: faker.name.findName(),
   }
 })
+
+export const fakeEnforcementAction = fake<EnforcementAction>(() => ({
+  code: fakeCode(),
+  description: faker.company.bs(),
+  outstandingContactAction: faker.datatype.boolean(),
+  responseByPeriod: faker.random.arrayElement([7, 14, 21, 28]),
+}))
+
+export const fakeContactOutcomeTypeDetail = fake<ContactOutcomeTypeDetail>((options, partial = {}) => ({
+  code: fakeCode(),
+  description: faker.company.bs(),
+  actionRequired: faker.datatype.boolean(),
+  attendance: faker.datatype.boolean(),
+  compliantAcceptable: faker.datatype.boolean(),
+  enforceable: faker.datatype.boolean(),
+  enforcements: partial.enforcements?.map(p => fakeEnforcementAction(p)) || [fakeEnforcementAction()],
+}))
+
+export const fakeAvailableOutcomeTypes = fake<AvailableContactOutcomeTypes>((options, partial = {}) => ({
+  outcomeRequired: fakeEnum(AvailableContactOutcomeTypesOutcomeRequired),
+  outcomeTypes: partial.outcomeTypes?.map(p => fakeContactOutcomeTypeDetail(p)) || [fakeContactOutcomeTypeDetail()],
+}))

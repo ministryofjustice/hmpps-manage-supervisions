@@ -14,14 +14,15 @@
 
   {{ govukPanel({
     titleText: title,
-    html: panelHtml
+    html: panelHtml,
+    classes: 'govuk-!-margin-bottom-6'
   }) }}
 
-  <h2 class="govuk-heading-m govuk-!-margin-top-6">Next steps</h2>
+  <h2 class="govuk-heading-m">Next steps</h2>
   <p class="govuk-body">
     Add this appointment to your calendar.
   </p>
-  <p class="govuk-body">
+  <p class="govuk-body govuk-!-margin-bottom-6">
     Give details of the appointment to {{ offender.firstName }}.<br>
     {% if offender.phoneNumber %}
       <span data-qa="confirm-appointment/phone">{{ offender.firstName }}’s phone number is <strong>{{ offender.phoneNumber }}</strong>.</span>

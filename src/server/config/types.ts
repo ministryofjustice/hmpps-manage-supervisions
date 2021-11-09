@@ -1,6 +1,8 @@
 import { URL } from 'url'
 
-export enum FeatureFlags {}
+export enum FeatureFlags {
+  RecordOutcome = 'record-outcome',
+}
 
 /**
  * These align to a subset of npm log levels that are supported by winston.

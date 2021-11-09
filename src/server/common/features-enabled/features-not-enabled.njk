@@ -1,0 +1,17 @@
+{% extends "partials/layout.njk" %}
+
+{% set pageTitle = 'You cannot perform this action' %}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl">{{ pageTitle }}</h1>
+
+            <p>This feature has not been enabled.</p>
+
+            <p>
+                Contact the {{ applicationName }} support team if you require further assistance: {{ appEmail(supportEmail) }}.
+            </p>
+        </div>
+    </div>
+{% endblock %}

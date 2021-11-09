@@ -1,6 +1,7 @@
 import { ValidationError } from 'class-validator'
 import { DeepPartial, FlatDeepPartial } from '../../app.types'
 import { SecurityContext } from '../../security'
+import { ResolveBreadcrumbOptions } from '../../common/links'
 
 export enum StepType {
   Update,
@@ -22,7 +23,10 @@ export interface WizardSession<Dto, Step extends string> {
   dto?: FlatDeepPartial<Dto>
   completedSteps?: Step[]
   isComplete?: boolean
+  breadcrumbOptions?: ExtraBreadcrumbOptions
 }
+
+export type ExtraBreadcrumbOptions = Omit<ResolveBreadcrumbOptions, 'crn' | 'step' | 'parentOverrides'>
 
 export type ViewModelFactory<Dto, Step extends string, ViewModel> = {
   [S in Step]: (

@@ -1,7 +1,7 @@
 import { ConfigModule } from '@nestjs/config'
 import { DynamicModule, Module } from '@nestjs/common'
 import * as faker from 'faker'
-import { ApiConfig, ClientCredentials, Config, LogLevel } from './types'
+import { ApiConfig, ClientCredentials, Config, FeatureFlags, LogLevel } from './types'
 import { CONTACT_DEFAULTS } from './factory'
 import { requirements } from './requirements'
 import { fake } from '../util/util.fake'
@@ -37,7 +37,7 @@ export const fakeConfig = fake<Config>(() => ({
     deploymentEnvironment: 'local',
     domain: new URL(faker.internet.url()),
     staticResourceCacheDuration: faker.datatype.number({ min: 60, max: 6000 }),
-    features: {},
+    features: Object.values(FeatureFlags).reduce((agg, flag) => ({ [flag]: faker.datatype.boolean() }), {}),
     logLevel: LogLevel.Info,
     sentryDsn: faker.internet.url(),
     supportEmail: faker.internet.email(),
