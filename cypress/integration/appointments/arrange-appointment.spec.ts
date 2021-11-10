@@ -322,7 +322,7 @@ context('Arrange appointment happy path & validation', () => {
   }
 
   function whenSelectingIsRar(value: boolean) {
-    page.pageTitle.contains('Will this be a RAR toolkit session?')
+    page.pageTitle.contains('Will this be a RAR session?')
     if (value) {
       page.rar.yes.click()
     } else {
