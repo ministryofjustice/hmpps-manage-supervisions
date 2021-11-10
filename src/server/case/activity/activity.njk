@@ -31,11 +31,15 @@
     {% endif %}
 {%- endmacro %}
 
-{% macro appointmentCard(entry, open) -%}
+{% macro appointmentCard(entry, open, date) -%}
     {% set title %}
         <span class="govuk-heading-s govuk-!-margin-bottom-0">
-            <a href="{{ entry.links.view }}">{{ entry.name }}</a>
-            <span class="govuk-!-font-weight-regular">at&nbsp;{{ entry.start | time }}</span>
+            <a href="{{ entry.links.view }}">{{ entry.name }}
+                <span class="govuk-!-font-weight-regular">at&nbsp;{{ entry.start | time }}</span>
+                <span class="govuk-visually-hidden">
+                    on {{ date | longDate }}
+                </span>
+            </a>
         </span>
         <span class='govuk-!-font-size-16' data-qa='sub-title'>
             {% if entry.nationalStandard %}
@@ -68,12 +72,17 @@
     {%- endcall %}
 {%- endmacro %}
 
-{% macro plainCard(entry, open, options) -%}
+{% macro plainCard(entry, open, date, options) -%}
     {% set title %}
-        <a href="{{ entry.links.view }}">{{ entry.name }}</a>
-        {% if options.time %}
-            <span class="govuk-!-font-weight-regular">at&nbsp;{{ entry.start | time }}</span>
-        {% endif %}
+        <a href="{{ entry.links.view }}">
+            {{ entry.name }}
+            {% if options.time %}
+                <span class="govuk-!-font-weight-regular">at&nbsp;{{ entry.start | time }}</span>
+            {% endif %}
+            <span class="govuk-visually-hidden">
+                on {{ date | longDate }}
+            </span>
+        </a>
     {% endset %}
     {% call appSummaryCard({
         titleHtml: title,
@@ -133,13 +142,13 @@
                         {% set open = index < 4 %}
                         {% switch entry.type %}
                         {% case 'appointment' %}
-                            {{ appointmentCard(entry, open) }}
+                            {{ appointmentCard(entry, open, group.date) }}
                         {% case 'communication' %}
-                            {{ plainCard(entry, open, { time: true }) }}
+                            {{ plainCard(entry, open, group.date, { time: true }) }}
                         {% case 'system' %}
                             {{ systemContact(entry) }}
                         {% default %}
-                            {{ plainCard(entry, open) }}
+                            {{ plainCard(entry, open, group.date) }}
                         {% endswitch %}
                     {% endfor %}
                 </section>
