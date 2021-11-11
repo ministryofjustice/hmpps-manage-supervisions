@@ -257,7 +257,7 @@ context('Case compliance tab', () => {
       .shouldRenderSentence({ breaches: 'None' })
       .shouldRenderRequirement({
         total: '7 national standard appointments',
-        withoutAnOutcome: '1 without a recorded outcome',
+        withoutAnOutcome: '1 appointment without a recorded outcome',
         complied: '1 complied',
         ftc: '2 unacceptable absences',
         absences: '3 acceptable absences',
@@ -356,7 +356,7 @@ context('Case compliance tab', () => {
       .shouldRenderSentence({ breaches: 'None', breachesLabel: 'Previous breaches' })
       .shouldRenderRequirement({
         total: '7 national standard appointments',
-        withoutAnOutcome: '1 without a recorded outcome',
+        withoutAnOutcome: '1 appointment without a recorded outcome',
         complied: '1 complied',
         ftc: '2 unacceptable absences',
         absences: '3 acceptable absences',
@@ -391,7 +391,7 @@ context('Case compliance tab', () => {
       .shouldRenderSentence({ breaches: 'Breach proven Resolved 3 December 2020' })
       .shouldRenderRequirement({
         total: '7 national standard appointments',
-        withoutAnOutcome: '1 without a recorded outcome',
+        withoutAnOutcome: '1 appointment without a recorded outcome',
         complied: '1 complied',
         ftc: '2 unacceptable absences',
         absences: '3 acceptable absences',

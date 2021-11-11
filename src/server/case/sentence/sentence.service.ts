@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { Conviction, Sentence } from '../../community-api/client'
 import { maxBy } from 'lodash'
 import { DateTime } from 'luxon'
-import { getElapsed, quantity, QuantityOptions, urlJoin } from '../../util'
+import { getElapsed, quantity, urlJoin } from '../../util'
 import {
   ComplianceDetails,
   CompliancePeriod,
@@ -150,19 +150,28 @@ export class SentenceService {
     }
 
     const activityUrl = this.links.getUrl(BreadcrumbType.CaseActivityLog, { crn })
-    function getAppointmentQuantity(
+
+    function getAppointmentContent(
       filter: ActivityComplianceFilter,
-      name: string,
-      options: QuantityOptions = {},
+      strings: { singular: string; plural: string; linkSingular: string; linkPlural: string },
     ): ComplianceQuantity {
-      const value = appointmentCounts[filter]
-      if (value === 0) {
-        return { name: 'None', value }
+      const fmt = (value: number): string =>
+        (value === 1 ? strings.singular : strings.plural).replace('$', value.toString())
+      const fmtLink = (value: number): string =>
+        (value === 1 ? strings.linkSingular : strings.linkPlural).replace('$', value.toString())
+
+      const quantity = appointmentCounts[filter]
+      if (!quantity) {
+        return { quantity, content: 'None' }
       }
+
+      console.log('quantity', quantity)
+
       return {
-        name: quantity(value, name, options),
-        value,
+        quantity,
+        content: fmt(quantity),
         link: urlJoin(activityUrl, filter),
+        linkContent: fmtLink(quantity),
       }
     }
 
@@ -210,26 +219,44 @@ export class SentenceService {
             ...currentSummary,
             period: compliancePeriod,
             appointments: {
-              total: getAppointmentQuantity(ActivityComplianceFilter.Appointments, 'national standard appointment'),
-              complied: getAppointmentQuantity(ActivityComplianceFilter.CompliedAppointments, 'complied', {
-                plural: '',
-                zero: 'None',
+              total: getAppointmentContent(ActivityComplianceFilter.Appointments, {
+                singular: '$ national standard appointment',
+                plural: '$ national standard appointments',
+                linkSingular: '<span class="govuk-visually-hidden">View </span>$ national standard appointment',
+                linkPlural: '<span class="govuk-visually-hidden">View </span>$ national standard appointments',
               }),
-              acceptableAbsences: getAppointmentQuantity(
-                ActivityComplianceFilter.AcceptableAbsenceAppointments,
-                'acceptable absence',
-              ),
-              failureToComply: getAppointmentQuantity(
-                ActivityComplianceFilter.FailedToComplyAppointments,
-                'unacceptable absence',
-              ),
-              withoutAnOutcome: getAppointmentQuantity(
-                ActivityComplianceFilter.WithoutOutcome,
-                'without a recorded outcome',
-                {
-                  plural: '',
-                },
-              ),
+              complied: getAppointmentContent(ActivityComplianceFilter.CompliedAppointments, {
+                singular: '$ complied',
+                plural: '$ complied',
+                linkSingular:
+                  '<span class="govuk-visually-hidden">View </span>$ complied<span class="govuk-visually-hidden"> appointment</span>',
+                linkPlural:
+                  '<span class="govuk-visually-hidden">View </span>$ complied<span class="govuk-visually-hidden"> appointments</span>',
+              }),
+              acceptableAbsences: getAppointmentContent(ActivityComplianceFilter.AcceptableAbsenceAppointments, {
+                singular: '$ acceptable absence',
+                plural: '$ acceptable absences',
+                linkSingular:
+                  '<span class="govuk-visually-hidden">View </span>$ acceptable absence<span class="govuk-visually-hidden"> from an appointment</span>',
+                linkPlural:
+                  '<span class="govuk-visually-hidden">View </span>$ acceptable absences<span class="govuk-visually-hidden"> from an appointment</span>',
+              }),
+              failureToComply: getAppointmentContent(ActivityComplianceFilter.FailedToComplyAppointments, {
+                singular: '$ unacceptable absence',
+                plural: '$ unacceptable absences',
+                linkSingular:
+                  '<span class="govuk-visually-hidden">View </span>$ unacceptable absence<span class="govuk-visually-hidden"> from an appointment</span>',
+                linkPlural:
+                  '<span class="govuk-visually-hidden">View </span>$ unacceptable absences<span class="govuk-visually-hidden"> from an appointment</span>',
+              }),
+              withoutAnOutcome: getAppointmentContent(ActivityComplianceFilter.WithoutOutcome, {
+                singular: '$ without a recorded outcome',
+                plural: '$ without a recorded outcome',
+                linkSingular:
+                  '<span class="govuk-visually-hidden">View </span>$ <span class="govuk-visually-hidden">appointment </span>without a recorded outcome',
+                linkPlural:
+                  '<span class="govuk-visually-hidden">View </span>$ <span class="govuk-visually-hidden">appointments </span>without a recorded outcome',
+              }),
             },
             status: getCurrentStatus(),
             requirement: current ? await this.getRarRequirement(crn, current.convictionId, requirements) : null,

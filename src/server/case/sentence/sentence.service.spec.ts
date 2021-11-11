@@ -323,28 +323,37 @@ describe('SentenceService', () => {
           },
           appointments: {
             acceptableAbsences: {
-              name: '3 acceptable absences',
-              value: 3,
+              content: '3 acceptable absences',
+              linkContent:
+                '<span class="govuk-visually-hidden">View </span>3 acceptable absences<span class="govuk-visually-hidden"> from an appointment</span>',
+              quantity: 3,
               link: '/case-activity-log/acceptable-absence-appointments',
             },
             complied: {
-              name: '1 complied',
-              value: 1,
+              content: '1 complied',
+              linkContent:
+                '<span class="govuk-visually-hidden">View </span>1 complied<span class="govuk-visually-hidden"> appointment</span>',
+              quantity: 1,
               link: '/case-activity-log/complied-appointments',
             },
             failureToComply: {
-              name: '2 unacceptable absences',
-              value: 2,
+              content: '2 unacceptable absences',
+              linkContent:
+                '<span class="govuk-visually-hidden">View </span>2 unacceptable absences<span class="govuk-visually-hidden"> from an appointment</span>',
+              quantity: 2,
               link: '/case-activity-log/failed-to-comply-appointments',
             },
             withoutAnOutcome: {
-              name: '1 without a recorded outcome',
-              value: 1,
+              content: '1 without a recorded outcome',
+              linkContent:
+                '<span class="govuk-visually-hidden">View </span>1 <span class="govuk-visually-hidden">appointment </span>without a recorded outcome',
+              quantity: 1,
               link: '/case-activity-log/without-an-outcome',
             },
             total: {
-              name: '7 national standard appointments',
-              value: 7,
+              content: '7 national standard appointments',
+              linkContent: '<span class="govuk-visually-hidden">View </span>7 national standard appointments',
+              quantity: 7,
               link: '/case-activity-log/appointments',
             },
           },

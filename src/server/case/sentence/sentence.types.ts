@@ -89,9 +89,10 @@ export enum ComplianceStatusAlertLevel {
 }
 
 export interface ComplianceQuantity {
-  name: string
-  value: number
+  quantity: number
+  content: string
   link?: string
+  linkContent?: string
 }
 
 export enum CompliancePeriod {
