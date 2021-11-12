@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 import { fakeAppointmentBuilderDto } from './arrange-appointment.fake'
-import { IS_BOOLEAN, IS_IN, IS_INT, IS_NOT_EMPTY, IS_POSITIVE, IS_STRING, validate } from 'class-validator'
+import { IS_BOOLEAN, IS_IN, IS_NOT_EMPTY, IS_STRING, validate } from 'class-validator'
 import { AppointmentBuilderDto } from './AppointmentBuilderDto'
 import { flattenValidationErrors } from '../../util/flattenValidationErrors'
 import { DateTime } from 'luxon'
@@ -243,9 +243,6 @@ describe('AppointmentBuilderDto validation & mapping', () => {
       })
         .whenValidating(AppointmentWizardStep.When)
         .shouldTriggerConstraints('date', IS_DATE_INPUT)
-        .shouldTriggerConstraints('date.day', IS_POSITIVE)
-        .shouldTriggerConstraints('date.month', IS_POSITIVE)
-        .shouldTriggerConstraints('date.year', IS_POSITIVE)
         .shouldTriggerConstraints('startTime', IS_TIME)
         .shouldTriggerConstraints('endTime', IS_TIME)
         .run())
@@ -258,9 +255,6 @@ describe('AppointmentBuilderDto validation & mapping', () => {
       })
         .whenValidating(AppointmentWizardStep.When)
         .shouldTriggerConstraints('date', IS_DATE_INPUT)
-        .shouldTriggerConstraints('date.day', IS_INT, IS_POSITIVE)
-        .shouldTriggerConstraints('date.month', IS_INT, IS_POSITIVE)
-        .shouldTriggerConstraints('date.year', IS_INT, IS_POSITIVE)
         .shouldTriggerConstraints('startTime', IS_TIME)
         .shouldTriggerConstraints('endTime', IS_TIME)
         .run())

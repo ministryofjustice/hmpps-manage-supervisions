@@ -1,6 +1,6 @@
 import { Transform, Type } from 'class-transformer'
 import { DateTime } from 'luxon'
-import { IsBoolean, IsIn, IsInt, IsNotEmpty, IsPositive, IsString, ValidateIf, ValidateNested } from 'class-validator'
+import { IsBoolean, IsIn, IsNotEmpty, IsString, ValidateIf, ValidateNested, ValidationArguments } from 'class-validator'
 import striptags = require('striptags')
 import { DateInput, IsAfter, IsDateInput, IsFutureTime, ValidationGroup, IsFutureDate, IsTime } from '../../validators'
 import { getDateTime } from '../../util'
@@ -50,27 +50,46 @@ function IsLocationCode() {
   )
 }
 
-function IsDateComponent(component: 'day' | 'month' | 'year') {
-  return ValidationGroup(
-    { message: MESSAGES.date.required.replace('{}', component), groups: [AppointmentWizardStep.When] },
-    IsInt,
-    IsPositive,
-  )
+function DateValidationMessage(args: ValidationArguments) {
+  const date = args.value
+  const { day, month, year } = args.value
+
+  const defaultMessage = 'Date must be a real date'
+
+  try {
+    var dt = DateTime.fromObject(date) // eslint-disable-line no-var
+  } catch (err) {
+    return defaultMessage
+  }
+
+  if (!dt.isValid) {
+    if (!day && !month && !year) {
+      return 'Enter the date of the appointment'
+    }
+
+    if (!day || !month || !year) {
+      const parts = []
+      if (!day) parts.push('day')
+      if (!month) parts.push('month')
+      if (!year) parts.push('year')
+
+      return 'Date must include a ' + parts.join(' and ')
+    }
+  }
+
+  return defaultMessage
 }
 
 export class AppointmentDateDto implements DateInput {
   @ExposeDefault({ groups: [AppointmentWizardStep.When] })
-  @IsDateComponent('day')
   @Type(() => Number)
   day: number
 
   @ExposeDefault({ groups: [AppointmentWizardStep.When] })
-  @IsDateComponent('month')
   @Type(() => Number)
   month: number
 
   @ExposeDefault({ groups: [AppointmentWizardStep.When] })
-  @IsDateComponent('year')
   @Type(() => Number)
   year: number
 
@@ -158,7 +177,7 @@ export class AppointmentBuilderDto {
 
   @ExposeDefault({ groups: [AppointmentWizardStep.When] })
   @Type(() => AppointmentDateDto)
-  @IsDateInput({ groups: [AppointmentWizardStep.When], message: 'Enter a valid date' })
+  @IsDateInput({ groups: [AppointmentWizardStep.When], message: DateValidationMessage })
   @IsFutureDate({ groups: [AppointmentWizardStep.When], message: 'Enter a date in the future' })
   @ValidateNested({ groups: [AppointmentWizardStep.When] })
   date: AppointmentDateDto
