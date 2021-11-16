@@ -209,9 +209,21 @@ context('Arrange appointment happy path & validation', () => {
 
     offendersCircumstancesAreShown()
 
+    whenEnteringDateStrings('', '', '')
+    whenSubmittingCurrentStep()
+    aDateErrorIsShown('Enter the date of the appointment')
+
+    whenEnteringDateStrings('80', '', '')
+    whenSubmittingCurrentStep()
+    aDateErrorIsShown('Date must include a month and year')
+
+    whenEnteringDateStrings('', '20', '')
+    whenSubmittingCurrentStep()
+    aDateErrorIsShown('Date must include a day and year')
+
     whenEnteringDateStrings('80', '20', '6')
     whenSubmittingCurrentStep()
-    aDateErrorIsShown('Enter a valid date')
+    aDateErrorIsShown('Date must be a real date')
     aStartTimeErrorIsShown('Enter a valid start time')
     aEndTimeErrorIsShown('Enter a valid end time')
 
@@ -464,9 +476,12 @@ context('Arrange appointment happy path & validation', () => {
   }
 
   function whenEnteringDateStrings(day: string, month: string, year: string) {
-    page.when.dayField.clear().type(day)
-    page.when.monthField.clear().type(month)
-    page.when.yearField.clear().type(year)
+    page.when.dayField.clear()
+    page.when.monthField.clear()
+    page.when.yearField.clear()
+    if (day) page.when.dayField.clear().type(day)
+    if (month) page.when.monthField.clear().type(month)
+    if (year) page.when.yearField.clear().type(year)
   }
 
   function whenEnteringStartTime(time: DateTime) {
