@@ -77,7 +77,7 @@ context('Case overview tab', () => {
         page.schedule(card => {
           card.value('Next appointment').contains('Tuesday 25 May 2100 at 12pm (Home visit with Laura Smith)')
         })
-
+        page.recordOutcomeAlert(5, 'Record an outcome for')
         page.personalDetails(card => {
           card.value('Name').contains('Liz Danger Haggis')
           card.value('Preferred name/Known as').contains('Bob')

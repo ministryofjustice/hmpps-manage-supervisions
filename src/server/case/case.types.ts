@@ -1,4 +1,4 @@
-import { ActivityComplianceFilter, CaseActivityLogGroup } from './activity'
+import { ActivityComplianceFilter, CaseActivityLogEntry, CaseActivityLogGroup } from './activity'
 import { ComplianceDetails, ConvictionDetails } from './sentence'
 import { AppointmentListViewModel, NextAppointmentSummary } from './schedule'
 import { AssessRisksAndNeedsApiStatus, RiskRegistrations, Risks, RisksAndNeedsDegraded } from './risk'
@@ -58,6 +58,7 @@ export interface CaseOverviewViewModel extends CaseViewModelBase<CasePage.Overvi
   nextAppointment?: NextAppointmentSummary
   risks: Risks | RisksAndNeedsDegraded
   registrations: RiskRegistrations
+  appointmentsWithoutAnOutcome: CaseActivityLogEntry[]
 }
 
 export interface CaseScheduleLinks {

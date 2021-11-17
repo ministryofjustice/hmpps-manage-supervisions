@@ -72,6 +72,9 @@ export class CasePage extends PageBase {
       activityAndCompliance(callback: SummaryListCallback) {
         SummaryList.selectFromCard('Activity and compliance', callback)
       },
+      recordOutcomeAlert(id: number, title: string) {
+        return cy.get(`[data-qa="offender/activity/${id}"]`).contains(title)
+      },
     }
   }
 
