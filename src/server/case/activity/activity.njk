@@ -12,11 +12,11 @@
     </div>
 {%- endmacro %}
 
-{% macro entryNotes(entry, open) -%}
+{% macro entryNotes(entry, open, date) -%}
     {% if entry.notes %}
         {% if entry.notes.length > 250 or entry.sensitive %}
             {{ govukDetails({
-                summaryText: "Notes (sensitive)" if entry.sensitive else "Notes",
+                summaryHtml: "Notes (sensitive)" if entry.sensitive else "Notes<span class='govuk-visually-hidden'> about " + entry.name + " at " + (entry.start | time) + " on " + (date | longDate) + "</span>",
                 html: flatNotes(entry.notes),
                 open: open and not entry.sensitive,
                 classes: 'govuk-!-margin-bottom-0'
@@ -68,7 +68,7 @@
             }) }}
             <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-1">
         {% endif %}
-        {{ entryNotes(entry, open) }}
+        {{ entryNotes(entry, open, date) }}
     {%- endcall %}
 {%- endmacro %}
 
@@ -90,7 +90,7 @@
         attributes: { 'data-qa': 'offender/activity/' + entry.id },
         headingLevel: 4
     }) -%}
-        {{ entryNotes(entry, open) }}
+        {{ entryNotes(entry, open, date) }}
     {%- endcall %}
 {%- endmacro %}
 
