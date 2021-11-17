@@ -233,8 +233,42 @@ describe('ViewModelFactoryService', () => {
       step: AppointmentWizardStep.Confirm,
       appointment: dto,
       paths: { next: links.url(BreadcrumbType.Case) },
-      offender: { firstName: 'Liz', phoneNumber: '1-530-861-4048' },
+      offender: {
+        firstName: 'Liz',
+        phoneNumber: '1-530-861-4048',
+        dateOfBirth: DateTime.fromISO('1999-10-10'),
+        displayName: 'Liz Danger Haggis',
+        ids: {
+          crn: 'SOME-CRN',
+          pnc: 'some-pnc',
+        },
+        shortName: 'Liz Haggis',
+      },
+      links: {
+        deliusContactLog:
+          '/ExitToDeliusContactLogNow?crn=some-crn&utm.campaign=no-phone-number&utm.medium=arrange-appointment',
+      },
     } as ConfirmAppointmentViewModel)
+  })
+
+  it('confirm with no phone numbers', () => {
+    const removed = fakeAppointmentBuilderDto({
+      offender: {
+        contactDetails: {
+          phoneNumbers: null,
+        },
+      },
+    })
+
+    const sessionWithNoPhoneNo: AppointmentWizardSession = {
+      crn: 'some-crn',
+      completedSteps: [],
+      dto: classToPlain(removed, { groups: [DEFAULT_GROUP] }),
+    }
+
+    const observed = subject.confirm(sessionWithNoPhoneNo)
+
+    expect(observed.offender.phoneNumber).toEqual(undefined)
   })
 
   it('unavailable', () => {

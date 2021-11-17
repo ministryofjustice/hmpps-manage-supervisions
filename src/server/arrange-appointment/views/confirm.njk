@@ -1,4 +1,7 @@
 {% extends "pages/wizard-page.njk" %}
+
+{% from 'partials/exit/_to-delius.njk' import toDeliusContactLog, toDeliusHomepage %}
+
 {% set buttonText = 'Finish' %}
 {% set buttonQa = 'confirm-appointment/finish-button' %}
 {% set title = 'Appointment arranged' %}
@@ -26,6 +29,11 @@
     Give details of the appointment to {{ offender.firstName }}.<br>
     {% if offender.phoneNumber %}
       <span data-qa="confirm-appointment/phone">{{ offender.firstName }}’s phone number is <strong>{{ offender.phoneNumber }}</strong>.</span>
+    {% else %}
+    <p data-qa="confirm-appointment/phone">
+      We don’t have a phone number for {{ offender.firstName }}. To add a phone number you'll need to do this on Delius.
+      {{ toDeliusContactLog({ offender: offender, links: links, headerPrefix: 'Add a phone number for' }) }}
+    </p>
     {% endif %}
   </p>
 {% endblock %}

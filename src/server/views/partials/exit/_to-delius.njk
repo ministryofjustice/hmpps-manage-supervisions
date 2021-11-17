@@ -3,7 +3,7 @@
 {# model: ToDeliusViewModel #}
 {% macro toDeliusContactLog(model) %}
     <h2 class="govuk-heading-m" data-qa='to-delius/contact-log-title'>
-        Go directly to {{ model.offender.shortName }} on Delius
+        {{ model.headerPrefix or "Go directly to" }} {{ model.offender.shortName }} on Delius
     </h2>
 
     <p>
