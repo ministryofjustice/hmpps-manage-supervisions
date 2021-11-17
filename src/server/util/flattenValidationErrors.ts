@@ -9,7 +9,7 @@ export function flattenValidationErrors(errors: ValidationError[]): FlatValidati
   const toVisit = [...errors]
   const result: FlatValidationError[] = []
   while (toVisit.length > 0) {
-    const error = toVisit.pop()
+    const error = toVisit.shift()
     if (error.children?.length > 0) {
       toVisit.push(...error.children.map(x => ({ ...x, property: `${error.property}.${x.property}` })))
     }

@@ -30,6 +30,6 @@ describe('flattenValidationErrors', () => {
 
     const observed = flattenValidationErrors(errors)
 
-    expect(observed).toEqual(expect.arrayContaining(expected))
+    expect(observed).toEqual(expected)
   })
 })
