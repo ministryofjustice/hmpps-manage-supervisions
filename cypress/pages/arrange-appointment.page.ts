@@ -25,7 +25,9 @@ export class ArrangeAppointmentPage extends PageBase {
       autoCompleteResult(name: string) {
         return cy.get('#arrange-appointment-other-select__listbox > li').contains(name)
       },
-
+      allOtherOptions() {
+        return cy.get('#arrange-appointment-other-select__listbox > li').then($els => Cypress._.map($els, 'innerText'))
+      },
       get errorMessages() {
         return {
           get type() {
@@ -64,6 +66,10 @@ export class ArrangeAppointmentPage extends PageBase {
     return {
       radio(name: string) {
         return cy.get(`[data-qa="arrange-appointment/location"] input[type=radio]`).siblings('label').contains(name)
+      },
+
+      firstRadio() {
+        return cy.get(`[data-qa="arrange-appointment/location"] input[type=radio]`).first()
       },
 
       get errorMessages() {

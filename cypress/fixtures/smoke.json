@@ -4,9 +4,9 @@
   },
   "dev": {
     "case": [
-      { "crn": "X009923", "displayName": "Liz Haggis" },
       { "crn": "X444900", "displayName": "Allan Dirks" },
-      { "crn": "X405125", "displayName": "Brian Jones (Baz)" }
+      { "crn": "X405125", "displayName": "Brian Jones (Baz)" },
+      { "crn": "X009923", "displayName": "Liz Haggis" }
     ]
   }
 }
