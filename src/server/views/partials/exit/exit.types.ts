@@ -20,4 +20,5 @@ export interface ToDeliusViewModel {
      */
     deliusHomePage?: string
   }
+  headerPrefix?: string
 }

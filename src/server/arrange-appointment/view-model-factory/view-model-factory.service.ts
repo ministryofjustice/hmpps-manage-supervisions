@@ -250,8 +250,10 @@ export class ViewModelFactoryService
       groups: [DEFAULT_GROUP],
       excludeExtraneousValues: true,
     })
-    const phoneNumber = session.dto.offender.contactDetails?.phoneNumbers.find(x => x.number)
-
+    const phoneNumber = session.dto.offender.contactDetails?.phoneNumbers?.find(x => x.number)?.number
+    const offender = session.dto.offender
+    const displayName = getDisplayName(offender)
+    const utm: Utm = { medium: UtmMedium.ArrangeAppointment, campaign: 'no-phone-number' }
     return {
       step: AppointmentWizardStep.Confirm,
       appointment,
@@ -260,7 +262,17 @@ export class ViewModelFactoryService
       },
       offender: {
         firstName: session.dto.offender.firstName,
-        phoneNumber: phoneNumber?.number,
+        phoneNumber,
+        ids: {
+          crn: offender.otherIds.crn.toUpperCase(),
+          pnc: offender.otherIds.pncNumber,
+        },
+        displayName,
+        shortName: getDisplayName(offender, { middleNames: false }),
+        dateOfBirth: offender.dateOfBirth && DateTime.fromISO(offender.dateOfBirth),
+      },
+      links: {
+        deliusContactLog: this.links.getUrl(BreadcrumbType.ExitToDeliusContactLogNow, { crn: session.crn, utm }),
       },
     }
   }

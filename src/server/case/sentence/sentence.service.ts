@@ -165,8 +165,6 @@ export class SentenceService {
         return { quantity, content: 'None' }
       }
 
-      console.log('quantity', quantity)
-
       return {
         quantity,
         content: fmt(quantity),
