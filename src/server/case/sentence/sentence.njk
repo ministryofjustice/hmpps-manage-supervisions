@@ -93,7 +93,7 @@
                         } if additionalSentences.length,
                         {
                             key: { text: "Notes" },
-                            value: { html: additionalSentences.notes | nl2br if additionalSentences.notes else 'No notes' }
+                            value: { html: additionalSentences.notes | nl2br | urlize | safe if additionalSentences.notes else 'No notes' }
                         }
                     ]
                 })

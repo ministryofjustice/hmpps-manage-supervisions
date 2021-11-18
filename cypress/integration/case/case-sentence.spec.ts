@@ -92,6 +92,7 @@ context('Case sentence tab', () => {
               list.value('Sentence').contains('Fine')
               list.value('Value').contains('500')
               list.value('Notes').contains('£500 fine')
+              list.value('Notes').contains('a', 'https://gov.uk')
             })
             card.detailsList('Additional sentences', 'Disqualified from Driving', list => {
               list.value('Sentence').contains('Disqualified from Driving')
