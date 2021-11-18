@@ -231,7 +231,7 @@ export const ACTIVITY_LOG_GROUPS: DeepPartial<ActivityLogGroup>[] = [
         type: { code: 'NOT_WELL_KNOWN', description: 'Not a well known appointment', appointment: true },
         startTime: '11:00:00',
         endTime: '13:00:00',
-        notes: 'Some unknown appointment',
+        notes: 'Some unknown appointment with a link to https://gov.uk',
         staff: { forenames: 'Robert', surname: 'Ohagan', unallocated: false },
         outcome: null,
         sensitive: false,

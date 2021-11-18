@@ -77,7 +77,7 @@
       } if rarDetails and rarDetails.subCategory,
       {
         key: { text: "Appointment notes" },
-        value: { text: appointment.notes or 'None' },
+        value: { text: (appointment.notes or 'None') | urlize | safe },
         classes: ["qa-notes"],
         actions: {
           items: [

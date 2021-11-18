@@ -321,6 +321,7 @@ context('Case activity tab', () => {
             list.value('Date').contains('2 September 2020')
             list.value('Time').contains('11am to 1pm')
             list.value('Appointment notes').contains('Some unknown appointment')
+            list.value('Appointment notes').contains('a', 'https://gov.uk')
             list.value('Sensitive').contains('No')
             list.value('RAR activity').contains('Finance, benefits and debt')
           })
