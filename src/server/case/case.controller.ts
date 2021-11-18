@@ -8,6 +8,8 @@ import { RiskService } from './risk'
 import { PersonalService } from './personal'
 import { BreadcrumbType, LinksService } from '../common/links'
 import { CaseTabbedPage } from './case-tabbed-page.decorators'
+import { ActivityService, ActivityComplianceFilter } from './activity'
+import { DateTime } from 'luxon'
 
 @Controller('case/:crn(\\w+)')
 export class CaseController {
@@ -18,6 +20,8 @@ export class CaseController {
     private readonly riskService: RiskService,
     private readonly personalService: PersonalService,
     private readonly linksService: LinksService,
+    private readonly sentence: SentenceService,
+    private readonly activity: ActivityService,
   ) {}
 
   @Get()
@@ -38,7 +42,19 @@ export class CaseController {
       this.riskService.getRiskRegistrations(crn),
       this.personalService.getPersonalCircumstances(crn),
     ])
-
+    const [conviction] = await Promise.all([this.sentence.getCurrentConvictionSummary(crn)])
+    let appointmentsWithoutAnOutcome = []
+    if (conviction) {
+      const today = DateTime.now()
+      const contacts = await this.activity.getActivityLogPage(crn, offender, {
+        conviction,
+        complianceFilter: ActivityComplianceFilter.WithoutOutcome,
+      })
+      appointmentsWithoutAnOutcome = contacts.content
+        .flatMap(x => x.entries)
+        .filter(x => x.start < today)
+        .sort((a, b) => (a.start > b.start ? 1 : -1))
+    }
     return this.offenderService.casePageOf<CaseOverviewViewModel>(offender, {
       page: CasePage.Overview,
       assessRisksAndNeedsApiStatus: risks.status,
@@ -48,6 +64,7 @@ export class CaseController {
       nextAppointment,
       risks,
       registrations,
+      appointmentsWithoutAnOutcome,
     })
   }
 }

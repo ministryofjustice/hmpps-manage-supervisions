@@ -44,6 +44,12 @@ context('Case overview tab', () => {
               outcome: { complied: false, attended: false },
             },
             {
+              contactId: 9998,
+              type: { code: 'ABNP', appointment: true },
+              outcome: null,
+            },
+            {
+              contactId: 9999,
               type: { code: 'ABNP', appointment: true },
               outcome: null,
             },
@@ -77,7 +83,8 @@ context('Case overview tab', () => {
         page.schedule(card => {
           card.value('Next appointment').contains('Tuesday 25 May 2100 at 12pm (Home visit with Laura Smith)')
         })
-
+        page.recordOutcomeAlert(9998, 'Record an outcome for')
+        page.recordOutcomeAlert(9999, 'Record an outcome for')
         page.personalDetails(card => {
           card.value('Name').contains('Liz Danger Haggis')
           card.value('Preferred name/Known as').contains('Bob')
@@ -117,7 +124,7 @@ context('Case overview tab', () => {
           card.value('Compliance').contains('Breach in progress. 1 prior breach on current order')
           card
             .value('Activity log')
-            .contains('3 national standard appointments 1 without a recorded outcome 1 complied 1 unacceptable absence')
+            .contains('4 national standard appointments 2 without a recorded outcome 1 complied 1 unacceptable absence')
         })
       })
   })

@@ -4,7 +4,7 @@ import { CaseController } from './case.controller'
 import { OffenderService } from './offender'
 import { CasePage } from './case.types'
 import { RedirectResponse } from '../common/dynamic-routing'
-import { fakeOffenderDetail } from '../community-api/community-api.fake'
+import { fakeOffenderDetail, fakePaginated } from '../community-api/community-api.fake'
 import {
   fakeContactDetailsViewModel,
   fakePersonalCircumstanceDetail,
@@ -13,12 +13,20 @@ import {
 import { SentenceService } from './sentence'
 import { ScheduleService } from './schedule'
 import { AssessRisksAndNeedsApiStatus, RiskService } from './risk'
-import { fakeComplianceDetails, fakeConvictionDetails, fakeConvictionRequirement } from './sentence/sentence.fake'
+import {
+  fakeComplianceDetails,
+  fakeConvictionDetails,
+  fakeConvictionRequirement,
+  fakeConvictionSummary,
+} from './sentence/sentence.fake'
 import { fakeNextAppointmentSummary } from './schedule/schedule.fake'
 import { MockLinksModule } from '../common/links/links.mock'
 import { PersonalService } from './personal'
 import { fakeRiskRegistrations, fakeRisks } from './risk/risk.fake'
 import { EligibilityService } from '../community-api/eligibility'
+import { ActivityComplianceFilter, ActivityService } from './activity'
+import { fakeCaseActivityLogGroup } from './activity/activity.fake'
+import { DateTime } from 'luxon'
 
 describe('CaseController', () => {
   let subject: CaseController
@@ -27,6 +35,7 @@ describe('CaseController', () => {
   let sentenceService: SinonStubbedInstance<SentenceService>
   let riskService: SinonStubbedInstance<RiskService>
   let personalService: SinonStubbedInstance<PersonalService>
+  let activityService: SinonStubbedInstance<ActivityService>
 
   beforeEach(async () => {
     offenderService = createStubInstance(OffenderService)
@@ -34,7 +43,7 @@ describe('CaseController', () => {
     sentenceService = createStubInstance(SentenceService)
     riskService = createStubInstance(RiskService)
     personalService = createStubInstance(PersonalService)
-
+    activityService = createStubInstance(ActivityService)
     const module = await Test.createTestingModule({
       controllers: [CaseController],
       imports: [MockLinksModule],
@@ -45,6 +54,7 @@ describe('CaseController', () => {
         { provide: RiskService, useValue: riskService },
         { provide: PersonalService, useValue: personalService },
         { provide: EligibilityService, useValue: null },
+        { provide: ActivityService, useValue: activityService },
       ],
     }).compile()
     subject = module.get(CaseController)
@@ -89,6 +99,21 @@ describe('CaseController', () => {
     const compliance = fakeComplianceDetails()
     sentenceService.getSentenceComplianceDetails.withArgs('some-crn').resolves(compliance)
 
+    const contacts = fakePaginated([fakeCaseActivityLogGroup()])
+    const appointmentsWithoutAnOutcome = contacts.content
+      .flatMap(x => x.entries)
+      .filter(x => x.start < DateTime.now())
+      .sort((a, b) => (a.start > b.start ? 1 : -1))
+    const convictionSummary = fakeConvictionSummary()
+
+    sentenceService.getCurrentConvictionSummary.withArgs('some-crn').resolves(convictionSummary)
+    activityService.getActivityLogPage
+      .withArgs('some-crn', offender, {
+        conviction: convictionSummary,
+        complianceFilter: ActivityComplianceFilter.WithoutOutcome,
+      })
+      .resolves(contacts)
+
     const observed = await subject.getOverview('some-crn')
 
     expect(observed).toBe(viewModel)
@@ -101,6 +126,7 @@ describe('CaseController', () => {
       registrations,
       risks,
       compliance,
+      appointmentsWithoutAnOutcome,
     })
   })
 })
