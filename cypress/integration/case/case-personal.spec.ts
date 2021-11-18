@@ -131,6 +131,9 @@ class Fixture extends ViewCaseFixture {
       }
       card.value('Verified').contains(expected.verified ? 'Yes' : 'No')
       card.value('Notes').contains(expected.notes || 'No Notes')
+      if (expected.notesLink) {
+        card.value('Notes').contains('a', expected.notesLink)
+      }
       card.lastUpdated.contains(expected.lastUpdated)
       if (expected.previous) {
         card.previousCircumstance.contains('Previous circumstance')
@@ -333,6 +336,7 @@ context('Case personal details tab', () => {
           startDate: '1 April 2005',
           endDate: '2 July 2021',
           verified: true,
+          notesLink: 'https://gov.uk',
           previous: true,
           notes: 'Divorced',
           lastUpdated: '2 July 2021',

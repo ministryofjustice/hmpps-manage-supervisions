@@ -62,7 +62,7 @@
                     },
                     {
                         key: { text: "Notes" },
-                        value: { html: (circumstance.notes | nl2br) if circumstance.notes else 'No Notes' }
+                        value: { html: (circumstance.notes | nl2br | urlize | safe) if circumstance.notes else 'No Notes' }
                     }
                 ]
             }) }}
