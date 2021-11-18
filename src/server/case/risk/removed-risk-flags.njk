@@ -16,7 +16,7 @@
       {% for risk in removedRisks %}
       <tr class="govuk-table__row">
         <td class="govuk-table__cell"><a href="{{ risk.links.view }}">{{ risk.text }}</a></td>
-        <td class="govuk-table__cell">{{ risk.notes or 'No notes given' }}</td>
+        <td class="govuk-table__cell">{{ (risk.notes | urlize | safe) or 'No notes given' }}</td>
         <td class="govuk-table__cell">{{ risk.removed | shortDate }}</td>
       </tr>
       {% endfor %}

@@ -27,7 +27,7 @@
           text: "Why it was removed"
         },
         value: {
-          text: registration.removedNotes if registration.removedNotes else 'No notes given'
+          text: registration.removedNotes | urlize | safe if registration.removedNotes else 'No notes given'
         }
       }
     ]
