@@ -73,6 +73,7 @@ context('Case risk tab', () => {
                 () => {
                   page.currentNotes.contains('No detail given')
                   page.previousNotes.contains('A hostel setting would pose significant risk for this case.')
+                  page.previousNotes.contains('a', 'https://gov.uk')
                 },
               )
               list.value('Vulnerability').contains('No concerns')

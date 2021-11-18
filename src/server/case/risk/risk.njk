@@ -10,12 +10,12 @@
         {% set detailsHtml %}
             <h3 class="govuk-heading-s">Current circumstances, issues and needs</h3>
             <p class='govuk-body' data-qa='offender/risk/current-notes'>
-                {{ (risk.notes.current or 'No detail given') | nl2BrSafe }}
+                {{ (risk.notes.current | nl2BrSafe | urlize | safe) if risk.notes.current else 'No detail given' }}
             </p>
             <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
             <h3 class="govuk-heading-s">Previous circumstances, issues and needs</h3>
             <p class='govuk-body' data-qa='offender/risk/previous-notes'>
-                {{ (risk.notes.previous or 'No detail given') | nl2BrSafe }}
+                {{ (risk.notes.previous| nl2BrSafe | urlize | safe) if risk.notes.previous else 'No detail given' }}
             </p>
         {% endset %}
         {{ govukDetails({ summaryText: risk.value, html: detailsHtml }) }}
