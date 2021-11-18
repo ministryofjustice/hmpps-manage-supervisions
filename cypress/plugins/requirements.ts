@@ -61,7 +61,7 @@ export const REQUIREMENTS: DeepPartial<Requirement>[] = [
   },
   {
     requirementId: 2500199144,
-    requirementNotes: null,
+    requirementNotes: 'This is a requirement note with a link to https://gov.uk',
     commencementDate: '2018-08-01',
     startDate: '2018-08-01',
     expectedEndDate: '2021-11-07',
