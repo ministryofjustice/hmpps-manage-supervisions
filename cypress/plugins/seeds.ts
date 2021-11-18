@@ -155,6 +155,7 @@ export interface ContactSeedOptions {
   activeConvictionId?: number
   appointments?: DeepPartial<AppointmentDetail>[]
   contacts?: DeepPartial<ActivityLogGroup>[]
+  appointmentBookingStatus?: number
 }
 
 /**
@@ -167,7 +168,7 @@ export function contactsSeed({
 }: ContactSeedOptions = {}) {
   return seedModule(
     { title: 'Contacts' },
-    appointments(crn, activeConvictionId, options.appointments),
+    appointments(crn, activeConvictionId, options.appointments, options.appointmentBookingStatus),
     contacts(crn, options.contacts),
   )
 }

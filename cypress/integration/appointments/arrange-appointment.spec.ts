@@ -54,7 +54,7 @@ context('Arrange appointment happy path & validation', () => {
 
       .shouldBeAccessible()
 
-      .shouldDisplayCorrectAppointmentSummary(test)
+      .shouldDisplayCorrectAppointmentSummary(test, true)
 
       .whenSubmittingCurrentStep()
       .shouldDisplayAppointmentBookingConfirmation(test)
@@ -77,7 +77,44 @@ context('Arrange appointment happy path & validation', () => {
     })
     cy.arrangeAppointment()
 
-    fixture.attemptBookingOtherAppointment(test, true)
+    fixture
+      .attemptBookingOtherAppointment(test)
+      .shouldDisplayAppointmentBookingConfirmation(test)
+      .shouldHaveBookedAppointment(test)
+  })
+
+  it('displays page about adjusting the time if there is a clash', () => {
+    cy.seed({ appointmentBookingStatus: 409 })
+    const test = testCase({
+      type: { code: 'C243', name: 'Alcohol Group Work Session (NS)' },
+      location: { code: 'LDN_BCR', name: '29/33 VICTORIA ROAD' },
+      sensitive: false,
+      addNotes: true,
+      notes: 'These are some notes',
+      crn: CRN,
+      firstName: OFFENDER.firstName,
+      phoneNumber: OFFENDER.contactDetails.phoneNumbers[0].number,
+    })
+    cy.arrangeAppointment()
+
+    fixture.attemptBookingOtherAppointment(test).shouldDisplayClashError(test)
+  })
+
+  it('displays page about adjusting the time if there is a bad request', () => {
+    cy.seed({ appointmentBookingStatus: 400 })
+    const test = testCase({
+      type: { code: 'C243', name: 'Alcohol Group Work Session (NS)' },
+      location: { code: 'LDN_BCR', name: '29/33 VICTORIA ROAD' },
+      sensitive: false,
+      addNotes: true,
+      notes: 'These are some notes',
+      crn: CRN,
+      firstName: OFFENDER.firstName,
+      phoneNumber: OFFENDER.contactDetails.phoneNumbers[0].number,
+    })
+    cy.arrangeAppointment()
+
+    fixture.attemptBookingOtherAppointment(test).shouldDisplayClashError(test)
   })
 
   it('validates appointment type', () => {

@@ -48,6 +48,7 @@ export function appointments(
   crn: string,
   convictionId: number,
   partials: DeepPartial<AppointmentDetail>[] = APPOINTMENTS,
+  bookingStatus = 200,
 ): SeedFn {
   return context => {
     const appointments = partials.map(p => fakeAppointmentDetail(p))
@@ -60,9 +61,16 @@ export function appointments(
       .priority(1)
       .returns(appointments.filter(x => DateTime.fromISO(x.appointmentStart).toISODate() >= DateTime.now().toISODate()))
 
-    context.client.community.post(`/secure/offenders/crn/${crn}/sentence/${convictionId}/appointments`).returns({
-      appointmentId: 1,
-    })
+    if (bookingStatus == 200) {
+      context.client.community.post(`/secure/offenders/crn/${crn}/sentence/${convictionId}/appointments`).returns({
+        appointmentId: 1,
+      })
+    } else {
+      context.client.community
+        .post(`/secure/offenders/crn/${crn}/sentence/${convictionId}/appointments`)
+        .serverErrorWithCode(bookingStatus)
+    }
+
     for (const appointment of appointments) {
       context.client.community
         .get(`/secure/offenders/crn/${crn}/appointments/${appointment.appointmentId}`)

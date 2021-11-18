@@ -222,7 +222,11 @@ export class ViewModelFactoryService
     }
   }
 
-  check(session: AppointmentWizardSession): CheckAppointmentViewModel {
+  check(
+    session: AppointmentWizardSession,
+    _body?: DeepPartial<AppointmentBuilderDto>,
+    errors: ValidationError[] = [],
+  ): CheckAppointmentViewModel {
     const appointment = plainToClass(AppointmentBuilderDto, session.dto, {
       groups: [DEFAULT_GROUP],
       excludeExtraneousValues: true,
@@ -242,6 +246,7 @@ export class ViewModelFactoryService
         category: '', // TODO from nsiType.description
         subCategory: '', // TODO from nsiSubType.description
       },
+      errors,
     }
   }
 

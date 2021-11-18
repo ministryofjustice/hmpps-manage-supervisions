@@ -1,5 +1,4 @@
 import {
-  AppointmentCreateResponse,
   AppointmentDetail,
   AppointmentOutcome,
   AppointmentType,
@@ -42,6 +41,7 @@ import { DateTime } from 'luxon'
 import { fake, fakeEnum } from '../util/util.fake'
 import { Paginated } from './types'
 import { WellKnownAddressTypes } from './well-known'
+import { AppointmentCreateStatus, AppointmentCreateSuccess } from '../arrange-appointment/dto/arrange-appointment.types'
 
 function paddedNumber(min: number, max: number) {
   const n = faker.datatype.number({ min, max }).toString()
@@ -72,13 +72,14 @@ export const fakeAppointmentType = fake<AppointmentType>(() => ({
   requiresLocation: faker.random.objectElement(AppointmentTypeRequiresLocation) as AppointmentTypeRequiresLocation,
 }))
 
-export const fakeAppointmentCreateResponse = fake<AppointmentCreateResponse>(() => ({
+export const fakeAppointmentCreateResponse = fake<AppointmentCreateSuccess>(() => ({
   appointmentId: faker.datatype.number(),
   appointmentStart: faker.date.future().toISOString(),
   appointmentEnd: faker.date.future().toISOString(),
   typeDescription: faker.lorem.slug(3),
   sensitive: faker.datatype.boolean(),
   type: faker.datatype.uuid(),
+  status: AppointmentCreateStatus.OK,
 }))
 
 export const fakeAddress = fake<Address>((options, partial = {}) => {

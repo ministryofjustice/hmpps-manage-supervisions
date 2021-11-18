@@ -18,6 +18,9 @@ import { AppointmentTypeRequiresLocation } from '../../community-api/client'
 import { FlatDeepPartial } from '../../app.types'
 import {
   AppointmentBookingUnavailableReason,
+  AppointmentCreateFailure,
+  AppointmentCreateStatus,
+  AppointmentCreateSuccess,
   AppointmentWizardStep,
   NO_LOCATION,
   UNAVAILABLE_LOCATION,
@@ -243,9 +246,29 @@ describe('SessionBuilderService', () => {
   it('books the appointment on check', async () => {
     const session = havingSession()
     const model = fakeAppointmentBuilderDto()
-    const stub = service.createAppointment.withArgs(model, 'some-crn')
+    const stub = service.createAppointment
+      .withArgs(model, 'some-crn')
+      .resolves({ status: AppointmentCreateStatus.OK } as AppointmentCreateSuccess)
     const observed = await subject.check(session, model)
     expect(observed).toEqual([])
+    expect(stub.called).toBe(true)
+  })
+
+  it('clashes are returned as a validation failure', async () => {
+    const session = havingSession()
+    const model = fakeAppointmentBuilderDto()
+    const stub = service.createAppointment
+      .withArgs(model, 'some-crn')
+      .resolves({ status: AppointmentCreateStatus.Clash } as AppointmentCreateFailure)
+    const observed = await subject.check(session, model)
+    expect(observed).toEqual([
+      {
+        constraints: {
+          response: 'clash',
+        },
+        property: 'booking',
+      },
+    ])
     expect(stub.called).toBe(true)
   })
 

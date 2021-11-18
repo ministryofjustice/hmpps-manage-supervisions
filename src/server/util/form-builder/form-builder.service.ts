@@ -99,7 +99,7 @@ export abstract class FormBuilderService<Dto, Step extends string> {
     this.recordStep(session, step)
     const steps = this.getSteps(session)
     const nextIndex = (steps.indexOf(step) + 1) % steps.length
-    return this.toStep(session, steps[nextIndex]) // TODO use options nfrom session
+    return this.toStep(session, steps[nextIndex]) // TODO use options from session
   }
 
   getBackUrl(session: WizardSession<Dto, Step>, step: Step): string {

@@ -8,6 +8,7 @@ import { AppointmentTypeRequiresLocation } from '../../community-api/client'
 import { SessionBuilder } from '../../util/form-builder'
 import {
   AppointmentBookingUnavailableReason,
+  AppointmentCreateStatus,
   AppointmentWizardStep,
   NO_LOCATION,
   UNAVAILABLE_LOCATION,
@@ -141,7 +142,15 @@ export class SessionBuilderService implements SessionBuilder<AppointmentBuilderD
   async check(session: AppointmentWizardSession, model: AppointmentBuilderDto): Promise<ValidationError[]> {
     // book the appointment!
     // TODO save to session?
-    await this.service.createAppointment(model, session.crn)
+    const bookingResponse = await this.service.createAppointment(model, session.crn)
+    if (bookingResponse.status != AppointmentCreateStatus.OK) {
+      return [
+        {
+          property: 'booking',
+          constraints: { response: bookingResponse.status },
+        },
+      ]
+    }
     return []
   }
 

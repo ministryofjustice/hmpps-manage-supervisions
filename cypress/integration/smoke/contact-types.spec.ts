@@ -34,7 +34,10 @@ context('contact types smoke test', () => {
 
       cy.arrangeAppointment(crn)
 
-      fixture.attemptBookingOtherAppointment(test, false)
+      fixture
+        .attemptBookingOtherAppointment(test)
+        .shouldDisplayAppointmentBookingConfirmation(test)
+        .whenClickingFinish()
 
       testcount++
     })

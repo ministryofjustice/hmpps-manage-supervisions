@@ -107,6 +107,10 @@ export class ArrangeAppointmentFixture {
     return this
   }
 
+  whenClickingFinish() {
+    this.page.confirm.finishButton.click()
+  }
+
   shouldDisplayCorrectAppointmentSummary(
     {
       start,
@@ -164,6 +168,13 @@ export class ArrangeAppointmentFixture {
   time(date: DateTime) {
     const hourMinuteFormat = date.minute === 0 ? 'ha' : 'h:mma'
     return date.toFormat(hourMinuteFormat).toLowerCase()
+  }
+
+  shouldDisplayClashError({ crn }: AppointmentBookingTestCase) {
+    this.page.pageTitle.contains('You need to choose a different appointment slot')
+    this.page.check.appointmentDateChangeLink
+      .should('have.attr', 'href')
+      .and('include', `${crn}/arrange-appointment/when`)
   }
 
   shouldDisplayAppointmentBookingConfirmation({
@@ -286,7 +297,7 @@ export class ArrangeAppointmentFixture {
     return this
   }
 
-  attemptBookingOtherAppointment(test: AppointmentBookingTestCase, verifyWiremockRequests = true) {
+  attemptBookingOtherAppointment(test: AppointmentBookingTestCase) {
     let locationEntered = false
     this.whenSelectingTypeRadio('Other')
       .whenSelectingOtherAppointmentType(test.type.name.substring(0, Math.max(10, test.type.name.length - 1)), test)
@@ -313,12 +324,7 @@ export class ArrangeAppointmentFixture {
       .shouldDisplayCorrectAppointmentSummary(test, locationEntered)
 
       .whenSubmittingCurrentStep()
-      .shouldDisplayAppointmentBookingConfirmation(test)
 
-    if (verifyWiremockRequests) {
-      this.shouldHaveBookedAppointment(test)
-    }
-    this.page.confirm.finishButton.click()
     return this
   }
 
