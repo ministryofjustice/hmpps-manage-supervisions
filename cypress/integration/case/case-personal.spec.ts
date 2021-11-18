@@ -356,6 +356,7 @@ context('Case personal details tab', () => {
           page.value('Address').contains('64 Ermin Street Wrenthorpe West Yorkshire WF2 8WT')
           page.value('Phone number').contains('07700 900 141')
           page.value('Start date').contains('13 September 2019')
+          page.value('Notes').contains('a', 'https://gov.uk')
           page.value('End date').contains('10 October 2200')
           page.value('Notes').contains('Divorced')
         })
