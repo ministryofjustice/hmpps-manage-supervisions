@@ -86,16 +86,19 @@ export interface TimeRangeColumn extends ColumnBase<'from'> {
 export type Column = TextColumn | LinkColumn | ShortDateColumn | LongDateColumn | TimeRangeColumn
 
 export class ToTableRows extends NunjucksFilter {
+  private readonly safe = this.environment.getFilter('safe')
+  private readonly urlize = this.environment.getFilter('urlize')
+
   filter(data: any[], columns: Column[]): TableColumn[][] {
     return data.map(x =>
       columns.map(col => ({
         ...pick(col, ['classes', 'colspan', 'rowspan', 'attributes']),
-        ...ToTableRows.getContent(x, col),
+        ...this.getContent(x, col),
       })),
     )
   }
 
-  private static getContent(row: any, col: Column): Pick<TableColumn, 'text' | 'html' | 'format'> {
+  getContent(row: any, col: Column): Pick<TableColumn, 'text' | 'html' | 'format'> {
     function getDateTime(path: string): DateTime {
       return safeGetDateTime(get(row, path)) || col.defaultValue
     }
@@ -106,7 +109,7 @@ export class ToTableRows extends NunjucksFilter {
 
     switch (col.type) {
       case ColumnType.Text:
-        return { text: getAny(col.path) }
+        return { text: this.safe(this.urlize(getAny(col.path))) }
       case ColumnType.Link:
         return { html: `<a href="${getAny(col.href)}">${getAny(col.path)}</a>` }
       case ColumnType.ShortDate:

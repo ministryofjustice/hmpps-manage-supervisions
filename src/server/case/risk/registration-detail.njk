@@ -55,7 +55,7 @@
           text: "Notes"
         },
         value: {
-          text: registration.notes if registration.notes else 'No notes'
+          text: registration.notes | urlize | safe if registration.notes else 'No notes'
         },
         actions: {
           items: [

@@ -82,6 +82,7 @@ context('Case risk tab', () => {
           page.riskFlags(table => {
             table.cell(0, 0).contains('Alert Notice')
             table.cell(0, 1).contains('Major alert about this offender')
+            table.cell(0, 1).contains('a', 'https://gov.uk')
             table.cell(0, 2).contains('2 January 2022')
           })
 
