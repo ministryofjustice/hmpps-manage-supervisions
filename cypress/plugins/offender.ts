@@ -122,7 +122,7 @@ export const OFFENDER: DeepPartial<OffenderDetail> = {
           {
             startDate: '2021-05-10',
             provisionType: { description: 'Other' },
-            notes: 'Extra tuition',
+            notes: 'Extra tuition, more information at https://gov.uk',
           },
         ],
         lastUpdatedDateTime: '2021-08-01',
@@ -130,7 +130,7 @@ export const OFFENDER: DeepPartial<OffenderDetail> = {
       {
         disabilityType: { description: 'Speech Impairment' },
         startDate: '2021-03-01',
-        notes: 'Talks like a pirate',
+        notes: 'Talks like a pirate, more information at https://gov.uk',
         provisions: null,
         lastUpdatedDateTime: '2021-07-01',
       },

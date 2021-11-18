@@ -87,6 +87,9 @@ class Fixture extends ViewCaseFixture {
       }
       if (expected.notes) {
         card.value('Notes').contains(expected.notes)
+        if (expected.notesLink) {
+          card.value('Notes').contains('a', expected.notesLink)
+        }
       } else {
         card.value('Notes').contains('No notes')
       }
@@ -104,6 +107,9 @@ class Fixture extends ViewCaseFixture {
 
           if (adjustment.notes) {
             subject.value('Notes').contains(adjustment.notes)
+            if (adjustment.notesLink) {
+              subject.value('Notes').contains('a', adjustment.notesLink)
+            }
           } else {
             subject.value('Notes').contains('No notes')
           }
@@ -301,12 +307,15 @@ context('Case personal details tab', () => {
         .shouldRenderDisability({
           name: 'Learning Difficulties',
           startDate: '1 February 2021',
-          adjustments: [{ name: 'Other', startDate: '10 May 2021', notes: 'Extra tuition' }],
+          adjustments: [
+            { name: 'Other', startDate: '10 May 2021', notes: 'Extra tuition', notesLink: 'https://gov.uk' },
+          ],
         })
         .shouldRenderDisability({
           name: 'Speech Impairment',
           startDate: '1 March 2021',
           notes: 'Talks like a pirate',
+          notesLink: 'https://gov.uk',
           adjustments: [],
         })
         .shouldRenderDisability({
