@@ -29,7 +29,7 @@ export const OFFENDER: DeepPartial<OffenderDetail> = {
         town: 'Sheffield',
         county: 'South Yorkshire',
         postcode: 'S10 1AG',
-        notes: 'Sleeping on sofa',
+        notes: 'Sleeping on sofa, https://gov.uk',
         telephoneNumber: '0123456789',
         status: {
           code: 'M',

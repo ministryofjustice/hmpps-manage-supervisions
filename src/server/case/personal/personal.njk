@@ -27,7 +27,7 @@
                             },
                             {
                                 key: { text: "Notes" },
-                                value: { html: contactDetails.address.notes | nl2br }
+                                value: { html: contactDetails.address.notes | nl2br | urlize | safe }
                             } if contactDetails.address.notes
                         ]
                     })

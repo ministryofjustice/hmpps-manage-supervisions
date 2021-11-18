@@ -63,6 +63,9 @@ class Fixture extends ViewCaseFixture {
     }
     if (expected.notes) {
       page.address(type, 'Notes').contains(expected.notes)
+      if (expected.notesLink) {
+        page.address(type, 'Notes').contains('a', expected.notesLink)
+      }
     } else {
       page.address(type, 'Notes').contains('No notes')
     }
@@ -268,6 +271,7 @@ context('Case personal details tab', () => {
           type: 'Approved Premises (verified)',
           startDate: '16 July 2015',
           notes: 'Sleeping on sofa',
+          notesLink: 'https://gov.uk',
         })
         .shouldRenderAddress('other', {
           name: 'Secondary address – Since 8 January 2016',
