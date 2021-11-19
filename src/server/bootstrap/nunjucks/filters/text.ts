@@ -79,6 +79,32 @@ export class Nl2brSafe extends NunjucksFilter {
   }
 }
 
+/**
+ * Used for formatting "Notes" type fields with sensible defaults:
+ * "foo\nbar"
+ *    | striptags(true) # To remove evil tags from untrusted user input
+ *    | escape          # Convert <, > etc to HTML-safe entities
+ *    | nl2br           # Convert all \n newlines to <br>
+ *    | urlize          # Convert all http://gov.uk urls to <a> anchor tags
+ *    | safe            # Mark the final string as safe to output with HTML
+ */
+export class SafeNotes extends NunjucksFilter {
+  private readonly safe = this.environment.getFilter('safe')
+  private readonly urlize = this.environment.getFilter('urlize')
+  private readonly nl2br = this.environment.getFilter('nl2br')
+  private readonly escape = this.environment.getFilter('escape')
+  private readonly striptags = this.environment.getFilter('striptags')
+
+  filter(value: any): any {
+    const s = unwrapString(value)
+    if (!s) {
+      return s
+    }
+
+    return this.safe(this.urlize(this.nl2br(this.escape(this.striptags(value, true)))))
+  }
+}
+
 export class NoOrphans extends NunjucksFilter {
   filter(value: any): any {
     const indexOflastSpace = value.lastIndexOf(' ')
