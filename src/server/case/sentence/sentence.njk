@@ -24,7 +24,7 @@
             } if requirement.terminationReason,
             {
                 key: { text: "Notes" },
-                value: { html: requirement.notes | nl2br | urlize | safe if requirement.notes else 'No notes' }
+                value: { html: requirement.notes | safeNotes if requirement.notes else 'No notes' }
             }
         ]
     }) }}
@@ -93,7 +93,7 @@
                         } if additionalSentences.length,
                         {
                             key: { text: "Notes" },
-                            value: { html: additionalSentences.notes | nl2br | urlize | safe if additionalSentences.notes else 'No notes' }
+                            value: { html: additionalSentences.notes | safeNotes if additionalSentences.notes else 'No notes' }
                         }
                     ]
                 })

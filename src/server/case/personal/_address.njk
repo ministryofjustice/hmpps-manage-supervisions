@@ -40,7 +40,7 @@
             } if address.endDate,
             {
                 key: { text: "Notes" },
-                value: { html: (address.notes | nl2br | urlize | safe) if address.notes else 'No notes' }
+                value: { html: (address.notes | safeNotes) if address.notes else 'No notes' }
             }
         ]
     }) }}

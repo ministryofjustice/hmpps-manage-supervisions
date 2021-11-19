@@ -43,7 +43,7 @@
                     } if personalContact.endDate,
                     {
                         key: { text: "Notes" },
-                        value: { text: personalContact.notes | urlize | safe if personalContact.notes else "No notes" }
+                        value: { text: personalContact.notes | safeNotes if personalContact.notes else "No notes" }
                     }
                 ]
             }) }}

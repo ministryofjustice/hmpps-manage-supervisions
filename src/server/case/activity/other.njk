@@ -18,7 +18,7 @@
             },
             {
                 key: { text: "Notes" },
-                value: { html: (contact.notes or 'No notes') | nl2BrSafe | urlize | safe }
+                value: { html: (contact.notes | safeNotes) or 'No notes' }
             }
         ]
     }) }}
