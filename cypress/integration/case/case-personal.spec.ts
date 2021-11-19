@@ -63,6 +63,9 @@ class Fixture extends ViewCaseFixture {
     }
     if (expected.notes) {
       page.address(type, 'Notes').contains(expected.notes)
+      if (expected.notesLink) {
+        page.address(type, 'Notes').contains('a', expected.notesLink)
+      }
     } else {
       page.address(type, 'Notes').contains('No notes')
     }
@@ -84,6 +87,9 @@ class Fixture extends ViewCaseFixture {
       }
       if (expected.notes) {
         card.value('Notes').contains(expected.notes)
+        if (expected.notesLink) {
+          card.value('Notes').contains('a', expected.notesLink)
+        }
       } else {
         card.value('Notes').contains('No notes')
       }
@@ -101,6 +107,9 @@ class Fixture extends ViewCaseFixture {
 
           if (adjustment.notes) {
             subject.value('Notes').contains(adjustment.notes)
+            if (adjustment.notesLink) {
+              subject.value('Notes').contains('a', adjustment.notesLink)
+            }
           } else {
             subject.value('Notes').contains('No notes')
           }
@@ -128,6 +137,9 @@ class Fixture extends ViewCaseFixture {
       }
       card.value('Verified').contains(expected.verified ? 'Yes' : 'No')
       card.value('Notes').contains(expected.notes || 'No Notes')
+      if (expected.notesLink) {
+        card.value('Notes').contains('a', expected.notesLink)
+      }
       card.lastUpdated.contains(expected.lastUpdated)
       if (expected.previous) {
         card.previousCircumstance.contains('Previous circumstance')
@@ -268,6 +280,7 @@ context('Case personal details tab', () => {
           type: 'Approved Premises (verified)',
           startDate: '16 July 2015',
           notes: 'Sleeping on sofa',
+          notesLink: 'https://gov.uk',
         })
         .shouldRenderAddress('other', {
           name: 'Secondary address – Since 8 January 2016',
@@ -294,12 +307,15 @@ context('Case personal details tab', () => {
         .shouldRenderDisability({
           name: 'Learning Difficulties',
           startDate: '1 February 2021',
-          adjustments: [{ name: 'Other', startDate: '10 May 2021', notes: 'Extra tuition' }],
+          adjustments: [
+            { name: 'Other', startDate: '10 May 2021', notes: 'Extra tuition', notesLink: 'https://gov.uk' },
+          ],
         })
         .shouldRenderDisability({
           name: 'Speech Impairment',
           startDate: '1 March 2021',
           notes: 'Talks like a pirate',
+          notesLink: 'https://gov.uk',
           adjustments: [],
         })
         .shouldRenderDisability({
@@ -329,6 +345,7 @@ context('Case personal details tab', () => {
           startDate: '1 April 2005',
           endDate: '2 July 2021',
           verified: true,
+          notesLink: 'https://gov.uk',
           previous: true,
           notes: 'Divorced',
           lastUpdated: '2 July 2021',
@@ -348,6 +365,7 @@ context('Case personal details tab', () => {
           page.value('Address').contains('64 Ermin Street Wrenthorpe West Yorkshire WF2 8WT')
           page.value('Phone number').contains('07700 900 141')
           page.value('Start date').contains('13 September 2019')
+          page.value('Notes').contains('a', 'https://gov.uk')
           page.value('End date').contains('10 October 2200')
           page.value('Notes').contains('Divorced')
         })

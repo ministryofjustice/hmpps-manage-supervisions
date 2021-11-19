@@ -73,6 +73,7 @@ context('Case risk tab', () => {
                 () => {
                   page.currentNotes.contains('No detail given')
                   page.previousNotes.contains('A hostel setting would pose significant risk for this case.')
+                  page.previousNotes.contains('a', 'https://gov.uk')
                 },
               )
               list.value('Vulnerability').contains('No concerns')
@@ -82,6 +83,7 @@ context('Case risk tab', () => {
           page.riskFlags(table => {
             table.cell(0, 0).contains('Alert Notice')
             table.cell(0, 1).contains('Major alert about this offender')
+            table.cell(0, 1).contains('a', 'https://gov.uk')
             table.cell(0, 2).contains('2 January 2022')
           })
 
@@ -170,6 +172,7 @@ context('Case risk tab', () => {
           page.removedRisksTable(table => {
             table.cell(0, 0).contains('Organised Crime')
             table.cell(0, 1).contains('No longer a risk')
+            table.cell(0, 1).contains('a', 'https://gov.uk')
             table.cell(0, 2).contains('19 July 2021')
           })
         })
@@ -191,6 +194,7 @@ context('Case risk tab', () => {
           page.removalDetails(card => {
             card.value('Date removed').contains('19 July 2021 by Brian Peashoots')
             card.value('Why it was removed').contains('No longer a risk')
+            card.value('Why it was removed').contains('a', 'https://gov.uk')
           })
 
           // These texts are long, so just check for a substring

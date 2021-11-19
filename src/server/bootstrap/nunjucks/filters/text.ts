@@ -60,11 +60,17 @@ function unwrapString(value: any): string {
 }
 
 /**
- * equivalent to:
- * "foo\nbar" | striptags(true) | escape | nl2br | safe
+ * Used for formatting "Notes" type fields with sensible defaults:
+ * "foo\nbar"
+ *    | striptags(true) # To remove evil tags from untrusted user input
+ *    | escape          # Convert <, > etc to HTML-safe entities
+ *    | nl2br           # Convert all \n newlines to <br>
+ *    | urlize          # Convert all http://gov.uk urls to <a> anchor tags
+ *    | safe            # Mark the final string as safe to output with HTML
  */
-export class Nl2brSafe extends NunjucksFilter {
+export class SafeNotes extends NunjucksFilter {
   private readonly safe = this.environment.getFilter('safe')
+  private readonly urlize = this.environment.getFilter('urlize')
   private readonly nl2br = this.environment.getFilter('nl2br')
   private readonly escape = this.environment.getFilter('escape')
   private readonly striptags = this.environment.getFilter('striptags')
@@ -75,7 +81,7 @@ export class Nl2brSafe extends NunjucksFilter {
       return s
     }
 
-    return this.safe(this.nl2br(this.escape(this.striptags(value, true))))
+    return this.safe(this.urlize(this.nl2br(this.escape(this.striptags(value, true)))))
   }
 }
 

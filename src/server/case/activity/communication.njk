@@ -30,7 +30,7 @@
             },
             {
                 key: { text: "Details" },
-                value: { html: (contact.notes or 'No notes') | nl2BrSafe }
+                value: { html: (contact.notes | safeNotes) or 'No notes' }
             }
         ]
     }) }}

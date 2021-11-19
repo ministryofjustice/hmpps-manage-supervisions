@@ -46,7 +46,7 @@ export const ACTIVE_CONVICTION: DeepPartial<Conviction> = {
       {
         type: { description: 'Fine' },
         amount: 500,
-        notes: '£500 fine',
+        notes: '£500 fine according to https://gov.uk',
       },
       {
         type: { description: 'Disqualified from Driving' },

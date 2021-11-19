@@ -13,7 +13,7 @@ export const PERSONAL_CONTACTS: DeepPartial<PersonalContact>[] = [
     surname: 'Wade',
     gender: 'Female',
     relationshipType: { description: 'Next of Kin' },
-    notes: 'Divorced',
+    notes: "Divorced, here's an unrelated link to https://gov.uk",
     address: {
       addressNumber: '64',
       buildingName: null,

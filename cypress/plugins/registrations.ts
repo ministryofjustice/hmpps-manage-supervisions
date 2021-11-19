@@ -50,7 +50,7 @@ export const REGISTRATIONS: DeepPartial<Registration>[] = Object.entries(riskRef
     {
       active: true,
       type: { code: 'ALERT', description: 'Alert Notice' },
-      notes: 'Major alert about this offender',
+      notes: 'Major alert about this offender https://gov.uk',
       nextReviewDate: '2022-01-02',
       startDate: '2020-05-14',
       registeringOfficer: {
@@ -92,7 +92,7 @@ export const REGISTRATIONS: DeepPartial<Registration>[] = Object.entries(riskRef
       endDate: '2021-07-19',
       nextReviewDate: '2022-01-02',
       notes: 'Deals in stolen weapons',
-      deregisteringNotes: 'No longer a risk',
+      deregisteringNotes: 'No longer a risk https://gov.uk',
       registeringOfficer: {
         code: 'ZXU221',
         forenames: 'Wamberto',

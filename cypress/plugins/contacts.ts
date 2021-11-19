@@ -45,7 +45,8 @@ export const ACTIVITY_LOG_GROUPS: DeepPartial<ActivityLogGroup>[] = [
         },
         startTime: '14:00:00',
         endTime: null,
-        notes: 'Some unknown communication\n<a href="#dont-click-this">this should not be a link</a>',
+        notes:
+          'Some unknown communication\n<a href="#dont-click-this">this should not be a link</a>\nbut this one should be https://gov.uk',
         outcome: null,
         lastUpdatedDateTime: '2020-09-04T15:20:23+01:00',
         lastUpdatedByUser: { forenames: 'John', surname: 'Rover' },
@@ -230,7 +231,7 @@ export const ACTIVITY_LOG_GROUPS: DeepPartial<ActivityLogGroup>[] = [
         type: { code: 'NOT_WELL_KNOWN', description: 'Not a well known appointment', appointment: true },
         startTime: '11:00:00',
         endTime: '13:00:00',
-        notes: 'Some unknown appointment',
+        notes: 'Some unknown appointment with a link to https://gov.uk',
         staff: { forenames: 'Robert', surname: 'Ohagan', unallocated: false },
         outcome: null,
         sensitive: false,

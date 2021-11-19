@@ -47,7 +47,7 @@
             } if appointment.rarActivity,
             {
                 key: { text: "Appointment notes" },
-                value: { html: (appointment.notes | nl2br) if appointment.notes else 'No notes' },
+                value: { html: (appointment.notes | safeNotes) if appointment.notes else 'No notes' },
                 actions: { items: [{ href: appointment.links.updateOutcome, html: "Change<span class=\"govuk-visually-hidden\"> appointment notes</span>" }] }
             } if not appointment.outcome,
             {
@@ -81,7 +81,7 @@
                 } if appointment.enforcementAction,
                 {
                     key: { text: "Appointment notes" },
-                    value: { html: (appointment.notes | nl2br) if appointment.notes else 'No notes' },
+                    value: { html: (appointment.notes | safeNotes) if appointment.notes else 'No notes' },
                     actions: { items: [{ href: appointment.links.updateOutcome, text: "Change" }] }
                 },
                 {
