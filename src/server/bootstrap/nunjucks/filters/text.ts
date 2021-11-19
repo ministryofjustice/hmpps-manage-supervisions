@@ -60,26 +60,6 @@ function unwrapString(value: any): string {
 }
 
 /**
- * equivalent to:
- * "foo\nbar" | striptags(true) | escape | nl2br | safe
- */
-export class Nl2brSafe extends NunjucksFilter {
-  private readonly safe = this.environment.getFilter('safe')
-  private readonly nl2br = this.environment.getFilter('nl2br')
-  private readonly escape = this.environment.getFilter('escape')
-  private readonly striptags = this.environment.getFilter('striptags')
-
-  filter(value: any): any {
-    const s = unwrapString(value)
-    if (!s) {
-      return s
-    }
-
-    return this.safe(this.nl2br(this.escape(this.striptags(value, true))))
-  }
-}
-
-/**
  * Used for formatting "Notes" type fields with sensible defaults:
  * "foo\nbar"
  *    | striptags(true) # To remove evil tags from untrusted user input
