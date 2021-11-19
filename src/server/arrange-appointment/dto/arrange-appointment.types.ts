@@ -1,4 +1,4 @@
-import { AppointmentType } from '../../community-api/client'
+import { AppointmentCreateResponse, AppointmentType } from '../../community-api/client'
 import { WellKnownAppointmentType } from '../../config'
 
 export type MaybeWellKnownAppointmentType = AppointmentType & { wellKnownType?: WellKnownAppointmentType }
@@ -35,3 +35,21 @@ export enum AppointmentWizardStep {
   Confirm = 'confirm',
   Unavailable = 'unavailable',
 }
+
+export interface AppointmentCreateResult<ServiceStatus extends AppointmentCreateStatus> {
+  status: ServiceStatus
+}
+
+export enum AppointmentCreateStatus {
+  OK = 'ok',
+  Clash = 'clash',
+  PastNoOutcome = 'past-no-outcome',
+}
+
+export type AppointmentCreateClash = AppointmentCreateResult<AppointmentCreateStatus.Clash>
+
+export type AppointmentCreatePastNoOutcome = AppointmentCreateResult<AppointmentCreateStatus.PastNoOutcome>
+
+export type AppointmentCreateFailure = AppointmentCreateClash | AppointmentCreatePastNoOutcome
+
+export type AppointmentCreateSuccess = AppointmentCreateResult<AppointmentCreateStatus.OK> & AppointmentCreateResponse

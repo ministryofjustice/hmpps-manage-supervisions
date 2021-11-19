@@ -310,8 +310,12 @@ class FluentWiremockContext {
   }
 
   serverError() {
+    return this.serverErrorWithCode(500)
+  }
+
+  serverErrorWithCode(status: number) {
     this.response({
-      status: 500,
+      status,
       headers: { 'Content-Type': 'application/json;charset=UTF-8' },
       jsonBody: { message: 'Sorry :-(' },
     })

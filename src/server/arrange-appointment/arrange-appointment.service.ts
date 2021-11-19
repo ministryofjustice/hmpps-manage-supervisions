@@ -1,9 +1,8 @@
 import { AppointmentBuilderDto } from './dto/AppointmentBuilderDto'
-import { Injectable } from '@nestjs/common'
+import { HttpStatus, Injectable, Logger } from '@nestjs/common'
 import { CacheService } from '../common'
 import {
   AppointmentCreateRequest,
-  AppointmentCreateResponse,
   AppointmentTypeOrderTypes,
   OffenderDetail,
   OfficeLocation,
@@ -21,10 +20,18 @@ import {
   EMPLOYMENT_TYPE_CODE,
   RequirementService,
 } from '../community-api'
-import { MaybeWellKnownAppointmentType } from './dto/arrange-appointment.types'
+import {
+  AppointmentCreateFailure,
+  AppointmentCreateStatus,
+  AppointmentCreateSuccess,
+  MaybeWellKnownAppointmentType,
+} from './dto/arrange-appointment.types'
+import { SanitisedAxiosError } from '../common/rest'
 
 @Injectable()
 export class ArrangeAppointmentService {
+  private readonly logger = new Logger(ArrangeAppointmentService.name)
+
   constructor(
     private readonly community: CommunityApiService,
     private readonly cache: CacheService,
@@ -51,7 +58,10 @@ export class ArrangeAppointmentService {
     return other.find(x => x.contactType === selected.value) || null
   }
 
-  async createAppointment(builder: AppointmentBuilderDto, crn: string): Promise<AppointmentCreateResponse> {
+  async createAppointment(
+    builder: AppointmentBuilderDto,
+    crn: string,
+  ): Promise<AppointmentCreateSuccess | AppointmentCreateFailure> {
     const appointmentType = await this.getAppointmentType(builder)
     if (!appointmentType) {
       throw new Error('appointment type is not set')
@@ -71,14 +81,29 @@ export class ArrangeAppointmentService {
       sensitive: builder.sensitive,
     }
 
-    const { data } = await this.community.appointment.createAppointmentUsingPOST({
-      appointmentCreateRequest,
-      //TODO: This field is named wrongly on Community API - it's called sentence ID when in fact it's the conviction ID
-      sentenceId: builder.convictionId,
-      crn,
-    })
+    const { data, success, status } = await SanitisedAxiosError.catchStatus(
+      () =>
+        this.community.appointment.createAppointmentUsingPOST({
+          appointmentCreateRequest,
+          //TODO: This field is named wrongly on Community API - it's called sentence ID when in fact it's the conviction ID
+          sentenceId: builder.convictionId,
+          crn,
+        }),
+      HttpStatus.CONFLICT,
+      HttpStatus.BAD_REQUEST,
+    )
 
-    return data
+    if (!success) {
+      if (status === HttpStatus.CONFLICT) {
+        this.logger.log(`appointment already exists at given time`)
+        return { status: AppointmentCreateStatus.Clash }
+      } else if (status === HttpStatus.BAD_REQUEST) {
+        this.logger.error(`bad request - most likely time is in the past and no outcome provided`, { data })
+        return { status: AppointmentCreateStatus.PastNoOutcome }
+      }
+    }
+
+    return { ...data, status: AppointmentCreateStatus.OK }
   }
 
   async getOffenderDetails(crn: string): Promise<OffenderDetail> {

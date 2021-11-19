@@ -1,10 +1,16 @@
-{% extends "pages/wizard-form.njk" %}
-{% set buttonText = 'Arrange appointment' %}
-{% set title = 'Check your answers' %}
 {% from "./partials/session-details.njk" import sessionDetails %}
 
-{% block form %}
-  <h1 class="govuk-heading-xl">{{ title }}</h1>
+{% if errors.length > 0 %}
+  {% set basePage = "./booking-failure.njk" %}
+{% else %}
+  {% set basePage = "pages/wizard-form.njk" %}
+  {% set buttonText = 'Arrange appointment' %}
+  {% set title = 'Check your answers' %}
+  {% block form %}
+    <h1 class="govuk-heading-xl">{{ title }}</h1>
 
-  {{ sessionDetails(appointment, rarDetails, paths) }}
-{% endblock %}
+    {{ sessionDetails(appointment, rarDetails, paths) }}
+  {% endblock %}
+{% endif %}
+
+{% extends basePage %}

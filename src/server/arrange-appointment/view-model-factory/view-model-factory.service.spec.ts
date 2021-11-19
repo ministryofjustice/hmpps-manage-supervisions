@@ -222,6 +222,7 @@ describe('ViewModelFactoryService', () => {
         sensitive: '/sensitive',
       },
       rarDetails: { category: '', subCategory: '' },
+      errors: [],
     } as CheckAppointmentViewModel)
   })
 

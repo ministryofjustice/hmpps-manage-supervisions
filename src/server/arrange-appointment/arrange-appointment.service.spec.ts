@@ -14,11 +14,13 @@ import {
   fakeOfficeLocation,
   fakePersonalCircumstance,
 } from '../community-api/community-api.fake'
-import { fakeOkResponse } from '../common/rest/rest.fake'
+import { fakeOkResponse, fakeRestError } from '../common/rest/rest.fake'
 import { WellKnownAppointmentType, ContactTypeCategory, WellKnownContactTypeConfig } from '../config'
 import { AvailableAppointmentTypes } from './dto/AppointmentWizardViewModel'
 import { FakeConfigModule } from '../config/config.fake'
 import { ConfigService } from '@nestjs/config'
+import { HttpStatus } from '@nestjs/common'
+import { AppointmentCreateStatus } from './dto/arrange-appointment.types'
 
 describe('ArrangeAppointmentService', () => {
   let community: MockCommunityApiService
@@ -61,7 +63,7 @@ describe('ArrangeAppointmentService', () => {
 
     const returned = await subject.createAppointment(dto, crn)
 
-    expect(returned).toBe(response)
+    expect(returned).toStrictEqual(response)
     expect(stub.getCall(0).args[0]).toEqual({
       crn,
       sentenceId: dto.convictionId,
@@ -78,6 +80,36 @@ describe('ArrangeAppointmentService', () => {
         teamCode: dto.teamCode,
       },
     })
+  })
+
+  it('handles conflict response without throwing exception', async () => {
+    const dto = fakeAppointmentBuilderDto({ type: WellKnownAppointmentType.OfficeVisit })
+    const crn = faker.datatype.uuid()
+    const type = fakeFeaturedAppointmentType({ type: WellKnownAppointmentType.OfficeVisit })
+    cache.cache['community:available-appointment-types-cja-true-legacy-false'] = {
+      featured: [type],
+      other: [],
+    } as AvailableAppointmentTypes
+    community.appointment.createAppointmentUsingPOST.withArgs(match.any).throws(fakeRestError(HttpStatus.CONFLICT))
+
+    const returned = await subject.createAppointment(dto, crn)
+
+    expect(returned).toStrictEqual({ status: AppointmentCreateStatus.Clash })
+  })
+
+  it('handles bad request response without throwing exception', async () => {
+    const dto = fakeAppointmentBuilderDto({ type: WellKnownAppointmentType.OfficeVisit })
+    const crn = faker.datatype.uuid()
+    const type = fakeFeaturedAppointmentType({ type: WellKnownAppointmentType.OfficeVisit })
+    cache.cache['community:available-appointment-types-cja-true-legacy-false'] = {
+      featured: [type],
+      other: [],
+    } as AvailableAppointmentTypes
+    community.appointment.createAppointmentUsingPOST.withArgs(match.any).throws(fakeRestError(HttpStatus.BAD_REQUEST))
+
+    const returned = await subject.createAppointment(dto, crn)
+
+    expect(returned).toStrictEqual({ status: AppointmentCreateStatus.PastNoOutcome })
   })
 
   it('gets offender details', async () => {

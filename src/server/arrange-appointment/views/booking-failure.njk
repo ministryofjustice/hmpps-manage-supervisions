@@ -1,0 +1,20 @@
+{% extends "partials/layout.njk" %}
+
+{% set pageTitle = "You need to choose a different appointment slot" %}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class='govuk-heading-xl'>{{ pageTitle }}</h1>
+
+            <p class='govuk-body qa-date'>
+                The date or time you’ve chosen either conflicts with another appointment or is in the past. 
+                Please go back and <a class='qa-change' href="{{ paths.when }}">select a new appointment slot</a>.
+            </p>
+            <p class='govuk-body'>
+                Contact the {{ applicationName }} support team if you require further assistance:
+                {{ appEmail(supportEmail) }}.
+            </p>
+        </div>
+    </div>
+{% endblock %}
