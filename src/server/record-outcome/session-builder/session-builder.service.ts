@@ -28,7 +28,7 @@ export class SessionBuilderService implements SessionBuilder<RecordOutcomeDto, R
         `current user with staff code '${security.staffCode}' is not an offender manager for offender with crn '${session.crn}'`,
       )
     }
-
+    session.dto.offender = offender
     session.dto.appointment = { ...appointment, start: appointment.start.toISO(), end: appointment.end?.toISO() }
     session.breadcrumbOptions.offenderName = getDisplayName(offender)
     session.breadcrumbOptions.entityName = appointment.name

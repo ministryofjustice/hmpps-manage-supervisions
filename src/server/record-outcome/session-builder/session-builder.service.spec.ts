@@ -62,6 +62,7 @@ describe('SessionBuilderService', () => {
             start: '2021-11-10T12:00:00.000+00:00',
             end: '2021-11-10T13:00:00.000+00:00',
           },
+          offender,
         },
         breadcrumbOptions: { id: 10, offenderName: 'Liz Haggis', entityName: 'Some appointment' },
       } as RecordOutcomeSession)

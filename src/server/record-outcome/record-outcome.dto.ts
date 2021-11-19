@@ -2,7 +2,12 @@ import { IsBoolean, IsEnum, IsString } from 'class-validator'
 import { Transform } from 'class-transformer'
 import striptags = require('striptags')
 import { ExposeDefault, ToBoolean } from '../util/mapping'
-import { AvailableContactOutcomeTypes, ContactOutcomeTypeDetail, ContactType } from '../community-api/client'
+import {
+  AvailableContactOutcomeTypes,
+  ContactOutcomeTypeDetail,
+  ContactType,
+  OffenderDetail,
+} from '../community-api/client'
 import {
   ComplianceOption,
   RecordOutcomeAppointmentSummary,
@@ -41,6 +46,12 @@ export const MESSAGES: Partial<Record<RecordOutcomeStep, Record<string, string>>
 }
 
 export class RecordOutcomeDto {
+  /**
+   * Details of the offender who this appointment relates to
+   */
+  @ExposeDefault()
+  offender?: OffenderDetail
+
   /**
    * The appointment that this outcome will be recorded against.
    */
