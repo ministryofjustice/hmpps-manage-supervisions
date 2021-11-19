@@ -157,7 +157,7 @@
                 ],
                 rows: registrations.active | toTableRows([
                     { type: 'link', path: 'text', href: 'links.view', classes: 'govuk-!-padding-top-3 govuk-!-padding-bottom-3' },
-                    { type: 'text', path: 'notes', defaultValue: 'No notes', classes: 'govuk-!-padding-top-3 govuk-!-padding-bottom-3' },
+                    { type: 'text', path: 'notes', defaultValue: 'No notes', classes: 'govuk-!-padding-top-3 govuk-!-padding-bottom-3 app-!-word-break-all' },
                     { type: 'short-date', path: 'reviewDue', defaultValue: 'None', classes: 'govuk-!-padding-top-3 govuk-!-padding-bottom-3' }
                 ])
             }) }}
