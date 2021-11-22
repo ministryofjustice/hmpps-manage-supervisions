@@ -52,7 +52,7 @@ export class ViewModelFactoryService
   ): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
     return {
       step: RecordOutcomeStep.Compliance,
-      compliance: body?.compliance,
+      compliance: body?.compliance || session.dto.compliance,
       offenderFirstName: session.dto.offender?.firstName,
       errors: errors,
       paths: {
