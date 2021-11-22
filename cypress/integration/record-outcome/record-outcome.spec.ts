@@ -1,60 +1,12 @@
-import { RecordOutcomePage } from '../../pages/record-outcome.page'
-import { CRN } from '../../plugins/offender'
-
-class Fixture {
-  readonly page = new RecordOutcomePage()
-
-  constructor(private readonly data: { crn: string; id: number } = { crn: CRN, id: 5 }) {}
-
-  whenRecordingOutcome() {
-    cy.recordOutcome(this.data)
-    return this
-  }
-
-  shouldDisplayStep<Step extends keyof RecordOutcomePage>(
-    step: Step,
-    title: string,
-    callback?: (page: RecordOutcomePage[Step]) => void,
-  ) {
-    this.page.pageTitle.contains(title)
-    cy.url().should(
-      'include',
-      `/case/${this.data.crn}/appointment/${this.data.id}/record-outcome${step === 'init' ? '' : '/' + step}`,
-    )
-    callback && callback(this.page[step])
-    return this
-  }
-
-  shouldDisplayAppointmentPage(name: string) {
-    this.page.pageTitle.contains(name)
-    return this
-  }
-  whenSubmittingFirstStep() {
-    this.page.landingPageContinueButton.click()
-    return this
-  }
-  whenSubmittingCurrentStep() {
-    this.page.continueButton.click()
-    return this
-  }
-  shouldDisplayCompliancePage(title: string) {
-    this.page.pageTitle.contains(title)
-    return this
-  }
-  shouldDisplayComplianceErrors(summary: string, error: string) {
-    this.page.errorSummary.contains(summary)
-    this.page.compliance.errorMessages.compliance.contains(error)
-    return this
-  }
-}
+import { RecordOutcomeFixture } from '../../fixtures/record-outcome.fixture'
 
 context('Record outcome happy path & validation', () => {
   before(() => {
     cy.seed()
   })
 
-  it('can record outcome (TODO upto init so far)', () => {
-    new Fixture()
+  it('can record outcome (TODO up to did not comply reason so far)', () => {
+    new RecordOutcomeFixture()
       .whenRecordingOutcome()
       .shouldDisplayStep('init', 'Record an outcome', page => {
         page.appointmentDetails.contains('Not a well known appointment with Robert Ohagan')
@@ -62,13 +14,18 @@ context('Record outcome happy path & validation', () => {
         page.appointmentDetails.find('a').contains('View appointment').click()
       })
       .shouldDisplayAppointmentPage('Not a well known appointment with Robert Ohagan')
+      .whenGoingBack()
+      .whenSubmittingFirstStep()
+      .shouldDisplayCompliancePage('attend and comply?')
+      .whenSelectingNonComplianceOption()
+      .whenSubmittingCurrentStep()
+      .shouldDisplayOutcomePage('How did Liz not comply?')
+      .whenSelectingOutcome('Attended - Failed to Comply')
+      .whenSubmittingCurrentStep()
   })
 
-  it('should record outcome ', () => {
-    new Fixture().whenRecordingOutcome().whenSubmittingFirstStep().shouldDisplayCompliancePage('attend and comply?')
-  })
   it('compliance page validation', () => {
-    new Fixture()
+    new RecordOutcomeFixture()
       .whenRecordingOutcome()
       .whenSubmittingFirstStep()
       .shouldDisplayCompliancePage('attend and comply?')

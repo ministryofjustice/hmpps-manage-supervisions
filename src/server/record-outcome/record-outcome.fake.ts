@@ -9,14 +9,16 @@ import {
 } from './record-outcome.types'
 import { DEFAULT_GROUP } from '../util/mapping'
 import { DateTime } from 'luxon'
+import { AvailableContactOutcomeTypes, AvailableContactOutcomeTypesOutcomeRequired } from '../community-api/client'
 
-export const fakeRecordOutcomeAppointmentSummary = fake<RecordOutcomeAppointmentSummary>((options, partial = {}) => {
+export const fakeRecordOutcomeAppointmentSummary = fake<RecordOutcomeAppointmentSummary>((_options, partial = {}) => {
   const start = partial.start || DateTime.fromJSDate(faker.date.past()).startOf('day').set({ hour: 12 })
   return {
     id: faker.datatype.number(),
     start,
     end: start.plus({ hours: 1 }),
     name: faker.company.bs(),
+    contactTypeCode: faker.datatype.uuid(),
   }
 })
 
@@ -48,3 +50,27 @@ export const fakeRecordOutcomeDto = fakeClass(
   },
   { groups: [DEFAULT_GROUP] },
 )
+
+export const fakeAvailableContactOutcomeTypes = fake<AvailableContactOutcomeTypes>((_options, _partial = {}) => {
+  return {
+    outcomeRequired: AvailableContactOutcomeTypesOutcomeRequired.Optional,
+    outcomeTypes: [
+      {
+        actionRequired: faker.datatype.boolean(),
+        attendance: faker.datatype.boolean(),
+        code: faker.datatype.uuid(),
+        compliantAcceptable: faker.datatype.boolean(),
+        description: faker.company.bs(),
+        enforceable: faker.datatype.boolean(),
+        enforcements: [
+          {
+            code: faker.datatype.uuid(),
+            description: faker.company.bs(),
+            outstandingContactAction: faker.datatype.boolean(),
+            responseByPeriod: faker.datatype.number(10),
+          },
+        ],
+      },
+    ],
+  }
+})

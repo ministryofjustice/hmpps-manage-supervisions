@@ -28,8 +28,10 @@ export class SessionBuilderService implements SessionBuilder<RecordOutcomeDto, R
         `current user with staff code '${security.staffCode}' is not an offender manager for offender with crn '${session.crn}'`,
       )
     }
+
     session.dto.offender = offender
     session.dto.appointment = { ...appointment, start: appointment.start.toISO(), end: appointment.end?.toISO() }
+    session.dto.availableOutcomeTypes = await this.service.getAvailableContactOutcomes(appointment.contactTypeCode)
     session.breadcrumbOptions.offenderName = getDisplayName(offender)
     session.breadcrumbOptions.entityName = appointment.name
   }
@@ -63,7 +65,7 @@ export class SessionBuilderService implements SessionBuilder<RecordOutcomeDto, R
   }
 
   outcome(): Promise<ValidationError[]> | ValidationError[] {
-    throw new Error('not implemented')
+    return []
   }
 
   rar(): Promise<ValidationError[]> | ValidationError[] {

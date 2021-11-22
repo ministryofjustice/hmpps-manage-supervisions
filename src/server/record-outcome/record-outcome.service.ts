@@ -3,7 +3,7 @@ import { CommunityApiService, ContactMappingService } from '../community-api'
 import { ContactTypeCategory } from '../config'
 import { DateTime } from 'luxon'
 import { RecordOutcomeAppointmentSummary } from './record-outcome.types'
-import { OffenderDetail } from '../community-api/client'
+import { AvailableContactOutcomeTypes, OffenderDetail } from '../community-api/client'
 
 @Injectable()
 export class RecordOutcomeService {
@@ -30,6 +30,14 @@ export class RecordOutcomeService {
       name: meta.name,
       start: DateTime.fromISO(appointment.contactStart),
       end: appointment.contactEnd && DateTime.fromISO(appointment.contactEnd),
+      contactTypeCode: appointment.type.code,
     }
+  }
+
+  async getAvailableContactOutcomes(contactTypeCode: string): Promise<AvailableContactOutcomeTypes> {
+    const { data: availableContactOutcomes } = await this.community.contactAndAttendance.getContactTypeOutcomesUsingGET(
+      { contactTypeCode },
+    )
+    return availableContactOutcomes
   }
 }

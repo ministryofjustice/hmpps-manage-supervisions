@@ -4,7 +4,7 @@ import { RecordOutcomeService } from '../record-outcome.service'
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { fakeSecurityContext } from '../../security/context/security-context.fake'
 import { fakeOffenderDetail } from '../../community-api/community-api.fake'
-import { fakeRecordOutcomeAppointmentSummary } from '../record-outcome.fake'
+import { fakeAvailableContactOutcomeTypes, fakeRecordOutcomeAppointmentSummary } from '../record-outcome.fake'
 import { RecordOutcomeSession } from '../record-outcome.dto'
 import { DateTime } from 'luxon'
 
@@ -48,8 +48,13 @@ describe('SessionBuilderService', () => {
         name: 'Some appointment',
         start: DateTime.fromISO('2021-11-10T12:00:00'),
         end: DateTime.fromISO('2021-11-10T13:00:00'),
+        contactTypeCode: 'OFFICE',
       })
       service.getAppointmentDetail.withArgs('some-crn', 10).resolves(appointment)
+
+      const availableOutcomeTypes = fakeAvailableContactOutcomeTypes()
+
+      service.getAvailableContactOutcomes.withArgs('OFFICE').resolves(availableOutcomeTypes)
 
       const session = { crn: 'some-crn', dto: {}, breadcrumbOptions: { id: 10 } } as RecordOutcomeSession
       await subject.init(session, security)
@@ -61,8 +66,10 @@ describe('SessionBuilderService', () => {
             name: 'Some appointment',
             start: '2021-11-10T12:00:00.000+00:00',
             end: '2021-11-10T13:00:00.000+00:00',
+            contactTypeCode: 'OFFICE',
           },
           offender,
+          availableOutcomeTypes,
         },
         breadcrumbOptions: { id: 10, offenderName: 'Liz Haggis', entityName: 'Some appointment' },
       } as RecordOutcomeSession)
