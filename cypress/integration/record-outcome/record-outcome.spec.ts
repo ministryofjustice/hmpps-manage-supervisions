@@ -73,6 +73,6 @@ context('Record outcome happy path & validation', () => {
       .whenSubmittingFirstStep()
       .shouldDisplayCompliancePage('attend and comply?')
       .whenSubmittingCurrentStep()
-      .shouldDisplayComplianceErrors('There is a problem', 'Select yes if attended and the outcome was acceptable')
+      .shouldDisplayComplianceErrors('There is a problem', 'Select one of the compliance option')
   })
 })
