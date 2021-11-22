@@ -33,8 +33,17 @@ class Fixture {
     this.page.landingPageContinueButton.click()
     return this
   }
+  whenSubmittingCurrentStep() {
+    this.page.continueButton.click()
+    return this
+  }
   shouldDisplayCompliancePage(title: string) {
     this.page.pageTitle.contains(title)
+    return this
+  }
+  shouldDisplayComplianceErrors(summary: string, error: string) {
+    this.page.errorSummary.contains(summary)
+    this.page.compliance.errorMessages.compliance.contains(error)
     return this
   }
 }
@@ -57,5 +66,13 @@ context('Record outcome happy path & validation', () => {
 
   it('should record outcome ', () => {
     new Fixture().whenRecordingOutcome().whenSubmittingFirstStep().shouldDisplayCompliancePage('attend and comply?')
+  })
+  it('compliance page validation', () => {
+    new Fixture()
+      .whenRecordingOutcome()
+      .whenSubmittingFirstStep()
+      .shouldDisplayCompliancePage('attend and comply?')
+      .whenSubmittingCurrentStep()
+      .shouldDisplayComplianceErrors('There is a problem', 'Select yes if attended and the outcome was acceptable')
   })
 })
