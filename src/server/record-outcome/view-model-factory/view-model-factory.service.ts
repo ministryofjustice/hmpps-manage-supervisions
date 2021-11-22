@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, ValidationError } from '@nestjs/common'
 import { ViewModelFactory } from '../../util/form-builder'
 import { RecordOutcomeDto, RecordOutcomeSession } from '../record-outcome.dto'
 import {
@@ -9,6 +9,7 @@ import {
 } from '../record-outcome.types'
 import { BreadcrumbType, LinksService } from '../../common/links'
 import { DateTime } from 'luxon'
+import { DeepPartial } from '../../app.types'
 
 @Injectable()
 export class ViewModelFactoryService
@@ -44,8 +45,20 @@ export class ViewModelFactoryService
     throw new Error('not implemented')
   }
 
-  compliance(): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
-    throw new Error('not implemented')
+  compliance(
+    session: RecordOutcomeSession,
+    body?: DeepPartial<RecordOutcomeDto>,
+    errors: ValidationError[] = [],
+  ): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
+    return {
+      step: RecordOutcomeStep.Compliance,
+      compliance: body?.compliance,
+      offenderFirstName: session.dto.offender?.firstName,
+      errors: errors,
+      paths: {
+        back: './',
+      },
+    }
   }
 
   confirm(): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {

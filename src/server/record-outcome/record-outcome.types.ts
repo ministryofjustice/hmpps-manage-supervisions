@@ -44,10 +44,11 @@ export interface RecordOutcomeInitViewModel extends ViewModel {
 export interface RecordOutcomeViewModelBase<Step extends RecordOutcomeStep> extends ViewModel {
   step: Step
   errors?: ValidationError[] | null
-  links?: {
+  paths?: {
     back?: string
     next?: string
   }
+  offenderFirstName?: string
 }
 
 export interface RecordOutcomeComplianceViewModel extends RecordOutcomeViewModelBase<RecordOutcomeStep.Compliance> {

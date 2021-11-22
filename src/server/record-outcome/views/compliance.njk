@@ -1,0 +1,41 @@
+{% extends "pages/wizard-form.njk" %}
+
+{% set title -%}
+    Did {{ offenderFirstName }} attend and comply?
+{%- endset %}
+
+{% block form %}
+
+    {{ govukRadios({
+        id: "record-outcome-compliance-radios",
+        name: "compliance",
+        fieldset: {
+            legend: {
+                text: title,
+                classes: "govuk-label--xl",
+                isPageHeading: true
+            }
+        },
+        items: [
+            {
+                id: 'complied-yes',
+                text: 'Yes',
+                value: 'compliance-acceptable',
+                checked: compliance === 'compliance-acceptable'
+            },
+            {
+                id: 'complied-no',
+                text: 'No, ' +offenderFirstName+ ' attended but failed to comply',
+                value: 'failed-to-comply',
+                checked: compliance === 'failed-to-comply'
+            },
+            {
+                id: 'complied-no-not-attended',
+                text: 'No, ' +offenderFirstName+ ' was absent',
+                value: 'failed-to-attend',
+                checked: compliance === 'failed-to-attend'
+            }
+        ],
+        errorMessage: errors | findErrorMessages("compliance")
+    }) }}
+{% endblock %}
