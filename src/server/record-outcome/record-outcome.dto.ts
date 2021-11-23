@@ -20,7 +20,7 @@ import { ValidationGroup } from '../validators'
 
 export const MESSAGES: Partial<Record<RecordOutcomeStep, Record<string, string>>> = {
   compliance: {
-    required: 'Select yes if attended and the outcome was acceptable',
+    required: 'Select one of the compliance options',
   },
   rar: {
     required: 'Select yes if this appointment will count towards RAR',

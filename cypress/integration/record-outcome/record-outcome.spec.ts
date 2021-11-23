@@ -29,6 +29,23 @@ class Fixture {
     this.page.pageTitle.contains(name)
     return this
   }
+  whenSubmittingFirstStep() {
+    this.page.landingPageContinueButton.click()
+    return this
+  }
+  whenSubmittingCurrentStep() {
+    this.page.continueButton.click()
+    return this
+  }
+  shouldDisplayCompliancePage(title: string) {
+    this.page.pageTitle.contains(title)
+    return this
+  }
+  shouldDisplayComplianceErrors(summary: string, error: string) {
+    this.page.errorSummary.contains(summary)
+    this.page.compliance.errorMessages.compliance.contains(error)
+    return this
+  }
 }
 
 context('Record outcome happy path & validation', () => {
@@ -45,5 +62,17 @@ context('Record outcome happy path & validation', () => {
         page.appointmentDetails.find('a').contains('View appointment').click()
       })
       .shouldDisplayAppointmentPage('Not a well known appointment with Robert Ohagan')
+  })
+
+  it('should record outcome ', () => {
+    new Fixture().whenRecordingOutcome().whenSubmittingFirstStep().shouldDisplayCompliancePage('attend and comply?')
+  })
+  it('compliance page validation', () => {
+    new Fixture()
+      .whenRecordingOutcome()
+      .whenSubmittingFirstStep()
+      .shouldDisplayCompliancePage('attend and comply?')
+      .whenSubmittingCurrentStep()
+      .shouldDisplayComplianceErrors('There is a problem', 'Select one of the compliance options')
   })
 })
