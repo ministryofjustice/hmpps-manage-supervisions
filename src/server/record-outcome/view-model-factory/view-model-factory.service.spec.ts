@@ -140,7 +140,6 @@ describe('ViewModelFactoryService', () => {
     const body = fakeRecordOutcomeDto({
       acceptableAbsence: true,
     })
-    //service.getBackUrl.withArgs(session, match.string).callsFake(() => `compliance`)
     service.getBackUrl.returns('/compliance')
 
     const observed = subject['failed-to-attend'](session, body)
@@ -149,7 +148,7 @@ describe('ViewModelFactoryService', () => {
       step: RecordOutcomeStep.FailedToAttend,
       offenderFirstName: 'Daniel',
       acceptableAbsence: true,
-      paths: { back: 'compliance' },
+      paths: { back: '/compliance' },
     } as RecordOutcomeViewModel)
   })
 
