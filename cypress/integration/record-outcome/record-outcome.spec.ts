@@ -41,6 +41,6 @@ context('Record outcome happy path & validation', () => {
       .whenSubmittingCurrentStep()
       .shouldDisplayFailedToAttendPage('absence acceptable?')
       .whenSubmittingCurrentStep()
-      .shouldDisplayFailedToAttendErrors('There is a problem', 'Select one of the options')
+      .shouldDisplayFailedToAttendErrors('There is a problem', 'Select one of the absence options')
   })
 })
