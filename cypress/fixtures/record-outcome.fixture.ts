@@ -66,7 +66,19 @@ export class RecordOutcomeFixture {
     this.page.outcome.outcomeRadios.should('exist')
     return this
   }
-
+  whenSelectingComplianceOutcome(name: string) {
+    this.page.compliance.radio(name).click()
+    return this
+  }
+  shouldDisplayFailedToAttendPage(title: string) {
+    this.page.pageTitle.contains(title)
+    return this
+  }
+  shouldDisplayFailedToAttendErrors(summary: string, error: string) {
+    this.page.errorSummary.contains(summary)
+    this.page.failedToAttend.errorMessages.acceptableAbsence.contains(error)
+    return this
+  }
   whenSelectingOutcome(option: string) {
     this.page.outcome.radio(option).click()
     return this

@@ -20,7 +20,9 @@ const meta: StepMeta<RecordOutcomeDto, RecordOutcomeStep> = {
   },
   [RecordOutcomeStep.FailedToAttend]: {
     type: StepType.Update,
-    next: RecordOutcomeStep.Outcome,
+    next: model => {
+      return model.acceptableAbsence ? RecordOutcomeStep.Outcome : RecordOutcomeStep.Enforcement
+    },
   },
   [RecordOutcomeStep.Outcome]: {
     type: StepType.Update,

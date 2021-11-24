@@ -26,7 +26,7 @@ export const MESSAGES: Partial<Record<RecordOutcomeStep, Record<string, string>>
     required: 'Select yes if this appointment will count towards RAR',
   },
   'failed-to-attend': {
-    required: 'Select yes if the reason for absence was acceptable',
+    required: 'Select one of the options',
   },
   outcome: {
     required: 'Select an outcome',

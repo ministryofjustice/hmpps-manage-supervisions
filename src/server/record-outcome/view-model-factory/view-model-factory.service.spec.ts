@@ -96,7 +96,6 @@ describe('ViewModelFactoryService', () => {
       imports: [MockLinksModule],
       providers: [ViewModelFactoryService, { provide: StateMachineService, useValue: service }],
     }).compile()
-
     subject = module.get(ViewModelFactoryService)
   })
 
@@ -135,6 +134,22 @@ describe('ViewModelFactoryService', () => {
       offenderFirstName: 'Daniel',
       compliance: ComplianceOption.ComplianceAcceptable,
       paths: { back: './' },
+    } as RecordOutcomeViewModel)
+  })
+  it('failed-to-attend', () => {
+    const body = fakeRecordOutcomeDto({
+      acceptableAbsence: true,
+    })
+    //service.getBackUrl.withArgs(session, match.string).callsFake(() => `compliance`)
+    service.getBackUrl.returns('/compliance')
+
+    const observed = subject['failed-to-attend'](session, body)
+    expect(observed).toEqual({
+      errors: [],
+      step: RecordOutcomeStep.FailedToAttend,
+      offenderFirstName: 'Daniel',
+      acceptableAbsence: true,
+      paths: { back: 'compliance' },
     } as RecordOutcomeViewModel)
   })
 
