@@ -1,0 +1,22 @@
+
+{% extends "pages/wizard-form.njk" %}
+
+{% set title -%}
+    Why was {{ offenderFirstName }} absent?
+{%- endset %}
+
+{% block form %}
+    {{ govukRadios({
+        id: "record-outcome-failed-to-attend-radios",
+        name: "failed-to-attend",
+        fieldset: {
+            legend: {
+                text: title,
+                classes: "govuk-label--xl",
+                isPageHeading: true
+            }
+        },
+        items: outcomes | toRadioList(outcome, "code", "description"),
+        errorMessage: errors | findErrorMessages("failed-to-attend")
+    }) }}
+{% endblock %}

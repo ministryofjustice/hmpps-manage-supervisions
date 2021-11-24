@@ -67,6 +67,11 @@ export interface RecordOutcomeUnavailableViewModel extends RecordOutcomeViewMode
 export interface RecordOutcomeFailedToAttendViewModel
   extends RecordOutcomeViewModelBase<RecordOutcomeStep.FailedToAttend> {
   acceptableAbsence?: boolean
+  outcomes: {
+    code: string
+    description: string
+  }[]
+  outcome?: string
 }
 
 export interface RecordOutcomeTypeViewModel extends RecordOutcomeViewModelBase<RecordOutcomeStep.Outcome> {

@@ -39,8 +39,27 @@ export class ViewModelFactoryService
     throw new Error('not implemented')
   }
 
-  'failed-to-attend'(): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
-    throw new Error('not implemented')
+  'failed-to-attend'(
+    session: RecordOutcomeSession,
+    body?: DeepPartial<RecordOutcomeDto>,
+    errors: ValidationError[] = [],
+  ): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
+    debugger
+
+    const outcomes = session.dto.availableOutcomeTypes.outcomeTypes
+      .filter(outcome => !outcome.attendance && outcome.compliantAcceptable)
+      .map(o => ({ code: o.code, description: o.description }))
+
+    return {
+      step: RecordOutcomeStep.FailedToAttend,
+      offenderFirstName: session.dto.offender?.firstName,
+      outcomes,
+      outcome: body?.outcome || session.dto?.outcome,
+      errors: errors,
+      paths: {
+        back: this.stateMachineService.getBackUrl(session, RecordOutcomeStep.FailedToAttend),
+      },
+    }
   }
 
   check(): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
