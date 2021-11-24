@@ -3,7 +3,7 @@ import { AppointmentBookingTestCase, ArrangeAppointmentFixture } from '../../fix
 import * as FixtureData from '../../fixtures/smoke.json'
 import { DeploymentEnvironment, Env } from '../../util'
 
-context('contact types smoke test', () => {
+context.skip('contact types smoke test', () => {
   const fixture = new ArrangeAppointmentFixture()
   const testRunStartTime = DateTime.now().set({ second: 0, millisecond: 0 })
   let testcount = 0

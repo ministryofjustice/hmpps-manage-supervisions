@@ -2,7 +2,11 @@ import { ArrangeAppointmentFixture } from '../../fixtures/arrange-appointment.fi
 import * as FixtureData from '../../fixtures/smoke.json'
 import { DeploymentEnvironment, Env } from '../../util'
 
-context('contact types fixture population', () => {
+/**
+ * Creates a fixture file containing all "other" contact types
+ * This is then iterated over by the test in the other suite.
+ */
+context.skip('contact types fixture population', () => {
   const fixture = new ArrangeAppointmentFixture()
   before(() => {
     if (Env.deployment === DeploymentEnvironment.Local) {
