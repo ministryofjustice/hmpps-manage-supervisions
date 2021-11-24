@@ -2,6 +2,7 @@ import { Injectable, ValidationError } from '@nestjs/common'
 import { ViewModelFactory } from '../../util/form-builder'
 import { RecordOutcomeDto, RecordOutcomeSession } from '../record-outcome.dto'
 import {
+  ComplianceOption,
   RecordOutcomeAppointmentSummary,
   RecordOutcomeInitViewModel,
   RecordOutcomeStep,
@@ -10,12 +11,13 @@ import {
 import { BreadcrumbType, LinksService } from '../../common/links'
 import { DateTime } from 'luxon'
 import { DeepPartial } from '../../app.types'
+import { StateMachineService } from '../state-machine/state-machine.service'
 
 @Injectable()
 export class ViewModelFactoryService
   implements ViewModelFactory<RecordOutcomeDto, RecordOutcomeStep, RecordOutcomeViewModel>
 {
-  constructor(private readonly links: LinksService) {}
+  constructor(private readonly links: LinksService, private readonly stateMachineService: StateMachineService) {}
 
   init(session: RecordOutcomeSession, nextUrl: string): RecordOutcomeInitViewModel {
     const links = this.links.of({ crn: session.crn, ...session.breadcrumbOptions })
@@ -73,8 +75,39 @@ export class ViewModelFactoryService
     throw new Error('not implemented')
   }
 
-  outcome(): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
-    throw new Error('not implemented')
+  outcome(
+    session: RecordOutcomeSession,
+    body?: DeepPartial<RecordOutcomeDto>,
+    errors: ValidationError[] = [],
+  ): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
+    // get list of outcomes to display, filtered on attendence/ compliance status
+    let attendance, compliantAcceptable
+
+    if (session.dto.compliance == ComplianceOption.ComplianceAcceptable) {
+      attendance = true
+      compliantAcceptable = true
+    } else if (session.dto.compliance == ComplianceOption.FailedToAttend) {
+      attendance = false
+      compliantAcceptable = false
+    } else if (session.dto.compliance == ComplianceOption.FailedToComply) {
+      attendance = true
+      compliantAcceptable = false
+    }
+
+    const outcomes = session.dto.availableOutcomeTypes.outcomeTypes
+      .filter(outcome => outcome.attendance == attendance && outcome.compliantAcceptable == compliantAcceptable)
+      .map(o => ({ code: o.code, description: o.description }))
+
+    return {
+      step: RecordOutcomeStep.Outcome,
+      errors,
+      outcomes,
+      outcome: body?.outcome || session.dto?.outcome,
+      offenderFirstName: session.dto.offender?.firstName,
+      paths: {
+        back: this.stateMachineService.getBackUrl(session, RecordOutcomeStep.Outcome),
+      },
+    }
   }
 
   rar(): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {

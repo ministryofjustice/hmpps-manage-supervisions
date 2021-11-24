@@ -9,6 +9,7 @@ import { DateTime } from 'luxon'
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { fakeContactMeta } from '../community-api/contact-mapping/contact-mapping.fake'
 import { ContactTypeCategory } from '../config'
+import { fakeAvailableContactOutcomeTypes } from './record-outcome.fake'
 
 describe('RecordOutcomeService', () => {
   let subject: RecordOutcomeService
@@ -30,6 +31,9 @@ describe('RecordOutcomeService', () => {
     const appointment = fakeContactSummary({
       contactStart: '2021-11-10',
       contactEnd: '2021-11-11',
+      type: {
+        code: 'OFFICE',
+      },
     })
     community.contactAndAttendance.getOffenderContactSummaryByCrnUsingGET
       .withArgs({
@@ -48,6 +52,19 @@ describe('RecordOutcomeService', () => {
       name: 'some appointment',
       start: DateTime.fromISO('2021-11-10'),
       end: DateTime.fromISO('2021-11-11'),
+      contactTypeCode: 'OFFICE',
     } as RecordOutcomeAppointmentSummary)
+  })
+
+  it('gets available contact outcomes', async () => {
+    const outcomes = fakeAvailableContactOutcomeTypes()
+
+    community.contactAndAttendance.getContactTypeOutcomesUsingGET
+      .withArgs({ contactTypeCode: 'some-contact-type' })
+      .resolves(fakeOkResponse(outcomes))
+
+    const observed = await subject.getAvailableContactOutcomes('some-contact-type')
+
+    expect(observed).toEqual(outcomes)
   })
 })

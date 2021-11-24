@@ -1,0 +1,20 @@
+{% extends "pages/wizard-form.njk" %}
+{% set title = "How did " + offenderFirstName + " not comply?" %}
+
+{% block form %}
+  {{ govukRadios({
+      id: "record-outcome-outcome-radios",
+      name: "outcome",
+      attributes: {
+          "data-qa": "record-outcome/outcome"
+      },
+      fieldset: {
+        legend: {
+          text: title,
+          classes: "govuk-label--xl",
+          isPageHeading: true
+        }
+      },
+      items: outcomes | toRadioList(outcome, "code", "description")
+  }) }}
+{% endblock %}

@@ -31,6 +31,7 @@ export interface RecordOutcomeAppointmentSummary {
   name: string
   start: DateTime
   end?: DateTime
+  contactTypeCode: string
 }
 
 export interface RecordOutcomeInitViewModel extends ViewModel {
@@ -69,6 +70,10 @@ export interface RecordOutcomeFailedToAttendViewModel
 }
 
 export interface RecordOutcomeTypeViewModel extends RecordOutcomeViewModelBase<RecordOutcomeStep.Outcome> {
+  outcomes: {
+    code: string
+    description: string
+  }[]
   outcome?: string
 }
 
