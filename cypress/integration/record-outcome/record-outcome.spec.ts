@@ -23,7 +23,7 @@ context('Record outcome happy path & validation', () => {
       .whenSelectingOutcome('Attended - Failed to Comply')
       .whenSubmittingCurrentStep()
   })
-  it('can record outcome - failed to attend   (TODO up to acceptable absence page so far)', () => {
+  it('can record outcome - failed to attend   (TODO up to outcome page so far)', () => {
     new RecordOutcomeFixture()
       .whenRecordingOutcome()
       .whenSubmittingFirstStep()
@@ -31,8 +31,9 @@ context('Record outcome happy path & validation', () => {
       .whenSelectingComplianceFailedToAttendOutcome()
       .whenSubmittingCurrentStep()
       .shouldDisplayFailedToAttendPage('Was Liz’s absence acceptable?')
-      .whenSelectingAbsenceAcceptable('Yes')
+      .whenSelectingAbsenceAcceptable('No')
       .whenSubmittingCurrentStep()
+      .shouldDisplayOutcomePage('How did Liz not comply?')
   })
   it('compliance page validation', () => {
     new RecordOutcomeFixture()
