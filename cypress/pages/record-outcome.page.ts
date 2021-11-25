@@ -26,18 +26,10 @@ export class RecordOutcomePage extends PageBase {
 
   get compliance() {
     return {
-      radio(name: string) {
-        if (name === 'yes') return this.yes
-        if (name === 'no') return this.no
-        if (name === 'absent') return this.noAbsent
-      },
-      get yes() {
+      get compliedYes() {
         return cy.get('#complied-yes')
       },
-      get no() {
-        return cy.get('#complied-no')
-      },
-      get noAbsent() {
+      get compliedNoFailedToAttend() {
         return cy.get('#complied-no-not-attended')
       },
       get errorMessages() {
@@ -78,6 +70,9 @@ export class RecordOutcomePage extends PageBase {
             return cy.get('#acceptableAbsence-error')
           },
         }
+      },
+      get absenceRadios() {
+        return cy.get('[data-qa="record-outcome/acceptableAbsence"]')
       },
     }
   }

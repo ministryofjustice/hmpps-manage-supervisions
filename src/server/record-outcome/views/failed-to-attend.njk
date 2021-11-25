@@ -9,6 +9,9 @@
     {{ govukRadios({
         id: "record-outcome-failed-to-attend-radios",
         name: "acceptableAbsence",
+        attributes: {
+            "data-qa": "record-outcome/acceptableAbsence"
+        },
         fieldset: {
             legend: {
                 text: title,
