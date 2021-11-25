@@ -27,3 +27,9 @@ export class ArrayCoalesce extends NunjucksFilter {
     return array
   }
 }
+
+export class SortBy extends NunjucksFilter {
+  filter(array: any[], by: string): any[] {
+    return array.sort((x, y) => x[by].localeCompare(y[by]))
+  }
+}
