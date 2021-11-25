@@ -1,0 +1,38 @@
+{% extends "pages/wizard-form.njk" %}
+
+{% set title -%}
+    Was {{ offenderFirstName }}’s absence acceptable?
+{%- endset %}
+
+{% block form %}
+
+    {{ govukRadios({
+        id: "record-outcome-failed-to-attend-radios",
+        name: "acceptableAbsence",
+        attributes: {
+            "data-qa": "record-outcome/acceptableAbsence"
+        },
+        fieldset: {
+            legend: {
+                text: title,
+                classes: "govuk-label--xl",
+                isPageHeading: true
+            }
+        },
+        items: [
+            {
+                id: 'acceptableAbsence-acceptable',
+                text: 'Yes',
+                value: 'true',
+                checked: acceptableAbsence === true
+            },
+            {
+                id: 'acceptableAbsence-unacceptable',
+                text: 'No, ' +offenderFirstName+ '’s absence was unacceptable',
+                value: 'false',
+                checked: acceptableAbsence === false
+            }
+        ],
+        errorMessage: errors | findErrorMessages("acceptableAbsence")
+    }) }}
+{% endblock %}

@@ -26,6 +26,12 @@ export class RecordOutcomePage extends PageBase {
 
   get compliance() {
     return {
+      get compliedYes() {
+        return cy.get('#complied-yes')
+      },
+      get compliedNoFailedToAttend() {
+        return cy.get('#complied-no-not-attended')
+      },
       get errorMessages() {
         return {
           get compliance() {
@@ -46,6 +52,27 @@ export class RecordOutcomePage extends PageBase {
       },
       radio(name: string) {
         return cy.get('[data-qa="record-outcome/outcome"] input[type=radio]').siblings('label').contains(name)
+      },
+    }
+  }
+  get failedToAttend() {
+    return {
+      get yes() {
+        return cy.get('#acceptableAbsence-acceptable')
+      },
+
+      get no() {
+        return cy.get('#acceptableAbsence-unacceptable')
+      },
+      get errorMessages() {
+        return {
+          get acceptableAbsence() {
+            return cy.get('#acceptableAbsence-error')
+          },
+        }
+      },
+      get absenceRadios() {
+        return cy.get('[data-qa="record-outcome/acceptableAbsence"]')
       },
     }
   }

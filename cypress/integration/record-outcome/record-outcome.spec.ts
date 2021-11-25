@@ -5,7 +5,7 @@ context('Record outcome happy path & validation', () => {
     cy.seed()
   })
 
-  it('can record outcome (TODO up to did not comply reason so far)', () => {
+  it('can record outcome - failed to comply (TODO up to did not comply reason so far)', () => {
     new RecordOutcomeFixture()
       .whenRecordingOutcome()
       .shouldDisplayStep('init', 'Record an outcome', page => {
@@ -23,7 +23,18 @@ context('Record outcome happy path & validation', () => {
       .whenSelectingOutcome('Attended - Failed to Comply')
       .whenSubmittingCurrentStep()
   })
-
+  it('can record outcome - failed to attend   (TODO up to outcome page so far)', () => {
+    new RecordOutcomeFixture()
+      .whenRecordingOutcome()
+      .whenSubmittingFirstStep()
+      .shouldDisplayCompliancePage('Did Liz attend and comply?')
+      .whenSelectingComplianceFailedToAttendOutcome()
+      .whenSubmittingCurrentStep()
+      .shouldDisplayFailedToAttendPage('Was Liz’s absence acceptable?')
+      .whenSelectingAbsenceAcceptable('No')
+      .whenSubmittingCurrentStep()
+      .shouldDisplayOutcomePage('How did Liz not comply?')
+  })
   it('compliance page validation', () => {
     new RecordOutcomeFixture()
       .whenRecordingOutcome()
@@ -31,5 +42,16 @@ context('Record outcome happy path & validation', () => {
       .shouldDisplayCompliancePage('attend and comply?')
       .whenSubmittingCurrentStep()
       .shouldDisplayComplianceErrors('There is a problem', 'Select one of the compliance options')
+  })
+  it('failed-to-attend page validation', () => {
+    new RecordOutcomeFixture()
+      .whenRecordingOutcome()
+      .whenSubmittingFirstStep()
+      .shouldDisplayCompliancePage('Did Liz attend and comply?')
+      .whenSelectingComplianceFailedToAttendOutcome()
+      .whenSubmittingCurrentStep()
+      .shouldDisplayFailedToAttendPage('Was Liz’s absence acceptable?')
+      .whenSubmittingCurrentStep()
+      .shouldDisplayFailedToAttendErrors('There is a problem', 'Select one of the absence options')
   })
 })

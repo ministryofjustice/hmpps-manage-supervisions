@@ -41,7 +41,7 @@ export class SessionBuilderService implements SessionBuilder<RecordOutcomeDto, R
   }
 
   'failed-to-attend'(): Promise<ValidationError[]> | ValidationError[] {
-    throw new Error('not implemented')
+    return []
   }
 
   check(): Promise<ValidationError[]> | ValidationError[] {
