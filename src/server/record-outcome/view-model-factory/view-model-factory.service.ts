@@ -95,15 +95,18 @@ export class ViewModelFactoryService
     // get list of outcomes to display, filtered on attendence/ compliance status
     let attendance, compliantAcceptable
 
-    if (session.dto.compliance == ComplianceOption.ComplianceAcceptable) {
-      attendance = true
-      compliantAcceptable = true
-    } else if (session.dto.compliance == ComplianceOption.FailedToAttend) {
+    if (session.dto.compliance == ComplianceOption.FailedToAttend && !session.dto.acceptableAbsence) {
       attendance = false
       compliantAcceptable = false
+    } else if (session.dto.compliance == ComplianceOption.FailedToAttend && session.dto.acceptableAbsence) {
+      attendance = false
+      compliantAcceptable = true
     } else if (session.dto.compliance == ComplianceOption.FailedToComply) {
       attendance = true
       compliantAcceptable = false
+    } else if (session.dto.compliance == ComplianceOption.ComplianceAcceptable) {
+      attendance = true
+      compliantAcceptable = true
     }
 
     const outcomes = session.dto.availableOutcomeTypes.outcomeTypes
