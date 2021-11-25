@@ -20,7 +20,7 @@ context('Record outcome happy path & validation', () => {
       .whenSelectingNonComplianceOption()
       .whenSubmittingCurrentStep()
       .shouldDisplayOutcomePage('How did Liz not comply?')
-      .whenSelectingOutcome('Attended - Failed to Comply')
+      .whenSelectingOutcome('Failed to comply')
       .whenSubmittingCurrentStep()
   })
 

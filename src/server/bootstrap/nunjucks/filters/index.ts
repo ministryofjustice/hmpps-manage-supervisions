@@ -9,6 +9,7 @@ import * as govukui from './govuk-ui'
 import * as arrays from './arrays'
 import * as text from './text'
 import * as email from './email'
+import * as outcome from './outcome'
 
 export const filters = {
   ...name,
@@ -22,6 +23,7 @@ export const filters = {
   ...arrays,
   ...text,
   ...email,
+  ...outcome,
 }
 
 export * from './types'
