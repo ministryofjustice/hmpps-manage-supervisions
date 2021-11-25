@@ -15,6 +15,7 @@
           isPageHeading: true
         }
       },
-      items: outcomes | translateOutcomes(offenderFirstName) | sortBy('description') | toRadioList(outcome, "code", "description") | separateOr('value', 'AAAA')
+      items: outcomes | translateOutcomes(offenderFirstName) | sortBy('description') | toRadioList(outcome, "code", "description") | separateOr('value', 'AAAA'),
+      errorMessage: errors | findErrorMessages("outcome")
   }) }}
 {% endblock %}
