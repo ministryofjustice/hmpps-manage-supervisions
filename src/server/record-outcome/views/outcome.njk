@@ -15,6 +15,6 @@
           isPageHeading: true
         }
       },
-      items: outcomes | toRadioList(outcome, "code", "description")
+      items: outcomes | translateOutcomes(offenderFirstName) | toRadioList(outcome, "code", "description")
   }) }}
 {% endblock %}
