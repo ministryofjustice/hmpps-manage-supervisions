@@ -115,6 +115,7 @@ export class ViewModelFactoryService
 
     return {
       step: RecordOutcomeStep.Outcome,
+      acceptableAbsence: !attendance && compliantAcceptable,
       errors,
       outcomes,
       outcome: body?.outcome || session.dto?.outcome,
