@@ -176,8 +176,20 @@ export class ViewModelFactoryService
     throw new Error('not implemented')
   }
 
-  sensitive(): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
-    throw new Error('not implemented')
+  sensitive(
+    session: RecordOutcomeSession,
+    body?: DeepPartial<RecordOutcomeDto>,
+    errors: ValidationError[] = [],
+  ): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
+    return {
+      step: RecordOutcomeStep.Sensitive,
+      offenderFirstName: session.dto.offender?.firstName,
+      sensitive: body?.sensitive || session.dto.sensitive,
+      errors: errors,
+      paths: {
+        back: this.stateMachineService.getBackUrl(session, RecordOutcomeStep.Sensitive),
+      },
+    }
   }
 
   unavailable(): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {

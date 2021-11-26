@@ -219,6 +219,30 @@ describe('ViewModelFactoryService', () => {
       },
     } as RecordOutcomeViewModel)
   })
+
+  it('sensitive', () => {
+    const body = fakeRecordOutcomeDto(
+      {
+        sensitive: true,
+      },
+      { groups: [RecordOutcomeStep.Sensitive] },
+    )
+
+    service.getBackUrl.returns('/previous-page')
+
+    const observed = subject.sensitive(session, body)
+
+    expect(observed).toEqual({
+      step: RecordOutcomeStep.Sensitive,
+      sensitive: true,
+      offenderFirstName: 'Daniel',
+      errors: [],
+      paths: {
+        back: '/previous-page',
+      },
+    } as RecordOutcomeViewModel)
+  })
+
   it('add-notes', () => {
     const body = fakeRecordOutcomeDto({
       addNotes: true,
