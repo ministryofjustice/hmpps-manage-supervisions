@@ -50,6 +50,7 @@ export interface RecordOutcomeViewModelBase<Step extends RecordOutcomeStep> exte
     next?: string
   }
   offenderFirstName?: string
+  acceptableAbsence?: boolean
 }
 
 export interface RecordOutcomeComplianceViewModel extends RecordOutcomeViewModelBase<RecordOutcomeStep.Compliance> {
@@ -64,10 +65,7 @@ export interface RecordOutcomeUnavailableViewModel extends RecordOutcomeViewMode
   reason: RecordOutcomeUnavailableReason
 }
 
-export interface RecordOutcomeFailedToAttendViewModel
-  extends RecordOutcomeViewModelBase<RecordOutcomeStep.FailedToAttend> {
-  acceptableAbsence?: boolean
-}
+export type RecordOutcomeFailedToAttendViewModel = RecordOutcomeViewModelBase<RecordOutcomeStep.FailedToAttend>
 
 export interface RecordOutcomeTypeViewModel extends RecordOutcomeViewModelBase<RecordOutcomeStep.Outcome> {
   outcomes: {

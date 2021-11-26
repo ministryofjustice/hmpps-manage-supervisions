@@ -165,6 +165,7 @@ describe('ViewModelFactoryService', () => {
     const observed = subject.outcome(session, body)
 
     expect(observed).toEqual({
+      acceptableAbsence: false,
       step: RecordOutcomeStep.Outcome,
       offenderFirstName: 'Daniel',
       errors: [],

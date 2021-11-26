@@ -80,6 +80,11 @@ export class RecordOutcomeFixture {
     this.page.failedToAttend.errorMessages.acceptableAbsence.contains(error)
     return this
   }
+  shouldDisplayOutcomeErrors(summary: string, error: string) {
+    this.page.errorSummary.contains(summary)
+    this.page.outcome.errorMessages.outcome.contains(error)
+    return this
+  }
   whenSelectingAbsenceAcceptable(yesNo: string) {
     yesNo === 'Yes' ? this.page.failedToAttend.yes.click() : this.page.failedToAttend.no.click()
     return this

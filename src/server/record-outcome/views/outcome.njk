@@ -1,5 +1,11 @@
 {% extends "pages/wizard-form.njk" %}
-{% set title = "How did " + offenderFirstName + " not comply?" %}
+{% set title %}
+  {% if acceptableAbsence %}
+    Why was {{offenderFirstName}} absent?
+  {% else %}
+    How did {{offenderFirstName}} not comply?
+  {% endif %}
+{% endset %}
 
 {% block form %}
   {{ govukRadios({
@@ -15,6 +21,7 @@
           isPageHeading: true
         }
       },
-      items: outcomes | translateOutcomes(offenderFirstName) | toRadioList(outcome, "code", "description")
+      items: outcomes | translateOutcomes(offenderFirstName) | sortBy('description') | toRadioList(outcome, "code", "description") | separateOr('value', 'AAAA'),
+      errorMessage: errors | findErrorMessages("outcome")
   }) }}
 {% endblock %}

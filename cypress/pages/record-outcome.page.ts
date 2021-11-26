@@ -50,6 +50,13 @@ export class RecordOutcomePage extends PageBase {
       get outcomeRadios() {
         return cy.get('[data-qa="record-outcome/outcome"]')
       },
+      get errorMessages() {
+        return {
+          get outcome() {
+            return cy.get('#outcome-error')
+          },
+        }
+      },
       radio(name: string) {
         return cy.get('[data-qa="record-outcome/outcome"] input[type=radio]').siblings('label').contains(name)
       },

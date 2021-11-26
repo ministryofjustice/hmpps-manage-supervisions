@@ -69,6 +69,10 @@ interface SelectListItem {
   disabled?: boolean
 }
 
+interface SelectListDivider {
+  divider: 'or'
+}
+
 export interface ToSelectListOptions {
   emptyValue?: boolean
 }
@@ -99,5 +103,26 @@ export class ToSelectList extends NunjucksFilter {
       result.unshift({ text: '', value: '', selected: !anySelected, disabled: true })
     }
     return result
+  }
+}
+
+export class SeparateOr extends NunjucksFilter {
+  filter(
+    arr: (SelectListItem | SelectListDivider)[],
+    valuePath: string,
+    value: string,
+  ): (SelectListItem | SelectListDivider)[] {
+    const index = arr.findIndex(x => get(x, valuePath) === value)
+
+    debugger
+
+    if (index !== -1) {
+      const separateOption = arr.splice(index, 1).pop()
+
+      arr.push({ divider: 'or' })
+      arr.push(separateOption)
+    }
+
+    return arr
   }
 }
