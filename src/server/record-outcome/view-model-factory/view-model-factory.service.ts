@@ -12,6 +12,8 @@ import { BreadcrumbType, LinksService } from '../../common/links'
 import { DateTime } from 'luxon'
 import { DeepPartial } from '../../app.types'
 import { StateMachineService } from '../state-machine/state-machine.service'
+import { plainToClass } from 'class-transformer'
+import { DEFAULT_GROUP } from '../../util/mapping'
 
 @Injectable()
 export class ViewModelFactoryService
@@ -79,8 +81,30 @@ export class ViewModelFactoryService
     throw new Error('not implemented')
   }
 
-  enforcement(): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
-    throw new Error('not implemented')
+  enforcement(
+    session: RecordOutcomeSession,
+    body?: DeepPartial<RecordOutcomeDto>,
+    errors: ValidationError[] = [],
+  ): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
+    const dto = plainToClass(RecordOutcomeDto, session.dto, {
+      groups: [DEFAULT_GROUP],
+      excludeExtraneousValues: true,
+    })
+
+    const enforcementActions = dto.selectedOutcome?.enforcements.map(e => ({
+      code: e.code,
+      description: e.description,
+    }))
+
+    return {
+      step: RecordOutcomeStep.Enforcement,
+      errors,
+      enforcementActions,
+      enforcement: body?.enforcement || dto?.enforcement,
+      paths: {
+        back: this.stateMachineService.getBackUrl(session, RecordOutcomeStep.Outcome),
+      },
+    }
   }
 
   notes(): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {

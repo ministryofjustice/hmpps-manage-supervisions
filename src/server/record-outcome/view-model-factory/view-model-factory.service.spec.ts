@@ -43,6 +43,7 @@ describe('ViewModelFactoryService', () => {
           enforcements: [
             {
               code: 'ROM',
+              description: 'Refer to Offender Manager',
             },
           ],
         },
@@ -87,7 +88,7 @@ describe('ViewModelFactoryService', () => {
     crn: 'some-crn',
     dto: classToPlain(dto, { groups: [DEFAULT_GROUP] }),
     breadcrumbOptions: { entityName: 'some-entity' },
-  } as RecordOutcomeSession
+  }
 
   beforeAll(async () => {
     service = createStubInstance(StateMachineService)
@@ -136,6 +137,7 @@ describe('ViewModelFactoryService', () => {
       paths: { back: './' },
     } as RecordOutcomeViewModel)
   })
+
   it('failed-to-attend', () => {
     const body = fakeRecordOutcomeDto({
       acceptableAbsence: true,
@@ -173,6 +175,42 @@ describe('ViewModelFactoryService', () => {
         {
           code: 'DNC',
           description: 'Did not comply',
+        },
+      ],
+      paths: {
+        back: '/previous-page',
+      },
+    } as RecordOutcomeViewModel)
+  })
+
+  it('enforcement', () => {
+    const dtoWithOutome = { ...dto, outcome: 'DNC' }
+
+    const sessionWithOutome: RecordOutcomeSession = {
+      crn: 'some-crn',
+      dto: classToPlain(dtoWithOutome, { groups: [DEFAULT_GROUP] }),
+      breadcrumbOptions: { entityName: 'some-entity' },
+    }
+
+    const body = fakeRecordOutcomeDto(
+      {
+        enforcement: 'ROM',
+      },
+      { groups: [RecordOutcomeStep.Enforcement] },
+    )
+
+    service.getBackUrl.returns('/previous-page')
+
+    const observed = subject.enforcement(sessionWithOutome, body)
+
+    expect(observed).toEqual({
+      step: RecordOutcomeStep.Enforcement,
+      errors: [],
+      enforcement: 'ROM',
+      enforcementActions: [
+        {
+          code: 'ROM',
+          description: 'Refer to Offender Manager',
         },
       ],
       paths: {

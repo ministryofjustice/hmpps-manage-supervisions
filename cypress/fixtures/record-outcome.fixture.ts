@@ -88,4 +88,20 @@ export class RecordOutcomeFixture {
     this.page.outcome.radio(option).click()
     return this
   }
+
+  shouldDisplayEnforcementPage() {
+    this.page.pageTitle.contains('Pick an enforcement action')
+    return this
+  }
+
+  shouldDisplayEnforcementErrors(summary: string, error: string) {
+    this.page.errorSummary.contains(summary)
+    this.page.enforcement.errorMessages.enforcement.contains(error)
+    return this
+  }
+
+  whenSelectingEnforcementAction(option: string) {
+    this.page.enforcement.select(option)
+    return this
+  }
 }

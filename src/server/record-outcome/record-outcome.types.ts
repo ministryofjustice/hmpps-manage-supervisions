@@ -70,14 +70,12 @@ export interface RecordOutcomeFailedToAttendViewModel
 }
 
 export interface RecordOutcomeTypeViewModel extends RecordOutcomeViewModelBase<RecordOutcomeStep.Outcome> {
-  outcomes: {
-    code: string
-    description: string
-  }[]
+  outcomes: KeyValue[]
   outcome?: string
 }
 
 export interface RecordOutcomeEnforcementViewModel extends RecordOutcomeViewModelBase<RecordOutcomeStep.Enforcement> {
+  enforcementActions: KeyValue[]
   enforcement?: string
 }
 
@@ -91,6 +89,11 @@ export interface RecordOutcomeNotesViewModel extends RecordOutcomeViewModelBase<
 
 export interface RecordOutcomeSensitiveViewModel extends RecordOutcomeViewModelBase<RecordOutcomeStep.Sensitive> {
   sensitive?: boolean
+}
+
+export interface KeyValue {
+  code: string
+  description: string
 }
 
 export type RecordOutcomeCheckViewModel = RecordOutcomeViewModelBase<RecordOutcomeStep.Check>

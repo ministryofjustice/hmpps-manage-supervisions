@@ -10,6 +10,7 @@ import {
 } from '../community-api/client'
 import {
   ComplianceOption,
+  KeyValue,
   RecordOutcomeAppointmentSummary,
   RecordOutcomeStep,
   RecordOutcomeUnavailableReason,
@@ -107,6 +108,9 @@ export class RecordOutcomeDto {
     options => IsInFn((obj: RecordOutcomeDto) => obj.selectedOutcome?.enforcements?.map(x => x.code), options),
   )
   enforcement?: string
+
+  @ExposeDefault({ groups: [RecordOutcomeStep.Enforcement] })
+  availableEnforcementActions?: KeyValue[]
 
   @ExposeDefault({ groups: [RecordOutcomeStep.AddNotes] })
   @ToBoolean()

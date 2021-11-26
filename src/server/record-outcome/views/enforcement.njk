@@ -1,0 +1,17 @@
+{% extends "pages/wizard-form.njk" %}
+{% set title = "Pick an enforcement action" %}
+
+{% block form %}
+{{ govukSelect({
+    id: "record-outcome-enforcement-select",
+    name: "enforcement",
+    label: {
+      text: title,
+      isPageHeading: true,
+      classes: 'govuk-label--xl'
+    },
+    items: enforcementActions | toSelectList(enforcement, "code", "description"),
+    errorMessage: errors | findErrorMessages("enforcement")
+})
+}}
+{% endblock %}

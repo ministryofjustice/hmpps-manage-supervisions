@@ -24,8 +24,12 @@ const meta: StepMeta<RecordOutcomeDto, RecordOutcomeStep> = {
   },
   [RecordOutcomeStep.Outcome]: {
     type: StepType.Update,
-    // TODO skip enforcement when the selected outcome is not enforceable or has no enforcements
-    next: RecordOutcomeStep.Enforcement,
+    next: model => {
+      if (model.selectedOutcome && model.selectedOutcome.enforceable && model.selectedOutcome.enforcements) {
+        return RecordOutcomeStep.Enforcement
+      }
+      return RecordOutcomeStep.AddNotes
+    },
   },
   [RecordOutcomeStep.Enforcement]: {
     type: StepType.Update,
