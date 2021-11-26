@@ -219,4 +219,18 @@ describe('ViewModelFactoryService', () => {
       },
     } as RecordOutcomeViewModel)
   })
+  it('add-notes', () => {
+    const body = fakeRecordOutcomeDto({
+      addNotes: true,
+    })
+    service.getBackUrl.returns('/previous-page')
+
+    const observed = subject['add-notes'](session, body)
+    expect(observed).toEqual({
+      errors: [],
+      step: RecordOutcomeStep.AddNotes,
+      addNotes: true,
+      paths: { back: '/previous-page' },
+    } as RecordOutcomeViewModel)
+  })
 })

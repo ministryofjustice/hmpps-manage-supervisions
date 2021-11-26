@@ -37,7 +37,7 @@ export class SessionBuilderService implements SessionBuilder<RecordOutcomeDto, R
   }
 
   'add-notes'(): Promise<ValidationError[]> | ValidationError[] {
-    throw new Error('not implemented')
+    return []
   }
 
   'failed-to-attend'(): Promise<ValidationError[]> | ValidationError[] {
@@ -61,7 +61,7 @@ export class SessionBuilderService implements SessionBuilder<RecordOutcomeDto, R
   }
 
   notes(): Promise<ValidationError[]> | ValidationError[] {
-    throw new Error('not implemented')
+    return []
   }
 
   outcome(): Promise<ValidationError[]> | ValidationError[] {

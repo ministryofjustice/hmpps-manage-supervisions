@@ -109,4 +109,8 @@ export class RecordOutcomeFixture {
     this.page.enforcement.select(option)
     return this
   }
+  whenSelectingAddNotesOption(yesNo: string) {
+    yesNo === 'Yes' ? this.page.addNotes.yes.click() : this.page.addNotes.no.click()
+    return this
+  }
 }

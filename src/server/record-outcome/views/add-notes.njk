@@ -1,0 +1,34 @@
+{% extends "pages/wizard-form.njk" %}
+{% set title = "Do you want to add notes to this appointment?" %}
+
+{% block form %}
+  {{ govukRadios({
+       id: "record-outcome-add-notes-radios",
+       name: "addNotes",
+      attributes: {
+          "data-qa": "record-outcome/addNotes"
+      },
+       fieldset: {
+         legend: {
+           text: title,
+           classes: "govuk-label--xl",
+           isPageHeading: true
+         }
+       },
+       items: [
+         {
+           id: 'addNotes-yes',
+           text: 'Yes',
+           value: 'true',
+           checked: addNotes === true
+         },
+         {
+           id: 'addNotes-no',
+           text: 'No (notes can be added later)',
+           value: 'false',
+           checked: addNotes === false
+         }
+       ],
+       errorMessage: errors | findErrorMessages("addNotes")
+    }) }}
+{% endblock %}
