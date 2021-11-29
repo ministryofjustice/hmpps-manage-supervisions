@@ -109,7 +109,7 @@ export class RecordOutcomePage extends PageBase {
       },
       get errorMessages() {
         return {
-          get acceptableAbsence() {
+          get addNotes() {
             return cy.get('#addNotes-error')
           },
         }

@@ -51,6 +51,12 @@ context('Record outcome happy path & validation', () => {
       .shouldDisplayEnforcementPage()
       .whenSelectingEnforcementAction('Refer to Offender Manager')
       .whenSubmittingCurrentStep()
+      .shouldDisplayAddNotesPage('Do you want to add notes to this appointment?')
+      .whenSubmittingCurrentStep()
+      .shouldDisplayAddNotesErrors('There is a problem', 'Select yes if you would like to add notes')
+      .whenSelectingAddNotesOption('Yes')
+      .whenSubmittingCurrentStep()
+      .shouldDisplayNotesPage('Add appointment notes')
   })
   it('compliance page validation', () => {
     new RecordOutcomeFixture()
