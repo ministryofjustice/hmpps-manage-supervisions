@@ -109,4 +109,22 @@ export class RecordOutcomeFixture {
     this.page.enforcement.select(option)
     return this
   }
+  shouldDisplayAddNotesPage(title: string) {
+    this.page.pageTitle.contains(title)
+    this.page.addNotes.addNotesRadios.should('exist')
+    return this
+  }
+  shouldDisplayAddNotesErrors(summary: string, error: string) {
+    this.page.errorSummary.contains(summary)
+    this.page.addNotes.errorMessages.addNotes.contains(error)
+    return this
+  }
+  whenSelectingAddNotesOption(yesNo: string) {
+    yesNo === 'Yes' ? this.page.addNotes.yes.click() : this.page.addNotes.no.click()
+    return this
+  }
+  shouldDisplayNotesPage(title: string) {
+    this.page.pageTitle.contains(title)
+    return this
+  }
 }

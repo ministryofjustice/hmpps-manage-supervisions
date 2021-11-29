@@ -98,4 +98,25 @@ export class RecordOutcomePage extends PageBase {
       },
     }
   }
+  get addNotes() {
+    return {
+      get yes() {
+        return cy.get('#addNotes-yes')
+      },
+
+      get no() {
+        return cy.get('#addNotes-no')
+      },
+      get errorMessages() {
+        return {
+          get addNotes() {
+            return cy.get('#addNotes-error')
+          },
+        }
+      },
+      get addNotesRadios() {
+        return cy.get('[data-qa="record-outcome/addNotes"]')
+      },
+    }
+  }
 }

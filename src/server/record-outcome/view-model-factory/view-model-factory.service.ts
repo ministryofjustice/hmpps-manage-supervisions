@@ -37,8 +37,19 @@ export class ViewModelFactoryService
     }
   }
 
-  'add-notes'(): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
-    throw new Error('not implemented')
+  'add-notes'(
+    session: RecordOutcomeSession,
+    body?: DeepPartial<RecordOutcomeDto>,
+    errors: ValidationError[] = [],
+  ): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
+    return {
+      step: RecordOutcomeStep.AddNotes,
+      addNotes: body?.addNotes || session.dto.addNotes,
+      errors: errors,
+      paths: {
+        back: this.stateMachineService.getBackUrl(session, RecordOutcomeStep.AddNotes),
+      },
+    }
   }
 
   'failed-to-attend'(
@@ -107,8 +118,19 @@ export class ViewModelFactoryService
     }
   }
 
-  notes(): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
-    throw new Error('not implemented')
+  notes(
+    session: RecordOutcomeSession,
+    body?: DeepPartial<RecordOutcomeDto>,
+    errors: ValidationError[] = [],
+  ): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
+    return {
+      step: RecordOutcomeStep.Notes,
+      notes: body?.notes || session.dto.notes,
+      errors: errors,
+      paths: {
+        back: this.stateMachineService.getBackUrl(session, RecordOutcomeStep.Notes),
+      },
+    }
   }
 
   outcome(

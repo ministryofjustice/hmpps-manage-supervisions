@@ -1,0 +1,66 @@
+{% extends "pages/wizard-form.njk" %}
+{% set title = "Add appointment notes" %}
+{% set hint = "Use paragraphs to make your notes easy to read." %}
+{% set crisis %}
+     <h2 class="govuk-heading-s">
+       Check-in
+       <br>
+       <span class="govuk-body">
+        What has happened in their life since the previous appointment? Clarify role boundaries and assess any
+        change in risk
+      </span>
+     </h2>
+     <h2 class="govuk-heading-s">
+       Review
+       <br>
+       <span class="govuk-body">
+        Review previous appointments and tasks and record progress against the sentence plan
+      </span>
+     </h2>
+     <h2 class="govuk-heading-s">
+       Implement
+       <br>
+       <span class="govuk-body">
+        Target criminogenic needs and risk status
+      </span>
+     </h2>
+     <h2 class="govuk-heading-s">
+       Summarise
+       <br>
+       <span class="govuk-body">
+        Summarise the purpose of the appointment
+      </span>
+     </h2>
+     <h2 class="govuk-heading-s">
+       Set tasks
+       <br>
+       <span class="govuk-body">
+        Set and agree tasks and confirm the next appointment
+      </span>
+     </h2>
+{% endset %}
+
+{% block form %}
+  <div class="govuk-form-group">
+    {{ govukTextarea({
+      name: "notes",
+      id: "notes",
+      label: {
+        text: "Add appointment notes",
+        classes: "govuk-label--xl",
+        isPageHeading: true
+      },
+      hint: {
+        html: hint
+      },
+      rows: 10,
+      value: notes
+    }) }}
+    {{ govukDetails({
+      summaryText: "Help with using CRISS to write notes",
+      html: crisis,
+      classes: 'govuk-!-margin-top-0'
+    }) }}
+  </div>
+
+{% endblock %}
