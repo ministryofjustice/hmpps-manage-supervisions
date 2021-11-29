@@ -51,6 +51,16 @@ context('Record outcome happy path & validation', () => {
       .whenSelectingAddNotesOption('Yes')
       .whenSubmittingCurrentStep()
       .shouldDisplayNotesPage('Add appointment notes')
+      .whenTypingNotesContent('Some notes')
+      .whenSubmittingCurrentStep()
+      .shouldDisplaySensitiveInformationPage('Does this appointment include sensitive information?')
+      .whenSubmittingCurrentStep()
+      .shouldDisplaySensitiveInformationErrors(
+        'There is a problem',
+        'Select yes if the appointment contains sensitive information',
+      )
+      .whenSelectingIsSensitiveOption('Yes')
+      .whenSubmittingCurrentStep()
   })
   it('compliance page validation', () => {
     new RecordOutcomeFixture()

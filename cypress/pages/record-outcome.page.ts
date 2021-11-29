@@ -119,4 +119,29 @@ export class RecordOutcomePage extends PageBase {
       },
     }
   }
+  get notes() {
+    return {
+      get notesTextField() {
+        return cy.get('#notes')
+      },
+    }
+  }
+  get sensitive() {
+    return {
+      get yes() {
+        return cy.get('#sensitive-yes')
+      },
+
+      get no() {
+        return cy.get('#sensitive-no')
+      },
+      get errorMessages() {
+        return {
+          get sensitive() {
+            return cy.get('#sensitive-error')
+          },
+        }
+      },
+    }
+  }
 }
