@@ -5,7 +5,7 @@ context('Record outcome happy path & validation', () => {
     cy.seed()
   })
 
-  it('can record outcome - failed to comply (TODO up to did not comply reason so far)', () => {
+  it('can record outcome - failed to comply', () => {
     new RecordOutcomeFixture()
       .whenRecordingOutcome()
       .shouldDisplayStep('init', 'Record an outcome', page => {
@@ -22,8 +22,14 @@ context('Record outcome happy path & validation', () => {
       .shouldDisplayOutcomePage('How did Liz not comply?')
       .whenSelectingOutcome('Failed to comply')
       .whenSubmittingCurrentStep()
+      .shouldDisplayEnforcementPage()
+      .whenSubmittingCurrentStep()
+      // testing the validation
+      .shouldDisplayEnforcementErrors('There is a problem', 'Select an enforcement')
+      .whenSelectingEnforcementAction('Refer to Offender Manager')
+      .whenSubmittingCurrentStep()
   })
-  it('can record outcome - failed to attend   (TODO up to outcome page so far)', () => {
+  it('can record outcome - failed to attend', () => {
     new RecordOutcomeFixture()
       .whenRecordingOutcome()
       .whenSubmittingFirstStep()
@@ -34,6 +40,11 @@ context('Record outcome happy path & validation', () => {
       .whenSelectingAbsenceAcceptable('No')
       .whenSubmittingCurrentStep()
       .shouldDisplayOutcomePage('How did Liz not comply?')
+      .whenSelectingOutcome('Failed to Attend')
+      .whenSubmittingCurrentStep()
+      .shouldDisplayEnforcementPage()
+      .whenSelectingEnforcementAction('Refer to Offender Manager')
+      .whenSubmittingCurrentStep()
   })
   it('compliance page validation', () => {
     new RecordOutcomeFixture()

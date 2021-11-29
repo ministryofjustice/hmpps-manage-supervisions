@@ -83,4 +83,19 @@ export class RecordOutcomePage extends PageBase {
       },
     }
   }
+
+  get enforcement() {
+    return {
+      select(name: string) {
+        return cy.get('#record-outcome-enforcement-select').select(name)
+      },
+      get errorMessages() {
+        return {
+          get enforcement() {
+            return cy.get('#record-outcome-enforcement-select-error')
+          },
+        }
+      },
+    }
+  }
 }
