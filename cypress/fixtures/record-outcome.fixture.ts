@@ -127,4 +127,24 @@ export class RecordOutcomeFixture {
     this.page.pageTitle.contains(title)
     return this
   }
+  whenTypingNotesContent(notes: string) {
+    this.page.notes.notesTextField.type(notes)
+    return this
+  }
+
+  shouldDisplaySensitiveInformationPage(title: string) {
+    this.page.pageTitle.contains(title)
+    return this
+  }
+
+  shouldDisplaySensitiveInformationErrors(summary: string, error: string) {
+    this.page.errorSummary.contains(summary)
+    this.page.sensitive.errorMessages.sensitive.contains(error)
+    return this
+  }
+
+  whenSelectingIsSensitiveOption(yesNo: string) {
+    yesNo === 'Yes' ? this.page.sensitive.yes.click() : this.page.sensitive.no.click()
+    return this
+  }
 }
