@@ -28,12 +28,6 @@ context('Record outcome happy path & validation', () => {
       .shouldDisplayEnforcementErrors('There is a problem', 'Select an enforcement')
       .whenSelectingEnforcementAction('Refer to Offender Manager')
       .whenSubmittingCurrentStep()
-      .shouldDisplayEnforcementPage()
-      .whenSubmittingCurrentStep()
-      // testing the validation
-      .shouldDisplayEnforcementErrors('There is a problem', 'Select an enforcement')
-      .whenSelectingEnforcementAction('Refer to Offender Manager')
-      .whenSubmittingCurrentStep()
   })
   it('can record outcome - failed to attend', () => {
     new RecordOutcomeFixture()
