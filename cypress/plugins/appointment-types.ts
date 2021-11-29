@@ -1180,7 +1180,7 @@ export const OUTCOME_TYPES: AvailableContactOutcomeTypes = {
     },
     {
       code: 'AFTA',
-      description: 'Failed to Attend',
+      description: 'Failed to attend',
       compliantAcceptable: false,
       attendance: false,
       actionRequired: true,
