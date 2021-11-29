@@ -40,7 +40,7 @@ context('Record outcome happy path & validation', () => {
       .whenSelectingAbsenceAcceptable('No')
       .whenSubmittingCurrentStep()
       .shouldDisplayOutcomePage('How did Liz not comply?')
-      .whenSelectingOutcome('Failed to Attend')
+      .whenSelectingOutcome('Failed to attend')
       .whenSubmittingCurrentStep()
       .shouldDisplayEnforcementPage()
       .whenSelectingEnforcementAction('Refer to Offender Manager')
