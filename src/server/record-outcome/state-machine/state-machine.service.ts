@@ -54,7 +54,7 @@ const meta: StepMeta<RecordOutcomeDto, RecordOutcomeStep> = {
   },
   sensitive: {
     type: StepType.Update,
-    next: RecordOutcomeStep.Check,
+    next: RecordOutcomeStep.Confirm, // TODO undo change before commit
   },
   check: {
     type: StepType.Confirmation,

@@ -76,6 +76,12 @@ context('Record outcome happy path & validation', () => {
         outcome: 'Failed to Attend',
         sensitive: 'Yes',
       })
+      .shouldDisplayRecordOutcomeConfirmation(
+        'Outcome of appointment recorded',
+        'Not a well known appointment with Robert Ohagan',
+        'Wednesday 2 September 2020 from 11am to 1pm',
+        'activity',
+      )
   })
   it('compliance page validation', () => {
     new RecordOutcomeFixture()
