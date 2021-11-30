@@ -10,6 +10,7 @@ interface ExpectedAppointment {
   title: string
   subTitle?: string
   notes: string
+  notesLink?: string
   notesType?: 'plain' | 'closed-detail' | 'open-detail'
   sensitive?: boolean
   action?: string | { colour: string; name: string }
@@ -34,16 +35,19 @@ class Fixture extends ViewCaseFixture {
       page.filterLink('without-an-outcome').click()
     })
   }
+
   whenClickingRarActivityFilter() {
     return this.shouldRenderOffenderTab('activity', page => {
       page.filterLink('rar-activity').click()
     })
   }
+
   whenClickingSystemContact(id: number) {
     return this.shouldRenderOffenderTab('activity', page => {
       page.entry(id).click()
     })
   }
+
   shouldRenderActivity({ notesType = 'plain', ...expected }: ExpectedAppointment) {
     return this.shouldRenderOffenderTab('activity', page => {
       page.group(expected.date, group =>
