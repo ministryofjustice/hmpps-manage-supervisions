@@ -44,7 +44,7 @@ export class HmppsOidcService {
         client_secret: credentials.secret,
       })
 
-      client[custom.http_options] = options => {
+      client[custom.http_options] = (url, options) => {
         options.headers = Object.assign(options.headers, { Authorization: generateOauthClientToken(credentials) })
         return options
       }
