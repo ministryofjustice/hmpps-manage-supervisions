@@ -286,10 +286,11 @@ describe('ViewModelFactoryService', () => {
     } as RecordOutcomeCheckViewModel)
   })
   it('confirm', () => {
+    const links = MockLinksModule.of({ crn: 'some-crn' })
     const observed = subject.confirm(session)
     expect(observed).toEqual({
       step: RecordOutcomeStep.Confirm,
-      paths: { next: '/CaseActivityLog?crn=some-crn' },
+      paths: { next: links.url(BreadcrumbType.CaseActivityLog) },
       appointment: {
         id: 10,
         name: 'some-appointment',
