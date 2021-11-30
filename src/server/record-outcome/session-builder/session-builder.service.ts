@@ -45,7 +45,7 @@ export class SessionBuilderService implements SessionBuilder<RecordOutcomeDto, R
   }
 
   check(): Promise<ValidationError[]> | ValidationError[] {
-    throw new Error('not implemented')
+    return []
   }
 
   compliance(): Promise<ValidationError[]> | ValidationError[] {
@@ -73,7 +73,7 @@ export class SessionBuilderService implements SessionBuilder<RecordOutcomeDto, R
   }
 
   sensitive(): Promise<ValidationError[]> | ValidationError[] {
-    throw new Error('not implemented')
+    return []
   }
 
   unavailable(): Promise<ValidationError[]> | ValidationError[] {

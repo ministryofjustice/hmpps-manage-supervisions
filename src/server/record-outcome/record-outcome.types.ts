@@ -1,6 +1,7 @@
 import { ViewModel } from '../common'
 import { ValidationError } from 'class-validator'
 import { DateTime } from 'luxon'
+import { RecordOutcomeDto } from './record-outcome.dto'
 
 export enum RecordOutcomeStep {
   Compliance = 'compliance',
@@ -48,9 +49,13 @@ export interface RecordOutcomeViewModelBase<Step extends RecordOutcomeStep> exte
   paths?: {
     back?: string
     next?: string
+    compliance?: string
+    outcome?: string
+    enforcement?: string
+    notes?: string
+    sensitive?: string
   }
   offenderFirstName?: string
-  acceptableAbsence?: boolean
 }
 
 export interface RecordOutcomeComplianceViewModel extends RecordOutcomeViewModelBase<RecordOutcomeStep.Compliance> {
@@ -65,9 +70,13 @@ export interface RecordOutcomeUnavailableViewModel extends RecordOutcomeViewMode
   reason: RecordOutcomeUnavailableReason
 }
 
-export type RecordOutcomeFailedToAttendViewModel = RecordOutcomeViewModelBase<RecordOutcomeStep.FailedToAttend>
+export interface RecordOutcomeFailedToAttendViewModel
+  extends RecordOutcomeViewModelBase<RecordOutcomeStep.FailedToAttend> {
+  acceptableAbsence?: boolean
+}
 
 export interface RecordOutcomeTypeViewModel extends RecordOutcomeViewModelBase<RecordOutcomeStep.Outcome> {
+  compliance: ComplianceOption
   outcomes: KeyValue[]
   outcome?: string
 }
@@ -94,7 +103,9 @@ export interface KeyValue {
   description: string
 }
 
-export type RecordOutcomeCheckViewModel = RecordOutcomeViewModelBase<RecordOutcomeStep.Check>
+export interface RecordOutcomeCheckViewModel extends RecordOutcomeViewModelBase<RecordOutcomeStep.Check> {
+  outcome: RecordOutcomeDto
+}
 
 export type RecordOutcomeConfirmViewModel = RecordOutcomeViewModelBase<RecordOutcomeStep.Confirm>
 
