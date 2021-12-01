@@ -16,6 +16,7 @@ generic-service:
     DELIUS_BASE_URL: https://ndelius.probation.service.justice.gov.uk
     OASYS_BASE_URL: https://bridge-oasys.az.justice.gov.uk
     INGRESS_URL: https://manage-supervisions.hmpps.service.justice.gov.uk
+    DELIUS_API_URL: https://delius-api.probation.service.justice.gov.uk
     RECORD_OUTCOME: false
 
   allowlist:
