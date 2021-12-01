@@ -42,6 +42,7 @@ export enum UtmMedium {
   Compliance = 'compliance',
   Sentence = 'sentence',
   ArrangeAppointment = 'arrange-appointment',
+  RecordOutcome = 'record-outcome',
 }
 
 export interface Utm {

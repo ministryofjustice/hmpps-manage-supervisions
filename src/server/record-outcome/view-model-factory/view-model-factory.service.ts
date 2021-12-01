@@ -5,15 +5,18 @@ import {
   ComplianceOption,
   RecordOutcomeAppointmentSummary,
   RecordOutcomeInitViewModel,
+  RecordOutcomeRarViewModel,
   RecordOutcomeStep,
+  RecordOutcomeUnavailableViewModel,
   RecordOutcomeViewModel,
 } from '../record-outcome.types'
-import { BreadcrumbType, LinksService } from '../../common/links'
+import { BreadcrumbType, LinksService, Utm, UtmMedium } from '../../common/links'
 import { DateTime } from 'luxon'
 import { DeepPartial } from '../../app.types'
 import { StateMachineService } from '../state-machine/state-machine.service'
 import { plainToClass } from 'class-transformer'
 import { DEFAULT_GROUP } from '../../util/mapping'
+import { getDisplayName } from '../../util'
 
 @Injectable()
 export class ViewModelFactoryService
@@ -202,8 +205,19 @@ export class ViewModelFactoryService
     }
   }
 
-  rar(): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
-    throw new Error('not implemented')
+  rar(
+    session: RecordOutcomeSession,
+    body?: DeepPartial<RecordOutcomeDto>,
+    errors: ValidationError[] = [],
+  ): RecordOutcomeRarViewModel {
+    return {
+      step: RecordOutcomeStep.Rar,
+      errors,
+      isRar: body?.isRar ?? session.dto?.isRar,
+      paths: {
+        back: this.stateMachineService.getBackUrl(session, RecordOutcomeStep.Rar),
+      },
+    }
   }
 
   sensitive(
@@ -222,7 +236,30 @@ export class ViewModelFactoryService
     }
   }
 
-  unavailable(): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
-    throw new Error('not implemented')
+  unavailable(session: RecordOutcomeSession): RecordOutcomeUnavailableViewModel {
+    const offender = session.dto.offender
+    const displayName = getDisplayName(offender)
+    const utm: Utm = { medium: UtmMedium.RecordOutcome, campaign: 'unavailable-' + session.dto.unavailableReason }
+    return {
+      step: RecordOutcomeStep.Unavailable,
+      errors: [],
+      reason: session.dto.unavailableReason,
+      offender: {
+        ids: {
+          crn: offender.otherIds.crn.toUpperCase(),
+          pnc: offender.otherIds.pncNumber,
+        },
+        displayName,
+        shortName: getDisplayName(offender, { middleNames: false }),
+        dateOfBirth: offender.dateOfBirth && DateTime.fromISO(offender.dateOfBirth),
+      },
+      links: {
+        deliusContactLog: this.links.getUrl(BreadcrumbType.ExitToDeliusContactLogNow, { crn: session.crn, utm }),
+        deliusHomePage: this.links.getUrl(BreadcrumbType.ExitToDeliusHomepageNow, { crn: session.crn, utm }),
+      },
+      paths: {
+        back: this.stateMachineService.getBackUrl(session, RecordOutcomeStep.Unavailable),
+      },
+    }
   }
 }

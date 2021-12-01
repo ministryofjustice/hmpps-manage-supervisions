@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { SessionBuilder } from '../../util/form-builder'
 import { RecordOutcomeDto, RecordOutcomeSession } from '../record-outcome.dto'
-import { RecordOutcomeStep } from '../record-outcome.types'
+import { RecordOutcomeStep, RecordOutcomeUnavailableReason } from '../record-outcome.types'
 import { ValidationError } from 'class-validator'
 import { SecurityContext } from '../../security'
 import { RecordOutcomeService } from '../record-outcome.service'
@@ -68,8 +68,12 @@ export class SessionBuilderService implements SessionBuilder<RecordOutcomeDto, R
     return []
   }
 
-  rar(): Promise<ValidationError[]> | ValidationError[] {
-    throw new Error('not implemented')
+  rar(session: RecordOutcomeSession): Promise<ValidationError[]> | ValidationError[] {
+    session.dto.unavailableReason = null
+    if (session.dto.isRar === true) {
+      session.dto.unavailableReason = RecordOutcomeUnavailableReason.CountsTowardsRar
+    }
+    return []
   }
 
   sensitive(): Promise<ValidationError[]> | ValidationError[] {
@@ -77,6 +81,6 @@ export class SessionBuilderService implements SessionBuilder<RecordOutcomeDto, R
   }
 
   unavailable(): Promise<ValidationError[]> | ValidationError[] {
-    throw new Error('not implemented')
+    return []
   }
 }

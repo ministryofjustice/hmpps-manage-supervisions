@@ -7,6 +7,7 @@ import { fakeOffenderDetail } from '../../community-api/community-api.fake'
 import { fakeAvailableContactOutcomeTypes, fakeRecordOutcomeAppointmentSummary } from '../record-outcome.fake'
 import { RecordOutcomeSession } from '../record-outcome.dto'
 import { DateTime } from 'luxon'
+import { RecordOutcomeUnavailableReason } from '../record-outcome.types'
 
 describe('SessionBuilderService', () => {
   let subject: SessionBuilderService
@@ -73,6 +74,24 @@ describe('SessionBuilderService', () => {
         },
         breadcrumbOptions: { id: 10, offenderName: 'Liz Haggis', entityName: 'Some appointment' },
       } as RecordOutcomeSession)
+    })
+  })
+
+  describe('rar', () => {
+    it('does nothing when isRar is false', () => {
+      const session = { dto: { isRar: false } } as RecordOutcomeSession
+      const observed = subject.rar(session)
+
+      expect(observed).toEqual([])
+      expect(session.dto.unavailableReason).toBeNull()
+    })
+
+    it('sets unavailable when isRar is true', () => {
+      const session = { dto: { isRar: true } } as RecordOutcomeSession
+      const observed = subject.rar(session)
+
+      expect(observed).toEqual([])
+      expect(session.dto.unavailableReason).toEqual(RecordOutcomeUnavailableReason.CountsTowardsRar)
     })
   })
 })
