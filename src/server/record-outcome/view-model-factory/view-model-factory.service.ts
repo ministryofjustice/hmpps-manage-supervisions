@@ -114,7 +114,11 @@ export class ViewModelFactoryService
       paths: {
         next: this.links.getUrl(BreadcrumbType.CaseActivityLog, { crn: session.crn }),
       },
-      ...session.dto.appointment,
+      appointment: {
+        ...session.dto.appointment,
+        start: DateTime.fromISO(session.dto.appointment.start),
+        end: DateTime.fromISO(session.dto.appointment.end),
+      } as RecordOutcomeAppointmentSummary,
     }
   }
 
