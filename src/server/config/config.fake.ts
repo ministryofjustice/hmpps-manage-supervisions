@@ -69,6 +69,7 @@ export const fakeConfig = fake<Config>(() => ({
     tokenVerification: fakeApiConfig(),
     community: fakeApiConfig(),
     assessRisksAndNeeds: fakeApiConfig(),
+    delius: fakeApiConfig(),
   },
   contacts: CONTACT_DEFAULTS,
   requirements,

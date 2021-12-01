@@ -11,7 +11,7 @@ export class MockRestModule {
     configurations: { name: keyof DependentApisConfig; user: User; authMethod?: AuthenticationMethod }[],
   ): DynamicModule {
     const client = Axios.create()
-    const mock = new MockAdapter(client)
+    const mock = new MockAdapter(client, { onNoMatch: 'throwException' })
     const service = createStubInstance(RestService)
 
     configurations.forEach(config => {

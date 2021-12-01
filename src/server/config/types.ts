@@ -78,6 +78,7 @@ export interface DependentApisConfig {
   tokenVerification: ApiConfig
   community: ApiConfig
   assessRisksAndNeeds: ApiConfig
+  delius: ApiConfig
 }
 
 export interface DeliusConfig {
