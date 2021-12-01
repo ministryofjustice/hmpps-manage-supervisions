@@ -16,4 +16,5 @@ generic-service:
     DELIUS_BASE_URL: https://ndelius.test.probation.service.justice.gov.uk
     OASYS_BASE_URL: "https://ords.t1.oasys.service.justice.gov.uk/eor/f?p=EORSEC010:SEC010_LANDING::::::"
     INGRESS_URL: https://manage-supervisions-dev.hmpps.service.justice.gov.uk
+    DELIUS_API_URL: https://delius-api.test.probation.service.justice.gov.uk
     RECORD_OUTCOME: true
