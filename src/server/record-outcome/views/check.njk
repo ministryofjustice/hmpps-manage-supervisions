@@ -14,68 +14,78 @@
     Unacceptable absence
   {%- endif -%}
 {% endset %}
-
+  <h1 class="govuk-heading-xl">{{ title }}</h1>
 {{ govukSummaryList({
   classes: 'govuk-!-margin-bottom-9',
   rows: [
     {
       key: { text: "Appointment" },
+      classes: ["qa-appointment"],
       value: { html: outcome.appointment.name + '<br />' + outcome.appointment.start | longDate + ' from ' + outcome.appointment.start | timeRange(outcome.appointment.end) }
     },
     {
       key: { text: "Complied" },
+      classes: ["qa-compliance"],
       value: { text: complianceText },
       actions: {
         items: [
           {
             href: paths.compliance,
             text: "Change",
-            visuallyHiddenText: "complied"
+            visuallyHiddenText: "complied",
+            classes: ["qa-change"]
           }
         ]
       }
     },
     {
       key: { text: "Reason for absence" if outcome.compliance === 'failed-to-attend' else ("Reason for not complying" if outcome.compliance === 'failed-to-comply' else "Outcome") },
+      classes: ["qa-outcome"],
       value: { text: outcome.selectedOutcome.description },
       actions: {
         items: [
           {
             href: paths.outcome,
             text: "Change",
-            visuallyHiddenText: "outcome"
+            visuallyHiddenText: "outcome",
+            classes: ["qa-change"]
           }
         ]
       }
     } ,
     {
       key: { text: "Enforcement action" },
+      classes: ["qa-enforcement"],
       value: { text: outcome.selectedEnforcement.description },
       actions: {
         items: [
           {
             href: paths.enforcement,
             text: "Change",
-            visuallyHiddenText: "enforcement action"
+            visuallyHiddenText: "enforcement action",
+            classes: ["qa-change"]
           }
         ]
       }
     } if outcome.selectedEnforcement,
     {
       key: { text: "Sensitive" },
+      classes: ["qa-sensitive"],
       value: { text: 'Yes' if outcome.sensitive else 'No' },
       actions: {
         items: [
           {
             href: paths.sensitive,
             text: "Change",
-            visuallyHiddenText: "if this was sensitive"
+            visuallyHiddenText: "if this was sensitive",
+            classes: ["qa-change"]
           }
         ]
       }
     },
     {
       key: { text: "Your notes" },
+      classes: ["qa-notes"],
       value: {
         html: (outcome.notes | urlize | safe) if outcome.addNotes else 'None'
       },
@@ -84,10 +94,12 @@
           {
             href: paths.notes,
             text: "Change",
-            visuallyHiddenText: "appointment notes"
+            visuallyHiddenText: "appointment notes",
+            classes: ["qa-change"]
           } if outcome.addNotes else {
             href: paths.addNotes,
-            text: "Add notes"
+            text: "Add notes",
+            classes: ["qa-change"]
           }
         ]
       }

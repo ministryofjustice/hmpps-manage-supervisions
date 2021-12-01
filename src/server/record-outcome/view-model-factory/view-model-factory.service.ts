@@ -70,16 +70,13 @@ export class ViewModelFactoryService
 
   check(
     session: RecordOutcomeSession,
-    body?: DeepPartial<RecordOutcomeDto>,
+    _body?: DeepPartial<RecordOutcomeDto>,
     errors: ValidationError[] = [],
   ): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
     const outcome = plainToClass(RecordOutcomeDto, session.dto, {
       groups: [DEFAULT_GROUP],
       excludeExtraneousValues: true,
     })
-
-    console.log(JSON.stringify(outcome))
-
     return {
       step: RecordOutcomeStep.Check,
       outcome,

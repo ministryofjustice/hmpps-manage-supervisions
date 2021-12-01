@@ -62,7 +62,7 @@ export class RecordOutcomePage extends PageBase {
       },
     }
   }
-  get failedToAttend() {
+  get 'failed-to-attend'() {
     return {
       get yes() {
         return cy.get('#acceptableAbsence-acceptable')
@@ -98,7 +98,7 @@ export class RecordOutcomePage extends PageBase {
       },
     }
   }
-  get addNotes() {
+  get 'add-notes'() {
     return {
       get yes() {
         return cy.get('#addNotes-yes')
@@ -141,6 +141,54 @@ export class RecordOutcomePage extends PageBase {
             return cy.get('#sensitive-error')
           },
         }
+      },
+    }
+  }
+
+  get check() {
+    return {
+      get appointment() {
+        return cy.get('.qa-appointment .govuk-summary-list__value')
+      },
+
+      get compliance() {
+        return cy.get('.qa-compliance .govuk-summary-list__value')
+      },
+
+      get complianceChangeLink() {
+        return cy.get('.qa-compliance .qa-change')
+      },
+
+      get outcome() {
+        return cy.get('.qa-outcome .govuk-summary-list__value')
+      },
+
+      get outcomeChangeLink() {
+        return cy.get('.qa-outcome .qa-change')
+      },
+
+      get enforcement() {
+        return cy.get('.qa-enforcement .govuk-summary-list__value')
+      },
+
+      get enforcementChangeLink() {
+        return cy.get('.qa-enforcement .qa-change')
+      },
+
+      get sensitive() {
+        return cy.get('.qa-sensitive .govuk-summary-list__value')
+      },
+
+      get sensitiveChangeLink() {
+        return cy.get('.qa-sensitive .qa-change')
+      },
+
+      get notes() {
+        return cy.get('.qa-notes .govuk-summary-list__value')
+      },
+
+      get notesChangeLink() {
+        return cy.get('.qa-notes .qa-change')
       },
     }
   }
