@@ -1,7 +1,9 @@
 {% extends "pages/wizard-form.njk" %}
 {% set title %}
-  {% if acceptableAbsence %}
+  {% if compliance == 'failed-to-attend' %}
     Why was {{offenderFirstName}} absent?
+  {% elseif compliance == 'compliance-acceptable' %}
+    What outcome would you like to record?
   {% else %}
     How did {{offenderFirstName}} not comply?
   {% endif %}

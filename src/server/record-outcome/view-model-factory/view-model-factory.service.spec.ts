@@ -4,6 +4,7 @@ import { MockLinksModule } from '../../common/links/links.mock'
 import { RecordOutcomeSession } from '../record-outcome.dto'
 import {
   ComplianceOption,
+  RecordOutcomeCheckViewModel,
   RecordOutcomeInitViewModel,
   RecordOutcomeStep,
   RecordOutcomeViewModel,
@@ -167,7 +168,7 @@ describe('ViewModelFactoryService', () => {
     const observed = subject.outcome(session, body)
 
     expect(observed).toEqual({
-      acceptableAbsence: false,
+      compliance: ComplianceOption.FailedToComply,
       step: RecordOutcomeStep.Outcome,
       offenderFirstName: 'Daniel',
       errors: [],
@@ -256,5 +257,31 @@ describe('ViewModelFactoryService', () => {
       addNotes: true,
       paths: { back: '/previous-page' },
     } as RecordOutcomeViewModel)
+  })
+
+  it('check', () => {
+    const body = fakeRecordOutcomeDto()
+    service.getBackUrl.returns('/previous-page')
+    service.getStepUrl.withArgs(session, RecordOutcomeStep.Compliance).returns('/compliance')
+    service.getStepUrl.withArgs(session, RecordOutcomeStep.Outcome).returns('/outcome')
+    service.getStepUrl.withArgs(session, RecordOutcomeStep.Enforcement).returns('/enforcement')
+    service.getStepUrl.withArgs(session, RecordOutcomeStep.Notes).returns('/notes')
+    service.getStepUrl.withArgs(session, RecordOutcomeStep.Sensitive).returns('/sensitive')
+
+    const observed = subject.check(session, body)
+
+    expect(observed).toEqual({
+      errors: [],
+      outcome: classToPlain(dto, { groups: [DEFAULT_GROUP] }),
+      step: RecordOutcomeStep.Check,
+      paths: {
+        back: '/previous-page',
+        compliance: '/compliance',
+        outcome: '/outcome',
+        enforcement: '/enforcement',
+        notes: '/notes',
+        sensitive: '/sensitive',
+      },
+    } as RecordOutcomeCheckViewModel)
   })
 })

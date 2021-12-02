@@ -307,7 +307,6 @@ export class ArrangeAppointmentFixture {
       .whenSubmittingCurrentStep()
 
     this.page.pageTitle.then(el => {
-      console.log(el.text())
       if (el.text().trim() == 'Where will the appointment be?') {
         this.whenSelectingLocationRadio(test.location.name).whenSubmittingCurrentStep()
         locationEntered = true

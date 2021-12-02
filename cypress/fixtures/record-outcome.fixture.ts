@@ -45,11 +45,6 @@ export class RecordOutcomeFixture {
     return this
   }
 
-  shouldDisplayCompliancePage(title: string) {
-    this.page.pageTitle.contains(title)
-    return this
-  }
-
   shouldDisplayComplianceErrors(summary: string, error: string) {
     this.page.errorSummary.contains(summary)
     this.page.compliance.errorMessages.compliance.contains(error)
@@ -61,23 +56,14 @@ export class RecordOutcomeFixture {
     return this
   }
 
-  shouldDisplayOutcomePage(title: string) {
-    this.page.pageTitle.contains(title)
-    this.page.outcome.outcomeRadios.should('exist')
-    return this
-  }
   whenSelectingComplianceFailedToAttendOutcome() {
     this.page.compliance.compliedNoFailedToAttend.click()
     return this
   }
-  shouldDisplayFailedToAttendPage(title: string) {
-    this.page.pageTitle.contains(title)
-    this.page.failedToAttend.absenceRadios.should('exist')
-    return this
-  }
+
   shouldDisplayFailedToAttendErrors(summary: string, error: string) {
     this.page.errorSummary.contains(summary)
-    this.page.failedToAttend.errorMessages.acceptableAbsence.contains(error)
+    this.page['failed-to-attend'].errorMessages.acceptableAbsence.contains(error)
     return this
   }
   shouldDisplayOutcomeErrors(summary: string, error: string) {
@@ -86,16 +72,11 @@ export class RecordOutcomeFixture {
     return this
   }
   whenSelectingAbsenceAcceptable(yesNo: string) {
-    yesNo === 'Yes' ? this.page.failedToAttend.yes.click() : this.page.failedToAttend.no.click()
+    yesNo === 'Yes' ? this.page['failed-to-attend'].yes.click() : this.page['failed-to-attend'].no.click()
     return this
   }
   whenSelectingOutcome(option: string) {
     this.page.outcome.radio(option).click()
-    return this
-  }
-
-  shouldDisplayEnforcementPage() {
-    this.page.pageTitle.contains('Pick an enforcement action')
     return this
   }
 
@@ -109,31 +90,19 @@ export class RecordOutcomeFixture {
     this.page.enforcement.select(option)
     return this
   }
-  shouldDisplayAddNotesPage(title: string) {
-    this.page.pageTitle.contains(title)
-    this.page.addNotes.addNotesRadios.should('exist')
-    return this
-  }
+
   shouldDisplayAddNotesErrors(summary: string, error: string) {
     this.page.errorSummary.contains(summary)
-    this.page.addNotes.errorMessages.addNotes.contains(error)
+    this.page['add-notes'].errorMessages.addNotes.contains(error)
     return this
   }
   whenSelectingAddNotesOption(yesNo: string) {
-    yesNo === 'Yes' ? this.page.addNotes.yes.click() : this.page.addNotes.no.click()
-    return this
-  }
-  shouldDisplayNotesPage(title: string) {
-    this.page.pageTitle.contains(title)
-    return this
-  }
-  whenTypingNotesContent(notes: string) {
-    this.page.notes.notesTextField.type(notes)
+    yesNo === 'Yes' ? this.page['add-notes'].yes.click() : this.page['add-notes'].no.click()
     return this
   }
 
-  shouldDisplaySensitiveInformationPage(title: string) {
-    this.page.pageTitle.contains(title)
+  whenTypingNotesContent(notes: string) {
+    this.page.notes.notesTextField.type(notes)
     return this
   }
 
@@ -145,6 +114,36 @@ export class RecordOutcomeFixture {
 
   whenSelectingIsSensitiveOption(yesNo: string) {
     yesNo === 'Yes' ? this.page.sensitive.yes.click() : this.page.sensitive.no.click()
+    return this
+  }
+
+  shouldDisplayCheckPage({ appointmentId, compliance, notes, sensitive, outcome, enforcement, crn }) {
+    this.page.pageTitle.contains('Check your answers and record the outcome')
+
+    this.page.check.compliance.contains(compliance)
+    this.page.check.complianceChangeLink
+      .should('have.attr', 'href')
+      .and('include', `${crn}/appointment/${appointmentId}/record-outcome/compliance`)
+
+    this.page.check.outcome.contains(outcome)
+    this.page.check.outcomeChangeLink
+      .should('have.attr', 'href')
+      .and('include', `${crn}/appointment/${appointmentId}/record-outcome/outcome`)
+
+    this.page.check.enforcement.contains(enforcement)
+    this.page.check.enforcementChangeLink
+      .should('have.attr', 'href')
+      .and('include', `${crn}/appointment/${appointmentId}/record-outcome/enforcement`)
+
+    this.page.check.notes.contains(notes)
+    this.page.check.notesChangeLink
+      .should('have.attr', 'href')
+      .and('include', `${crn}/appointment/${appointmentId}/record-outcome/notes`)
+
+    this.page.check.sensitive.contains(sensitive ? 'Yes' : 'No')
+    this.page.check.sensitiveChangeLink
+      .should('have.attr', 'href')
+      .and('include', `${crn}/appointment/${appointmentId}/record-outcome/sensitive`)
     return this
   }
 }

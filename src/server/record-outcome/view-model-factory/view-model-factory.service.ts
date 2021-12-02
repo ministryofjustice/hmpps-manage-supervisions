@@ -68,8 +68,28 @@ export class ViewModelFactoryService
     }
   }
 
-  check(): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
-    throw new Error('not implemented')
+  check(
+    session: RecordOutcomeSession,
+    _body?: DeepPartial<RecordOutcomeDto>,
+    errors: ValidationError[] = [],
+  ): Promise<RecordOutcomeViewModel> | RecordOutcomeViewModel {
+    const outcome = plainToClass(RecordOutcomeDto, session.dto, {
+      groups: [DEFAULT_GROUP],
+      excludeExtraneousValues: true,
+    })
+    return {
+      step: RecordOutcomeStep.Check,
+      outcome,
+      paths: {
+        back: this.stateMachineService.getBackUrl(session, RecordOutcomeStep.Check),
+        compliance: this.stateMachineService.getStepUrl(session, RecordOutcomeStep.Compliance),
+        outcome: this.stateMachineService.getStepUrl(session, RecordOutcomeStep.Outcome),
+        enforcement: this.stateMachineService.getStepUrl(session, RecordOutcomeStep.Enforcement),
+        notes: this.stateMachineService.getStepUrl(session, RecordOutcomeStep.Notes),
+        sensitive: this.stateMachineService.getStepUrl(session, RecordOutcomeStep.Sensitive),
+      },
+      errors,
+    }
   }
 
   compliance(
@@ -161,7 +181,7 @@ export class ViewModelFactoryService
 
     return {
       step: RecordOutcomeStep.Outcome,
-      acceptableAbsence: !attendance && compliantAcceptable,
+      compliance: session.dto.compliance,
       errors,
       outcomes,
       outcome: body?.outcome || session.dto?.outcome,
