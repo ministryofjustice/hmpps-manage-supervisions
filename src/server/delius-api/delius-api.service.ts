@@ -15,7 +15,7 @@ export class DeliusApiService {
   private readonly axios: AxiosInstance
 
   constructor(@Inject(REQUEST) request: Request, rest: RestService) {
-    this.axios = rest.build('community', request.user as User, AuthenticationMethod.ReissueForDeliusUser)
+    this.axios = rest.build('delius', request.user as User, AuthenticationMethod.ReissueForDeliusUser)
   }
 
   get contactV1() {

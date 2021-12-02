@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { SessionBuilder } from '../../util/form-builder'
 import { RecordOutcomeDto, RecordOutcomeSession } from '../record-outcome.dto'
-import { RecordOutcomeStep, RecordOutcomeUnavailableReason } from '../record-outcome.types'
+import { RecordOutcomeStep, RecordOutcomeStatus, RecordOutcomeUnavailableReason } from '../record-outcome.types'
 import { ValidationError } from 'class-validator'
 import { SecurityContext } from '../../security'
 import { RecordOutcomeService } from '../record-outcome.service'
@@ -44,7 +44,16 @@ export class SessionBuilderService implements SessionBuilder<RecordOutcomeDto, R
     return []
   }
 
-  check(): Promise<ValidationError[]> | ValidationError[] {
+  async check(session: RecordOutcomeSession, model: RecordOutcomeDto): Promise<ValidationError[]> {
+    const outcomeUpdateResponse = await this.service.recordOutcome(model)
+    if (outcomeUpdateResponse.status != RecordOutcomeStatus.OK) {
+      return [
+        {
+          property: 'outcome',
+          constraints: { response: outcomeUpdateResponse.status },
+        },
+      ]
+    }
     return []
   }
 
