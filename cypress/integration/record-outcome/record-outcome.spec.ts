@@ -28,6 +28,33 @@ context('Record outcome happy path & validation', () => {
       .shouldDisplayEnforcementErrors('There is a problem', 'Select an enforcement')
       .whenSelectingEnforcementAction('Refer to Offender Manager')
       .whenSubmittingCurrentStep()
+      .shouldDisplayStep('add-notes', 'Do you want to add notes to this appointment?', page => {
+        page.addNotesRadios.should('exist')
+      })
+      .whenSelectingAddNotesOption('Yes')
+      .whenSubmittingCurrentStep()
+      .shouldDisplayStep('notes', 'Add appointment notes')
+      .whenTypingNotesContent('Some notes')
+      .whenSubmittingCurrentStep()
+      .shouldDisplayStep('sensitive', 'Does this appointment include sensitive information?')
+      .whenSelectingIsSensitiveOption('No')
+      .whenSubmittingCurrentStep()
+      .shouldDisplayCheckPage({
+        crn: 'X009923',
+        appointmentId: 5,
+        compliance: 'No',
+        notes: 'Some notes',
+        enforcement: 'Refer to Offender Manager',
+        outcome: 'Attended - Failed to Comply',
+        sensitive: 'No',
+      })
+      .whenSubmittingCurrentStep()
+      .shouldDisplayRecordOutcomeConfirmation(
+        'Outcome of appointment recorded',
+        'Not a well known appointment with Robert Ohagan',
+        'Wednesday 2 September 2020 from 11am to 1pm',
+        'activity',
+      )
   })
   it('can record outcome - failed to attend', () => {
     new RecordOutcomeFixture()
@@ -76,13 +103,13 @@ context('Record outcome happy path & validation', () => {
         outcome: 'Failed to Attend',
         sensitive: 'Yes',
       })
-    //TODO enable when check step is complete
-    // .shouldDisplayRecordOutcomeConfirmation(
-    //   'Outcome of appointment recorded',
-    //   'Not a well known appointment with Robert Ohagan',
-    //   'Wednesday 2 September 2020 from 11am to 1pm',
-    //   'activity',
-    // )
+      .whenSubmittingCurrentStep()
+      .shouldDisplayRecordOutcomeConfirmation(
+        'Outcome of appointment recorded',
+        'Not a well known appointment with Robert Ohagan',
+        'Wednesday 2 September 2020 from 11am to 1pm',
+        'activity',
+      )
   })
   it('compliance page validation', () => {
     new RecordOutcomeFixture()

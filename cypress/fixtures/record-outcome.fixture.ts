@@ -140,7 +140,7 @@ export class RecordOutcomeFixture {
       .should('have.attr', 'href')
       .and('include', `${crn}/appointment/${appointmentId}/record-outcome/notes`)
 
-    this.page.check.sensitive.contains(sensitive ? 'Yes' : 'No')
+    this.page.check.sensitive.contains(sensitive === 'Yes' ? 'Yes' : 'No')
     this.page.check.sensitiveChangeLink
       .should('have.attr', 'href')
       .and('include', `${crn}/appointment/${appointmentId}/record-outcome/sensitive`)
