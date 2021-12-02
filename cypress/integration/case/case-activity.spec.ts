@@ -505,5 +505,20 @@ context('Case activity tab', () => {
         .shouldNotRenderActivityWithId(10)
         .shouldNotRenderActivityWithId(11)
     })
+
+    // TODO: Remove below .only before this passes code review.
+    it.only("allows changing an appointment's sensitivity", () => {
+      fixture
+        .whenViewingOffender()
+        .whenClickingSubNavTab('activity')
+        .whenClickingActivityEntry(5)
+
+        .shouldRenderAppointmentPage('Appointment Not a well known appointment with Robert Ohagan', page => {
+          page.detail(list => {
+            list.value('Sensitive').contains('No')
+            list.actions('Sensitive').contains('Change sensitivity')
+          })
+        })
+    })
   })
 })
