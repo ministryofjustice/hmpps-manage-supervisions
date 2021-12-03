@@ -364,6 +364,7 @@ context('Case compliance tab', () => {
   })
 
   it('displays previous breach compliance page', () => {
+    const endDate = DateTime.now().minus({ month: 1 }).startOf('day')
     cy.seed({
       convictions: {
         active: {
@@ -373,8 +374,8 @@ context('Case compliance tab', () => {
               active: false,
               nsiType: { code: 'BRE' },
               nsiOutcome: { description: 'Breach proven' },
-              actualStartDate: '2020-12-02',
-              actualEndDate: '2020-12-03',
+              actualStartDate: endDate.minus({ month: 1 }),
+              actualEndDate: endDate.toISODate(),
             },
           ],
         },
@@ -388,7 +389,7 @@ context('Case compliance tab', () => {
       .shouldRenderOffenderTab('compliance', page => {
         page.currentStatus.contains('2 failures to comply since last breach')
       })
-      .shouldRenderSentence({ breaches: 'Breach proven Resolved 3 December 2020' })
+      .shouldRenderSentence({ breaches: `Breach proven Resolved ${endDate.toFormat('d MMMM yyyy')}` })
       .shouldRenderRequirement({
         total: '7 national standard appointments',
         withoutAnOutcome: '1 appointment without a recorded outcome',
