@@ -45,6 +45,7 @@ export interface RecordOutcomeInitViewModel extends ViewModel {
 
 export interface RecordOutcomeViewModelBase<Step extends RecordOutcomeStep> extends ViewModel {
   step: Step
+  appointment?: RecordOutcomeAppointmentSummary
   errors?: ValidationError[] | null
   paths?: {
     back?: string

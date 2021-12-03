@@ -57,7 +57,7 @@ const meta: StepMeta<RecordOutcomeDto, RecordOutcomeStep> = {
     next: RecordOutcomeStep.Check,
   },
   check: {
-    type: StepType.Confirmation,
+    type: StepType.Update,
     next: RecordOutcomeStep.Confirm,
   },
   confirm: {

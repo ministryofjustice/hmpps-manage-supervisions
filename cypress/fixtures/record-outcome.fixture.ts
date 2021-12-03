@@ -140,10 +140,17 @@ export class RecordOutcomeFixture {
       .should('have.attr', 'href')
       .and('include', `${crn}/appointment/${appointmentId}/record-outcome/notes`)
 
-    this.page.check.sensitive.contains(sensitive ? 'Yes' : 'No')
+    this.page.check.sensitive.contains(sensitive === 'Yes' ? 'Yes' : 'No')
     this.page.check.sensitiveChangeLink
       .should('have.attr', 'href')
       .and('include', `${crn}/appointment/${appointmentId}/record-outcome/sensitive`)
+    return this
+  }
+  shouldDisplayRecordOutcomeConfirmation(title: string, description: string, timeMessage: string, finishLink: string) {
+    this.page.pageTitle.contains(title)
+    this.page.confirm.descriptionMessage.contains(description)
+    this.page.confirm.timeMessage.contains(timeMessage)
+    this.page.confirm.finishButton.should('have.attr', 'href').and('include', `/${finishLink}`)
     return this
   }
 }

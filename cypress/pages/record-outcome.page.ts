@@ -192,4 +192,19 @@ export class RecordOutcomePage extends PageBase {
       },
     }
   }
+  get confirm() {
+    return {
+      get timeMessage() {
+        return cy.get('span[data-qa="confirm-outcome-appointment/times"]')
+      },
+
+      get descriptionMessage() {
+        return cy.get('span[data-qa="confirm-outcome-appointment/description"]')
+      },
+
+      get finishButton() {
+        return cy.get('a[data-qa="confirm-outcome/finish-button"]')
+      },
+    }
+  }
 }

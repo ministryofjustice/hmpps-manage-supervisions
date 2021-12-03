@@ -5,6 +5,7 @@ import { RecordOutcomeSession } from '../record-outcome.dto'
 import {
   ComplianceOption,
   RecordOutcomeCheckViewModel,
+  RecordOutcomeConfirmViewModel,
   RecordOutcomeInitViewModel,
   RecordOutcomeStep,
   RecordOutcomeViewModel,
@@ -283,5 +284,20 @@ describe('ViewModelFactoryService', () => {
         sensitive: '/sensitive',
       },
     } as RecordOutcomeCheckViewModel)
+  })
+  it('confirm', () => {
+    const links = MockLinksModule.of({ crn: 'some-crn' })
+    const observed = subject.confirm(session)
+    expect(observed).toEqual({
+      step: RecordOutcomeStep.Confirm,
+      paths: { next: links.url(BreadcrumbType.CaseActivityLog) },
+      appointment: {
+        id: 10,
+        name: 'some-appointment',
+        start: DateTime.fromISO(dto.appointment.start),
+        end: DateTime.fromISO(dto.appointment.end),
+        contactTypeCode: 'OFF1',
+      },
+    } as RecordOutcomeConfirmViewModel)
   })
 })

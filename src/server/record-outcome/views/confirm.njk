@@ -1,0 +1,21 @@
+{% extends "pages/wizard-page.njk" %}
+
+{% set buttonText = 'Finish' %}
+{% set buttonQa = 'confirm-outcome/finish-button' %}
+{% set title = 'Outcome of appointment recorded' %}
+{% block page %}
+  {% set panelHtml %}
+    <strong><span data-qa="confirm-outcome-appointment/description">{{ appointment.name }}</span></strong><br />
+    <span data-qa="confirm-outcome-appointment/times">
+      {{ appointment.start | longDate }}
+      from {{ appointment.start | time }} to {{ appointment.end | time }}
+    </span>
+  {% endset %}
+
+  {{ govukPanel({
+    titleText: title,
+    html: panelHtml,
+    classes: 'govuk-!-margin-bottom-6'
+  }) }}
+
+{% endblock %}
