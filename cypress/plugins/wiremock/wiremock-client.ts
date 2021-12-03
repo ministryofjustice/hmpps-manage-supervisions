@@ -243,6 +243,12 @@ class FluentWiremockContext {
     return this
   }
 
+  patch(path: string): this {
+    this.mapping.request.method = 'PATCH'
+    this.mapping.request.urlPath = this.resolvePath(path)
+    return this
+  }
+
   basicAuth(username: string, password: string): this {
     this.mapping.request.basicAuth = { username, password }
     return this

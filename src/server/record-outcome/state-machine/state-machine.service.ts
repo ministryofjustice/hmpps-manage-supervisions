@@ -61,7 +61,7 @@ const meta: StepMeta<RecordOutcomeDto, RecordOutcomeStep> = {
     next: RecordOutcomeStep.Confirm,
   },
   confirm: {
-    type: StepType.Confirmation,
+    type: StepType.Complete,
     next: null,
   },
   unavailable: {

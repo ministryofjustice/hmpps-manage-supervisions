@@ -32,6 +32,7 @@ import { needs } from './needs'
 import { cases } from './cases'
 import { DeepPartial } from '../../src/server/app.types'
 import { exit } from './exit'
+import { deliusApiContact } from './delius-api'
 
 /**
  * Resets the wiremock server, this should always be the first seed module loaded.
@@ -147,6 +148,7 @@ export function offenderSeed(options: OffenderSeedOptions = {}) {
         nsis(crn, x.conviction.convictionId, x.nsis || []),
       ])
       .reduce((agg, x) => [...agg, ...x], []),
+    deliusApiContact(),
   )
 }
 

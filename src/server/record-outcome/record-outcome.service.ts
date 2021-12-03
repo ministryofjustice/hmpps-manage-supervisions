@@ -3,7 +3,6 @@ import { CommunityApiService, ContactMappingService } from '../community-api'
 import { ContactTypeCategory } from '../config'
 import { DateTime } from 'luxon'
 import {
-  Operation,
   PatchContactRequest,
   RecordOutcomeAppointmentSummary,
   RecordOutcomeFailure,
