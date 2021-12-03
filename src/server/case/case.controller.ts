@@ -50,10 +50,7 @@ export class CaseController {
         conviction,
         complianceFilter: ActivityComplianceFilter.WithoutOutcome,
       })
-      appointmentsWithoutAnOutcome = contacts.content
-        .flatMap(x => x.entries)
-        .filter(x => x.start < today)
-        .sort((a, b) => (a.start > b.start ? 1 : -1))
+      appointmentsWithoutAnOutcome = contacts.content.flatMap(x => x.entries).filter(x => x.start < today)
     }
     return this.offenderService.casePageOf<CaseOverviewViewModel>(offender, {
       page: CasePage.Overview,
@@ -64,7 +61,12 @@ export class CaseController {
       nextAppointment,
       risks,
       registrations,
-      appointmentsWithoutAnOutcome,
+      appointmentsMissingOutcome: {
+        count: appointmentsWithoutAnOutcome.length,
+        activityFilterLink: `${this.linksService.getUrl(BreadcrumbType.CaseActivityLog, { crn })}/${
+          ActivityComplianceFilter.WithoutOutcome
+        }`,
+      },
     })
   }
 }

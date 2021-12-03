@@ -18,7 +18,10 @@ export interface ActivityLogEntryTag {
   name: string
   colour: GovUkUiTagColour
 }
-
+export interface AppointmentsMissingOutcome {
+  count: number
+  activityFilterLink: string
+}
 interface ActivityLogEntryBase<Type extends ContactTypeCategory, Links = {}> {
   type: Type
   id: number

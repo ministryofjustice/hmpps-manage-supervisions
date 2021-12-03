@@ -72,8 +72,11 @@ export class CasePage extends PageBase {
       activityAndCompliance(callback: SummaryListCallback) {
         SummaryList.selectFromCard('Activity and compliance', callback)
       },
-      recordOutcomeAlert(id: number, title: string) {
-        return cy.get(`[data-qa="offender/overview/${id}"]`).contains(title)
+      recordOutcomeAlert(crn: string, title: string) {
+        cy.get(`[data-qa="offender/overview/outcome-alert"]`)
+          .should('have.attr', 'href')
+          .and('include', `case/${crn}/activity/without-an-outcome`)
+        return cy.get(`[data-qa="offender/overview/outcome-alert"]`).contains(title)
       },
     }
   }

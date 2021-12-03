@@ -2,17 +2,14 @@
 {% set pageName = 'Overview' %}
 {% from '_join.njk' import join %}
 {% from 'components/summary-card.njk' import appSummaryCard %}
-
 {% block page %}
-{% if appointmentsWithoutAnOutcome.length %}
+{% if appointmentsMissingOutcome.count %}
     {% set outcomeAlert %}
-        <h2 class="govuk-heading-m">You need to record an outcome for an appointment</h2>
+        <h2 class="govuk-heading-m">You have appintments that needs attention</h2>
         <ul class="govuk-list govuk-!-margin-bottom-0">
-            {% for apt in appointmentsWithoutAnOutcome %}
-                <li>
-                    <a href="{{ apt.links.recordMissingAttendance }}" data-qa="offender/overview/{{ apt.id }}">Record an outcome for: {{ apt.name }} on {{ apt.start | longDate }} at {{ apt.start | time }}</a>
-                </li>
-            {% endfor %}
+            <li>
+                <a href="{{ appointmentsMissingOutcome.activityFilterLink }}" data-qa="offender/overview/outcome-alert">You need to record an outcome for {{ appointmentsMissingOutcome.count | quantity('appointment') }} </a>
+            </li>
         </ul>
     {% endset %}
     {{ govukNotificationBanner({ html: outcomeAlert }) }}
