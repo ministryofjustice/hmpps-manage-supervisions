@@ -5,6 +5,41 @@ context('Record outcome happy path & validation', () => {
     cy.seed()
   })
 
+  it('cannot record outcome when counts towards rar', () => {
+    new RecordOutcomeFixture()
+      .whenRecordingOutcome()
+      .whenSubmittingFirstStep()
+      .shouldDisplayCompliancePage()
+      .whenSelectingCompliedOption()
+      .whenSubmittingCurrentStep()
+      .shouldDisplayRarStep(page => page.radio('Yes').click())
+      .whenSubmittingCurrentStep()
+      .shouldRedirectToRarUnavailablePage()
+  })
+
+  it('can record outcome - complied & attended', () => {
+    new RecordOutcomeFixture()
+      .whenRecordingOutcome()
+      .whenSubmittingFirstStep()
+      .shouldDisplayCompliancePage()
+      .whenSelectingCompliedOption()
+      .whenSubmittingCurrentStep()
+      .shouldDisplayRarStep()
+      .whenSubmittingCurrentStep()
+      .shouldDisplayRarStep(page => {
+        page.errorMessages.isRar.contains('Select yes if this appointment counted towards RAR')
+        page.radio('No').click()
+      })
+      .whenSubmittingCurrentStep()
+      .shouldDisplayAddNotesPage()
+      .whenSelectingAddNotesOption('No')
+      .whenSubmittingCurrentStep()
+      .shouldDisplaySensitiveInformationPage()
+      .whenSelectingIsSensitiveOption('No')
+      .whenSubmittingCurrentStep()
+    // TODO complete this once record outcome implemented
+  })
+
   it('can record outcome - failed to comply', () => {
     new RecordOutcomeFixture()
       .whenRecordingOutcome()
@@ -16,7 +51,7 @@ context('Record outcome happy path & validation', () => {
       .shouldDisplayAppointmentPage('Not a well known appointment with Robert Ohagan')
       .whenGoingBack()
       .whenSubmittingFirstStep()
-      .shouldDisplayStep('compliance', 'attend and comply?')
+      .shouldDisplayCompliancePage()
       .whenSelectingNonComplianceOption()
       .whenSubmittingCurrentStep()
       .shouldDisplayStep('outcome', 'How did Liz not comply?')
@@ -56,11 +91,12 @@ context('Record outcome happy path & validation', () => {
         'activity',
       )
   })
+
   it('can record outcome - failed to attend', () => {
     new RecordOutcomeFixture()
       .whenRecordingOutcome()
       .whenSubmittingFirstStep()
-      .shouldDisplayStep('compliance', 'Did Liz attend and comply?')
+      .shouldDisplayCompliancePage()
       .whenSelectingComplianceFailedToAttendOutcome()
       .whenSubmittingCurrentStep()
       .shouldDisplayStep('failed-to-attend', 'Was Liz’s absence acceptable?', page => {
@@ -76,9 +112,6 @@ context('Record outcome happy path & validation', () => {
       .shouldDisplayStep('enforcement', 'Pick an enforcement action')
       .whenSelectingEnforcementAction('Refer to Offender Manager')
       .whenSubmittingCurrentStep()
-      .shouldDisplayStep('add-notes', 'Do you want to add notes to this appointment?', page => {
-        page.addNotesRadios.should('exist')
-      })
       .whenSubmittingCurrentStep()
       .shouldDisplayAddNotesErrors('There is a problem', 'Select yes if you would like to add notes')
       .whenSelectingAddNotesOption('Yes')
@@ -86,7 +119,7 @@ context('Record outcome happy path & validation', () => {
       .shouldDisplayStep('notes', 'Add appointment notes')
       .whenTypingNotesContent('Some notes')
       .whenSubmittingCurrentStep()
-      .shouldDisplayStep('sensitive', 'Does this appointment include sensitive information?')
+      .shouldDisplaySensitiveInformationPage()
       .whenSubmittingCurrentStep()
       .shouldDisplaySensitiveInformationErrors(
         'There is a problem',
@@ -111,30 +144,33 @@ context('Record outcome happy path & validation', () => {
         'activity',
       )
   })
+
   it('compliance page validation', () => {
     new RecordOutcomeFixture()
       .whenRecordingOutcome()
       .whenSubmittingFirstStep()
-      .shouldDisplayStep('compliance', 'attend and comply?')
+      .shouldDisplayCompliancePage()
       .whenSubmittingCurrentStep()
       .shouldDisplayComplianceErrors('There is a problem', 'Select one of the compliance options')
   })
+
   it('failed-to-attend page validation', () => {
     new RecordOutcomeFixture()
       .whenRecordingOutcome()
       .whenSubmittingFirstStep()
-      .shouldDisplayStep('compliance', 'Did Liz attend and comply?')
+      .shouldDisplayCompliancePage()
       .whenSelectingComplianceFailedToAttendOutcome()
       .whenSubmittingCurrentStep()
       .shouldDisplayStep('failed-to-attend', 'Was Liz’s absence acceptable?')
       .whenSubmittingCurrentStep()
       .shouldDisplayFailedToAttendErrors('There is a problem', 'Select one of the absence options')
   })
+
   it('outcome page validation', () => {
     new RecordOutcomeFixture()
       .whenRecordingOutcome()
       .whenSubmittingFirstStep()
-      .shouldDisplayStep('compliance', 'Did Liz attend and comply?')
+      .shouldDisplayCompliancePage()
       .whenSelectingComplianceFailedToAttendOutcome()
       .whenSubmittingCurrentStep()
       .shouldDisplayStep('failed-to-attend', 'Was Liz’s absence acceptable?')

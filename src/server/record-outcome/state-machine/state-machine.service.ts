@@ -14,7 +14,7 @@ const meta: StepMeta<RecordOutcomeDto, RecordOutcomeStep> = {
         case ComplianceOption.FailedToComply:
           return RecordOutcomeStep.Outcome
         default:
-          return RecordOutcomeStep.Outcome
+          return RecordOutcomeStep.Rar
       }
     },
   },

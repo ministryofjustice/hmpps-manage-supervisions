@@ -1,0 +1,27 @@
+{% extends "pages/wizard-page.njk" %}
+
+{% from 'partials/exit/_to-delius.njk' import toDeliusContactLog, toDeliusHomepage %}
+
+{% switch(reason) %}
+
+{% case 'counts-towards-rar' %}
+    {% set title = 'You need to record this outcome on National Delius' %}
+    {% set page %}
+        <h1 class="govuk-heading-xl">{{ title }}</h1>
+
+        <p>Recording a RAR activity is not yet available in the Manage supervisions pilot.</p>
+
+        {{ toDeliusContactLog({ offender: offender, links: links }) }}
+        {{ toDeliusHomepage({ offender: offender, links: links }) }}
+    {% endset %}
+{% endswitch %}
+
+{% block page %}
+    {{ page | safe }}
+    {% if displaySupportEmail %}
+        <p>
+            Contact us by email:<br>
+            {{ appEmail(supportEmail) }}
+        </p>
+    {% endif %}
+{% endblock %}

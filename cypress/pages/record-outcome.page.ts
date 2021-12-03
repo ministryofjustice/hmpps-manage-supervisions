@@ -45,6 +45,22 @@ export class RecordOutcomePage extends PageBase {
     }
   }
 
+  get rar() {
+    return {
+      get errorMessages() {
+        return {
+          get isRar() {
+            return cy.get('#isRar-error')
+          },
+        }
+      },
+
+      radio(name: string) {
+        return cy.get('[data-qa="record-outcome/rar"] input[type=radio]').siblings('label').contains(name)
+      },
+    }
+  }
+
   get outcome() {
     return {
       get outcomeRadios() {

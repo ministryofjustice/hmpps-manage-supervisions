@@ -1,0 +1,33 @@
+{% extends "pages/wizard-form.njk" %}
+{% set title = "Did this appointment count towards RAR?" %}
+
+{% block form %}
+    {{ govukRadios({
+        name: "isRar",
+        attributes: {
+            "data-qa": "record-outcome/rar"
+        },
+        fieldset: {
+            legend: {
+                text: title,
+                classes: "govuk-label--xl",
+                isPageHeading: true
+            }
+        },
+        items: [
+            {
+                id: 'isRar-yes',
+                text: 'Yes',
+                value: 'true',
+                checked: isRar === true
+            },
+            {
+                id: 'isRar-no',
+                text: 'No',
+                value: 'false',
+                checked: isRar === false
+            }
+        ],
+        errorMessage: errors | findErrorMessages("isRar")
+    }) }}
+{% endblock %}

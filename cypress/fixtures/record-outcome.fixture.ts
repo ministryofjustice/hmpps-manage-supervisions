@@ -4,7 +4,9 @@ import { CRN } from '../plugins/offender'
 export class RecordOutcomeFixture {
   readonly page = new RecordOutcomePage()
 
-  constructor(private readonly data: { crn: string; id: number } = { crn: CRN, id: 5 }) {}
+  constructor(
+    private readonly data: { crn: string; id: number; firstName: string } = { crn: CRN, id: 5, firstName: 'Liz' },
+  ) {}
 
   whenRecordingOutcome() {
     cy.recordOutcome(this.data)
@@ -36,6 +38,7 @@ export class RecordOutcomeFixture {
   }
 
   whenSubmittingFirstStep() {
+    this.page.pageTitle.contains('Record an outcome')
     this.page.landingPageContinueButton.click()
     return this
   }
@@ -43,6 +46,20 @@ export class RecordOutcomeFixture {
   whenSubmittingCurrentStep() {
     this.page.continueButton.click()
     return this
+  }
+
+  shouldDisplayCompliancePage() {
+    this.page.pageTitle.contains(`Did ${this.data.firstName} attend and comply?`)
+    return this
+  }
+
+  shouldDisplayRarStep(callback?: (page: RecordOutcomePage['rar']) => void) {
+    return this.shouldDisplayStep('rar', 'Did this appointment count towards RAR?', callback)
+  }
+
+  shouldRedirectToRarUnavailablePage() {
+    this.page.pageTitle.contains('You need to record this outcome on National Delius')
+    this.page.documentTitle.contains('You need to record this outcome on National Delius')
   }
 
   shouldDisplayComplianceErrors(summary: string, error: string) {
@@ -56,6 +73,11 @@ export class RecordOutcomeFixture {
     return this
   }
 
+  whenSelectingCompliedOption() {
+    this.page.compliance.compliedYes.click()
+    return this
+  }
+
   whenSelectingComplianceFailedToAttendOutcome() {
     this.page.compliance.compliedNoFailedToAttend.click()
     return this
@@ -66,11 +88,13 @@ export class RecordOutcomeFixture {
     this.page['failed-to-attend'].errorMessages.acceptableAbsence.contains(error)
     return this
   }
+
   shouldDisplayOutcomeErrors(summary: string, error: string) {
     this.page.errorSummary.contains(summary)
     this.page.outcome.errorMessages.outcome.contains(error)
     return this
   }
+
   whenSelectingAbsenceAcceptable(yesNo: string) {
     yesNo === 'Yes' ? this.page['failed-to-attend'].yes.click() : this.page['failed-to-attend'].no.click()
     return this
@@ -91,11 +115,17 @@ export class RecordOutcomeFixture {
     return this
   }
 
+  shouldDisplayAddNotesPage() {
+    this.page.pageTitle.contains('Do you want to add notes to this appointment?')
+    return this
+  }
+
   shouldDisplayAddNotesErrors(summary: string, error: string) {
     this.page.errorSummary.contains(summary)
     this.page['add-notes'].errorMessages.addNotes.contains(error)
     return this
   }
+
   whenSelectingAddNotesOption(yesNo: string) {
     yesNo === 'Yes' ? this.page['add-notes'].yes.click() : this.page['add-notes'].no.click()
     return this
@@ -103,6 +133,11 @@ export class RecordOutcomeFixture {
 
   whenTypingNotesContent(notes: string) {
     this.page.notes.notesTextField.type(notes)
+    return this
+  }
+
+  shouldDisplaySensitiveInformationPage() {
+    this.page.pageTitle.contains('Does this appointment include sensitive information?')
     return this
   }
 

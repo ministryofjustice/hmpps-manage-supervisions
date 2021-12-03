@@ -2,6 +2,7 @@ import { ViewModel } from '../common'
 import { ValidationError } from 'class-validator'
 import { DateTime } from 'luxon'
 import { RecordOutcomeDto } from './record-outcome.dto'
+import { ToDeliusViewModel } from '../views/partials/exit/exit.types'
 
 export enum RecordOutcomeStep {
   Compliance = 'compliance',
@@ -67,7 +68,9 @@ export interface RecordOutcomeRarViewModel extends RecordOutcomeViewModelBase<Re
   isRar?: boolean
 }
 
-export interface RecordOutcomeUnavailableViewModel extends RecordOutcomeViewModelBase<RecordOutcomeStep.Unavailable> {
+export interface RecordOutcomeUnavailableViewModel
+  extends RecordOutcomeViewModelBase<RecordOutcomeStep.Unavailable>,
+    ToDeliusViewModel {
   reason: RecordOutcomeUnavailableReason
 }
 

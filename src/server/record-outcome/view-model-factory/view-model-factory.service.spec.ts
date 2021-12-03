@@ -1,22 +1,26 @@
 import { Test } from '@nestjs/testing'
 import { ViewModelFactoryService } from './view-model-factory.service'
 import { MockLinksModule } from '../../common/links/links.mock'
-import { RecordOutcomeSession } from '../record-outcome.dto'
+import { RecordOutcomeDto, RecordOutcomeSession } from '../record-outcome.dto'
 import {
   ComplianceOption,
   RecordOutcomeCheckViewModel,
   RecordOutcomeConfirmViewModel,
   RecordOutcomeInitViewModel,
+  RecordOutcomeRarViewModel,
   RecordOutcomeStep,
+  RecordOutcomeUnavailableReason,
+  RecordOutcomeUnavailableViewModel,
   RecordOutcomeViewModel,
 } from '../record-outcome.types'
 import { DateTime } from 'luxon'
-import { BreadcrumbType } from '../../common/links'
+import { BreadcrumbType, UtmMedium } from '../../common/links'
 import { fakeRecordOutcomeDto } from '../record-outcome.fake'
 import { StateMachineService } from '../state-machine/state-machine.service'
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { classToPlain } from 'class-transformer'
 import { DEFAULT_GROUP } from '../../util/mapping'
+import { FlatDeepPartial } from '../../app.types'
 
 describe('ViewModelFactoryService', () => {
   let subject: ViewModelFactoryService
@@ -25,7 +29,7 @@ describe('ViewModelFactoryService', () => {
   // TODO: I wanted to use fakeRecordOutcomeDto() here, but ran into issues with the date fields
   // fakeRecordOutcomeDto() converts the DateTimes to strings ready for plainToClass, but the partial
   // then gets merged over the top replacing them with DateTimes, which then results in an error.
-  const dto = {
+  const dto: FlatDeepPartial<RecordOutcomeDto> = {
     appointment: {
       id: 10,
       name: 'some-appointment',
@@ -33,7 +37,17 @@ describe('ViewModelFactoryService', () => {
       end: '2021-11-09',
       contactTypeCode: 'OFF1',
     },
-    offender: { offenderId: 1, firstName: 'Daniel' },
+    offender: {
+      offenderId: 1,
+      firstName: 'Daniel',
+      surname: 'Briggs',
+      dateOfBirth: '1980-11-10',
+      middleNames: ['Danger'],
+      otherIds: {
+        crn: 'some-crn',
+        pncNumber: 'some-pnc',
+      },
+    },
     compliance: ComplianceOption.FailedToComply,
     availableOutcomeTypes: {
       outcomeTypes: [
@@ -84,6 +98,7 @@ describe('ViewModelFactoryService', () => {
         },
       ],
     },
+    unavailableReason: RecordOutcomeUnavailableReason.CountsTowardsRar,
   }
 
   const session: RecordOutcomeSession = {
@@ -285,6 +300,7 @@ describe('ViewModelFactoryService', () => {
       },
     } as RecordOutcomeCheckViewModel)
   })
+
   it('confirm', () => {
     const links = MockLinksModule.of({ crn: 'some-crn' })
     const observed = subject.confirm(session)
@@ -299,5 +315,44 @@ describe('ViewModelFactoryService', () => {
         contactTypeCode: 'OFF1',
       },
     } as RecordOutcomeConfirmViewModel)
+  })
+
+  it('rar', () => {
+    const body = fakeRecordOutcomeDto({
+      isRar: true,
+    })
+    service.getBackUrl.returns('/previous-page')
+    const observed = subject.rar(session, body)
+    expect(observed).toEqual({
+      errors: [],
+      step: RecordOutcomeStep.Rar,
+      isRar: true,
+      paths: { back: '/previous-page' },
+    } as RecordOutcomeRarViewModel)
+  })
+
+  it('unavailable', () => {
+    service.getBackUrl.returns('/previous-page')
+    const observed = subject.unavailable(session)
+    const links = MockLinksModule.of({
+      crn: 'some-crn',
+      utm: { medium: UtmMedium.RecordOutcome, campaign: 'unavailable-' + session.dto.unavailableReason },
+    })
+    expect(observed).toEqual({
+      errors: [],
+      step: RecordOutcomeStep.Unavailable,
+      reason: RecordOutcomeUnavailableReason.CountsTowardsRar,
+      paths: { back: '/previous-page' },
+      links: {
+        deliusContactLog: links.url(BreadcrumbType.ExitToDeliusContactLogNow),
+        deliusHomePage: links.url(BreadcrumbType.ExitToDeliusHomepageNow),
+      },
+      offender: {
+        dateOfBirth: DateTime.fromISO('1980-11-10'),
+        displayName: 'Daniel Danger Briggs',
+        ids: { crn: 'SOME-CRN', pnc: 'some-pnc' },
+        shortName: 'Daniel Briggs',
+      },
+    } as RecordOutcomeUnavailableViewModel)
   })
 })
