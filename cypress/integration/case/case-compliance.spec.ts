@@ -364,6 +364,9 @@ context('Case compliance tab', () => {
   })
 
   it('displays previous breach compliance page', () => {
+    const from = DateTime.now().minus({ years: 1 }).set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+    const endDate = '2020-12-03'
+    const sinceLastBreach = DateTime.fromISO(endDate) > from
     cy.seed({
       convictions: {
         active: {
@@ -374,7 +377,7 @@ context('Case compliance tab', () => {
               nsiType: { code: 'BRE' },
               nsiOutcome: { description: 'Breach proven' },
               actualStartDate: '2020-12-02',
-              actualEndDate: '2020-12-03',
+              actualEndDate: endDate,
             },
           ],
         },
@@ -386,7 +389,9 @@ context('Case compliance tab', () => {
       .whenClickingSubNavTab('compliance')
       .shouldDisplayCommonHeader()
       .shouldRenderOffenderTab('compliance', page => {
-        page.currentStatus.contains('2 failures to comply since last breach')
+        page.currentStatus.contains(
+          sinceLastBreach ? '2 failures to comply since last breach' : '2 failures to comply within 12 months',
+        )
       })
       .shouldRenderSentence({ breaches: 'Breach proven Resolved 3 December 2020' })
       .shouldRenderRequirement({
@@ -395,7 +400,7 @@ context('Case compliance tab', () => {
         complied: '1 complied',
         ftc: '2 unacceptable absences',
         absences: '3 acceptable absences',
-        sinceLastBreach: true,
+        sinceLastBreach,
       })
   })
 })
