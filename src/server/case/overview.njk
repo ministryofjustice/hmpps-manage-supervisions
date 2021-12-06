@@ -1,11 +1,11 @@
 {% extends "./_layout.njk" %}
 {% set pageName = 'Overview' %}
-{% from '_join.njk' import join %}
+{% from '_join.njk' import join %}appointments
 {% from 'components/summary-card.njk' import appSummaryCard %}
 {% block page %}
 {% if appointmentsMissingOutcome.count %}
     {% set outcomeAlert %}
-        <h2 class="govuk-heading-m">You have appintments that need attention</h2>
+        <h2 class="govuk-heading-m">You have appointments that need attention</h2>
         <ul class="govuk-list govuk-!-margin-bottom-0">
             <li>
                 <a href="{{ appointmentsMissingOutcome.activityFilterLink }}" data-qa="offender/overview/outcome-alert">You need to record an outcome for {{ appointmentsMissingOutcome.count | quantity('appointment') }} </a>
