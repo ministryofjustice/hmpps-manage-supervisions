@@ -83,8 +83,7 @@ context('Case overview tab', () => {
         page.schedule(card => {
           card.value('Next appointment').contains('Tuesday 25 May 2100 at 12pm (Home visit with Laura Smith)')
         })
-        page.recordOutcomeAlert(9998, 'Record an outcome for')
-        page.recordOutcomeAlert(9999, 'Record an outcome for')
+        page.recordOutcomeAlert('X009923', 'You need to record an outcome for 2 appointments')
         page.personalDetails(card => {
           card.value('Name').contains('Liz Danger Haggis')
           card.value('Preferred name/Known as').contains('Bob')

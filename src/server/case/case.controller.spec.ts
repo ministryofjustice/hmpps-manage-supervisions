@@ -27,6 +27,7 @@ import { EligibilityService } from '../community-api/eligibility'
 import { ActivityComplianceFilter, ActivityService } from './activity'
 import { fakeCaseActivityLogGroup } from './activity/activity.fake'
 import { DateTime } from 'luxon'
+import { BreadcrumbType } from '../common/links'
 
 describe('CaseController', () => {
   let subject: CaseController
@@ -100,10 +101,8 @@ describe('CaseController', () => {
     sentenceService.getSentenceComplianceDetails.withArgs('some-crn').resolves(compliance)
 
     const contacts = fakePaginated([fakeCaseActivityLogGroup()])
-    const appointmentsWithoutAnOutcome = contacts.content
-      .flatMap(x => x.entries)
-      .filter(x => x.start < DateTime.now())
-      .sort((a, b) => (a.start > b.start ? 1 : -1))
+    const appointmentsWithoutAnOutcome = contacts.content.flatMap(x => x.entries).filter(x => x.start < DateTime.now())
+
     const convictionSummary = fakeConvictionSummary()
 
     sentenceService.getCurrentConvictionSummary.withArgs('some-crn').resolves(convictionSummary)
@@ -116,6 +115,7 @@ describe('CaseController', () => {
 
     const observed = await subject.getOverview('some-crn')
 
+    const links = MockLinksModule.of({ crn: 'some-crn' })
     expect(observed).toBe(viewModel)
     expect(stub.getCall(0).args[1]).toEqual({
       page: CasePage.Overview,
@@ -126,7 +126,10 @@ describe('CaseController', () => {
       registrations,
       risks,
       compliance,
-      appointmentsWithoutAnOutcome,
+      appointmentsMissingOutcome: {
+        count: appointmentsWithoutAnOutcome.length,
+        activityFilterLink: `${links.url(BreadcrumbType.CaseActivityLog)}/${ActivityComplianceFilter.WithoutOutcome}`,
+      },
     })
   })
 })

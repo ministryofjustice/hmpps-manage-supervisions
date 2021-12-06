@@ -43,17 +43,14 @@ export class CaseController {
       this.personalService.getPersonalCircumstances(crn),
     ])
     const [conviction] = await Promise.all([this.sentence.getCurrentConvictionSummary(crn)])
-    let appointmentsWithoutAnOutcome = []
+    let appointmentsMissingOutcomeCount = 0
     if (conviction) {
       const today = DateTime.now()
       const contacts = await this.activity.getActivityLogPage(crn, offender, {
         conviction,
         complianceFilter: ActivityComplianceFilter.WithoutOutcome,
       })
-      appointmentsWithoutAnOutcome = contacts.content
-        .flatMap(x => x.entries)
-        .filter(x => x.start < today)
-        .sort((a, b) => (a.start > b.start ? 1 : -1))
+      appointmentsMissingOutcomeCount = contacts.content.flatMap(x => x.entries).filter(x => x.start < today).length
     }
     return this.offenderService.casePageOf<CaseOverviewViewModel>(offender, {
       page: CasePage.Overview,
@@ -64,7 +61,12 @@ export class CaseController {
       nextAppointment,
       risks,
       registrations,
-      appointmentsWithoutAnOutcome,
+      appointmentsMissingOutcome: {
+        count: appointmentsMissingOutcomeCount,
+        activityFilterLink: `${this.linksService.getUrl(BreadcrumbType.CaseActivityLog, { crn })}/${
+          ActivityComplianceFilter.WithoutOutcome
+        }`,
+      },
     })
   }
 }
