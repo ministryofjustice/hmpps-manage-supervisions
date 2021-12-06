@@ -6,9 +6,10 @@ import { RecordOutcomeService } from './record-outcome.service'
 import { RecordOutcomeController } from './record-outcome.controller'
 import { CommonModule } from '../common/common.module'
 import { CommunityApiModule } from '../community-api/community-api.module'
+import { DeliusApiModule } from '../delius-api/delius-api.module'
 
 @Module({
-  imports: [CommonModule, CommunityApiModule],
+  imports: [CommonModule, CommunityApiModule, DeliusApiModule],
   providers: [SessionBuilderService, ViewModelFactoryService, StateMachineService, RecordOutcomeService],
   controllers: [RecordOutcomeController],
 })

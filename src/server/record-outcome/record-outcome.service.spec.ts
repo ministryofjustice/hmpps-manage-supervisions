@@ -9,22 +9,28 @@ import { DateTime } from 'luxon'
 import { createStubInstance, SinonStubbedInstance } from 'sinon'
 import { fakeContactMeta } from '../community-api/contact-mapping/contact-mapping.fake'
 import { ContactTypeCategory } from '../config'
-import { fakeAvailableContactOutcomeTypes } from './record-outcome.fake'
+import { fakeAvailableContactOutcomeTypes, fakeRecordOutcomeDto } from './record-outcome.fake'
+import { MockDeliusApiModule, MockDeliusApiService } from '../delius-api/delius-api.mock'
+import { fakeContactDto } from '../delius-api/delius-api.fake'
+import { ContactV1ApiPatchContactRequest } from '../delius-api/client'
+import { DeliusApiService } from '../delius-api'
 
 describe('RecordOutcomeService', () => {
   let subject: RecordOutcomeService
   let community: MockCommunityApiService
+  let delius: MockDeliusApiService
   let contactMapping: SinonStubbedInstance<ContactMappingService>
 
   beforeEach(async () => {
     contactMapping = createStubInstance(ContactMappingService)
     const module = await Test.createTestingModule({
-      imports: [MockCommunityApiModule.register()],
+      imports: [MockCommunityApiModule.register(), MockDeliusApiModule.register()],
       providers: [RecordOutcomeService, { provide: ContactMappingService, useValue: contactMapping }],
     }).compile()
 
     subject = module.get(RecordOutcomeService)
     community = module.get(CommunityApiService)
+    delius = module.get(DeliusApiService)
   })
 
   it('gets appointment detail', async () => {
@@ -66,5 +72,33 @@ describe('RecordOutcomeService', () => {
     const observed = await subject.getAvailableContactOutcomes('some-contact-type')
 
     expect(observed).toEqual(outcomes)
+  })
+
+  it('records outcomes', async () => {
+    const output = fakeContactDto()
+
+    const expectedPatchRequest: ContactV1ApiPatchContactRequest = {
+      id: 123,
+      body: [
+        { op: 'replace', path: '/outcome', value: 'DNA1' },
+        { op: 'replace', path: '/sensitive', value: false },
+        { op: 'replace', path: '/notes', value: 'These are the new notes' },
+        { op: 'replace', path: '/enforcement', value: 'DVDJ' },
+      ],
+    }
+
+    delius.contactV1.patchContact.withArgs(expectedPatchRequest).resolves(fakeOkResponse(output))
+
+    const input = fakeRecordOutcomeDto({
+      appointment: { id: 123 },
+      sensitive: false,
+      addNotes: true,
+      notes: 'These are the new notes',
+      outcome: 'DNA1',
+      enforcement: 'DVDJ',
+    })
+
+    const observed = await subject.recordOutcome(input)
+    expect(observed).toEqual({ ...output, status: 'ok' })
   })
 })
