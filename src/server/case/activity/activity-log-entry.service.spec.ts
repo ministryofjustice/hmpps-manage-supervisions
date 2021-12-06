@@ -59,11 +59,11 @@ describe('ActivityLogEntryService', () => {
       notes: 'some appointment notes',
       links: {
         view: links.url(BreadcrumbType.Appointment),
-        addNotes: links.url(BreadcrumbType.ExitToDelius, {
+        addNotes: links.url(BreadcrumbType.ExitToDeliusContact, {
           utm: { medium: UtmMedium.ActivityLog, campaign: 'add-appointment-notes', content: { contactId: 1 } },
         }),
         recordMissingAttendance: null,
-        updateOutcome: links.url(BreadcrumbType.ExitToDelius, {
+        updateOutcome: links.url(BreadcrumbType.ExitToDeliusContact, {
           utm: { medium: UtmMedium.ActivityLog, campaign: 'update-appointment-outcome', content: { contactId: 1 } },
         }),
       },
@@ -118,17 +118,17 @@ describe('ActivityLogEntryService', () => {
       notes: 'some appointment notes',
       links: {
         view: links.url(BreadcrumbType.Appointment),
-        addNotes: links.url(BreadcrumbType.ExitToDelius, {
+        addNotes: links.url(BreadcrumbType.ExitToDeliusContact, {
           utm: { medium: UtmMedium.ActivityLog, campaign: 'add-appointment-notes', content: { contactId: 1 } },
         }),
-        recordMissingAttendance: links.url(BreadcrumbType.ExitToDelius, {
+        recordMissingAttendance: links.url(BreadcrumbType.ExitToDeliusContact, {
           utm: {
             medium: UtmMedium.ActivityLog,
             campaign: 'create-appointment-outcome',
             content: { contactId: 1 },
           },
         }),
-        updateOutcome: links.url(BreadcrumbType.ExitToDelius, {
+        updateOutcome: links.url(BreadcrumbType.ExitToDeliusContact, {
           utm: { medium: UtmMedium.ActivityLog, campaign: 'update-appointment-outcome', content: { contactId: 1 } },
         }),
       },
@@ -173,7 +173,7 @@ describe('ActivityLogEntryService', () => {
       lastUpdatedDateTime: DateTime.fromObject({ year: 2020, month: 1, day: 2, hour: 14 }),
       links: {
         view: links.url(BreadcrumbType.Communication),
-        addNotes: links.url(BreadcrumbType.ExitToDelius, {
+        addNotes: links.url(BreadcrumbType.ExitToDeliusContact, {
           utm: {
             medium: UtmMedium.ActivityLog,
             campaign: 'add-communication-notes',
@@ -219,7 +219,7 @@ describe('ActivityLogEntryService', () => {
       lastUpdatedDateTime: DateTime.fromObject({ year: 2020, month: 1, day: 2, hour: 14 }),
       links: {
         view: links.url(BreadcrumbType.Communication),
-        addNotes: links.url(BreadcrumbType.ExitToDelius, {
+        addNotes: links.url(BreadcrumbType.ExitToDeliusContact, {
           utm: {
             medium: UtmMedium.ActivityLog,
             campaign: 'add-communication-notes',
@@ -261,7 +261,7 @@ describe('ActivityLogEntryService', () => {
       lastUpdatedDateTime: DateTime.fromObject({ year: 2020, month: 1, day: 2, hour: 14 }),
       links: {
         view: links.url(BreadcrumbType.OtherActivityLogEntry),
-        addNotes: links.url(BreadcrumbType.ExitToDelius, {
+        addNotes: links.url(BreadcrumbType.ExitToDeliusContact, {
           utm: {
             medium: UtmMedium.ActivityLog,
             campaign: 'add-unknown-contact-notes',
@@ -294,7 +294,7 @@ describe('ActivityLogEntryService', () => {
       isFuture: false,
       start: DateTime.fromObject({ year: 2020, month: 1, day: 1, hour: 12 }),
       links: {
-        view: links.url(BreadcrumbType.ExitToDelius, {
+        view: links.url(BreadcrumbType.ExitToDeliusContact, {
           utm: {
             medium: UtmMedium.ActivityLog,
             campaign: 'view-system-generated-contact',
