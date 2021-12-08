@@ -80,7 +80,7 @@ export class ActivityLogEntryService {
       location,
       links: {
         view: links.url(BreadcrumbType.Appointment),
-        addNotes: links.url(BreadcrumbType.ExitToDelius, {
+        addNotes: links.url(BreadcrumbType.ExitToDeliusContact, {
           utm: { medium: UtmMedium.ActivityLog, campaign: 'add-appointment-notes', content: { contactId: id } },
         }),
         // user is prompted to record outcome for appointments in the past without an existing outcome
@@ -88,7 +88,7 @@ export class ActivityLogEntryService {
           !contact.outcome && start <= DateTime.now()
             ? features[FeatureFlags.RecordOutcome]
               ? links.url(BreadcrumbType.RecordOutcome)
-              : links.url(BreadcrumbType.ExitToDelius, {
+              : links.url(BreadcrumbType.ExitToDeliusContact, {
                   utm: {
                     medium: UtmMedium.ActivityLog,
                     campaign: 'create-appointment-outcome',
@@ -96,7 +96,7 @@ export class ActivityLogEntryService {
                   },
                 })
             : null,
-        updateOutcome: links.url(BreadcrumbType.ExitToDelius, {
+        updateOutcome: links.url(BreadcrumbType.ExitToDeliusContact, {
           utm: { medium: UtmMedium.ActivityLog, campaign: 'update-appointment-outcome', content: { contactId: id } },
         }),
       },
@@ -144,7 +144,7 @@ export class ActivityLogEntryService {
       typeName: meta.value?.name || contact.type.description,
       links: {
         view: links.url(BreadcrumbType.Communication),
-        addNotes: links.url(BreadcrumbType.ExitToDelius, {
+        addNotes: links.url(BreadcrumbType.ExitToDeliusContact, {
           utm: {
             medium: UtmMedium.ActivityLog,
             campaign: 'add-communication-notes',
@@ -169,7 +169,7 @@ export class ActivityLogEntryService {
       typeName: meta.value && 'name' in meta.value ? meta.value.name : null,
       links: {
         view: links.url(BreadcrumbType.OtherActivityLogEntry),
-        addNotes: links.url(BreadcrumbType.ExitToDelius, {
+        addNotes: links.url(BreadcrumbType.ExitToDeliusContact, {
           utm: {
             medium: UtmMedium.ActivityLog,
             campaign: 'add-unknown-contact-notes',
@@ -190,7 +190,7 @@ export class ActivityLogEntryService {
       category: 'System contact',
       name: meta.name,
       links: {
-        view: links.url(BreadcrumbType.ExitToDelius, {
+        view: links.url(BreadcrumbType.ExitToDeliusContact, {
           utm: {
             medium: UtmMedium.ActivityLog,
             campaign: 'view-system-generated-contact',

@@ -10,7 +10,7 @@ import {
   RecordOutcomeUnavailableViewModel,
   RecordOutcomeViewModel,
 } from '../record-outcome.types'
-import { BreadcrumbType, LinksService, Utm, UtmMedium } from '../../common/links'
+import { BreadcrumbType, LinksService, UtmMedium } from '../../common/links'
 import { DateTime } from 'luxon'
 import { DeepPartial } from '../../app.types'
 import { StateMachineService } from '../state-machine/state-machine.service'
@@ -239,7 +239,15 @@ export class ViewModelFactoryService
   unavailable(session: RecordOutcomeSession): RecordOutcomeUnavailableViewModel {
     const offender = session.dto.offender
     const displayName = getDisplayName(offender)
-    const utm: Utm = { medium: UtmMedium.RecordOutcome, campaign: 'unavailable-' + session.dto.unavailableReason }
+    const links = this.links.of({
+      crn: session.crn,
+      id: session.dto.appointment.id,
+      utm: {
+        medium: UtmMedium.RecordOutcome,
+        campaign: 'unavailable-' + session.dto.unavailableReason,
+        content: { contactId: session.dto.appointment.id },
+      },
+    })
     return {
       step: RecordOutcomeStep.Unavailable,
       errors: [],
@@ -254,8 +262,8 @@ export class ViewModelFactoryService
         dateOfBirth: offender.dateOfBirth && DateTime.fromISO(offender.dateOfBirth),
       },
       links: {
-        deliusContactLog: this.links.getUrl(BreadcrumbType.ExitToDeliusContactLogNow, { crn: session.crn, utm }),
-        deliusHomePage: this.links.getUrl(BreadcrumbType.ExitToDeliusHomepageNow, { crn: session.crn, utm }),
+        deliusContactLog: links.url(BreadcrumbType.ExitToDeliusContactNow),
+        deliusHomePage: links.url(BreadcrumbType.ExitToDeliusHomepageNow),
       },
       paths: {
         back: this.stateMachineService.getBackUrl(session, RecordOutcomeStep.Unavailable),

@@ -1,4 +1,4 @@
-import { Controller, Get, Logger, Param, Redirect, Render } from '@nestjs/common'
+import { Controller, Get, Logger, Param, ParseIntPipe, Redirect, Render } from '@nestjs/common'
 import { OffenderService } from '../offender'
 import { SentenceService } from '../sentence'
 import { ConfigService } from '@nestjs/config'
@@ -24,22 +24,6 @@ export class ExitController {
     private readonly links: LinksService,
   ) {}
 
-  @Get('to-delius-contact-log-now')
-  @Redirect()
-  @Breadcrumb({ type: BreadcrumbType.ExitToDeliusContactLogNow, requiresUtm: true })
-  async toDeliusContactLogNow(@Param('crn') crn: string, @UtmTags() utm: Utm): Promise<RedirectResponse> {
-    const result = await this.getDeliusExit(crn, utm)
-    return RedirectResponse.found(result.links.deliusContactLog)
-  }
-
-  @Get('to-delius-homepage-now')
-  @Redirect()
-  @Breadcrumb({ type: BreadcrumbType.ExitToDeliusHomepageNow, requiresUtm: true })
-  async toDeliusHomepageNow(@Param('crn') crn: string, @UtmTags() utm: Utm): Promise<RedirectResponse> {
-    const result = await this.getDeliusExit(crn, utm)
-    return RedirectResponse.found(result.links.deliusHomePage)
-  }
-
   @Get('to-delius')
   @Render('case/exit/to-delius')
   @Breadcrumb({
@@ -49,30 +33,51 @@ export class ExitController {
     requiresUtm: true,
   })
   async getDeliusExit(@Param('crn') crn: string, @UtmTags() utm: Utm): Promise<DeliusExitViewModel> {
-    this.exitTrackingLogger.log('delius exit', { crn, utm, exit: 'delius' })
+    return this.getDeliusExitViewModel(crn, utm)
+  }
 
-    const [offender, conviction] = await Promise.all([
-      this.offender.getOffenderDetail(crn),
-      this.sentence.getCurrentConvictionSummary(crn),
-    ])
+  @Get('to-delius-homepage-now')
+  @Redirect()
+  @Breadcrumb({ type: BreadcrumbType.ExitToDeliusHomepageNow, requiresUtm: true })
+  async toDeliusHomepageNow(@Param('crn') crn: string, @UtmTags() utm: Utm): Promise<RedirectResponse> {
+    const result = await this.getDeliusExitViewModel(crn, utm)
+    return RedirectResponse.found(result.links.deliusHomePage)
+  }
 
-    const { baseUrl } = this.config.get<DeliusConfig>('delius')
-    const contactLog = new URL(urlJoin(baseUrl, '/NDelius-war/delius/JSP/deeplink.jsp'))
-    contactLog.searchParams.set('component', 'ContactList')
-    contactLog.searchParams.set('offenderId', offender.offenderId.toString())
-    if (conviction) {
-      contactLog.searchParams.set('eventId', conviction.id.toString())
-    }
+  @Get('to-delius-contact-log-now')
+  @Redirect()
+  @Breadcrumb({ type: BreadcrumbType.ExitToDeliusContactLogNow, requiresUtm: true })
+  async toDeliusContactLogNow(@Param('crn') crn: string, @UtmTags() utm: Utm): Promise<RedirectResponse> {
+    const result = await this.getDeliusExitViewModel(crn, utm)
+    return RedirectResponse.found(result.links.deliusContactLog)
+  }
 
-    const homePage = new URL(urlJoin(baseUrl, '/NDelius-war/delius/JSP/homepage.jsp'))
+  @Get('contact/:id(\\d+)/to-delius')
+  @Render('case/exit/to-delius')
+  @Breadcrumb({
+    type: BreadcrumbType.ExitToDeliusContact,
+    parent: BreadcrumbType.Case,
+    title: 'Continue on National Delius',
+    requiresUtm: true,
+  })
+  async getDeliusContactExit(
+    @Param('crn') crn: string,
+    @Param('id', ParseIntPipe) contactId: number,
+    @UtmTags() utm: Utm,
+  ): Promise<DeliusExitViewModel> {
+    return this.getDeliusExitViewModel(crn, utm, contactId)
+  }
 
-    return {
-      ...this.getBase(offender, BreadcrumbType.ExitToDelius),
-      links: {
-        deliusContactLog: contactLog.href,
-        deliusHomePage: homePage.href,
-      },
-    }
+  @Get('contact/:id(\\d+)/to-delius-now')
+  @Redirect()
+  @Breadcrumb({ type: BreadcrumbType.ExitToDeliusContactNow, requiresUtm: true })
+  async toDeliusContactNow(
+    @Param('crn') crn: string,
+    @Param('id', ParseIntPipe) contactId: number,
+    @UtmTags() utm: Utm,
+  ): Promise<RedirectResponse> {
+    const result = await this.getDeliusExitViewModel(crn, utm, contactId)
+    return RedirectResponse.found(result.links.deliusContactLog)
   }
 
   @Get('to-oasys')
@@ -91,6 +96,40 @@ export class ExitController {
       ...this.getBase(offender, BreadcrumbType.ExitToOASys),
       links: {
         oasysHomePage: this.config.get<OASysConfig>('oasys').baseUrl.href,
+      },
+    }
+  }
+
+  private async getDeliusExitViewModel(crn: string, utm: Utm, contactId?: number) {
+    this.exitTrackingLogger.log('delius exit', { crn, contactId, utm, exit: 'delius' })
+
+    const [offender, conviction] = await Promise.all([
+      this.offender.getOffenderDetail(crn),
+      this.sentence.getCurrentConvictionSummary(crn),
+    ])
+
+    const { baseUrl } = this.config.get<DeliusConfig>('delius')
+
+    const deep = new URL(urlJoin(baseUrl, '/NDelius-war/delius/JSP/deeplink.jsp'))
+    if (contactId) {
+      deep.searchParams.set('component', 'Contact')
+      deep.searchParams.set('componentId', contactId.toString())
+    } else {
+      deep.searchParams.set('component', 'ContactList')
+      deep.searchParams.set('offenderId', offender.offenderId.toString())
+      if (conviction) {
+        deep.searchParams.set('eventId', conviction.id.toString())
+      }
+    }
+
+    return {
+      ...this.getBase(
+        offender,
+        contactId === undefined ? BreadcrumbType.ExitToDelius : BreadcrumbType.ExitToDeliusContact,
+      ),
+      links: {
+        deliusContactLog: deep.href,
+        deliusHomePage: new URL(urlJoin(baseUrl, '/NDelius-war/delius/JSP/homepage.jsp')).href,
       },
     }
   }

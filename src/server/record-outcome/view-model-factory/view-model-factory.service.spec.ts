@@ -336,7 +336,12 @@ describe('ViewModelFactoryService', () => {
     const observed = subject.unavailable(session)
     const links = MockLinksModule.of({
       crn: 'some-crn',
-      utm: { medium: UtmMedium.RecordOutcome, campaign: 'unavailable-' + session.dto.unavailableReason },
+      id: 10,
+      utm: {
+        medium: UtmMedium.RecordOutcome,
+        campaign: 'unavailable-counts-towards-rar',
+        content: { contactId: 10 },
+      },
     })
     expect(observed).toEqual({
       errors: [],
@@ -344,7 +349,7 @@ describe('ViewModelFactoryService', () => {
       reason: RecordOutcomeUnavailableReason.CountsTowardsRar,
       paths: { back: '/previous-page' },
       links: {
-        deliusContactLog: links.url(BreadcrumbType.ExitToDeliusContactLogNow),
+        deliusContactLog: links.url(BreadcrumbType.ExitToDeliusContactNow),
         deliusHomePage: links.url(BreadcrumbType.ExitToDeliusHomepageNow),
       },
       offender: {
