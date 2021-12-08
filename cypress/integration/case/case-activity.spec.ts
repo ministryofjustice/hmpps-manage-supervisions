@@ -109,6 +109,7 @@ class Fixture extends ViewCaseFixture {
     const page = new CaseActivityAppointmentPage()
     page.pageTitle.contains(title)
     assert(page)
+    return this
   }
 
   shouldRenderActivityDetailPage(title: string, assert: (page: CaseActivityDetailPage) => void) {
@@ -516,9 +517,10 @@ context('Case activity tab', () => {
         .shouldRenderAppointmentPage('Appointment Not a well known appointment with Robert Ohagan', page => {
           page.detail(list => {
             list.value('Sensitive').contains('No')
-            list.actions('Sensitive').contains('Change sensitivity')
+            list.actions('Sensitive').contains('Change sensitivity').click()
           })
         })
+        .shouldHaveDocumentTitle('Does this appointment include sensitive information?')
     })
   })
 })

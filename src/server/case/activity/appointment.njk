@@ -52,7 +52,8 @@
             } if not appointment.outcome,
             {
                 key: { text: "Sensitive" },
-                value: { text: appointment.sensitive | yesNo }
+                value: { text: appointment.sensitive | yesNo },
+                actions: { items: [{ href: appointment.links.updateSensitivity, html: "Change<span class=\"govuk-visually-hidden\"> sensitivity</span>" }] }
             } if not appointment.outcome
         ]
     }) }}
