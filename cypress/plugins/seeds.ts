@@ -46,9 +46,6 @@ export const reset = seedModule(
     context.client.community.stubApiInfo('2100-01-01.999999.1680c86')
     context.client.assessRisksAndNeeds.stubPing()
     context.client.assessRisksAndNeeds.stubApiInfo('2100-01-01.999999.c482abe')
-    context.client.delius.stubPing()
-    context.client.delius.stubPing(true)
-    context.client.delius.stubApiInfo('2100-01-01.999999.1680c86')
     context.client.hmppsAuth.stubPing()
   },
   exit,

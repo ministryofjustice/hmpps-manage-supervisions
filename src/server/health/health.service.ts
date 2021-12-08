@@ -31,16 +31,15 @@ export class HealthService {
     const openApiPromise = Promise.all([
       this.openApiVersion.versionReport('community'),
       this.openApiVersion.versionReport('assessRisksAndNeeds'),
-      this.openApiVersion.versionReport('delius'),
     ])
 
-    const [[community, assessRisksAndNeeds, delius], results] = await Promise.all([openApiPromise, servicesPromise])
+    const [[community, assessRisksAndNeeds], results] = await Promise.all([openApiPromise, servicesPromise])
     return {
       healthy: results.length === 0 || results.every(x => x.healthy || !x.criticalAvailability),
       checks: results.reduce((agg, x) => ({ ...agg, [x.name]: x.result }), {}),
       uptime: process.uptime(),
       version,
-      services: { community, assessRisksAndNeeds, delius },
+      services: { community, assessRisksAndNeeds },
     }
   }
 
