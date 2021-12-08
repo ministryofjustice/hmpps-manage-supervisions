@@ -406,7 +406,7 @@ export function configFactory(): Config {
         specVersion: (appInfo.apiSpecVersions && appInfo.apiSpecVersions['assess-risks-and-needs-api']) || null,
       },
       delius: {
-        enabled: true,
+        enabled: false,
         criticalAvailability: false,
         url: url('DELIUS_API_URL', developmentOnly('http://localhost:9091/delius')),
         timeout: int('DELIUS_API_TIMEOUT', fallback(10000)),
