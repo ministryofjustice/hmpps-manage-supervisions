@@ -161,6 +161,12 @@ Smoke tests are implemented as part of the cypress tests. To run on dev:
 CYPRESS_HMPPS_USERNAME={YOUR_USERNAME} CYPRESS_HMPPS_PASSWORD={YOUR_PASSWORD} cypress run --config-file cypress.dev.json --spec 'cypress/integration/smoke/**/*.spec.ts'
 ```
 
+## Accessibility tests
+
+You can call `cy.testA11y()` in any end to end test to trigger a check of the currently visible HTML using [cypress-axe](https://github.com/component-driven/cypress-axe). When adding a new page to the application, it's good to add this check at least once.
+
+[A few rules are disabled from Axe due to upstream design system behaviours.](https://github.com/ministryofjustice/hmpps-manage-supervisions/pull/277)
+
 ## Security workflow
 
 The `security` CircleCI workflow is run Mon-Fri @7am off of the `main` branch. It includes:
