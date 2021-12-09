@@ -53,9 +53,11 @@ export interface RecordOutcomeViewModelBase<Step extends RecordOutcomeStep> exte
     back?: string
     next?: string
     compliance?: string
+    rar?: string
     outcome?: string
     enforcement?: string
     notes?: string
+    addNotes?: string
     sensitive?: string
   }
   offenderFirstName?: string

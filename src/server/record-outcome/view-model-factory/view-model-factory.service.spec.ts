@@ -282,6 +282,7 @@ describe('ViewModelFactoryService', () => {
     service.getStepUrl.withArgs(session, RecordOutcomeStep.Outcome).returns('/outcome')
     service.getStepUrl.withArgs(session, RecordOutcomeStep.Enforcement).returns('/enforcement')
     service.getStepUrl.withArgs(session, RecordOutcomeStep.Notes).returns('/notes')
+    service.getStepUrl.withArgs(session, RecordOutcomeStep.AddNotes).returns('/add-notes')
     service.getStepUrl.withArgs(session, RecordOutcomeStep.Sensitive).returns('/sensitive')
 
     const observed = subject.check(session, body)
@@ -296,6 +297,7 @@ describe('ViewModelFactoryService', () => {
         outcome: '/outcome',
         enforcement: '/enforcement',
         notes: '/notes',
+        addNotes: '/add-notes',
         sensitive: '/sensitive',
       },
     } as RecordOutcomeCheckViewModel)

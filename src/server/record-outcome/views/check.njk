@@ -39,6 +39,21 @@
       }
     },
     {
+      key: { text: "RAR activity" },
+      classes: ["qa-rar-activity"],
+      value: { text: outcome.isRar | yesNo },
+      actions: {
+      items: [
+        {
+          href: paths.rar,
+          text: "Change",
+          visuallyHiddenText: "rar-activity",
+          classes: ["qa-change"]
+        }
+      ]
+    }
+    } if not outcome.selectedOutcome,
+    {
       key: { text: "Reason for absence" if outcome.compliance === 'failed-to-attend' else ("Reason for not complying" if outcome.compliance === 'failed-to-comply' else "Outcome") },
       classes: ["qa-outcome"],
       value: { text: outcome.selectedOutcome.description },
@@ -52,7 +67,7 @@
           }
         ]
       }
-    } ,
+    } if outcome.selectedOutcome,
     {
       key: { text: "Enforcement action" },
       classes: ["qa-enforcement"],
@@ -71,7 +86,7 @@
     {
       key: { text: "Sensitive" },
       classes: ["qa-sensitive"],
-      value: { text: 'Yes' if outcome.sensitive else 'No' },
+      value: { text: outcome.sensitive | yesNo },
       actions: {
         items: [
           {

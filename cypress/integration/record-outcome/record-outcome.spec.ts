@@ -37,6 +37,17 @@ context('Record outcome happy path & validation', () => {
       .shouldDisplaySensitiveInformationPage()
       .whenSelectingIsSensitiveOption('No')
       .whenSubmittingCurrentStep()
+      .shouldDisplayCheckPage({
+        crn: 'X009923',
+        appointmentId: 5,
+        compliance: 'Yes',
+        rarActivity: 'No',
+        addNotes: 'No',
+        notes: 'None',
+        enforcement: 'Refer to Offender Manager',
+        outcome: 'Attended - Failed to Comply',
+        sensitive: 'No',
+      })
     // TODO complete this once record outcome implemented
   })
 
@@ -78,6 +89,8 @@ context('Record outcome happy path & validation', () => {
         crn: 'X009923',
         appointmentId: 5,
         compliance: 'No',
+        rarActivity: 'No',
+        addNotes: 'Yes',
         notes: 'Some notes',
         enforcement: 'Refer to Offender Manager',
         outcome: 'Attended - Failed to Comply',
@@ -131,6 +144,8 @@ context('Record outcome happy path & validation', () => {
         crn: 'X009923',
         appointmentId: 5,
         compliance: 'Unacceptable absence',
+        rarActivity: 'No',
+        addNotes: 'Yes',
         notes: 'Some notes',
         enforcement: 'Refer to Offender Manager',
         outcome: 'Failed to Attend',
