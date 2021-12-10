@@ -99,7 +99,6 @@ export class ActivityLogEntryService {
         updateOutcome: links.url(BreadcrumbType.ExitToDeliusContact, {
           utm: { medium: UtmMedium.ActivityLog, campaign: 'update-appointment-outcome', content: { contactId: id } },
         }),
-        updateSensitivity: 'foobar' || links.url(BreadcrumbType.RecordOutcome),
       },
       rarActivity: rarActivity
         ? {

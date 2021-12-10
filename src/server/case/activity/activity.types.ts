@@ -41,7 +41,7 @@ interface ActivityLogEntryBase<Type extends ContactTypeCategory, Links = {}> {
 export interface AppointmentActivityLogEntry
   extends ActivityLogEntryBase<
     ContactTypeCategory.Appointment,
-    { recordMissingAttendance: string | null; updateOutcome: string; updateSensitivity: string }
+    { recordMissingAttendance: string | null; updateOutcome: string }
   > {
   nationalStandard: boolean
   enforcementAction?: string
