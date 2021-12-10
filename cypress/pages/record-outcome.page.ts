@@ -175,6 +175,13 @@ export class RecordOutcomePage extends PageBase {
         return cy.get('.qa-compliance .qa-change')
       },
 
+      get rarActivity() {
+        return cy.get('.qa-rar-activity .govuk-summary-list__value')
+      },
+      get rarChangeLink() {
+        return cy.get('.qa-rar-activity .qa-change')
+      },
+
       get outcome() {
         return cy.get('.qa-outcome .govuk-summary-list__value')
       },

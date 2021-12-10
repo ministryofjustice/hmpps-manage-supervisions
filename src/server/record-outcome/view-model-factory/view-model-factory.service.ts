@@ -86,9 +86,11 @@ export class ViewModelFactoryService
       paths: {
         back: this.stateMachineService.getBackUrl(session, RecordOutcomeStep.Check),
         compliance: this.stateMachineService.getStepUrl(session, RecordOutcomeStep.Compliance),
+        rar: this.stateMachineService.getStepUrl(session, RecordOutcomeStep.Rar),
         outcome: this.stateMachineService.getStepUrl(session, RecordOutcomeStep.Outcome),
         enforcement: this.stateMachineService.getStepUrl(session, RecordOutcomeStep.Enforcement),
         notes: this.stateMachineService.getStepUrl(session, RecordOutcomeStep.Notes),
+        addNotes: this.stateMachineService.getStepUrl(session, RecordOutcomeStep.AddNotes),
         sensitive: this.stateMachineService.getStepUrl(session, RecordOutcomeStep.Sensitive),
       },
       errors,

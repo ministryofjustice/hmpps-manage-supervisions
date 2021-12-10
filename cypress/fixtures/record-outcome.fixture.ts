@@ -152,7 +152,17 @@ export class RecordOutcomeFixture {
     return this
   }
 
-  shouldDisplayCheckPage({ appointmentId, compliance, notes, sensitive, outcome, enforcement, crn }) {
+  shouldDisplayCheckPage({
+    appointmentId,
+    compliance,
+    rarActivity,
+    addNotes,
+    notes,
+    sensitive,
+    outcome,
+    enforcement,
+    crn,
+  }) {
     this.page.pageTitle.contains('Check your answers and record the outcome')
 
     this.page.check.compliance.contains(compliance)
@@ -160,20 +170,33 @@ export class RecordOutcomeFixture {
       .should('have.attr', 'href')
       .and('include', `${crn}/appointment/${appointmentId}/record-outcome/compliance`)
 
-    this.page.check.outcome.contains(outcome)
-    this.page.check.outcomeChangeLink
-      .should('have.attr', 'href')
-      .and('include', `${crn}/appointment/${appointmentId}/record-outcome/outcome`)
+    if (compliance === 'Yes') {
+      this.page.check.rarActivity.contains(rarActivity)
+      this.page.check.rarChangeLink
+        .should('have.attr', 'href')
+        .and('include', `${crn}/appointment/${appointmentId}/record-outcome/rar`)
+    }
 
-    this.page.check.enforcement.contains(enforcement)
-    this.page.check.enforcementChangeLink
-      .should('have.attr', 'href')
-      .and('include', `${crn}/appointment/${appointmentId}/record-outcome/enforcement`)
+    if (compliance !== 'Yes') {
+      this.page.check.outcome.contains(outcome)
+      this.page.check.outcomeChangeLink
+        .should('have.attr', 'href')
+        .and('include', `${crn}/appointment/${appointmentId}/record-outcome/outcome`)
 
+      this.page.check.enforcement.contains(enforcement)
+      this.page.check.enforcementChangeLink
+        .should('have.attr', 'href')
+        .and('include', `${crn}/appointment/${appointmentId}/record-outcome/enforcement`)
+    }
     this.page.check.notes.contains(notes)
     this.page.check.notesChangeLink
       .should('have.attr', 'href')
-      .and('include', `${crn}/appointment/${appointmentId}/record-outcome/notes`)
+      .and(
+        'include',
+        addNotes === 'Yes'
+          ? `${crn}/appointment/${appointmentId}/record-outcome/notes`
+          : `${crn}/appointment/${appointmentId}/record-outcome/add-notes`,
+      )
 
     this.page.check.sensitive.contains(sensitive === 'Yes' ? 'Yes' : 'No')
     this.page.check.sensitiveChangeLink
