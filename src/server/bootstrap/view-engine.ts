@@ -6,6 +6,7 @@ import { ConfigService } from '@nestjs/config'
 import { ServerConfig } from '../config'
 import { camelCase } from 'lodash'
 import { filters, NunjucksFilter } from './nunjucks/filters'
+import { Request, Response } from 'express'
 
 export function useGovUkUi(app: NestExpressApplication) {
   const { description, isProduction, staticResourceCacheDuration, supportEmail } = app
@@ -15,6 +16,14 @@ export function useGovUkUi(app: NestExpressApplication) {
 
   app.setLocal('applicationName', description)
   app.setLocal('supportEmail', supportEmail)
+
+  app.use((req: Request, res: Response, next: () => void) => {
+    const { notification } = req.query
+    if (notification) {
+      res.locals.notification = notification
+    }
+    next()
+  })
 
   const viewsPath = path.resolve(__dirname, 'views')
   const environment = nunjucks.configure([viewsPath], {

@@ -3,7 +3,7 @@ import { ValidationError } from 'class-validator'
 import { DateTime } from 'luxon'
 import { RecordOutcomeDto } from './record-outcome.dto'
 import { ToDeliusViewModel } from '../views/partials/exit/exit.types'
-import { ContactDto, ContactV1ApiPatchContactRequest } from '../delius-api/client'
+import { ContactDto } from '../delius-api/client'
 
 export enum RecordOutcomeStep {
   Compliance = 'compliance',
@@ -129,10 +129,6 @@ export type RecordOutcomeViewModel =
   | RecordOutcomeCheckViewModel
   | RecordOutcomeConfirmViewModel
 
-export interface PatchContactRequest extends ContactV1ApiPatchContactRequest {
-  body: Operation[]
-}
-
 export interface RecordOutcomeResult<ServiceStatus extends RecordOutcomeStatus> {
   status: ServiceStatus
 }
@@ -145,9 +141,3 @@ export enum RecordOutcomeStatus {
 export type RecordOutcomeSuccess = RecordOutcomeResult<RecordOutcomeStatus.OK> & ContactDto
 
 export type RecordOutcomeFailure = RecordOutcomeResult<RecordOutcomeStatus.ERROR>
-
-export interface Operation {
-  op: string
-  path: string
-  value: any
-}

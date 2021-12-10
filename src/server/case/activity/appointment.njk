@@ -77,7 +77,8 @@
                 } if appointment.outcome.complied and not appointment.outcome.attended,
                 {
                     key: { text: "Enforcement action" },
-                    value: { text: appointment.enforcementAction }
+                    value: { text: appointment.enforcementAction },
+                    actions: { items: [{ href: appointment.links.updateEnforcement, text: "Change" }] }
                 } if appointment.enforcementAction,
                 {
                     key: { text: "Appointment notes" },

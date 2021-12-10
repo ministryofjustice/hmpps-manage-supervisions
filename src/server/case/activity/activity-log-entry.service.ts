@@ -99,6 +99,17 @@ export class ActivityLogEntryService {
         updateOutcome: links.url(BreadcrumbType.ExitToDeliusContact, {
           utm: { medium: UtmMedium.ActivityLog, campaign: 'update-appointment-outcome', content: { contactId: id } },
         }),
+        updateEnforcement: enforcementAction
+          ? features[FeatureFlags.UpdateEnforcement]
+            ? links.url(BreadcrumbType.UpdateEnforcement)
+            : links.url(BreadcrumbType.ExitToDeliusContact, {
+                utm: {
+                  medium: UtmMedium.ActivityLog,
+                  campaign: 'update-appointment-enforcement',
+                  content: { contactId: id },
+                },
+              })
+          : null,
       },
       rarActivity: rarActivity
         ? {

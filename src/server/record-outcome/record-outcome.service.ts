@@ -3,14 +3,13 @@ import { CommunityApiService, ContactMappingService } from '../community-api'
 import { ContactTypeCategory } from '../config'
 import { DateTime } from 'luxon'
 import {
-  PatchContactRequest,
   RecordOutcomeAppointmentSummary,
   RecordOutcomeFailure,
   RecordOutcomeStatus,
   RecordOutcomeSuccess,
 } from './record-outcome.types'
 import { AvailableContactOutcomeTypes, OffenderDetail } from '../community-api/client'
-import { DeliusApiService } from '../delius-api'
+import { DeliusApiService, PatchContactRequest } from '../delius-api'
 import { RecordOutcomeDto } from './record-outcome.dto'
 import { SanitisedAxiosError } from '../common/rest'
 

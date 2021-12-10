@@ -18,6 +18,7 @@ generic-service:
     INGRESS_URL: https://manage-supervisions.hmpps.service.justice.gov.uk
     DELIUS_API_URL: https://delius-api.probation.service.justice.gov.uk
     RECORD_OUTCOME: false
+    UPDATE_ENFORCEMENT: false
 
   allowlist:
     mojvpn: "81.134.202.29/32"
