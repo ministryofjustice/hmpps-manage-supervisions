@@ -13,6 +13,7 @@ import { CasesModule } from './cases/cases.module'
 import { StaticModule } from './static/static.module'
 import { SentryModule } from '@ntegral/nestjs-sentry'
 import { RecordOutcomeModule } from './record-outcome/record-outcome.module'
+import { UpdateEnforcementModule } from './update-enforcement/update-enforcement.module'
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { RecordOutcomeModule } from './record-outcome/record-outcome.module'
     CommunityApiModule,
     CaseModule,
     RecordOutcomeModule,
+    UpdateEnforcementModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: HttpExceptionFilter }],
 })

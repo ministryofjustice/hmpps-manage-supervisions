@@ -30,6 +30,7 @@ export enum BreadcrumbType {
   ExitToOASys,
   RecordOutcome,
   RecordOutcomeStep,
+  UpdateEnforcement,
 }
 
 export enum UtmSource {

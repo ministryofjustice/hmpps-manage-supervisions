@@ -75,7 +75,6 @@ export class RecordOutcomeController extends FormBuilderController<
 
   @Post(':step([-\\w]+)')
   @DynamicRouting(DynamicRedirect(), DynamicRender('record-outcome/views/param:step'))
-  @DynamicRedirect()
   async postStep(
     @Param('crn') crn: string,
     @Param('id', ParseIntPipe) id: number,

@@ -1,0 +1,17 @@
+{% extends "pages/wizard-form.njk" %}
+{% set title = "Change enforcement action" %}
+{% set buttonText = "Save" %}
+
+{% block form %}
+    {{ govukSelect({
+        attributes: { 'data-qa': 'update-enforcement/enforcement' },
+        name: "enforcement",
+        label: {
+            text: title,
+            isPageHeading: true,
+            classes: 'govuk-label--xl'
+        },
+        items: enforcementActions | toSelectList(enforcement, "code", "description"),
+        errorMessage: errors | findErrorMessages("enforcement")
+    })}}
+{% endblock %}

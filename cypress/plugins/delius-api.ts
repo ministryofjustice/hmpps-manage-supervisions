@@ -9,6 +9,7 @@ const CONTACT_DTO: DeepPartial<ContactDto>[] = [
     notes: 'Some updated notes',
     outcome: 'DNA1',
   },
+  { id: 4 }, // used for enforcement update
 ]
 
 export function deliusApiContact(partials: DeepPartial<ContactDto>[] = CONTACT_DTO): SeedFn {

@@ -273,6 +273,7 @@ export const CONTACT_DEFAULTS: WellKnownContactTypeConfig = {
 
 const FEATURE_DEFAULTS: Record<FeatureFlags, boolean> = {
   [FeatureFlags.RecordOutcome]: true,
+  [FeatureFlags.UpdateEnforcement]: true,
 }
 
 export function configFactory(): Config {

@@ -209,7 +209,7 @@ export const ACTIVITY_LOG_GROUPS: DeepPartial<ActivityLogGroup>[] = [
         endTime: '12:00:00',
         notes: LONG_CONTACT_NOTES,
         staff: { forenames: 'Unallocated', surname: 'Staff', unallocated: true },
-        outcome: { complied: false, attended: false },
+        outcome: { complied: false, attended: false, code: 'AFTC' },
         enforcement: { enforcementAction: { code: 'WLS', description: 'Warning letter requested' } },
         rarActivity: {
           nsiId: 101,

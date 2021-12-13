@@ -2,6 +2,7 @@ import { URL } from 'url'
 
 export enum FeatureFlags {
   RecordOutcome = 'record-outcome',
+  UpdateEnforcement = 'update-enforcement',
 }
 
 /**

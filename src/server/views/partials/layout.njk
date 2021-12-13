@@ -50,6 +50,18 @@
       classes: "govuk-!-display-none-print"
     }) }}
   {% endif %}
+
+  {% for notification in notifications %}
+    {% set notificationHtml %}
+      <h3 class="govuk-notification-banner__heading">{{ notification.message }}</h3>
+    {% endset %}
+    {{ govukNotificationBanner({
+      attributes: { 'data-qa': 'global/notification' },
+      html: notificationHtml,
+      type: notification.level,
+      classes: 'govuk-!-margin-bottom-0 govuk-!-margin-top-6'
+    }) }}
+  {% endfor %}
 {% endblock %}
 
 {% block bodyStart %}

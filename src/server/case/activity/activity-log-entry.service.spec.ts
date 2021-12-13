@@ -22,7 +22,9 @@ describe('ActivityLogEntryService', () => {
       providers: [ActivityLogEntryService],
       imports: [
         MockLinksModule,
-        FakeConfigModule.register({ server: { features: { [FeatureFlags.RecordOutcome]: false } } }),
+        FakeConfigModule.register({
+          server: { features: { [FeatureFlags.RecordOutcome]: false, [FeatureFlags.UpdateEnforcement]: true } },
+        }),
       ],
     }).compile()
 
@@ -66,6 +68,7 @@ describe('ActivityLogEntryService', () => {
         updateOutcome: links.url(BreadcrumbType.ExitToDeliusContact, {
           utm: { medium: UtmMedium.ActivityLog, campaign: 'update-appointment-outcome', content: { contactId: 1 } },
         }),
+        updateEnforcement: links.url(BreadcrumbType.UpdateEnforcement),
       },
       start: DateTime.fromObject({ year: 2200, month: 1, day: 1, hour: 12 }),
       end: DateTime.fromObject({ year: 2200, month: 1, day: 2, hour: 14 }),
@@ -131,6 +134,7 @@ describe('ActivityLogEntryService', () => {
         updateOutcome: links.url(BreadcrumbType.ExitToDeliusContact, {
           utm: { medium: UtmMedium.ActivityLog, campaign: 'update-appointment-outcome', content: { contactId: 1 } },
         }),
+        updateEnforcement: links.url(BreadcrumbType.UpdateEnforcement),
       },
       start: DateTime.fromObject({ year: 2020, month: 1, day: 1, hour: 12 }),
       end: DateTime.fromObject({ year: 2020, month: 1, day: 1, hour: 14 }),

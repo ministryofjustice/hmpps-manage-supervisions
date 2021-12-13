@@ -14,4 +14,8 @@ export abstract class PageBase {
   get currentBreadcrumb() {
     return cy.get('.govuk-breadcrumbs [aria-current]')
   }
+
+  get notifications() {
+    return cy.get('[data-qa="global/notification"]')
+  }
 }
