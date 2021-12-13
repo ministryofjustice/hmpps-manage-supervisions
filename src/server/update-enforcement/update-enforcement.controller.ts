@@ -1,8 +1,7 @@
 import { Controller, Get, Param, ParseIntPipe, Post, Render } from '@nestjs/common'
-import { URL } from 'url'
 import { Role, Roles } from '../security'
 import { FeaturesEnabled } from '../common/features-enabled'
-import { Config, FeatureFlags, ServerConfig } from '../config'
+import { Config, FeatureFlags } from '../config'
 import { Breadcrumb, BreadcrumbType, LinksHelper, LinksService } from '../common/links'
 import { EligibleCaseloadOnly } from '../security/eligibility'
 import {
@@ -21,6 +20,7 @@ import { DynamicRedirect, DynamicRender, RedirectResponse } from '../common/dyna
 import { DynamicRouting } from '../common/dynamic-routing/dynamic-routing.decorator'
 import { ConfigService } from '@nestjs/config'
 import { EnforcementAction } from '../community-api/client'
+import { NotificationLevel, NotificationService } from '../common/notification'
 
 @Controller(`/case/:crn(\\w+)/appointment/:id(\\d+)/update-enforcement`)
 @Roles(Role.ReadWrite)
@@ -31,6 +31,7 @@ export class UpdateEnforcementController {
     private readonly service: UpdateEnforcementService,
     private readonly links: LinksService,
     private readonly config: ConfigService<Config>,
+    private readonly notifications: NotificationService,
   ) {}
 
   @Get()
@@ -75,10 +76,8 @@ export class UpdateEnforcementController {
 
     await this.service.updateEnforcement(appointment.id, model.enforcement)
 
-    const { domain } = this.config.get<ServerConfig>('server')
-    const url = new URL(links.url(BreadcrumbType.Appointment), domain)
-    url.searchParams.set('notification', 'enforcement-action-changed')
-    return RedirectResponse.found(url.href)
+    this.notifications.notify(NotificationLevel.Success, 'Enforcement action changed')
+    return RedirectResponse.found(links.url(BreadcrumbType.Appointment))
   }
 
   private async getCommon(

@@ -5,10 +5,11 @@ import { RestService } from './rest'
 import { LinksService } from './links'
 import { DiscoveryModule } from '@nestjs/core'
 import { FeaturesEnabledGuard } from './features-enabled/features-enabled.guard'
+import { NotificationService } from './notification'
 
 @Module({
   imports: [DiscoveryModule],
-  providers: [FeaturesEnabledGuard, CacheService, RestService, HmppsOidcService, LinksService],
-  exports: [CacheService, RestService, HmppsOidcService, LinksService],
+  providers: [FeaturesEnabledGuard, CacheService, RestService, HmppsOidcService, LinksService, NotificationService],
+  exports: [CacheService, RestService, HmppsOidcService, LinksService, NotificationService],
 })
 export class CommonModule {}

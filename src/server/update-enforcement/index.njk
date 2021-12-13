@@ -4,7 +4,7 @@
 
 {% block form %}
     {{ govukSelect({
-        id: "update-enforcement-select",
+        attributes: { 'data-qa': 'update-enforcement/enforcement' },
         name: "enforcement",
         label: {
             text: title,
@@ -13,6 +13,5 @@
         },
         items: enforcementActions | toSelectList(enforcement, "code", "description"),
         errorMessage: errors | findErrorMessages("enforcement")
-    })
-    }}
+    })}}
 {% endblock %}

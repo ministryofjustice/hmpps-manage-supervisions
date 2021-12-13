@@ -4,6 +4,7 @@ import { RedisConfig, ServerConfig, SessionConfig } from '../config'
 import * as connectRedis from 'connect-redis'
 import * as session from 'express-session'
 import * as redis from 'redis'
+import flash = require('connect-flash')
 
 export function useRedisSession(app: NestExpressApplication) {
   const config = app.get(ConfigService)
@@ -27,4 +28,5 @@ export function useRedisSession(app: NestExpressApplication) {
       rolling: true,
     }),
   )
+  app.use(flash())
 }

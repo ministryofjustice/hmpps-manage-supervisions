@@ -18,9 +18,10 @@ export function useGovUkUi(app: NestExpressApplication) {
   app.setLocal('supportEmail', supportEmail)
 
   app.use((req: Request, res: Response, next: () => void) => {
-    const { notification } = req.query
-    if (notification) {
-      res.locals.notification = notification
+    res.locals.notifications = []
+    const success = req.flash('success')
+    if (success?.length) {
+      res.locals.notifications.push(...success.map(message => ({ message, level: 'success' })))
     }
     next()
   })
