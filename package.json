@@ -45,7 +45,7 @@
     "applicationinsights": "^2.1.9",
     "axios": "^0.21.4",
     "axios-retry": "^3.2.4",
-    "class-transformer": "^0.4.0",
+    "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
     "connect-flash": "^0.1.1",
     "connect-redis": "^6.0.0",
