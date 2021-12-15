@@ -15,11 +15,11 @@
             } if offender.dateOfBirth,
             {
                 key: { html: 'CRN' | abbr },
-                value: { text: offender.ids.crn }
+                value: { html: '<span class="app-!-font-family-tabular">' + offender.ids.crn + '</span>'}
             },
             {
                 key: { html: 'PNC' | abbr },
-                value: { text: offender.ids.pnc }
+                value: { html: '<span class="app-!-font-family-tabular">' + offender.ids.pnc + '</span>'}
             } if offender.ids.pnc
         ]
     }) }}
