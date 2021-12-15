@@ -62,6 +62,16 @@ npm run start:dev
 
 Navigate to `http://localhost:3000` and login as above.
 
+To start the app in end to end testing mode with mocked Sign in:
+
+```bash
+docker compose up redis wiremock
+npm run seed -- --hmpps-auth
+npm run start:e2e:dev
+```
+
+Then open `http://localhost:3007`.
+
 ## Nestjs
 
 This application is built on top of [nestjs](https://nestjs.com/).
