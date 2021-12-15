@@ -2,16 +2,20 @@
 {% set pageTitle = appointment.name + ' – ' + displayName %}
 {% from 'components/summary-card.njk' import appSummaryCard %}
 {% block content %}
-    <h1 class="govuk-heading-xl govuk-!-margin-bottom-{{ 2 if appointment.outcome else 6 }}">
-        <span class="govuk-caption-xl">
-            {% if appointment.nationalStandard %}
-                National standard appointment
-            {% else %}
-                Appointment
-            {% endif %}
-        </span>
-        {{ appointment.name }}
-    </h1>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl govuk-!-margin-bottom-{{ 2 if appointment.outcome else 6 }}">
+                <span class="govuk-caption-xl">
+                    {% if appointment.nationalStandard %}
+                        National standard appointment
+                    {% else %}
+                        Appointment
+                    {% endif %}
+                </span>
+                {{ appointment.name }}
+            </h1>
+        </div>
+    </div>
 
     {% if appointment.outcome %}
         <div class="govuk-!-margin-bottom-6" data-qa='offender/activity/outcome-tag'>
