@@ -26,7 +26,7 @@ describe('RequirementService', () => {
     const options: GetConvictionRequirementsOptions = { crn: 'some-crn', convictionId: 100 }
     const rarRequirement1 = fakeRequirement({
       requirementId: 1,
-      length: 4,
+      length: 0,
       lengthUnit: 'Day',
       requirementNotes: 'RAR 1',
       startDate: '2020-06-20',
@@ -73,18 +73,19 @@ describe('RequirementService', () => {
     expect(observed).toEqual([
       {
         type: ConvictionRequirementType.Aggregate,
-        name: '9 days RAR',
+        name: '5 days RAR',
         isRar: true,
         requirements: [
           {
             id: 1,
-            length: '4 days',
+            length: 'Length not set',
             notes: 'RAR 1',
             startDate: {
               value: DateTime.fromObject({ year: 2020, month: 6, day: 20 }),
               expected: false,
             },
             endDate: null,
+            terminationReason: undefined,
           },
           {
             id: 2,
@@ -98,6 +99,7 @@ describe('RequirementService', () => {
               value: DateTime.fromObject({ year: 2021, month: 12, day: 20 }),
               expected: true,
             },
+            terminationReason: undefined,
           },
         ],
       },
@@ -110,6 +112,7 @@ describe('RequirementService', () => {
         notes: 'Plain old requirement',
         startDate: null,
         endDate: null,
+        terminationReason: undefined,
       },
       {
         id: 4,
@@ -126,6 +129,7 @@ describe('RequirementService', () => {
           value: DateTime.fromObject({ year: 2021, month: 2, day: 1 }),
           expected: false,
         },
+        terminationReason: undefined,
       },
     ] as ConvictionRequirement[])
   })
