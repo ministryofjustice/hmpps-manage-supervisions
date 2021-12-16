@@ -133,6 +133,7 @@
 
             {% set index = 0 %}
             {% for group in groups %}
+                {% set systemContactEntries = [] %}
                 <section class='govuk-!-margin-bottom-7' data-qa='offender/activity/{{ group.date | longDate | slug }}'>
                     <h3 class="govuk-heading-s govuk-!-margin-bottom-2" data-qa='offender/activity/group-title'>
                         {{ 'Today' if group.isToday else group.date | longDate }}
@@ -146,10 +147,13 @@
                         {% case 'communication' %}
                             {{ plainCard(entry, open, group.date, { time: true }) }}
                         {% case 'system' %}
-                            {{ systemContact(entry) }}
+                            {% set systemContactEntries = (systemContactEntries.push(entry), systemContactEntries) %}
                         {% default %}
                             {{ plainCard(entry, open, group.date) }}
                         {% endswitch %}
+                    {% endfor %}
+                    {% for entry in systemContactEntries %}
+                        {{ systemContact(entry) }}
                     {% endfor %}
                 </section>
             {% endfor %}
