@@ -31,7 +31,7 @@
                     } if join(personalContact.address).trim().length,
                     {
                         key: { text: "Phone number" },
-                        value: { text: personalContact.phone }
+                        value: { html: '<span class="app-!-font-family-tabular">' + personalContact.phone + '</span1>'}
                     } if personalContact.phone,
                     {
                         key: { text: "Start date" },

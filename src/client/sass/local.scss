@@ -39,3 +39,7 @@ table.app-table--cell-vertical-align-bottom {
 .app-\!-word-break-all {
   word-break: break-all;
 }
+
+.app-\!-font-family-tabular {
+  @include govuk-font($size: false, $tabular: true);
+}

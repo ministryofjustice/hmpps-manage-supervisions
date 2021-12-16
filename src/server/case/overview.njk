@@ -56,11 +56,11 @@
                 },
                 {
                     key: { text: 'Mobile number' if contactDetails.phoneNumbers.other else 'Phone number' },
-                    value: { html: contactDetails.phoneNumbers.mobile }
+                    value: { html: '<span class="app-!-font-family-tabular">' + contactDetails.phoneNumbers.mobile + '</span>' }
                 } if contactDetails.phoneNumbers.mobile,
                 {
                     key: { text: 'Telephone number' if contactDetails.phoneNumbers.mobile else 'Phone number' },
-                    value: { html: contactDetails.phoneNumbers.other }
+                    value: { html: '<span class="app-!-font-family-tabular">' + contactDetails.phoneNumbers.other + '</span>' }
                 } if contactDetails.phoneNumbers.other,
                 {
                     key: { text: "Current circumstances<br>and disabilities" | safe },

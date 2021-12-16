@@ -67,11 +67,11 @@
             rows: [
                 {
                     key: { text: 'Mobile number' if contactDetails.phoneNumbers.other else 'Phone number' },
-                    value: { html: contactDetails.phoneNumbers.mobile }
+                    value: { html: '<span class="app-!-font-family-tabular">' + contactDetails.phoneNumbers.mobile + '</span>'}
                 } if contactDetails.phoneNumbers.mobile,
                 {
                     key: { text: 'Telephone number' if contactDetails.phoneNumbers.mobile else 'Phone number' },
-                    value: { html: contactDetails.phoneNumbers.other }
+                    value: { html: '<span class="app-!-font-family-tabular">' + contactDetails.phoneNumbers.other + '</span1>'}
                 } if contactDetails.phoneNumbers.other,
                 {
                     key: { text: "Email address" },
@@ -167,11 +167,11 @@
                 },
                 {
                     key: { html: 'PNC' | abbr },
-                    value: { text: ids.pnc }
+                    value: { html: '<span class="app-!-font-family-tabular">' + ids.pnc + '</span>'}
                 } if ids.pnc,
                 {
                     key: { html: 'CRN' | abbr },
-                    value: { text: ids.crn }
+                    value: { html: '<span class="app-!-font-family-tabular">' + ids.crn + '</span>'}
                 } if ids.crn
             ]
         }) }}
