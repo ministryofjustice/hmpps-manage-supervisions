@@ -62,7 +62,7 @@
                 classes: 'govuk-!-margin-bottom-0',
                 rows: [
                     { key: { html: 'RAR' | abbr + ' activity' }, value: { text: entry.rarActivity.name or 'Yes' } } if entry.rarActivity,
-                    { key: { text: 'Enforcement action' }, value: { text: entry.enforcementAction } } if entry.enforcementAction,
+                    { key: { text: 'Enforcement' }, value: { text: entry.enforcementAction } } if entry.enforcementAction,
                     { key: { text: 'Reason for absence' }, value: { text: entry.outcome.description | replace("Acceptable Absence - ", "") } } if entry.outcome.complied and not entry.outcome.attended
                 ]
             }) }}
