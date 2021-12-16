@@ -253,7 +253,7 @@ context('Case activity tab', () => {
           action: { colour: 'red', name: 'unacceptable absence' },
           summary: {
             'RAR activity': 'Attitudes, thinking and behaviour: Racially Motivated Offending',
-            'Enforcement action': 'Warning letter requested',
+            Enforcement: 'Warning letter requested',
           },
         })
 
@@ -393,7 +393,7 @@ context('Case activity tab', () => {
 
           page.outcome(list => {
             list.value('Complied').contains('Uncceptable absence')
-            list.value('Enforcement action').contains('Warning letter requested')
+            list.value('Enforcement').contains('Warning letter requested')
             list.value('Appointment notes').contains(EXPECTED_LONG_CONTACT_NOTES)
             list.value('Sensitive').contains('No')
           })
