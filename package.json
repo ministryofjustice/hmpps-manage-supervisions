@@ -42,7 +42,7 @@
     "@sentry/node": "^6.15.0",
     "@sentry/tracing": "^6.15.0",
     "@sentry/types": "^6.15.0",
-    "applicationinsights": "^2.1.9",
+    "applicationinsights": "^2.3.2",
     "axios": "^0.21.4",
     "axios-retry": "^3.2.4",
     "class-transformer": "^0.5.1",
